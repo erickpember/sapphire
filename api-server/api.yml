@@ -1,0 +1,9 @@
+# Copyright (C) 2014-2015 dataFascia Corporation - All Rights Reserved)
+# For license information, please contact http://datafascia.com/contact
+
+defaultPackage: com.datafascia.api.services
+
+server:
+  applicationConnectors:
+  - type: http 
+    port: 9090

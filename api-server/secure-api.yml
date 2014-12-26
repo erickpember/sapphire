@@ -1,0 +1,39 @@
+# Copyright (C) 2014-2015 dataFascia Corporation - All Rights Reserved)
+# For license information, please contact http://datafascia.com/contact
+
+template: Hello, %s!
+defaultName: Stranger
+
+server:
+  applicationConnectors:
+    - type: http
+      port: 8080
+    - type: https
+      port: 8443
+      keyStorePath: api.keystore
+      keyStorePassword: example
+      validateCerts: false
+
+  adminConnectors:
+    - type: http
+      port: 8081
+    - type: https
+      port: 8444
+      keyStorePath: api.keystore
+      keyStorePassword: example
+      validateCerts: false
+
+# Logging settings.
+logging:
+
+  # The default level of all loggers. Can be OFF, ERROR, WARN, INFO, DEBUG, TRACE, or ALL.
+  level: INFO
+
+  # Logger-specific levels.
+  loggers:
+
+    # Sets the level for 'com.example.app' to DEBUG.
+    com.datafasica.api: DEBUG
+
+  appenders:
+    - type: console

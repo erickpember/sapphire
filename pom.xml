@@ -35,6 +35,7 @@
     <atmosphere-version>2.2.0</atmosphere-version>
     <java.version>1.8</java.version>
     <jetty.version>9.2.4.v20141103</jetty.version>
+    <jackson.version>2.4.3</jackson.version>
   </properties>
 
   <modules>
@@ -42,6 +43,7 @@
     <module>dropwizard-testing</module>
     <module>core</module>
     <module>api-server</module>
+    <module>emerge-apps</module>
   </modules>
 
   <dependencyManagement>
@@ -75,6 +77,11 @@
         <groupId>org.atmosphere</groupId>
         <artifactId>atmosphere-annotations</artifactId>
         <version>${atmosphere-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.fasterxml.jackson.dataformat</groupId>
+        <artifactId>jackson-dataformat-csv</artifactId>
+        <version>${jackson.version}</version>
       </dependency>
       <dependency>
         <groupId>org.testng</groupId>

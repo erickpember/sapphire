@@ -6,6 +6,7 @@ import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.dropwizard.testing.DropwizardTestApp;
 import com.datafascia.models.Version;
 import com.google.common.base.Optional;
+import com.google.common.io.Resources;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.WebTarget;
@@ -25,7 +26,7 @@ public class APIIntegrationTest {
 
   @BeforeSuite
   public void before() throws Exception {
-    app = new DropwizardTestApp<APIConfiguration>(APIService.class, "api.yml");
+    app = new DropwizardTestApp<>(APIService.class, Resources.getResource("test.yml").getPath());
     app.start();
   }
 

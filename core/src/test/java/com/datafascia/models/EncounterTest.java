@@ -8,12 +8,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
 /**
- * Test code for Patient model.
+ * Test for the Encounter model.
  */
 @Slf4j
-public class PatientTest extends ModelTestBase {
+public class EncounterTest extends ModelTestBase {
   @Test
-  public <T extends Object> void testPatient() throws IOException, URISyntaxException {
-    geneticEncodeDecodeTest(TestModels.patient);
+  public <T extends Object> void testEncounter() throws IOException, URISyntaxException {
+    geneticEncodeDecodeTest(TestModels.encounter);
   }
 }

@@ -4,16 +4,14 @@ package com.datafascia.models;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
-import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
 /**
- * Test code for Patient model.
+ * Test code for observation model.
  */
-@Slf4j
-public class PatientTest extends ModelTestBase {
+public class ObservationTest extends ModelTestBase {
   @Test
-  public <T extends Object> void testPatient() throws IOException, URISyntaxException {
-    geneticEncodeDecodeTest(TestModels.patient);
+  public <T extends Object> void testObservation() throws IOException, URISyntaxException {
+    geneticEncodeDecodeTest(TestModels.observation);
   }
 }

@@ -10,12 +10,7 @@ import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
-import java.util.EnumSet;
-import javax.servlet.DispatcherType;
-import javax.servlet.FilterRegistration;
 import lombok.extern.slf4j.Slf4j;
-import org.atmosphere.cpr.AtmosphereServlet;
-import org.eclipse.jetty.servlets.CrossOriginFilter;
 
 /**
  * The main application class for the Datafascia API end-point as required by the dropwizard
@@ -53,21 +48,5 @@ public class APIService extends Application<APIConfiguration> {
 
     environment.healthChecks().register("packageName", healthCheck);
     environment.jersey().register(resource);
-  }
-
-  /**
-   * Initialize the Atmosphere servlet for websocket events
-   *
-   * @param environment the Dropwizard environment
-   */
-  private void initAtmosphere(Environment environment) {
-    final FilterRegistration.Dynamic cors = environment.servlets().addFilter("CORS", CrossOriginFilter.class);
-    cors.setInitParameter(CrossOriginFilter.ALLOWED_ORIGINS_PARAM, "*");
-    cors.addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*");
-    AtmosphereServlet atmosphereServlet = new AtmosphereServlet();
-    atmosphereServlet.framework().addInitParameter("com.sun.jersey.config.property.packages",
-        "com.datafascia.resources.events");
-    atmosphereServlet.framework().addInitParameter("org.atmosphere.websocket.messageContentType", "application/json");
-    environment.servlets().addServlet("events", atmosphereServlet);
   }
 }

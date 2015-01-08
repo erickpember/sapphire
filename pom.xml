@@ -29,6 +29,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <dropwizard.version>0.8.0-rc1</dropwizard.version>
+    <dropwizard-guice.version>0.7.0.2</dropwizard-guice.version>
     <dropwizard-testing.version>0.0.8</dropwizard-testing.version>
     <lombok.version>1.14.8</lombok.version>
     <testng.version>6.8.13</testng.version>
@@ -37,6 +38,11 @@
     <jetty.version>9.2.4.v20141103</jetty.version>
     <jackson.version>2.4.3</jackson.version>
     <neovisionaries.version>1.14</neovisionaries.version>
+    <guice.version>3.0</guice.version>
+    <accumulo.version>1.5.1</accumulo.version>
+    <hadoop1.version>1.2.1</hadoop1.version>
+    <hadoop2.version>2.2.0</hadoop2.version>
+    <slf4j.version>1.7.7</slf4j.version>
   </properties>
 
   <modules>
@@ -93,6 +99,61 @@
         <groupId>com.neovisionaries</groupId>
         <artifactId>nv-i18n</artifactId>
         <version>${neovisionaries.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.inject.extensions</groupId>
+        <artifactId>guice-throwingproviders</artifactId>
+        <version>${guice.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.inject</groupId>
+        <artifactId>guice</artifactId>
+        <version>${guice.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.accumulo</groupId>
+        <artifactId>accumulo-minicluster</artifactId>
+        <version>${accumulo.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.accumulo</groupId>
+        <artifactId>accumulo-core</artifactId>
+        <version>${accumulo.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.hadoop</groupId>
+        <artifactId>hadoop-core</artifactId>
+        <version>${hadoop1.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.hadoop</groupId>
+        <artifactId>hadoop-common</artifactId>
+        <version>${hadoop2.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-server</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-json</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-core</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>slf4j-log4j12</artifactId>
+        <version>${slf4j.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

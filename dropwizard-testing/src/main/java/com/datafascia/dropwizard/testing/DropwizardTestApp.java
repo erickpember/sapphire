@@ -80,7 +80,7 @@ public class DropwizardTestApp<C extends Configuration> {
     };
 
     application.initialize(bootstrap);
-    final ServerCommand<C> command = new ServerCommand<C>(application);
+    final ServerCommand<C> command = new ServerCommand<>(application);
     ImmutableMap.Builder<String, Object> file = ImmutableMap.builder();
     if (!Strings.isNullOrEmpty(configPath)) {
       file.put("file", configPath);

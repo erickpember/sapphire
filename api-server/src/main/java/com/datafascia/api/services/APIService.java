@@ -6,7 +6,7 @@ import com.datafascia.accumulo.AccumuloConfig;
 import com.datafascia.accumulo.AccumuloConnector;
 import com.datafascia.api.bundle.AtmosphereBundle;
 import com.datafascia.api.configurations.APIConfiguration;
-import com.datafascia.api.health.PackageHealthCheck;
+import com.datafascia.api.health.AccumuloHealthCheck;
 import com.datafascia.api.resources.PatientResource;
 import com.datafascia.api.resources.VersionResource;
 import com.google.inject.AbstractModule;
@@ -53,9 +53,8 @@ public class APIService extends Application<APIConfiguration> {
     environment.jersey().register(injector.getInstance(PatientResource.class));
     environment.jersey().register(new VersionResource(configuration.getDefaultPackage()));
 
-    final PackageHealthCheck healthCheck =
-      new PackageHealthCheck(configuration.getDefaultPackage());
-    environment.healthChecks().register("packageName", healthCheck);
+    // Health checkers
+    environment.healthChecks().register("accumulo", injector.getInstance(AccumuloHealthCheck.class));
   }
 
   /**

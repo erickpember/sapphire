@@ -1,7 +1,16 @@
 # Copyright (C) 2014-2015 dataFascia Corporation - All Rights Reserved)
 # For license information, please contact http://datafascia.com/contact
 
+# Version resource
 defaultPackage: com.datafascia.api.services
+
+# Accumulo configuration: Use mock for testing purposes
+accumuloConfig:
+  instance: test
+  user: user
+  password: password
+  zooKeepers: zookeeper1.datafascia.com
+  type: mock
 
 server:
   applicationConnectors:

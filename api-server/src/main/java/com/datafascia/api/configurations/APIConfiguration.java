@@ -2,14 +2,21 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.configurations;
 
+import com.datafascia.accumulo.AccumuloConfig;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import io.dropwizard.Configuration;
+import javax.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
-import org.hibernate.validator.constraints.NotEmpty;
 
+/**
+ * Configuration parameters for dataFascia API server
+ */
 @JsonAutoDetect
 public class APIConfiguration extends Configuration {
-  @NotEmpty @Getter @Setter
+  @NotNull @Getter @Setter
   private String defaultPackage;
+
+  @NotNull @Getter @Setter
+  private AccumuloConfig accumuloConfig;
 }

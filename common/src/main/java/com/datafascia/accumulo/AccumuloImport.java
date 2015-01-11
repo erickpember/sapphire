@@ -3,13 +3,13 @@
 package com.datafascia.accumulo;
 
 import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
 import org.apache.accumulo.core.client.admin.TableOperations;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.TableExistsException;
 import org.apache.accumulo.core.client.TableNotFoundException;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Utility class to allow bulk import of data into an Accumulo instance.

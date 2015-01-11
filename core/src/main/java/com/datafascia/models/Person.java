@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import java.net.URI;
 import java.util.Date;
@@ -23,6 +24,7 @@ public class Person {
   @JsonProperty("gender")
   private Gender gender;
   @JsonProperty("birthDate")
+  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "UTC")
   private Date birthDate;
   @JsonProperty("photo")
   private URI photo;

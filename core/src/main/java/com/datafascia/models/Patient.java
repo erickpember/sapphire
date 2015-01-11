@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.models;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.neovisionaries.i18n.LanguageCode;
 import java.net.URI;
@@ -23,6 +24,7 @@ public class Patient extends Person {
   @JsonProperty("contacts")
   private List<Contact> contactDetails;
   @JsonProperty("creationDate")
+  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "UTC")
   private Date creationDate;
   @JsonProperty("deceased")
   private boolean deceased;

@@ -43,6 +43,7 @@
     <hadoop1.version>1.2.1</hadoop1.version>
     <hadoop2.version>2.2.0</hadoop2.version>
     <slf4j.version>1.7.7</slf4j.version>
+    <retrofit.version>1.8.0</retrofit.version>
   </properties>
 
   <modules>
@@ -50,6 +51,7 @@
     <module>dropwizard-testing</module>
     <module>core</module>
     <module>api-server</module>
+    <module>api-client</module>
     <module>emerge-apps</module>
   </modules>
 
@@ -154,6 +156,16 @@
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-log4j12</artifactId>
         <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.squareup.retrofit</groupId>
+        <artifactId>retrofit</artifactId>
+        <version>${retrofit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.squareup.retrofit</groupId>
+        <artifactId>converter-jackson</artifactId>
+        <version>${retrofit.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

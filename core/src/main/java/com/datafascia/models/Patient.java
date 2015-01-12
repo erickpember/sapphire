@@ -40,4 +40,6 @@ public class Patient extends Person {
   private String managingOrg;
   @JsonProperty("active")
   private boolean active;
+  @JsonProperty("institutionPatientId")
+  private URI institutionPatientId;
 }

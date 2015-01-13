@@ -15,38 +15,38 @@ import static org.testng.Assert.assertEquals;
 @Slf4j
 public class DemographicTest {
   String header = "Entry #,Date Created,Date Updated,IP Address,Data Collection Date,JHED ID,"
-                  + "Subject Patient ID,Subject Patcom,Patient Name,SICU Admission Date,"
-                  + "Readmission,Patient Date of Birth,Gender,Race,Patient Admission Weight (kg),"
-                  + "Patient Admission Height (cm),Prior to Hospital Stay,Highest-level Activity,"
-                  + "Screening Tool Used,IVC Filter";
+          + "Subject Patient ID,Subject Patcom,Patient Name,SICU Admission Date,"
+          + "Readmission,Patient Date of Birth,Gender,Race,Patient Admission Weight (kg),"
+          + "Patient Admission Height (cm),Prior to Hospital Stay,Highest-level Activity,"
+          + "Screening Tool Used,IVC Filter";
   // Test data
   String testLine1 = "565,2014-02-18 07:37:46,2014-05-20 12:24:48,10.21.1.59,2014-02-18,dmcneli1,"
-                     + "Male170 cm109 kg,P-Male170 cm109 kg,Jud Joe Johnson,2014-05-13,No,"
-                     + "1969-01-02,Male,Black/African Am,109 kg,170 cm,NULL,NULL,Yes,No";
+          + "Male170 cm109 kg,P-Male170 cm109 kg,Jud Joe Johnson,2014-05-13,No,"
+          + "1969-01-02,Male,Black/African Am,109 kg,170 cm,NULL,NULL,Yes,No";
   String testLine2 = "565,2014-02-18 07:37:46,2014-05-20 12:24:48,10.21.1.59,2014-02-18,dmcneli1,"
-                     + "Male170 cm109 kg,P-Male170 cm109 kg,\"Johnson, Jud\",2014-05-13,No,"
-                     + "1969-01-02,Male,Black/African Am,109 kg,170 cm,NULL,NULL,Yes,No";
+          + "Male170 cm109 kg,P-Male170 cm109 kg,\"Johnson, Jud\",2014-05-13,No,"
+          + "1969-01-02,Male,Black/African Am,109 kg,170 cm,NULL,NULL,Yes,No";
   String testLine3 = "565,2014-02-18 07:37:46,2014-05-20 12:24:48,10.21.1.59,2014-02-18,dmcneli1,"
-                     + "Male170 cm109 kg,P-Male170 cm109 kg,\"\"\"Johnson, Jud\"\"\",2014-05-13,No,"
-                     + "1969-01-02,Male,Black/African Am,109 kg,170 cm,NULL,NULL,Yes,No";
+          + "Male170 cm109 kg,P-Male170 cm109 kg,\"\"\"Johnson, Jud\"\"\",2014-05-13,No,"
+          + "1969-01-02,Male,Black/African Am,109 kg,170 cm,NULL,NULL,Yes,No";
 
   @Test
   public void deserialisation() throws IOException {
-    assertEquals(Demographic.fromString(testLine1),getDemographic());
+    assertEquals(Demographic.fromString(testLine1), getDemographic());
   }
 
   @Test
   public void quoteDeserialisation() throws IOException {
     Demographic dmg = getDemographic();
     dmg.setPatientName("\"Johnson, Jud\"");
-    assertEquals(Demographic.fromString(testLine3),dmg);
+    assertEquals(Demographic.fromString(testLine3), dmg);
   }
 
   @Test
   public void commaDeserialisation() throws IOException {
     Demographic dmg = getDemographic();
     dmg.setPatientName("Johnson, Jud");
-    assertEquals(Demographic.fromString(testLine2),dmg);
+    assertEquals(Demographic.fromString(testLine2), dmg);
   }
 
   @Test

@@ -103,6 +103,8 @@ public class Demographic {
    * Create object from string using ',' as separators
    *
    * @param line the line to parse values from
+   * @return Demographic instance created from string
+   * @throws java.io.IOException
    */
   public static Demographic fromString(String line) throws IOException {
     return reader.readValue(line);
@@ -110,6 +112,8 @@ public class Demographic {
 
   /**
    * Serialize the object to string using ',' as separator
+   * @return string representation of Demographic instance
+   * @throws com.fasterxml.jackson.core.JsonProcessingException
    */
   public String asString() throws JsonProcessingException {
     return writer.writeValueAsString(this).trim();

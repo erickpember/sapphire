@@ -6,6 +6,7 @@ import com.beust.jcommander.JCommander;
 import com.datafascia.api.client.DatafasciaApi;
 import com.datafascia.api.client.DatafasciaApiBuilder;
 import com.datafascia.emerge.models.Demographic;
+import com.datafascia.models.Name;
 import com.datafascia.models.Patient;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Joiner;
@@ -25,6 +26,9 @@ import lombok.extern.slf4j.Slf4j;
 public class EmergeCSV {
   // Date format the CSV is expecting.
   private static final DateFormat df  = new SimpleDateFormat("yyyy-MM-dd");
+  // Name format
+  private static final String NAME_FMT =
+    "<[" + Name.FIRST + "," + Name.MIDDLE + "," + Name.LAST + "]; separator=\" \">";
 
   /**
    * The main entry point for the application
@@ -64,19 +68,12 @@ public class EmergeCSV {
       throw new MissingUrnException("Institution patient ID missing " + pat.getId().getRawPath());
     }
 
-    // Build the name.
-    String name = pat.getName().getFirst();
-    if (pat.getName().getMiddle() != null) {
-      name += " " + pat.getName().getMiddle();
-    }
-    name += " " + pat.getName().getLast();
-
     Demographic demo = new Demographic();
     demo.setGender(pat.getGender().name());
     demo.setHighestLevelActivity("Unknown");
     demo.setIvcFilter("No");
     demo.setPatientDateOfBirth(df.format(pat.getBirthDate()));
-    demo.setPatientName(name);
+    demo.setPatientName(pat.getName().format(NAME_FMT));
     demo.setPriorToHospitalStay("Unknown");
     demo.setRace(pat.getRace().name());
     demo.setReadmission("No");

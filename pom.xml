@@ -45,6 +45,7 @@
     <slf4j.version>1.7.7</slf4j.version>
     <retrofit.version>1.8.0</retrofit.version>
     <jcommander.version>1.47</jcommander.version>
+    <string-template.version>4.0.2</string-template.version>
   </properties>
 
   <modules>
@@ -172,6 +173,11 @@
         <groupId>com.beust</groupId>
         <artifactId>jcommander</artifactId>
         <version>${jcommander.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.antlr</groupId>
+        <artifactId>stringtemplate</artifactId>
+        <version>${string-template.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

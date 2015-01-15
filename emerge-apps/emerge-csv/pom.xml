@@ -51,6 +51,10 @@
       <artifactId>api-client</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>com.beust</groupId>
+      <artifactId>jcommander</artifactId>
+    </dependency>
   </dependencies>
 
   <build>

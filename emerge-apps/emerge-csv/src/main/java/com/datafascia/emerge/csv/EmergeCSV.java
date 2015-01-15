@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.csv;
 
+import com.beust.jcommander.JCommander;
 import com.datafascia.api.client.DatafasciaApi;
 import com.datafascia.api.client.DatafasciaApiBuilder;
 import com.datafascia.emerge.models.Demographic;
@@ -31,14 +32,11 @@ public class EmergeCSV {
    * @param args the command line arguments
    */
   public static void main(String[] args) throws JsonProcessingException, IOException {
-    if (args.length != 2) {
-      log.error("Two arguments are required.\nFirst: An API endpoint must be passed as an argument"
-          + "when executing the Emerge CSV generator.\nSecond: A filename for the the csv.");
-      System.exit(1);
-    }
+    EmergeCSVOpts opts = new EmergeCSVOpts();
+    new JCommander(opts, args);
 
-    try (PrintWriter pw = new PrintWriter(new FileWriter(args[1]))) {
-      DatafasciaApi api = DatafasciaApiBuilder.GetAPI(new URI(args[0]));
+    try (PrintWriter pw = new PrintWriter(new FileWriter(opts.csvFile))) {
+      DatafasciaApi api = DatafasciaApiBuilder.GetAPI(opts.apiEndpoint);
       pw.write(Joiner.on(",").join(Demographic.headers()));
 
       int entry = 0;
@@ -50,8 +48,6 @@ public class EmergeCSV {
           log.error("Error processing patient: ", ex);
         }
       }
-    } catch (URISyntaxException ex) {
-      log.error("Given endpoint \"" + args[0] + "\"" + " is not a valid.", ex);
     }
   }
 

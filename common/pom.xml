@@ -104,5 +104,9 @@
       <artifactId>testng</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.beust</groupId>
+      <artifactId>jcommander</artifactId>
+    </dependency>
   </dependencies>
 </project>

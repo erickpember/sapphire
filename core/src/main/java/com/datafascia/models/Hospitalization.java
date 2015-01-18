@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode
 public class Hospitalization {
   /** Pre-admission identifier. */
-  @JsonProperty("id")
+  @JsonProperty("@id")
   private URI id;
 
   /** The location from which the patient came befor admission */

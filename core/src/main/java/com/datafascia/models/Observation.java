@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode
 public class Observation {
   /** Unique identifier for observation */
-  @JsonProperty("id")
+  @JsonProperty("@id")
   private URI id;
 
   /** Describes what was observed. Sometimes this is called the observation "code". */

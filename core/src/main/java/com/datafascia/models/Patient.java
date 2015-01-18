@@ -19,7 +19,7 @@ import lombok.Setter;
  */
 @Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode(callSuper = true)
 public class Patient extends Person {
-  @JsonProperty("id")
+  @JsonProperty("@id")
   private URI id;
   @JsonProperty("contacts")
   private List<Contact> contactDetails;

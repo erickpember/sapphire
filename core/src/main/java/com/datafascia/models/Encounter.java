@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode
 public class Encounter {
   /** Identifies the encounter. */
-  @JsonProperty("id")
+  @JsonProperty("@id")
   private URI id;
 
   /** Status of the encounter. */

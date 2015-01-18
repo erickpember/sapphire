@@ -18,7 +18,7 @@ public class URNFactoryTest {
   @Test
   public void oneParam() {
     try {
-      URI dfId = URNFactory.getInstitutionPatientId("inst-id", "", "");
+      URI dfId = URNFactory.institutionPatientId("inst-id", "", "");
       assertEquals(dfId.toString(), "urn:df-institution-patientId-1:inst-id::");
     } catch (Exception e) {
       fail("Exception constructing URN not expected " + e.getMessage());
@@ -28,7 +28,7 @@ public class URNFactoryTest {
   @Test
   public void twoParams() {
     try {
-      URI dfId = URNFactory.getInstitutionPatientId("inst-id", "", "pat-id");
+      URI dfId = URNFactory.institutionPatientId("inst-id", "", "pat-id");
       assertEquals(dfId.toString(), "urn:df-institution-patientId-1:inst-id::pat-id");
     } catch (Exception e) {
       fail("Exception constructing URN not expected " + e.getMessage());
@@ -48,7 +48,7 @@ public class URNFactoryTest {
   @Test
   public void allParams() {
     try {
-      URI dfId = URNFactory.getInstitutionPatientId("inst-id", "fac-id", "pat-id");
+      URI dfId = URNFactory.institutionPatientId("inst-id", "fac-id", "pat-id");
       assertEquals(dfId.toString(), "urn:df-institution-patientId-1:inst-id:fac-id:pat-id");
     } catch (Exception e) {
       fail("Exception constructing URN not expected " + e.getMessage());
@@ -58,7 +58,7 @@ public class URNFactoryTest {
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void nullParam() {
     try {
-      URNFactory.getInstitutionPatientId(null, "fac-id", "pat-id");
+      URNFactory.institutionPatientId(null, "fac-id", "pat-id");
     } catch (URISyntaxException | UnsupportedEncodingException e) {
       fail("Exception constructing URN not expected " + e.getMessage());
     }

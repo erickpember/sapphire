@@ -185,7 +185,7 @@ public class PatientDao extends AbstractDao {
             break;
           case dF_pidPatientId :
             String fields[] = visitId.get().split("\\|");
-            patient.setInstitutionPatientId(URNFactory.getInstitutionPatientId(fields[0].trim(),
+            patient.setInstitutionPatientId(URNFactory.institutionPatientId(fields[0].trim(),
                 fields[1].trim(), trimQuote(value.toString())));
             break;
           case dF_pidDateTimeOfBirth :

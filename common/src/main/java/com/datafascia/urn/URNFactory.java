@@ -31,7 +31,7 @@ public class URNFactory {
    *
    * @return URN of type df-institution-patientId-1
    */
-  public static URI getInstitutionPatientId(String instId, String facilityId, String patientId)
+  public static URI institutionPatientId(String instId, String facilityId, String patientId)
     throws URISyntaxException, UnsupportedEncodingException {
     if (instId == null || facilityId == null || patientId == null) {
       throw new IllegalArgumentException("Institution patient idenfier parameters cannot be null");

@@ -34,7 +34,7 @@ public class URNFactory {
   public static URI institutionPatientId(String instId, String facilityId, String patientId)
     throws URISyntaxException, UnsupportedEncodingException {
     if (instId == null || facilityId == null || patientId == null) {
-      throw new IllegalArgumentException("Institution patient idenfier parameters cannot be null");
+      throw new IllegalArgumentException("Institution patient identifiers cannot be null");
     }
 
     Joiner join = Joiner.on(":");
@@ -56,7 +56,7 @@ public class URNFactory {
   public static URI patientId(String patientId) throws URISyntaxException,
       UnsupportedEncodingException {
     if (patientId == null) {
-      throw new IllegalArgumentException("Patient identifier parameter cannot be null");
+      throw new IllegalArgumentException("Patient identifier cannot be null");
     }
 
     Joiner join = Joiner.on(":");

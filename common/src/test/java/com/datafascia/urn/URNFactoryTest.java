@@ -36,6 +36,16 @@ public class URNFactoryTest {
   }
 
   @Test
+  public void patientId() {
+    try {
+      URI dfId = URNFactory.patientId("23434:342342");
+      assertEquals(dfId.toString(), "urn:df-patientId-1:23434%253A342342");
+    } catch (Exception e) {
+      fail("Exception constructing URN not expected " + e.getMessage());
+    }
+  }
+
+  @Test
   public void allParams() {
     try {
       URI dfId = URNFactory.getInstitutionPatientId("inst-id", "fac-id", "pat-id");

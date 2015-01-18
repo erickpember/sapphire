@@ -69,7 +69,7 @@ public class PatientDao extends AbstractDao {
     ArrayList<Patient> patients = new ArrayList<Patient>();
     ArrayList<String> patientIds = getPatientIds(connect, "true");
     for (String patientId : patientIds) {
-      Optional<Patient> patient = patient(connect, lastVisitId(connect, patientId));
+      Optional<Patient> patient = patient(connect, patientId, lastVisitId(connect, patientId));
       if (patient.isPresent()) {
         patients.add(patient.get());
       }
@@ -137,11 +137,13 @@ public class PatientDao extends AbstractDao {
 
   /**
    * @param connect the Accumulo connection
+   * @param patientId the patient identifier
    * @param visitId the visit map identifier
    *
    * @return the patient 
    */
-  public static Optional<Patient> patient(Connector connect, Optional<String> visitId) {
+  public static Optional<Patient> patient(Connector connect, String patientId, Optional<String>
+      visitId) {
     if (!visitId.isPresent()) {
       return Optional.empty();
     }
@@ -150,6 +152,7 @@ public class PatientDao extends AbstractDao {
       Scanner scan = connect.createScanner(OPAL_DF_DATA, auths);
       scan.setRange(Range.exact(VISIT_KEY_PREFIX + visitId.get()));
       Patient patient = new Patient();
+      patient.setId(URNFactory.patientId(patientId));
       Name name = new Name();
 
       Iterator<Entry<Key,Value>> iter = scan.iterator();
@@ -182,7 +185,7 @@ public class PatientDao extends AbstractDao {
             break;
           case dF_pidPatientId :
             String fields[] = visitId.get().split("\\|");
-            patient.setId(URNFactory.getInstitutionPatientId(fields[0].trim(),
+            patient.setInstitutionPatientId(URNFactory.getInstitutionPatientId(fields[0].trim(),
                 fields[1].trim(), trimQuote(value.toString())));
             break;
           case dF_pidDateTimeOfBirth :
@@ -193,9 +196,8 @@ public class PatientDao extends AbstractDao {
         }
       }
       patient.setName(name);
-      if (patient.getId() != null) {
-        return Optional.of(patient);
-      }
+
+      return Optional.of(patient);
     } catch (TableNotFoundException | ParseException | URISyntaxException |
         UnsupportedEncodingException exp) {
       log.error("Error building patient object", exp);

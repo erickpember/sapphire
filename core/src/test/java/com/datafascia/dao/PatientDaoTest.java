@@ -97,6 +97,6 @@ public class PatientDaoTest {
       count++;
     }
 
-    assertEquals(count, 669);
+    assertEquals(count, 703);
   }
 }

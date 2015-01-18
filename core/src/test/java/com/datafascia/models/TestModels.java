@@ -2,31 +2,27 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.models;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.neovisionaries.i18n.CountryCode;
 import com.neovisionaries.i18n.LanguageCode;
-import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import lombok.extern.slf4j.Slf4j;
 
 import static org.testng.Assert.assertEquals;
 
 /**
  * A container for various test models.
  */
+@Slf4j
 public class TestModels {
   public static URI getURI(){
     try {
       return new URI("test://testuri");
     } catch (URISyntaxException ex) {
-      Logger.getLogger(EncounterTest.class.getName()).log(Level.SEVERE, null, ex);
-      return null; // The hardcoded value above validates.
+      throw new RuntimeException("Unexpected invalid URI for test.", ex);
     }
   }
 

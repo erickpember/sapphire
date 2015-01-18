@@ -5,6 +5,7 @@ package com.datafascia.emerge.csv;
 import com.beust.jcommander.JCommander;
 import com.datafascia.api.client.DatafasciaApi;
 import com.datafascia.api.client.DatafasciaApiBuilder;
+import com.datafascia.csv.CSVMapper;
 import com.datafascia.emerge.models.Demographic;
 import com.datafascia.models.Name;
 import com.datafascia.models.Patient;
@@ -30,6 +31,8 @@ public class EmergeCSV {
   private static final String NAME_FMT =
     "<[" + Name.FIRST + "," + Name.MIDDLE + "," + Name.LAST + "]; separator=\" \">";
 
+  private static CSVMapper<Demographic> mapper;
+
   /**
    * The main entry point for the application
    *
@@ -38,15 +41,16 @@ public class EmergeCSV {
   public static void main(String[] args) throws JsonProcessingException, IOException {
     EmergeCSVOpts opts = new EmergeCSVOpts();
     new JCommander(opts, args);
+    mapper = new CSVMapper<>(Demographic.class);
 
     try (PrintWriter pw = new PrintWriter(new FileWriter(opts.csvFile))) {
       DatafasciaApi api = DatafasciaApiBuilder.GetAPI(opts.apiEndpoint);
-      pw.write(Joiner.on(",").join(Demographic.headers()));
+      pw.write(Joiner.on(",").join(mapper.getHeaders()));
 
       int entry = 0;
       for (Patient pat : api.patients()) {
         try {
-          pw.write("\n" + getDemographic(pat, entry).asString());
+          pw.write("\n" + mapper.asCSV(getDemographic(pat, entry)));
           entry++;
         } catch (MissingUrnException ex) {
           log.error("Error processing patient: ", ex);

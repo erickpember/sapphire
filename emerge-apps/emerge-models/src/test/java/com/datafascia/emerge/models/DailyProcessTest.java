@@ -2,9 +2,11 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.models;
 
+import com.datafascia.csv.CSVMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -77,30 +79,37 @@ public class DailyProcessTest {
           + "t),2,Yes,Not Documented,No,N/A,No Line,N/A,0,N/A,N/A,N/A,No Line,N/A,0,N/A,N/A,N/A,No,"
           + "No,Yes,Contraindicated: Active Bleeding";
 
+  CSVMapper<DailyProcess> mapper;
+
+  @BeforeClass
+  public void setup() {
+    mapper = new CSVMapper<>(DailyProcess.class);
+  }
+
   @Test
   public void deserialisation() throws IOException {
-    assertEquals(DailyProcess.fromString(testLine1), getDailyProcess());
+    assertEquals(mapper.fromCSV(testLine1), getDailyProcess());
   }
 
   @Test
   public void quoteDeserialisation() throws IOException {
     DailyProcess dpInstance = getDailyProcess();
     dpInstance.setJhedId("\"Spur,ious1\"");
-    assertEquals(DailyProcess.fromString(testLine3), dpInstance);
+    assertEquals(mapper.fromCSV(testLine3), dpInstance);
   }
 
   @Test
   public void commaDeserialisation() throws IOException {
     DailyProcess dpInstance = getDailyProcess();
     dpInstance.setJhedId("Spur,ious1");
-    assertEquals(DailyProcess.fromString(testLine2), dpInstance);
+    assertEquals(mapper.fromCSV(testLine2), dpInstance);
   }
 
   @Test
   public void header() throws JsonProcessingException {
     String prefix = "";
     StringBuilder sb = new StringBuilder();
-    for (String s : DailyProcess.headers()) {
+    for (String s : mapper.getHeaders()) {
       sb.append(prefix);
       sb.append(s);
       prefix = ",";
@@ -112,19 +121,19 @@ public class DailyProcessTest {
   public void quoteSerialisation() throws JsonProcessingException {
     DailyProcess dpInstance = getDailyProcess();
     dpInstance.setJhedId("\"Spur,ious1\"");
-    assertEquals(dpInstance.asString(), testLine3);
+    assertEquals(mapper.asCSV(dpInstance), testLine3);
   }
 
   @Test
   public void commaSerialisation() throws JsonProcessingException {
     DailyProcess dpInstance = getDailyProcess();
     dpInstance.setJhedId("Spur,ious1");
-    assertEquals(dpInstance.asString(), testLine2);
+    assertEquals(mapper.asCSV(dpInstance), testLine2);
   }
 
   @Test
   public void serialisation() throws JsonProcessingException {
-    assertEquals(getDailyProcess().asString(), testLine1);
+    assertEquals(mapper.asCSV(getDailyProcess()), testLine1);
   }
 
   /**

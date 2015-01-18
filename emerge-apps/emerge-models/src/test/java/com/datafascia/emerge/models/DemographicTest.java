@@ -2,9 +2,11 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.models;
 
+import com.datafascia.csv.CSVMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -30,30 +32,37 @@ public class DemographicTest {
           + "Male170 cm109 kg,P-Male170 cm109 kg,\"\"\"Johnson, Jud\"\"\",2014-05-13,No,"
           + "1969-01-02,Male,Black/African Am,109 kg,170 cm,NULL,NULL,Yes,No";
 
+  CSVMapper<Demographic> mapper;
+
+  @BeforeClass
+  public void setup() {
+    mapper = new CSVMapper<>(Demographic.class);
+  }
+
   @Test
   public void deserialisation() throws IOException {
-    assertEquals(Demographic.fromString(testLine1), getDemographic());
+    assertEquals(mapper.fromCSV(testLine1), getDemographic());
   }
 
   @Test
   public void quoteDeserialisation() throws IOException {
     Demographic dmg = getDemographic();
     dmg.setPatientName("\"Johnson, Jud\"");
-    assertEquals(Demographic.fromString(testLine3), dmg);
+    assertEquals(mapper.fromCSV(testLine3), dmg);
   }
 
   @Test
   public void commaDeserialisation() throws IOException {
     Demographic dmg = getDemographic();
     dmg.setPatientName("Johnson, Jud");
-    assertEquals(Demographic.fromString(testLine2), dmg);
+    assertEquals(mapper.fromCSV(testLine2), dmg);
   }
 
   @Test
   public void header() throws JsonProcessingException {
     String prefix = "";
     StringBuilder sb = new StringBuilder();
-    for (String s : Demographic.headers()) {
+    for (String s : mapper.getHeaders()) {
       sb.append(prefix);
       sb.append(s);
       prefix = ",";
@@ -65,19 +74,19 @@ public class DemographicTest {
   public void quoteSerialisation() throws JsonProcessingException {
     Demographic dmg = getDemographic();
     dmg.setPatientName("\"Johnson, Jud\"");
-    assertEquals(dmg.asString(), testLine3);
+    assertEquals(mapper.asCSV(dmg), testLine3);
   }
 
   @Test
   public void commaSerialisation() throws JsonProcessingException {
     Demographic dmg = getDemographic();
     dmg.setPatientName("Johnson, Jud");
-    assertEquals(dmg.asString(), testLine2);
+    assertEquals(mapper.asCSV(dmg), testLine2);
   }
 
   @Test
   public void serialisation() throws JsonProcessingException {
-    assertEquals(getDemographic().asString(), testLine1);
+    assertEquals(mapper.asCSV(getDemographic()), testLine1);
   }
 
   /**

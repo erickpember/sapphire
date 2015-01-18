@@ -2,18 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.models;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectReader;
-import com.fasterxml.jackson.databind.ObjectWriter;
-import com.fasterxml.jackson.dataformat.csv.CsvGenerator;
-import com.fasterxml.jackson.dataformat.csv.CsvMapper;
-import com.fasterxml.jackson.dataformat.csv.CsvSchema;
-import java.io.IOException;
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import lombok.Getter;
@@ -31,24 +20,6 @@ import lombok.Setter;
  */
 @Slf4j @NoArgsConstructor @EqualsAndHashCode
 public class DailyProcess {
-
-  @JsonIgnore
-  private static final ObjectReader reader;
-  @JsonIgnore
-  private static final ObjectWriter writer;
-
-  static {
-    CsvMapper mapper = new CsvMapper();
-    mapper.configure(CsvGenerator.Feature.STRICT_CHECK_FOR_QUOTING, true);
-    CsvSchema.Builder builder = CsvSchema.builder();
-    for (String header : headers()) {
-      builder.addColumn(header);
-    }
-    CsvSchema schema = builder.build();
-    reader = mapper.reader(DailyProcess.class).with(schema);
-    writer = mapper.writer(schema);
-  }
-
   @Getter @Setter @JsonProperty(value = "Entry #", index = 0)
   private String entry;
   @Getter @Setter @JsonProperty(value = "Date Created", index = 1)
@@ -286,40 +257,4 @@ public class DailyProcess {
   private String mechanical = "No: Not Ordered";
   @Getter @Setter @JsonProperty(value = "Pharmacologic", index = 111)
   private String pharmacologic = "No";
-
-  /**
-   * @return the headers for the object
-   */
-  public static List<String> headers() {
-    List<String> headers = new ArrayList<>();
-    for (Field f : DailyProcess.class.getDeclaredFields()) {
-      if (f.isAnnotationPresent(JsonProperty.class)) {
-        JsonProperty property = f.getAnnotation(JsonProperty.class);
-        headers.add(property.index(), property.value());
-      }
-    }
-
-    return headers;
-  }
-
-  /**
-   * Create object from string using ',' as separators
-   *
-   * @param line the line to parse values from
-   * @return dailyProcess pojo created from string
-   * @throws java.io.IOException
-   */
-  public static DailyProcess fromString(String line) throws IOException {
-    return reader.readValue(line);
-  }
-
-  /**
-   * Serialize the object to string using ',' as separator
-   *
-   * @return string representation of object
-   * @throws com.fasterxml.jackson.core.JsonProcessingException
-   */
-  public String asString() throws JsonProcessingException {
-    return writer.writeValueAsString(this).trim();
-  }
 }

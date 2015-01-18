@@ -36,6 +36,11 @@
       <artifactId>jackson-dataformat-csv</artifactId>
     </dependency>
     <dependency>
+      <groupId>com.datafascia</groupId>
+      <artifactId>common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>org.testng</groupId>
       <artifactId>testng</artifactId>
       <scope>test</scope>

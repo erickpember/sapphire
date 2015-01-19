@@ -20,7 +20,7 @@
   <inceptionYear>2013</inceptionYear>
 
   <organization>
-    <name>dataFascia Corporation </name>
+    <name>dataFascia Corporation</name>
     <url>${project.url}</url>
   </organization>
 

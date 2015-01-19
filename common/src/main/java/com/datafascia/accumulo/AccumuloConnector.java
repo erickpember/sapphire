@@ -18,8 +18,7 @@ import org.apache.accumulo.core.client.ZooKeeperInstance;
  * This class provides the Accumulo connector needed by other applications via Guice injection
  * mechanism.
  *
- * NOTE: The parameters needed to connect to Accumulo as also injected into this class. It is the
- * responsibility of the environment to provide the bindings for those parameters.
+ * NOTE: The Accumulo configuration parameters are injected into this class.
  */
 @Slf4j
 public class AccumuloConnector extends AbstractModule {

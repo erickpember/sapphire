@@ -29,7 +29,6 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     <dropwizard.version>0.8.0-rc1</dropwizard.version>
-    <dropwizard-guice.version>0.7.0.2</dropwizard-guice.version>
     <dropwizard-testing.version>0.0.8</dropwizard-testing.version>
     <lombok.version>1.14.8</lombok.version>
     <testng.version>6.8.13</testng.version>
@@ -46,6 +45,7 @@
     <retrofit.version>1.8.0</retrofit.version>
     <jcommander.version>1.47</jcommander.version>
     <string-template.version>4.0.2</string-template.version>
+    <zookeeper.version>3.4.5</zookeeper.version>
   </properties>
 
   <modules>
@@ -119,6 +119,11 @@
         <artifactId>accumulo-minicluster</artifactId>
         <version>${accumulo.version}</version>
         <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.zookeeper</groupId>
+        <artifactId>zookeeper</artifactId>
+        <version>${zookeeper.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.accumulo</groupId>

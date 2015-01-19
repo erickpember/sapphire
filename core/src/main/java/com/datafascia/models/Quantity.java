@@ -3,13 +3,15 @@
 package com.datafascia.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.math.BigDecimal;
 import java.net.URI;
 import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * A measured amount (or an amount that can potentially be measured). Note that measured amounts
@@ -17,6 +19,8 @@ import lombok.extern.slf4j.Slf4j;
  * and floating currencies.
  */
 @Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
+@JsonTypeName("Quantity")
 public class Quantity {
   /**
    * The value of the measured amount. The value includes an implicit precision in the presentation

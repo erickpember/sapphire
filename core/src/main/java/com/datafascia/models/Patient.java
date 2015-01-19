@@ -4,6 +4,8 @@ package com.datafascia.models;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.neovisionaries.i18n.LanguageCode;
 import java.net.URI;
 import java.util.Date;
@@ -18,6 +20,8 @@ import lombok.Setter;
  * Represents a patient record.
  */
 @Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode(callSuper = true)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
+@JsonTypeName("Patient")
 public class Patient extends Person {
   @JsonProperty("@id")
   private URI id;

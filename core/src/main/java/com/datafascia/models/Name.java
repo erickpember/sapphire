@@ -3,6 +3,8 @@
 package com.datafascia.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import lombok.Getter;
@@ -14,6 +16,8 @@ import org.stringtemplate.v4.ST;
  * Represents a person's name, with a first, middle, and last name.
  */
 @Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
+@JsonTypeName("Name")
 public class Name {
   /** First name format identifier */
   public static final String FIRST_FM = "<first>";

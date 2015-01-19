@@ -3,16 +3,20 @@
 package com.datafascia.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Measurements and simple assertions made about a patient, device or other subject.
  */
 @Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode(callSuper = true)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
+@JsonTypeName("ReferenceRange")
 public class ReferenceRange extends Range {
   /** Code for the meaning of the reference range. */
   @JsonProperty("meaning")

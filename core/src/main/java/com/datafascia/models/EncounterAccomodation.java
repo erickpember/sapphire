@@ -3,17 +3,21 @@
 package com.datafascia.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.net.URI;
 import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Represents which bed the patient will be in, and for what period.
  */
 @Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
+@JsonTypeName("EncounterAccomodation")
 public class EncounterAccomodation {
   // The bed that is assigned to the patient.
   @JsonProperty("bed")

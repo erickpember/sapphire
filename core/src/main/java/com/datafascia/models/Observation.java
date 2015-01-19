@@ -3,19 +3,23 @@
 package com.datafascia.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
 import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Represents a patient observation.
  */
 @Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
+@JsonTypeName("Observation")
 public class Observation {
   /** Unique identifier for observation */
   @JsonProperty("@id")

@@ -3,18 +3,22 @@
 package com.datafascia.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.neovisionaries.i18n.LanguageCode;
 import java.net.URI;
 import lombok.EqualsAndHashCode;
+import lombok.extern.slf4j.Slf4j;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * For referring to data content defined in other formats.
  */
 @Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
+@JsonTypeName("Attachment")
 public class Attachment {
   /*
    * Identifies the type of the data in the attachment and allows a method to be chosen to interpret

@@ -3,9 +3,11 @@
 package com.datafascia.api.resources;
 
 import com.codahale.metrics.annotation.Timed;
+import com.datafascia.api.authenticator.User;
 import com.datafascia.api.responses.IteratorResponse;
 import com.datafascia.dao.PatientDao;
 import com.datafascia.models.Patient;
+import io.dropwizard.auth.Auth;
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.GET;
@@ -35,7 +37,7 @@ public class PatientResource {
    * @return stream list of patients back
    */
   @GET @Timed
-  public IteratorResponse<Patient> patients() {
+  public IteratorResponse<Patient> patients(@Auth User user) {
     return new IteratorResponse<Patient>(PatientDao.patients(connect));
   }
 }

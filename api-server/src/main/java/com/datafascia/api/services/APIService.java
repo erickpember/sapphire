@@ -4,6 +4,8 @@ package com.datafascia.api.services;
 
 import com.datafascia.accumulo.AccumuloConfig;
 import com.datafascia.accumulo.AccumuloConnector;
+import com.datafascia.api.authenticator.SimpleAuthenticator;
+import com.datafascia.api.authenticator.User;
 import com.datafascia.api.bundle.AtmosphereBundle;
 import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.api.health.AccumuloHealthCheck;
@@ -15,6 +17,8 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.dropwizard.Application;
 import io.dropwizard.assets.AssetsBundle;
+import io.dropwizard.auth.AuthFactory;
+import io.dropwizard.auth.basic.BasicAuthFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import lombok.extern.slf4j.Slf4j;
@@ -50,6 +54,10 @@ public class APIService extends Application<APIConfiguration> {
   @Override
   public void run(APIConfiguration configuration, Environment environment) {
     Injector injector = createInjector(configuration);
+
+    // Authenticator
+    environment.jersey().register(AuthFactory.binder(new BasicAuthFactory<>(new
+        SimpleAuthenticator(), "dataFascia-API", User.class)));
 
     // Resources
     environment.jersey().register(injector.getInstance(PatientResource.class));

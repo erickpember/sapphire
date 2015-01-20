@@ -10,6 +10,7 @@ import com.datafascia.api.bundle.AtmosphereBundle;
 import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.api.health.AccumuloHealthCheck;
 import com.datafascia.api.resources.APIConfigurationResource;
+import com.datafascia.api.resources.EmergeResource;
 import com.datafascia.api.resources.PatientResource;
 import com.datafascia.api.resources.VersionResource;
 import com.google.inject.AbstractModule;
@@ -62,6 +63,7 @@ public class APIService extends Application<APIConfiguration> {
     // Resources
     environment.jersey().register(injector.getInstance(PatientResource.class));
     environment.jersey().register(injector.getInstance(APIConfigurationResource.class));
+    environment.jersey().register(injector.getInstance(EmergeResource.class));
     environment.jersey().register(new VersionResource(configuration.getDefaultPackage()));
 
     // Health checkers

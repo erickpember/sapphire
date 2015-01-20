@@ -1,0 +1,302 @@
+{
+  "EmergeDataFeed": {
+    "timeOfDataFeed": "2014-10-27T10:04:55.667+0000",
+    "EmergePatients": [
+      {
+        "patientID": "Jane Doe",
+        "encounterID": "12345",
+        "medicalData": {
+          "medications": [
+            {
+              "medication": "Hydramorphone",
+              "calculatedSums": [
+                {
+                  "sumType": "dailyPCASum",
+                  "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
+                  "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                  "sum": "250",
+                  "UCUM": "mg",
+                  "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+                },
+                {
+                  "sumType": "dailyInjectionSum",
+                  "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
+                  "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                  "sum": "330",
+                  "UCUM": "mg",
+                  "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+                },
+                {
+                  "sumType": "dailySuppositorySum",
+                  "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
+                  "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                  "sum": "250",
+                  "UCUM": "mg",
+                  "timeOfCalculation": "2014-10-27T09:04:56.667+0000"
+                }
+              ],
+              "doses": [
+                {
+                  "dosageTime": "2014-10-27T05:34:55.667+0000",
+                  "dosageRoute": "PCA",
+                  "dosageAmount": {
+                    "amount": "20",
+                    "UCUM": "mg"
+                  },
+                  "dosageStrength": {
+                    "strength": "10",
+                    "UCUM": "mg/ml"
+                  },
+                  "timeOfDataAquisition": "2014-10-27T09:44:55.667+0000"
+                },
+                {
+                  "dosageTime": "2014-10-27T05:37:58.667+0000",
+                  "dosageRoute": "PCA",
+                  "dosageAmount": {
+                    "amount": "30",
+                    "UCUM": "mg"
+                  },
+                  "dosageStrength": {
+                    "strength": "10",
+                    "UCUM": "mg/ml"
+                  },
+                  "timeOfDataAquisition": "2014-10-27T09:44:59.667+0000"
+                },
+                {
+                  "dosageTime": "2014-10-27T05:39:55.667+0000",
+                  "dosageRoute": "Injection",
+                  "dosageAmount": {
+                    "amount": "20",
+                    "UCUM": "mg"
+                  },
+                  "dosageStrength": {
+                    "strength": "10",
+                    "UCUM": "mg/ml"
+                  },
+                  "timeOfDataAquisition": "2014-10-27T09:44:55.667+0000"
+                },
+                {
+                  "dosageTime": "2014-10-27T05:40:55.667+0000",
+                  "dosageRoute": "Suppository",
+                  "dosageAmount": {
+                    "amount": "200",
+                    "UCUM": "mg"
+                  },
+                  "dosageStrength": {
+                    "strength": "200",
+                    "UCUM": "mg"
+                  },
+                  "timeOfDataAquisition": "2014-10-27T09:44:55.667+0000"
+                }
+              ]
+            },
+            {
+              "medication": "Fentanyl",
+              "calculatedSums": [
+                {
+                  "sumType": "dailyInjectionSum",
+                  "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
+                  "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                  "dailyInjectionSum": "20",
+                  "UCUM": "mg",
+                  "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+                }
+              ],
+              "doses": [
+                {
+                  "dosageTime": "2014-10-27T06:39:55.667+0000",
+                  "dosageRoute": "Injection",
+                  "dosageAmount": {
+                    "amount": "20",
+                    "UCUM": "mg"
+                  },
+                  "dosageStrength": {
+                    "strength": "10",
+                    "UCUM": "mg/ml"
+                  },
+                  "timeOfDataAquisition": "2014-10-27T09:44:55.667+0000"
+                }
+              ]
+            },
+            {
+              "medication": "Morphine",
+              "calculatedSums": [
+                {
+                  "sumType": "dailyIVSum",
+                  "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
+                  "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                  "dailyInjectionSum": "20",
+                  "UCUM": "mg",
+                  "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+                }
+              ],
+              "doses": [
+                {
+                  "dosageTime": "2014-10-27T06:39:55.667+0000",
+                  "dosageRoute": "IV",
+                  "dosageAmount": {
+                    "amount": "20",
+                    "UCUM": "mg"
+                  },
+                  "dosageStrength": {
+                    "strength": "10",
+                    "UCUM": "mg/ml"
+                  },
+                  "timeOfDataAquisition": "2014-10-27T09:44:55.667+0000"
+                }
+              ]
+            }
+          ],
+          "PAIN": {
+            "numerical": {
+              "CurrentScore": {
+                "PAINScore": "5",
+                "timeOfDataAquisition": "2014-10-27T09:04:55.667+0000"
+              },
+              "DailyMax": {
+                "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
+                "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                "PAINMax": "5",
+                "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+              },
+              "DailyMin": {
+                "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
+                "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                "PAINMin": "1",
+                "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+              }
+            },
+            "behavioural": {
+              "CurrentScore": {
+                "PAINScore": "5",
+                "timeOfDataAquisition": "2014-10-27T09:04:55.667+0000"
+              },
+              "DailyMax": {
+                "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
+                "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                "PAINMax": "5",
+                "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+              },
+              "DailyMin": {
+                "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
+                "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                "PAINMin": "1",
+                "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+              }
+            }
+          },
+          "RASS": {
+            "currentScore": {
+              "RASSScore": "-5",
+              "timeOfDataAquisition": "2014-10-27T09:44:55.667+0000"
+            },
+            "dailyMax": {
+              "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
+              "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+              "RASSMax": "4",
+              "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+            },
+            "dailyMin": {
+              "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
+              "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+              "RASSMin": "-5",
+              "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+            }
+          }
+        }
+      },
+      {
+        "subjectID": "John Smith",
+        "subjectPatcom": "31415",
+        "medicalData": {
+          "medications": [
+            {
+              "medication": "Fentanyl",
+              "calculatedSums": [
+                {
+                  "sumType": "dailyInjectionSum",
+                  "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
+                  "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                  "dailyInjectionSum": "20",
+                  "UCUM": "mg",
+                  "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+                }
+              ],
+              "doses": [
+                {
+                  "dosageTime": "2014-10-27T07:39:55.667+0000",
+                  "dosageRoute": "Injection",
+                  "dosageAmount": {
+                    "amount": "20",
+                    "UCUM": "mg"
+                  },
+                  "dosageStrength": {
+                    "strength": "10",
+                    "UCUM": "mg/ml"
+                  },
+                  "timeOfDataAquisition": "2014-10-27T09:44:55.667+0000"
+                }
+              ]
+            }
+          ],
+          "PAIN": {
+            "numerical": {
+              "currentScore": {
+                "PAINScore": "5",
+                "timeOfDataAquisition": "2014-10-27T09:04:55.667+0000"
+              },
+              "dailyMax": {
+                "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
+                "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                "PAINMax": "5",
+                "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+              },
+              "dailyMin": {
+                "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
+                "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                "PAINMin": "1",
+                "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+              }
+            },
+            "behavioural": {
+              "currentScore": {
+                "PAINScore": "5",
+                "timeOfDataAquisition": "2014-10-27T09:04:55.667+0000"
+              },
+              "dailyMax": {
+                "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
+                "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                "PAINMax": "5",
+                "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+              },
+              "dailyMin": {
+                "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
+                "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                "PAINMin": "1",
+                "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+              }
+            }
+          },
+          "RASS": {
+            "currentScore": {
+              "RASSScore": "-5",
+              "timeOfDataAquisition": "2014-10-27T09:04:55.667+0000"
+            },
+            "dailyMax": {
+              "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
+              "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+              "RASSMax": "4",
+              "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+            },
+            "dailyMin": {
+              "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
+              "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+              "RASSMin": "-5",
+              "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+            }
+          }
+        }
+      }
+    ]
+  }
+}

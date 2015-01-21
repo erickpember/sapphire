@@ -75,11 +75,6 @@
         <version>${jetty.version}</version>
       </dependency>
       <dependency>
-        <groupId>io.dropwizard</groupId>
-        <artifactId>dropwizard-assets</artifactId>
-        <version>${dropwizard.version}</version>
-      </dependency>
-      <dependency>
         <groupId>org.atmosphere</groupId>
         <artifactId>atmosphere-runtime</artifactId>
         <version>${atmosphere-version}</version>

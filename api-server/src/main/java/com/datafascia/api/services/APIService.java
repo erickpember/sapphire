@@ -17,7 +17,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.dropwizard.Application;
-import io.dropwizard.assets.AssetsBundle;
 import io.dropwizard.auth.AuthFactory;
 import io.dropwizard.auth.basic.BasicAuthFactory;
 import io.dropwizard.setup.Bootstrap;
@@ -48,7 +47,6 @@ public class APIService extends Application<APIConfiguration> {
 
   @Override
   public void initialize(Bootstrap<APIConfiguration> bootstrap) {
-    bootstrap.addBundle(new AssetsBundle("/assets", "/events", "chat.html"));
     bootstrap.addBundle(new AtmosphereBundle());
   }
 

@@ -13,7 +13,7 @@ import io.dropwizard.auth.basic.BasicCredentials;
 public class SimpleAuthenticator implements Authenticator<BasicCredentials, User> {
   @Override
   public Optional<User> authenticate(BasicCredentials credentials) throws AuthenticationException {
-    if ("6n'48i?cNHT388b".equals(credentials.getPassword())) {
+    if ("supersecret".equals(credentials.getPassword())) {
       return Optional.of(new User(credentials.getUsername()));
     }
 

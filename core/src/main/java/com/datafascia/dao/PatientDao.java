@@ -153,6 +153,8 @@ public class PatientDao extends AbstractDao {
       scan.setRange(Range.exact(VISIT_KEY_PREFIX + visitId.get()));
       Patient patient = new Patient();
       patient.setId(URNFactory.patientId(patientId));
+      patient.setGender(Gender.Unknown);
+      patient.setRace(Race.Unknown);
       Name name = new Name();
 
       Iterator<Entry<Key,Value>> iter = scan.iterator();

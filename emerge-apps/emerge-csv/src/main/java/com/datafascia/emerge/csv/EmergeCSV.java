@@ -73,6 +73,7 @@ public class EmergeCSV {
     }
 
     Demographic demo = new Demographic();
+    demo.setEntry(Integer.toString(entry));
     demo.setGender(pat.getGender().name());
     demo.setHighestLevelActivity("Unknown");
     demo.setIvcFilter("No");
@@ -96,7 +97,6 @@ public class EmergeCSV {
     demo.setDataCollectionDate(null);
     demo.setDateCreated(null);
     demo.setDateUpdated(null);
-    demo.setEntry(null);
 
     return demo;
   }
@@ -109,6 +109,10 @@ public class EmergeCSV {
    * @return The ID from the end.
    */
   private static String getIdFromUrn(URI urn){
+    if (urn == null) {
+      return null;
+    }
+
     String[] path = urn.toString().split(":");
     return path[path.length - 1];
   }

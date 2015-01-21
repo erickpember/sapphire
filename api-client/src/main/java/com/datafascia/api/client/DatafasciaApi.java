@@ -2,10 +2,12 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.client;
 
+import com.datafascia.models.Encounter;
 import com.datafascia.models.Patient;
 import com.datafascia.models.Version;
 import java.util.List;
 import retrofit.http.GET;
+import retrofit.http.Path;
 
 /**
  * Base interface for interacting with the dataFascia API.
@@ -16,6 +18,18 @@ public interface DatafasciaApi {
    */
   @GET("/patient")
   List<Patient> patients();
+
+  /**
+   * @return An encounter for the id given.
+   */
+  @GET("/encounter/{id}")
+  Encounter encounter(@Path("id") String id);
+
+  /**
+   * @return The last encounter for the patient
+   */
+  @GET("/encounter/last/{patientId}")
+  Encounter lastvisit(@Path("patientId") String patientId);
 
   /**
    * @return Version information for a package on the server.

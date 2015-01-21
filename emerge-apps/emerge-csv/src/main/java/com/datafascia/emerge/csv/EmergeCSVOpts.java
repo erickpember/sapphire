@@ -16,6 +16,12 @@ public class EmergeCSVOpts {
              converter = URIConverter.class)
   public URI apiEndpoint;
 
-  @Parameter(names = "-csvFile", description = "The name of the CSV file to generae", required = true)
+  @Parameter(names = "-csvFile", description = "The name of the CSV file to generate", required = true)
   public String csvFile;
+
+  @Parameter(names = "-user", description = "User name for API access", required = true)
+  public String user;
+
+  @Parameter(names = "-password", description = "User password for API access", required = true)
+  public String password;
 }

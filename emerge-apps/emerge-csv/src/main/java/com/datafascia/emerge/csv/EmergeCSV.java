@@ -44,7 +44,7 @@ public class EmergeCSV {
     mapper = new CSVMapper<>(Demographic.class);
 
     try (PrintWriter pw = new PrintWriter(new FileWriter(opts.csvFile))) {
-      DatafasciaApi api = DatafasciaApiBuilder.GetAPI(opts.apiEndpoint);
+      DatafasciaApi api = DatafasciaApiBuilder.endpoint(opts.apiEndpoint, opts.user, opts.password);
       pw.write(Joiner.on(",").join(mapper.getHeaders()));
 
       int entry = 0;

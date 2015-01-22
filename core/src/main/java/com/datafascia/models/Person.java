@@ -28,7 +28,7 @@ public class Person {
   @JsonProperty("gender")
   private Gender gender;
   @JsonProperty("birthDate")
-  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "UTC")
+  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
   private Date birthDate;
   @JsonProperty("photo")
   private URI photo;

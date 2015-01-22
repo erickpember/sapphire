@@ -28,7 +28,7 @@ public class Patient extends Person {
   @JsonProperty("contacts")
   private List<Contact> contactDetails;
   @JsonProperty("creationDate")
-  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss.SSSZ", timezone = "UTC")
+  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
   private Date creationDate;
   @JsonProperty("deceased")
   private boolean deceased;

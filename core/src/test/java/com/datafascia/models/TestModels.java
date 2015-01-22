@@ -7,6 +7,8 @@ import com.neovisionaries.i18n.LanguageCode;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +20,16 @@ import static org.testng.Assert.assertEquals;
  */
 @Slf4j
 public class TestModels {
+  public static Date getDate() {
+    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+
+    try {
+      return format.parse("2009-12-31 12:12:12 +0000");
+    } catch (ParseException e) {
+      throw new RuntimeException(e);
+    }
+  }
+
   public static URI getURI(){
     try {
       return new URI("test://testuri");
@@ -46,7 +58,7 @@ public class TestModels {
     setSpecialty(Specialty.Allergy);
     setName(name);
     setGender(Gender.Undifferentiated);
-    setBirthDate(new Date());
+    setBirthDate(getDate());
     setPhoto(getURI());
     setOrganization("Test Corp.");
   }};
@@ -55,7 +67,7 @@ public class TestModels {
     setAddress(address);
     setName(name);
     setGender(Gender.Undifferentiated);
-    setBirthDate(new Date());
+    setBirthDate(getDate());
     setPhoto(getURI());
     setOrganization("Test Corp.");
     setRelationship("Tester");
@@ -64,13 +76,13 @@ public class TestModels {
   public static Patient patient = new Patient(){{
     setActive(true);
     setAddress(address);
-    setBirthDate(new Date());
+    setBirthDate(getDate());
     setPhoto(getURI());
     setOrganization("Test Corp.");
     setName(name);
     setCareProvider(Arrays.asList(caregiver, caregiver));
     setContactDetails(Arrays.asList(contact, contact));
-    setCreationDate(new Date());
+    setCreationDate(getDate());
     setDeceased(false);
     setId(getURI());
     setLangs(Arrays.asList(LanguageCode.en, LanguageCode.ch));
@@ -80,8 +92,8 @@ public class TestModels {
   }};
 
   public static Period period = new Period(){{
-    setStart(new Date());
-    setStop(new Date());
+    setStart(getDate());
+    setStop(getDate());
   }};
 
   public static CodeableConcept codeable = new CodeableConcept(){{
@@ -165,7 +177,7 @@ public class TestModels {
     setInterpretation(ObservationInterpretation.A);
     setComments("The patient is alive.");
     setApplies(period);
-    setIssued(new Date());
+    setIssued(getDate());
     setStatus(ObservationStatus.Final);
     setReliability(ObservationReliability.Ok);
     setSite(codeable);

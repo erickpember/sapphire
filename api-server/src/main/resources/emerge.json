@@ -1,6 +1,6 @@
 {
   "EmergeDataFeed": {
-    "timeOfDataFeed": "2014-10-27T10:04:55.667+0000",
+    "timeOfDataFeed": "2014-10-27T10:04:55Z",
     "EmergePatients": [
       {
         "patientID": "Jane Doe",
@@ -12,32 +12,32 @@
               "calculatedSums": [
                 {
                   "sumType": "dailyPCASum",
-                  "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
-                  "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                  "startOfTimePeriod": "2014-10-27T05:00:00Z",
+                  "endOfTimePeriod": "2014-10-27T09:00:00Z",
                   "sum": "250",
                   "UCUM": "mg",
-                  "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+                  "timeOfCalculation": "2014-10-27T09:04:55Z"
                 },
                 {
                   "sumType": "dailyInjectionSum",
-                  "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
-                  "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                  "startOfTimePeriod": "2014-10-27T05:00:00Z",
+                  "endOfTimePeriod": "2014-10-27T09:00:00Z",
                   "sum": "330",
                   "UCUM": "mg",
-                  "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+                  "timeOfCalculation": "2014-10-27T09:04:55Z"
                 },
                 {
                   "sumType": "dailySuppositorySum",
-                  "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
-                  "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                  "startOfTimePeriod": "2014-10-27T05:00:00Z",
+                  "endOfTimePeriod": "2014-10-27T09:00:00Z",
                   "sum": "250",
                   "UCUM": "mg",
-                  "timeOfCalculation": "2014-10-27T09:04:56.667+0000"
+                  "timeOfCalculation": "2014-10-27T09:04:56Z"
                 }
               ],
               "doses": [
                 {
-                  "dosageTime": "2014-10-27T05:34:55.667+0000",
+                  "dosageTime": "2014-10-27T05:34:55Z",
                   "dosageRoute": "PCA",
                   "dosageAmount": {
                     "amount": "20",
@@ -47,10 +47,10 @@
                     "strength": "10",
                     "UCUM": "mg/ml"
                   },
-                  "timeOfDataAquisition": "2014-10-27T09:44:55.667+0000"
+                  "timeOfDataAquisition": "2014-10-27T09:44:55Z"
                 },
                 {
-                  "dosageTime": "2014-10-27T05:37:58.667+0000",
+                  "dosageTime": "2014-10-27T05:37:58Z",
                   "dosageRoute": "PCA",
                   "dosageAmount": {
                     "amount": "30",
@@ -60,10 +60,10 @@
                     "strength": "10",
                     "UCUM": "mg/ml"
                   },
-                  "timeOfDataAquisition": "2014-10-27T09:44:59.667+0000"
+                  "timeOfDataAquisition": "2014-10-27T09:44:59Z"
                 },
                 {
-                  "dosageTime": "2014-10-27T05:39:55.667+0000",
+                  "dosageTime": "2014-10-27T05:39:55Z",
                   "dosageRoute": "Injection",
                   "dosageAmount": {
                     "amount": "20",
@@ -73,10 +73,10 @@
                     "strength": "10",
                     "UCUM": "mg/ml"
                   },
-                  "timeOfDataAquisition": "2014-10-27T09:44:55.667+0000"
+                  "timeOfDataAquisition": "2014-10-27T09:44:55Z"
                 },
                 {
-                  "dosageTime": "2014-10-27T05:40:55.667+0000",
+                  "dosageTime": "2014-10-27T05:40:55Z",
                   "dosageRoute": "Suppository",
                   "dosageAmount": {
                     "amount": "200",
@@ -86,7 +86,7 @@
                     "strength": "200",
                     "UCUM": "mg"
                   },
-                  "timeOfDataAquisition": "2014-10-27T09:44:55.667+0000"
+                  "timeOfDataAquisition": "2014-10-27T09:44:55Z"
                 }
               ]
             },
@@ -95,16 +95,16 @@
               "calculatedSums": [
                 {
                   "sumType": "dailyInjectionSum",
-                  "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
-                  "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                  "startOfTimePeriod": "2014-10-27T05:00:00Z",
+                  "endOfTimePeriod": "2014-10-27T09:00:00Z",
                   "dailyInjectionSum": "20",
                   "UCUM": "mg",
-                  "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+                  "timeOfCalculation": "2014-10-27T09:04:55Z"
                 }
               ],
               "doses": [
                 {
-                  "dosageTime": "2014-10-27T06:39:55.667+0000",
+                  "dosageTime": "2014-10-27T06:39:55Z",
                   "dosageRoute": "Injection",
                   "dosageAmount": {
                     "amount": "20",
@@ -114,7 +114,7 @@
                     "strength": "10",
                     "UCUM": "mg/ml"
                   },
-                  "timeOfDataAquisition": "2014-10-27T09:44:55.667+0000"
+                  "timeOfDataAquisition": "2014-10-27T09:44:55Z"
                 }
               ]
             },
@@ -123,16 +123,16 @@
               "calculatedSums": [
                 {
                   "sumType": "dailyIVSum",
-                  "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
-                  "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                  "startOfTimePeriod": "2014-10-27T05:00:00Z",
+                  "endOfTimePeriod": "2014-10-27T09:00:00Z",
                   "dailyInjectionSum": "20",
                   "UCUM": "mg",
-                  "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+                  "timeOfCalculation": "2014-10-27T09:04:55Z"
                 }
               ],
               "doses": [
                 {
-                  "dosageTime": "2014-10-27T06:39:55.667+0000",
+                  "dosageTime": "2014-10-27T06:39:55Z",
                   "dosageRoute": "IV",
                   "dosageAmount": {
                     "amount": "20",
@@ -142,7 +142,7 @@
                     "strength": "10",
                     "UCUM": "mg/ml"
                   },
-                  "timeOfDataAquisition": "2014-10-27T09:44:55.667+0000"
+                  "timeOfDataAquisition": "2014-10-27T09:44:55Z"
                 }
               ]
             }
@@ -151,56 +151,56 @@
             "numerical": {
               "CurrentScore": {
                 "PAINScore": "5",
-                "timeOfDataAquisition": "2014-10-27T09:04:55.667+0000"
+                "timeOfDataAquisition": "2014-10-27T09:04:55Z"
               },
               "DailyMax": {
-                "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
-                "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                "startOfTimePeriod": "2014-10-27T05:00:00Z",
+                "endOfTimePeriod": "2014-10-27T09:00:00Z",
                 "PAINMax": "5",
-                "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+                "timeOfCalculation": "2014-10-27T09:04:55Z"
               },
               "DailyMin": {
-                "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
-                "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                "startOfTimePeriod": "2014-10-27T05:00:00Z",
+                "endOfTimePeriod": "2014-10-27T09:00:00Z",
                 "PAINMin": "1",
-                "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+                "timeOfCalculation": "2014-10-27T09:04:55Z"
               }
             },
             "behavioural": {
               "CurrentScore": {
                 "PAINScore": "5",
-                "timeOfDataAquisition": "2014-10-27T09:04:55.667+0000"
+                "timeOfDataAquisition": "2014-10-27T09:04:55Z"
               },
               "DailyMax": {
-                "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
-                "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                "startOfTimePeriod": "2014-10-27T05:00:00Z",
+                "endOfTimePeriod": "2014-10-27T09:00:00Z",
                 "PAINMax": "5",
-                "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+                "timeOfCalculation": "2014-10-27T09:04:55Z"
               },
               "DailyMin": {
-                "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
-                "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                "startOfTimePeriod": "2014-10-27T05:00:00Z",
+                "endOfTimePeriod": "2014-10-27T09:00:00Z",
                 "PAINMin": "1",
-                "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+                "timeOfCalculation": "2014-10-27T09:04:55Z"
               }
             }
           },
           "RASS": {
             "currentScore": {
               "RASSScore": "-5",
-              "timeOfDataAquisition": "2014-10-27T09:44:55.667+0000"
+              "timeOfDataAquisition": "2014-10-27T09:44:55Z"
             },
             "dailyMax": {
-              "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
-              "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+              "startOfTimePeriod": "2014-10-27T05:00:00Z",
+              "endOfTimePeriod": "2014-10-27T09:00:00Z",
               "RASSMax": "4",
-              "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+              "timeOfCalculation": "2014-10-27T09:04:55Z"
             },
             "dailyMin": {
-              "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
-              "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+              "startOfTimePeriod": "2014-10-27T05:00:00Z",
+              "endOfTimePeriod": "2014-10-27T09:00:00Z",
               "RASSMin": "-5",
-              "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+              "timeOfCalculation": "2014-10-27T09:04:55Z"
             }
           }
         }
@@ -215,16 +215,16 @@
               "calculatedSums": [
                 {
                   "sumType": "dailyInjectionSum",
-                  "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
-                  "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                  "startOfTimePeriod": "2014-10-27T05:00:00Z",
+                  "endOfTimePeriod": "2014-10-27T09:00:00Z",
                   "dailyInjectionSum": "20",
                   "UCUM": "mg",
-                  "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+                  "timeOfCalculation": "2014-10-27T09:04:55Z"
                 }
               ],
               "doses": [
                 {
-                  "dosageTime": "2014-10-27T07:39:55.667+0000",
+                  "dosageTime": "2014-10-27T07:39:55Z",
                   "dosageRoute": "Injection",
                   "dosageAmount": {
                     "amount": "20",
@@ -234,7 +234,7 @@
                     "strength": "10",
                     "UCUM": "mg/ml"
                   },
-                  "timeOfDataAquisition": "2014-10-27T09:44:55.667+0000"
+                  "timeOfDataAquisition": "2014-10-27T09:44:55Z"
                 }
               ]
             }
@@ -243,56 +243,56 @@
             "numerical": {
               "currentScore": {
                 "PAINScore": "5",
-                "timeOfDataAquisition": "2014-10-27T09:04:55.667+0000"
+                "timeOfDataAquisition": "2014-10-27T09:04:55Z"
               },
               "dailyMax": {
-                "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
-                "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                "startOfTimePeriod": "2014-10-27T05:00:00Z",
+                "endOfTimePeriod": "2014-10-27T09:00:00Z",
                 "PAINMax": "5",
-                "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+                "timeOfCalculation": "2014-10-27T09:04:55Z"
               },
               "dailyMin": {
-                "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
-                "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                "startOfTimePeriod": "2014-10-27T05:00:00Z",
+                "endOfTimePeriod": "2014-10-27T09:00:00Z",
                 "PAINMin": "1",
-                "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+                "timeOfCalculation": "2014-10-27T09:04:55Z"
               }
             },
             "behavioural": {
               "currentScore": {
                 "PAINScore": "5",
-                "timeOfDataAquisition": "2014-10-27T09:04:55.667+0000"
+                "timeOfDataAquisition": "2014-10-27T09:04:55Z"
               },
               "dailyMax": {
-                "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
-                "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                "startOfTimePeriod": "2014-10-27T05:00:00Z",
+                "endOfTimePeriod": "2014-10-27T09:00:00Z",
                 "PAINMax": "5",
-                "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+                "timeOfCalculation": "2014-10-27T09:04:55Z"
               },
               "dailyMin": {
-                "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
-                "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+                "startOfTimePeriod": "2014-10-27T05:00:00Z",
+                "endOfTimePeriod": "2014-10-27T09:00:00Z",
                 "PAINMin": "1",
-                "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+                "timeOfCalculation": "2014-10-27T09:04:55Z"
               }
             }
           },
           "RASS": {
             "currentScore": {
               "RASSScore": "-5",
-              "timeOfDataAquisition": "2014-10-27T09:04:55.667+0000"
+              "timeOfDataAquisition": "2014-10-27T09:04:55Z"
             },
             "dailyMax": {
-              "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
-              "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+              "startOfTimePeriod": "2014-10-27T05:00:00Z",
+              "endOfTimePeriod": "2014-10-27T09:00:00Z",
               "RASSMax": "4",
-              "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+              "timeOfCalculation": "2014-10-27T09:04:55Z"
             },
             "dailyMin": {
-              "startOfTimePeriod": "2014-10-27T05:00:00.667+0000",
-              "endOfTimePeriod": "2014-10-27T09:00:00.667+0000",
+              "startOfTimePeriod": "2014-10-27T05:00:00Z",
+              "endOfTimePeriod": "2014-10-27T09:00:00Z",
               "RASSMin": "-5",
-              "timeOfCalculation": "2014-10-27T09:04:55.667+0000"
+              "timeOfCalculation": "2014-10-27T09:04:55Z"
             }
           }
         }

@@ -39,8 +39,7 @@
     <neovisionaries.version>1.14</neovisionaries.version>
     <guice.version>3.0</guice.version>
     <accumulo.version>1.5.1</accumulo.version>
-    <hadoop1.version>1.2.1</hadoop1.version>
-    <hadoop2.version>2.2.0</hadoop2.version>
+    <hadoop.version>2.2.0</hadoop.version>
     <slf4j.version>1.7.7</slf4j.version>
     <retrofit.version>1.8.0</retrofit.version>
     <jcommander.version>1.47</jcommander.version>
@@ -68,6 +67,17 @@
         <groupId>io.dropwizard</groupId>
         <artifactId>dropwizard-core</artifactId>
         <version>${dropwizard.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>io.dropwizard</groupId>
+        <artifactId>dropwizard-logging</artifactId>
+        <version>${dropwizard.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>log4j-over-slf4j</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.eclipse.jetty.websocket</groupId>
@@ -124,6 +134,32 @@
         <groupId>org.apache.zookeeper</groupId>
         <artifactId>zookeeper</artifactId>
         <version>${zookeeper.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.sun.jdmk</groupId>
+            <artifactId>jmxtools</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.sun.jmx</groupId>
+            <artifactId>jmxri</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>javax.jms</groupId>
+            <artifactId>jms</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>jline</groupId>
+            <artifactId>jline</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
       <dependency>
         <groupId>org.apache.accumulo</groupId>
@@ -132,14 +168,8 @@
       </dependency>
       <dependency>
         <groupId>org.apache.hadoop</groupId>
-        <artifactId>hadoop-core</artifactId>
-        <version>${hadoop1.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.hadoop</groupId>
-        <artifactId>hadoop-common</artifactId>
-        <version>${hadoop2.version}</version>
+        <artifactId>hadoop-client</artifactId>
+        <version>${hadoop.version}</version>
         <exclusions>
           <exclusion>
             <groupId>org.slf4j</groupId>
@@ -158,11 +188,6 @@
             <artifactId>jersey-core</artifactId>
           </exclusion>
         </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>slf4j-log4j12</artifactId>
-        <version>${slf4j.version}</version>
       </dependency>
       <dependency>
         <groupId>com.squareup.retrofit</groupId>

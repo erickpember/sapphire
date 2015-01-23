@@ -19,7 +19,7 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>${project.artifactId}</name>
   <packaging>jar</packaging>
-  
+
   <dependencies>
     <dependency>
       <groupId>org.slf4j</groupId>

@@ -3,10 +3,12 @@
   Copyright (C) 2014-2015 dataFascia Corporation - All Rights Reserved
   For license information, please contact http://datafascia.com/contact
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-
+<project
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
+        http://maven.apache.org/POM/4.0.0
+        http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.datafascia</groupId>
@@ -25,45 +27,79 @@
   </organization>
 
   <properties>
-    <!-- use UTF-8 for everything -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-    <dropwizard.version>0.8.0-rc1</dropwizard.version>
-    <dropwizard-testing.version>0.0.8</dropwizard-testing.version>
-    <lombok.version>1.14.8</lombok.version>
-    <testng.version>6.8.13</testng.version>
-    <atmosphere-version>2.2.0</atmosphere-version>
-    <java.version>1.8</java.version>
-    <jetty.version>9.2.4.v20141103</jetty.version>
-    <jackson.version>2.4.3</jackson.version>
-    <neovisionaries.version>1.14</neovisionaries.version>
-    <guice.version>3.0</guice.version>
     <accumulo.version>1.5.1</accumulo.version>
+    <atmosphere-version>2.2.0</atmosphere-version>
+    <dropwizard-testing.version>0.0.8</dropwizard-testing.version>
+    <dropwizard.version>0.8.0-rc1</dropwizard.version>
+    <guice.version>3.0</guice.version>
     <hadoop.version>2.2.0</hadoop.version>
-    <slf4j.version>1.7.7</slf4j.version>
-    <retrofit.version>1.8.0</retrofit.version>
+    <jackson.version>2.4.3</jackson.version>
+    <java.version>1.8</java.version>
     <jcommander.version>1.47</jcommander.version>
+    <jetty.version>9.2.4.v20141103</jetty.version>
+    <lombok.version>1.14.8</lombok.version>
+    <neovisionaries.version>1.14</neovisionaries.version>
+    <retrofit.version>1.8.0</retrofit.version>
+    <slf4j.version>1.7.7</slf4j.version>
     <string-template.version>4.0.2</string-template.version>
+    <testng.version>6.8.13</testng.version>
     <zookeeper.version>3.4.5</zookeeper.version>
   </properties>
 
   <modules>
-    <module>common</module>
     <module>accumulo</module>
-    <module>dropwizard-testing</module>
-    <module>core</module>
-    <module>api-server</module>
     <module>api-client</module>
+    <module>api-server</module>
+    <module>common</module>
+    <module>core</module>
+    <module>dropwizard-testing</module>
     <module>emerge-apps</module>
   </modules>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
-        <groupId>org.projectlombok</groupId>
-        <artifactId>lombok</artifactId>
-        <version>${lombok.version}</version>
+        <groupId>com.beust</groupId>
+        <artifactId>jcommander</artifactId>
+        <version>${jcommander.version}</version>
       </dependency>
+
+      <dependency>
+        <groupId>com.fasterxml.jackson.dataformat</groupId>
+        <artifactId>jackson-dataformat-csv</artifactId>
+        <version>${jackson.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.google.inject</groupId>
+        <artifactId>guice</artifactId>
+        <version>${guice.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.google.inject.extensions</groupId>
+        <artifactId>guice-throwingproviders</artifactId>
+        <version>${guice.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.neovisionaries</groupId>
+        <artifactId>nv-i18n</artifactId>
+        <version>${neovisionaries.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.squareup.retrofit</groupId>
+        <artifactId>converter-jackson</artifactId>
+        <version>${retrofit.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.squareup.retrofit</groupId>
+        <artifactId>retrofit</artifactId>
+        <version>${retrofit.version}</version>
+      </dependency>
+
       <dependency>
         <groupId>io.dropwizard</groupId>
         <artifactId>dropwizard-core</artifactId>
@@ -80,56 +116,71 @@
           </exclusion>
         </exclusions>
       </dependency>
-      <dependency>
-        <groupId>org.eclipse.jetty.websocket</groupId>
-        <artifactId>websocket-server</artifactId>
-        <version>${jetty.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.atmosphere</groupId>
-        <artifactId>atmosphere-runtime</artifactId>
-        <version>${atmosphere-version}</version>
-      </dependency>
+
       <dependency>
         <groupId>org.atmosphere</groupId>
         <artifactId>atmosphere-annotations</artifactId>
         <version>${atmosphere-version}</version>
       </dependency>
       <dependency>
-        <groupId>com.fasterxml.jackson.dataformat</groupId>
-        <artifactId>jackson-dataformat-csv</artifactId>
-        <version>${jackson.version}</version>
+        <groupId>org.atmosphere</groupId>
+        <artifactId>atmosphere-runtime</artifactId>
+        <version>${atmosphere-version}</version>
       </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.jetty.websocket</groupId>
+        <artifactId>websocket-server</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+
       <dependency>
         <groupId>io.dropwizard</groupId>
         <artifactId>dropwizard-auth</artifactId>
         <version>${dropwizard.version}</version>
       </dependency>
+
       <dependency>
-        <groupId>org.testng</groupId>
-        <artifactId>testng</artifactId>
-        <version>${testng.version}</version>
+        <groupId>org.antlr</groupId>
+        <artifactId>stringtemplate</artifactId>
+        <version>${string-template.version}</version>
       </dependency>
+
       <dependency>
-        <groupId>com.neovisionaries</groupId>
-        <artifactId>nv-i18n</artifactId>
-        <version>${neovisionaries.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.inject.extensions</groupId>
-        <artifactId>guice-throwingproviders</artifactId>
-        <version>${guice.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.google.inject</groupId>
-        <artifactId>guice</artifactId>
-        <version>${guice.version}</version>
+        <groupId>org.apache.accumulo</groupId>
+        <artifactId>accumulo-core</artifactId>
+        <version>${accumulo.version}</version>
       </dependency>
       <dependency>
         <groupId>org.apache.accumulo</groupId>
         <artifactId>accumulo-minicluster</artifactId>
         <version>${accumulo.version}</version>
       </dependency>
+
+      <dependency>
+        <groupId>org.apache.hadoop</groupId>
+        <artifactId>hadoop-client</artifactId>
+        <version>${hadoop.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-core</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-json</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-server</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+
       <dependency>
         <groupId>org.apache.zookeeper</groupId>
         <artifactId>zookeeper</artifactId>
@@ -161,53 +212,17 @@
           </exclusion>
         </exclusions>
       </dependency>
+
       <dependency>
-        <groupId>org.apache.accumulo</groupId>
-        <artifactId>accumulo-core</artifactId>
-        <version>${accumulo.version}</version>
+        <groupId>org.projectlombok</groupId>
+        <artifactId>lombok</artifactId>
+        <version>${lombok.version}</version>
       </dependency>
+
       <dependency>
-        <groupId>org.apache.hadoop</groupId>
-        <artifactId>hadoop-client</artifactId>
-        <version>${hadoop.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-server</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-json</artifactId>
-          </exclusion>
-          <exclusion>
-            <groupId>com.sun.jersey</groupId>
-            <artifactId>jersey-core</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
-      <dependency>
-        <groupId>com.squareup.retrofit</groupId>
-        <artifactId>retrofit</artifactId>
-        <version>${retrofit.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.squareup.retrofit</groupId>
-        <artifactId>converter-jackson</artifactId>
-        <version>${retrofit.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.beust</groupId>
-        <artifactId>jcommander</artifactId>
-        <version>${jcommander.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.antlr</groupId>
-        <artifactId>stringtemplate</artifactId>
-        <version>${string-template.version}</version>
+        <groupId>org.testng</groupId>
+        <artifactId>testng</artifactId>
+        <version>${testng.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

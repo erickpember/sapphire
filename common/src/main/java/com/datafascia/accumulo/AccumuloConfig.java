@@ -16,9 +16,12 @@ public class AccumuloConfig {
   /** Accumulo type mock */
   @JsonIgnore
   public static String MOCK = "mock";
-  /** Accumulo type real*/
+  /** Accumulo type real */
   @JsonIgnore
   public static String REAL = "real";
+  /** Accumulo type mini */
+  @JsonIgnore
+  public static String MINI = "mini";
 
   /** Accumulo instance name */
   private String instance;
@@ -43,5 +46,12 @@ public class AccumuloConfig {
    */
   public boolean isMock() {
     return type.equalsIgnoreCase(MOCK);
+  }
+
+  /**
+   * @return true if Accumulo type is mini
+   */
+  public boolean isMini() {
+    return type.equalsIgnoreCase(MINI);
   }
 }

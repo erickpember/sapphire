@@ -2,10 +2,14 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.accumulo;
 
+import com.datafascia.accumulo.MiniAccumuloStart;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.util.Properties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
@@ -68,5 +72,26 @@ public class AccumuloConnector extends AbstractModule {
 
     return new MockInstance().getConnector(config.getUser(),
         new PasswordToken(config.getPassword()));
+  }
+
+  /**
+   * Return connector to mini instance of Accumulo. To be used for testing purposes.
+   *
+   * @param config the accumulo configuration
+   */
+  private Connector miniInstance(AccumuloConfig config) throws AccumuloException,
+      AccumuloSecurityException {
+    Properties props = new Properties();
+    try {
+      props.load(new FileInputStream(MiniAccumuloStart.config));
+    } catch (IOException e) {
+      throw new AccumuloException("Mini-cluster config file missing.", e);
+    }
+    log.info("Accumulo Mini connector with user: " + props.getProperty(MiniAccumuloStart.USER));
+
+    return new ZooKeeperInstance(props.getProperty(MiniAccumuloStart.INSTANCE),
+        props.getProperty(MiniAccumuloStart.ZOOKEEPER)).getConnector(
+        props.getProperty(MiniAccumuloStart.USER),
+        new PasswordToken(props.getProperty(MiniAccumuloStart.PASSWORD)));
   }
 }

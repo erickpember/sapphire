@@ -3,7 +3,7 @@
 package com.datafascia.accumulo;
 
 import java.io.FileInputStream;
-import com.datafascia.accumulo.MiniAccumulo;
+import com.datafascia.accumulo.MiniAccumuloStart;
 import java.io.IOException;
 import java.util.Properties;
 import lombok.extern.slf4j.Slf4j;
@@ -22,11 +22,11 @@ public class AccumuloShell {
    * @param args the command line arguments
    */
   public static void main(String[] args) throws IOException {
-    props.load(new FileInputStream(MiniAccumulo.config));
-    String instance = props.getProperty(MiniAccumulo.INSTANCE);
-    String zookeeper = props.getProperty(MiniAccumulo.ZOOKEEPER);
-    String user = props.getProperty(MiniAccumulo.USER);
-    String password = props.getProperty(MiniAccumulo.PASSWORD);
+    props.load(new FileInputStream(MiniAccumuloStart.config));
+    String instance = props.getProperty(MiniAccumuloStart.INSTANCE);
+    String zookeeper = props.getProperty(MiniAccumuloStart.ZOOKEEPER);
+    String user = props.getProperty(MiniAccumuloStart.USER);
+    String password = props.getProperty(MiniAccumuloStart.PASSWORD);
 
     String[] shellArgs = new String[]{"-u", user, "-p", password, "-z", instance, zookeeper};
     Shell.main(shellArgs);

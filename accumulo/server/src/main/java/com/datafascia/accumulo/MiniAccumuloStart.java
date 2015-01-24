@@ -6,6 +6,8 @@ import com.google.common.io.Files;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Properties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.minicluster.MiniAccumuloCluster;
@@ -45,11 +47,11 @@ public class MiniAccumuloStart {
    * @param args the command line arguments
    */
   public static void main(String[] args) throws IOException, InterruptedException {
+    System.out.println("Starting Accumulo mini-cluster ...");
+    setClasspath();
     File tempDir = Files.createTempDir();
     MiniAccumuloCluster accumulo = new MiniAccumuloCluster(tempDir, USER_PASSWORD);
     accumulo.start();
-
-    System.out.println("Starting Accumulo mini-cluster ...");
     Thread.sleep(3000);
     exportConfig(accumulo, tempDir);
     System.out.println("  server started ..");
@@ -63,6 +65,20 @@ public class MiniAccumuloStart {
         accumulo.stop();
       }
     }
+  }
+
+  /**
+   * Set up classpath for next executable
+   */
+  private static void setClasspath() {
+    String sep = "";
+    StringBuffer buffer = new StringBuffer();
+    for (URL url : ((URLClassLoader) (Thread.currentThread() .getContextClassLoader())).getURLs()) {
+      buffer.append(sep);
+      buffer.append(new File(url.getPath()));
+      sep = System.getProperty("path.separator");
+    }
+    System.setProperty("java.class.path", buffer.toString());
   }
 
   /**

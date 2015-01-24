@@ -39,8 +39,6 @@ public class MiniAccumuloStart {
   /** Default user password */
   public static final String USER_PASSWORD = "secret";
 
-  private static Properties props = new Properties();
-
   /**
    * Start the server
    *
@@ -53,15 +51,9 @@ public class MiniAccumuloStart {
 
     System.out.println("Starting Accumulo mini-cluster ...");
     Thread.sleep(3000);
-
-    props.setProperty(INSTANCE, accumulo.getInstanceName());
-    props.setProperty(ZOOKEEPER, accumulo.getZooKeepers());
-    props.setProperty(USER, ROOT);
-    props.setProperty(PASSWORD, USER_PASSWORD);
-    props.setProperty(DIRECTORY, tempDir.getAbsolutePath());
-    props.store(new FileOutputStream(config), null);
-
+    exportConfig(accumulo, tempDir);
     System.out.println("  server started ..");
+
     while (true) {
       Thread.sleep(3000);
       File kill = new File(killFile);
@@ -71,5 +63,21 @@ public class MiniAccumuloStart {
         accumulo.stop();
       }
     }
+  }
+
+  /**
+   * Export mini-cluster parameters
+   *
+   * @param accumulo the Accumulo instance
+   * @param tempDir the Accumulo directory
+   */
+  private static void exportConfig(MiniAccumuloCluster accumulo, File tempDir) throws IOException {
+    Properties props = new Properties();
+    props.setProperty(INSTANCE, accumulo.getInstanceName());
+    props.setProperty(ZOOKEEPER, accumulo.getZooKeepers());
+    props.setProperty(USER, ROOT);
+    props.setProperty(PASSWORD, USER_PASSWORD);
+    props.setProperty(DIRECTORY, tempDir.getAbsolutePath());
+    props.store(new FileOutputStream(config), null);
   }
 }

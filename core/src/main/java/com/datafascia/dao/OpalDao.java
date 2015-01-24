@@ -39,12 +39,17 @@ public class OpalDao {
 
   /**
    * Returns a usable scanner of the opal_dF_data table.
+   *
    * @param auths The authorizations to filter on.
    * @return A scanner for the opal_dF_data table.
-   * @throws TableNotFoundException
+   * @throws RuntimeException if table not found.
    */
-  public Scanner getScanner(Authorizations auths) throws TableNotFoundException {
-    return connector.createScanner(OPAL_DATA, auths);
+  public Scanner getScanner(Authorizations auths) {
+    try {
+      return connector.createScanner(OPAL_DATA, auths);
+    } catch (TableNotFoundException e) {
+      throw new IllegalStateException("Table " + OPAL_DATA + " not found", e);
+    }
   }
 
   private String[] splitKey(String key) {
@@ -59,10 +64,9 @@ public class OpalDao {
    * @param id The id of the Opal object.
    * @param auths The auths to connect with.
    * @return An optional map pairing Opal fields to values.
-   * @throws org.apache.accumulo.core.client.TableNotFoundException
    */
   protected Optional<Map<String, Value>> getObjectFields(String namespace, String kind, String id,
-      Authorizations auths) throws TableNotFoundException {
+      Authorizations auths) {
     HashMap<String, Value> map = new HashMap<String, Value>();
 
     Scanner scanner = getScanner(auths);
@@ -91,10 +95,9 @@ public class OpalDao {
    * @param requestedFieldName The name of the field to pull.
    * @param auths The auths to connect with.
    * @return A given field value for an Opal object.
-   * @throws TableNotFoundException
    */
   protected Optional<Value> getFieldValue(String namespace, String kind, String id,
-      String requestedFieldName, Authorizations auths) throws TableNotFoundException {
+      String requestedFieldName, Authorizations auths) {
     Scanner scanner = getScanner(auths);
     scanner.setRange(Range.exact(namespace + SEPERATOR + kind + SEPERATOR + id));
     Iterator<Entry<Key, Value>> iter = scanner.iterator();

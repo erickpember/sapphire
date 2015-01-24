@@ -2,12 +2,12 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.dao;
 
+import com.datafascia.models.CodeableConcept;
 import com.datafascia.models.Encounter;
 import com.datafascia.models.Hospitalization;
 import com.datafascia.models.Observation;
 import com.datafascia.models.ObservationValue;
 import com.datafascia.models.Period;
-import com.datafascia.models.CodeableConcept;
 import com.datafascia.models.Quantity;
 import com.datafascia.string.StringUtils;
 import java.math.BigDecimal;
@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.Connector;
-import org.apache.accumulo.core.client.TableNotFoundException;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.Authorizations;
 
@@ -42,9 +41,8 @@ public class EncounterDao extends OpalDao {
    * @param id ID of the encounter to return.
    * @param auths Authorizations to filter on.
    * @return A populated Encounter object.
-   * @throws TableNotFoundException
    */
-  public Encounter getEncounter(String id, String auths) throws TableNotFoundException {
+  public Encounter getEncounter(String id, String auths) {
     Encounter encounter = new Encounter();
     Authorizations authorizations = new Authorizations(auths);
 
@@ -82,10 +80,8 @@ public class EncounterDao extends OpalDao {
    * @param id ID of the visit to fetch.
    * @param auths Authorizations to filter on.
    * @return A date for the admission.
-   * @throws TableNotFoundException
    */
-  public Optional<Date> getAdmissionDate(String id, Authorizations auths) throws
-      TableNotFoundException {
+  public Optional<Date> getAdmissionDate(String id, Authorizations auths) {
     Optional<Value> valdate = getFieldValue(ObjectStore, PatientVisitMap, id, admitTime, auths);
     if (!valdate.isPresent()) {
       return Optional.empty();
@@ -107,10 +103,8 @@ public class EncounterDao extends OpalDao {
    * @param id ID of the visit to fetch.
    * @param auths Authorizations to filter on.
    * @return An optional observation for the weight.
-   * @throws TableNotFoundException
    */
-  public Optional<Observation> getWeight(String id, Authorizations auths)
-      throws TableNotFoundException {
+  public Optional<Observation> getWeight(String id, Authorizations auths) {
     Optional<Value> weightOpt = getFieldValue(ObjectStore, PatientVisitMap, id, admitWeight, auths);
     String[] weightl = new String[0];
     if (weightOpt.isPresent()) {
@@ -140,10 +134,8 @@ public class EncounterDao extends OpalDao {
    * @param id ID of the visit to fetch.
    * @param auths Authorizations to filter on.
    * @return An optional observation for the height.
-   * @throws TableNotFoundException
    */
-  public Optional<Observation> getHeight(String id, Authorizations auths)
-      throws TableNotFoundException {
+  public Optional<Observation> getHeight(String id, Authorizations auths) {
     Optional<Value> heightOpt = getFieldValue(ObjectStore, PatientVisitMap, id, admitHeight, auths);
     String[] heightl = new String[0];
     if (heightOpt.isPresent()) {

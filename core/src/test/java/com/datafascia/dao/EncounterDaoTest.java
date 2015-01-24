@@ -9,7 +9,6 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.accumulo.core.client.TableNotFoundException;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -24,7 +23,7 @@ public class EncounterDaoTest extends DaoTest {
   private static String auths = "System";
 
   @Test
-  public void encounters() throws TableNotFoundException, ParseException {
+  public void encounters() throws Exception {
     log.info("Getting test encounters");
     EncounterDao dao = new EncounterDao(connect);
 

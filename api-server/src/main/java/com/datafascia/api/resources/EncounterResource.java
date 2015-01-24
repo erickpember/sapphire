@@ -14,10 +14,11 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.Connector;
-import org.apache.accumulo.core.client.TableNotFoundException;
 
 /**
  * Resource object to model encounter information
@@ -43,13 +44,8 @@ public class EncounterResource {
    */
   @GET @Timed @Path("{id}")
   public Encounter encounter(@Auth User user, @PathParam("id") String id) {
-    try {
-      EncounterDao dao = new EncounterDao(connect);
-      return dao.getEncounter(id, authsString);
-    } catch (TableNotFoundException ex) {
-      log.error("Error connecting to table.", ex);
-      return null;
-    }
+    EncounterDao dao = new EncounterDao(connect);
+    return dao.getEncounter(id, authsString);
   }
 
   /**
@@ -57,17 +53,12 @@ public class EncounterResource {
    */
   @GET @Timed @Path("last/{patientid}")
   public Encounter getlast(@Auth User user, @PathParam("patientid") String id) {
-    try {
-      Optional<String> lastvisit = PatientDao.lastVisitId(connect, id);
-      if (lastvisit.isPresent()) {
-        EncounterDao dao = new EncounterDao(connect);
-        return dao.getEncounter(lastvisit.get(), authsString);
-      } else {
-        return null;
-      }
-    } catch (TableNotFoundException ex) {
-      log.error("Error connecting to table.", ex);
-      return null;
+    Optional<String> lastVisit = PatientDao.lastVisitId(connect, id);
+    if (!lastVisit.isPresent()) {
+      throw new WebApplicationException(Response.Status.NOT_FOUND);
     }
+
+    EncounterDao dao = new EncounterDao(connect);
+    return dao.getEncounter(lastVisit.get(), authsString);
   }
 }

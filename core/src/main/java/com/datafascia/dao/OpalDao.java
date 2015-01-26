@@ -2,6 +2,10 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.dao;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -21,6 +25,8 @@ import org.apache.accumulo.core.security.Authorizations;
  */
 @Slf4j
 public class OpalDao {
+  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+
   protected static final String ObjectStore = "ObjectStore";
   protected static final String PatientVisitMap = "PatientVisitMap";
   protected static final String admitWeight = "df_obxWeight";
@@ -130,5 +136,90 @@ public class OpalDao {
    */
   protected Range toRange(String kind, String id) {
     return toRange(ObjectStore, kind, id);
+  }
+
+  /**
+   * Converts value from database representation to Java boolean.
+   *
+   * @param value
+   *     to convert
+   * @return converted value
+   */
+  protected static boolean decodeBoolean(Value value) {
+    String json = decodeJson(value);
+    try {
+      return OBJECT_MAPPER.readValue(json, Boolean.class);
+    } catch (IOException e) {
+      throw new IllegalStateException(String.format("Cannot convert JSON [%s]", json), e);
+    }
+  }
+
+  /**
+   * Converts value from database representation to Java Date.
+   *
+   * @param value
+   *     to convert
+   * @return converted value
+   */
+  protected static Date decodeDate(Value value) {
+    String json = decodeJson(value);
+    try {
+      long millis = OBJECT_MAPPER.readValue(json, Long.class);
+      return new Date(millis);
+    } catch (IOException e) {
+      throw new IllegalStateException(String.format("Cannot convert JSON [%s]", json), e);
+    }
+  }
+
+  /**
+   * Converts value from database representation to Java long.
+   *
+   * @param value
+   *     to convert
+   * @return converted value
+   */
+  protected static long decodeLong(Value value) {
+    String json = decodeJson(value);
+    try {
+      return OBJECT_MAPPER.readValue(json, Long.class);
+    } catch (IOException e) {
+      throw new IllegalStateException(String.format("Cannot convert JSON [%s]", json), e);
+    }
+  }
+
+  /**
+   * Converts value from database representation to Java String.
+   *
+   * @param value
+   *     to convert
+   * @return converted value
+   */
+  protected static String decodeString(Value value) {
+    String json = decodeJson(value);
+    try {
+      return OBJECT_MAPPER.readValue(json, String.class);
+    } catch (IOException e) {
+      throw new IllegalStateException(String.format("Cannot convert JSON [%s]", json), e);
+    }
+  }
+
+  /**
+   * Converts value from database representation to Java String array.
+   *
+   * @param value
+   *     to convert
+   * @return converted value
+   */
+  protected static String[] decodeStringArray(Value value) {
+    String json = decodeJson(value);
+    try {
+      return OBJECT_MAPPER.readValue(json, String[].class);
+    } catch (IOException e) {
+      throw new IllegalStateException(String.format("Cannot convert JSON [%s]", json), e);
+    }
+  }
+
+  private static String decodeJson(Value value) {
+    return new String(value.get(), StandardCharsets.UTF_8);
   }
 }

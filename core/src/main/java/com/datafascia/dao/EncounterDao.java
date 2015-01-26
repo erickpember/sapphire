@@ -108,8 +108,8 @@ public class EncounterDao extends OpalDao {
     Optional<Value> weightOpt = getFieldValue(ObjectStore, PatientVisitMap, id, admitWeight, auths);
     String[] weightl = new String[0];
     if (weightOpt.isPresent()) {
-      Value weightVal = weightOpt.get();
-      weightl = ValueUtils.getString(weightVal).replace("\"", "").split(" ");
+      Value weightVal = (Value) weightOpt.get();
+      weightl = decodeString(weightVal).split(" ");
     }
 
     if (weightl.length != 2) {
@@ -139,8 +139,8 @@ public class EncounterDao extends OpalDao {
     Optional<Value> heightOpt = getFieldValue(ObjectStore, PatientVisitMap, id, admitHeight, auths);
     String[] heightl = new String[0];
     if (heightOpt.isPresent()) {
-      Value heightVal = heightOpt.get();
-      heightl = ValueUtils.getString(heightVal).replace("\"", "").split(" ");
+      Value heightVal = (Value) heightOpt.get();
+      heightl = decodeString(heightVal).split(" ");
     }
 
     if (heightl.length != 2) {

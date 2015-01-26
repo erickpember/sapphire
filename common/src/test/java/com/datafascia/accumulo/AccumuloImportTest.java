@@ -28,8 +28,6 @@ import org.testng.annotations.Test;
  */
 @Slf4j
 public class AccumuloImportTest {
-  private static final String PASSWORD = "secret";
-
   private File tempDir;
   private MiniAccumuloCluster mac;
   private AccumuloConfig config;
@@ -38,15 +36,15 @@ public class AccumuloImportTest {
   @BeforeClass
   public void setup() throws IOException, InterruptedException {
     tempDir = Files.createTempDir();
-    mac = new MiniAccumuloCluster(new MiniAccumuloConfig(tempDir, PASSWORD));
+    mac = new MiniAccumuloCluster(new MiniAccumuloConfig(tempDir, AccumuloConfig.USER_PASSWORD));
     mac.start();
 
     config = new AccumuloConfig() {{
       setInstance(mac.getInstanceName());
-      setUser("root");
-      setPassword(PASSWORD);
+      setUser(AccumuloConfig.ROOT);
+      setPassword(AccumuloConfig.USER_PASSWORD);
       setZooKeepers(mac.getZooKeepers());
-      setType(AccumuloConfig.REAL);
+      setType(AccumuloConfig.MINI);
     }};
     injector = Guice.createInjector(new AbstractModule() {
       @Override

@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.dao;
 
+import com.datafascia.dao.PatientDao;
 import com.datafascia.models.Patient;
 import java.io.IOException;
 import java.util.Iterator;
@@ -15,10 +16,10 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 
 /**
- * Test for Patient DAO
+ * Integration test for Patient DAO
  */
 @Slf4j
-public class PatientDaoTest extends DaoTest {
+public class PatientDaoIT extends DaoIT {
   @Test
   public void patients() throws AccumuloException, AccumuloSecurityException, IOException,
       TableExistsException, TableNotFoundException, InterruptedException {

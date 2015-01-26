@@ -2,6 +2,8 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.accumulo;
 
+import com.beust.jcommander.JCommander;
+import com.datafascia.accumulo.AccumuloConfig;
 import com.google.common.io.Files;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -18,28 +20,7 @@ import org.apache.accumulo.minicluster.MiniAccumuloCluster;
  */
 @Slf4j
 public class MiniAccumuloStart {
-  /** Accumulo configuration file */
-  public static String config = System.getProperty("java.io.tmpdir") +
-      File.separatorChar + "accumulo.cfg";
-  /** Kill file */
-  public static String killFile = System.getProperty("java.io.tmpdir") +
-      File.separatorChar + "killAccumulo";
-
-  /** Property name for ZooKeeper instance */
-  public static final String ZOOKEEPER = "zookeeper";
-  /** Property name for Accumulo instance */
-  public static final String INSTANCE = "instance";
-  /** Property name for Accumulo user */
-  public static final String USER = "user";
-  /** Property name for Accumulo password */
-  public static final String PASSWORD = "password";
-  /** Property name for Accumulo directory */
-  public static final String DIRECTORY = "directory";
-
-  /** Default user name */
-  public static final String ROOT = "root";
-  /** Default user password */
-  public static final String USER_PASSWORD = "secret";
+  private static MiniAccumuloOpts opts = new MiniAccumuloOpts();
 
   /**
    * Start the server
@@ -47,25 +28,47 @@ public class MiniAccumuloStart {
    * @param args the command line arguments
    */
   public static void main(String[] args) throws IOException, InterruptedException {
+    new JCommander(opts, args);
+
     System.out.println("Starting Accumulo mini-cluster ...");
     setClasspath();
-    File tempDir = Files.createTempDir();
-    MiniAccumuloCluster accumulo = new MiniAccumuloCluster(tempDir, USER_PASSWORD);
-    accumulo.start();
-    Thread.sleep(3000);
-    exportConfig(accumulo, tempDir);
-    System.out.println("  server started ..");
 
-    while (true) {
-      Thread.sleep(3000);
-      File kill = new File(killFile);
-      if (kill.exists()) {
-        kill.delete();
-        System.out.println("Stopping Accumulo mini-cluster ...");
-        accumulo.stop();
-      }
+    Runnable run = runnable();
+    if (opts.background) {
+      new Thread(run){{ setDaemon(true); }}.start();
+      Thread.sleep(6000);
+    } else {
+      run.run();
+      System.in.read();
     }
   }
+
+  /**
+   * @return the function to execute
+   */
+  private static Runnable runnable() {
+    return (() -> {
+      try {
+        File tmpDir = Files.createTempDir();
+        MiniAccumuloCluster accInst = new MiniAccumuloCluster(tmpDir, AccumuloConfig.USER_PASSWORD);
+        accInst.start();
+        exportConfig(accInst, tmpDir);
+        System.out.println("  server started ..");
+
+        while (true) {
+          Thread.sleep(2000);
+          File kill = new File(opts.killFile);
+          if (kill.exists()) {
+            kill.delete();
+            System.out.println("Kill file detected ...");
+            accInst.stop();
+          }
+        }
+      } catch (Exception e) {
+        new RuntimeException(e);
+      }
+    });
+ }
 
   /**
    * Set up classpath for next executable
@@ -89,11 +92,12 @@ public class MiniAccumuloStart {
    */
   private static void exportConfig(MiniAccumuloCluster accumulo, File tempDir) throws IOException {
     Properties props = new Properties();
-    props.setProperty(INSTANCE, accumulo.getInstanceName());
-    props.setProperty(ZOOKEEPER, accumulo.getZooKeepers());
-    props.setProperty(USER, ROOT);
-    props.setProperty(PASSWORD, USER_PASSWORD);
-    props.setProperty(DIRECTORY, tempDir.getAbsolutePath());
-    props.store(new FileOutputStream(config), null);
+    props.setProperty(AccumuloConfig.INSTANCE, accumulo.getInstanceName());
+    props.setProperty(AccumuloConfig.ZOOKEEPERS, accumulo.getZooKeepers());
+    props.setProperty(AccumuloConfig.USER, AccumuloConfig.ROOT);
+    props.setProperty(AccumuloConfig.PASSWORD, AccumuloConfig.USER_PASSWORD);
+    props.setProperty(AccumuloConfig.DIRECTORY, tempDir.getAbsolutePath());
+    props.setProperty(AccumuloConfig.TYPE, AccumuloConfig.MINI);
+    props.store(new FileOutputStream(opts.configFile), null);
   }
 }

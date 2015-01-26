@@ -60,6 +60,11 @@
       <groupId>com.beust</groupId>
       <artifactId>jcommander</artifactId>
     </dependency>
+    <dependency>
+      <groupId>com.datafascia</groupId>
+      <artifactId>common</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
   <build>

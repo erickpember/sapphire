@@ -2,14 +2,10 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.accumulo;
 
-import com.datafascia.accumulo.MiniAccumuloStart;
 import com.google.inject.AbstractModule;
 import com.google.inject.Inject;
 import com.google.inject.Provides;
 import com.google.inject.Singleton;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
@@ -17,6 +13,7 @@ import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.mock.MockInstance;
 import org.apache.accumulo.core.client.security.tokens.PasswordToken;
 import org.apache.accumulo.core.client.ZooKeeperInstance;
+import org.apache.accumulo.core.security.Authorizations;
 
 /**
  * This class provides the Accumulo connector needed by other applications via Guice injection
@@ -35,11 +32,16 @@ public class AccumuloConnector extends AbstractModule {
   @Inject @Provides @Singleton
   public Connector connector(AccumuloConfig config) throws AccumuloException,
       AccumuloSecurityException {
+    Connector connect;
     if (config.isMock()) {
-      return mockInstance(config);
+      connect = mockInstance(config);
+    } else {
+      connect = instance(config);
     }
+    connect.securityOperations().changeUserAuthorizations(config.getUser(),
+        new Authorizations("System"));
 
-    return realInstance(config);
+    return connect;
   }
 
   @Override
@@ -51,7 +53,7 @@ public class AccumuloConnector extends AbstractModule {
    *
    * @param config the accumulo configuration
    */
-  private Connector realInstance(AccumuloConfig config) throws AccumuloException,
+  private Connector instance(AccumuloConfig config) throws AccumuloException,
       AccumuloSecurityException {
     log.info("Accumulo Zookeeper: " + config.getZooKeepers() + ", connector for: " +
         config.getInstance() + ", with user " + config.getUser());
@@ -72,26 +74,5 @@ public class AccumuloConnector extends AbstractModule {
 
     return new MockInstance().getConnector(config.getUser(),
         new PasswordToken(config.getPassword()));
-  }
-
-  /**
-   * Return connector to mini instance of Accumulo. To be used for testing purposes.
-   *
-   * @param config the accumulo configuration
-   */
-  private Connector miniInstance(AccumuloConfig config) throws AccumuloException,
-      AccumuloSecurityException {
-    Properties props = new Properties();
-    try {
-      props.load(new FileInputStream(MiniAccumuloStart.config));
-    } catch (IOException e) {
-      throw new AccumuloException("Mini-cluster config file missing.", e);
-    }
-    log.info("Accumulo Mini connector with user: " + props.getProperty(MiniAccumuloStart.USER));
-
-    return new ZooKeeperInstance(props.getProperty(MiniAccumuloStart.INSTANCE),
-        props.getProperty(MiniAccumuloStart.ZOOKEEPER)).getConnector(
-        props.getProperty(MiniAccumuloStart.USER),
-        new PasswordToken(props.getProperty(MiniAccumuloStart.PASSWORD)));
   }
 }

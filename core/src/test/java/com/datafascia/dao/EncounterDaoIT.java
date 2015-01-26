@@ -18,7 +18,7 @@ import static org.testng.Assert.assertTrue;
  * Test for Encounter DAO
  */
 @Slf4j
-public class EncounterDaoTest extends DaoTest {
+public class EncounterDaoIT extends DaoIT {
 
   private static String auths = "System";
 

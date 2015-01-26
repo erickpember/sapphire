@@ -48,8 +48,8 @@
   </properties>
 
   <modules>
-    <module>accumulo</module>
     <module>common</module>
+    <module>accumulo</module>
     <module>dropwizard-testing</module>
     <module>core</module>
     <module>api-server</module>

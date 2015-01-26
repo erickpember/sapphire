@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.accumulo;
 
+import com.beust.jcommander.JCommander;
 import java.io.File;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
@@ -16,9 +17,18 @@ public class MiniAccumuloStop {
    *
    * @param args the command line arguments
    */
-  public static void main(String[] args) throws IOException {
-    System.out.println("Stopping the Accumulo mini-cluster ... ");
-    File kill = new File(MiniAccumuloStart.killFile);
-    kill.createNewFile();
+  public static void main(String[] args) throws IOException, InterruptedException {
+    MiniAccumuloOpts opts = new MiniAccumuloOpts();
+    new JCommander(opts, args);
+
+    new File(opts.killFile).createNewFile();
+    System.out.print("Stopping the Accumulo mini-cluster ... ");
+    while (true) {
+      System.out.print(".");
+      Thread.sleep(3000);
+      if (!new File(opts.killFile).exists()) {
+        return;
+      }
+    }
   }
 }

@@ -22,11 +22,6 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.datafascia</groupId>
-      <artifactId>accumulo-server</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <scope>provided</scope>

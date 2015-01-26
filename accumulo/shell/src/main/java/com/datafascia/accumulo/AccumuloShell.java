@@ -2,8 +2,11 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.accumulo;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
+import com.beust.jcommander.Parameters;
+import com.datafascia.accumulo.AccumuloConfig;
 import java.io.FileInputStream;
-import com.datafascia.accumulo.MiniAccumuloStart;
 import java.io.IOException;
 import java.util.Properties;
 import lombok.extern.slf4j.Slf4j;
@@ -14,21 +17,32 @@ import org.apache.accumulo.core.util.shell.Shell;
  */
 @Slf4j
 public class AccumuloShell {
-  private static Properties props = new Properties();
-
   /**
-   * Start the server
+   * Start the shell
    *
    * @param args the command line arguments
    */
   public static void main(String[] args) throws IOException {
-    props.load(new FileInputStream(MiniAccumuloStart.config));
-    String instance = props.getProperty(MiniAccumuloStart.INSTANCE);
-    String zookeeper = props.getProperty(MiniAccumuloStart.ZOOKEEPER);
-    String user = props.getProperty(MiniAccumuloStart.USER);
-    String password = props.getProperty(MiniAccumuloStart.PASSWORD);
+    Opts opts = new Opts();
+    new JCommander(opts, args);
 
-    String[] shellArgs = new String[]{"-u", user, "-p", password, "-z", instance, zookeeper};
+    Properties props = new Properties();
+    props.load(new FileInputStream(opts.configFile));
+    String[] shellArgs = new String[] {
+        "-u",
+        props.getProperty(AccumuloConfig.USER),
+        "-p",
+        props.getProperty(AccumuloConfig.PASSWORD),
+        "-z",
+        props.getProperty(AccumuloConfig.INSTANCE),
+        props.getProperty(AccumuloConfig.ZOOKEEPERS)
+    };
     Shell.main(shellArgs);
+  }
+
+  @Parameters(commandDescription = "Command line parameters to start Accumulo shell.")
+  static class Opts {
+    @Parameter(names = "-config", description = "File for Accumulo configuration", required = true)
+    public String configFile;
   }
 }

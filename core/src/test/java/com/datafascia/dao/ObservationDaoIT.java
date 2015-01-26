@@ -13,7 +13,7 @@ import org.testng.annotations.Test;
  * {@link ObservationDao} integration test
  */
 @Slf4j
-public class ObservationDaoTest extends DaoTest {
+public class ObservationDaoIT extends DaoIT {
 
   private static final String PATIENT_ID = "96087004";
   private static final String AUTHORIZATIONS = "System";

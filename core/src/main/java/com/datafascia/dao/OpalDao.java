@@ -27,7 +27,7 @@ public class OpalDao {
   protected static final String admitHeight = "df_obxHeight";
   protected static final String admitTime = "dF_pv1AdmitDateTime";
   protected static final String LastVisitOiid = "LastVisitOiid";
-  protected static final String SEPERATOR = "\0";
+  protected static final String KEY_SEPARATOR = "\0";
   protected static final String PatientObject = "PatientObject";
   protected static final String OPAL_DATA = "opal_dF_data";
 
@@ -53,7 +53,7 @@ public class OpalDao {
   }
 
   private String[] splitKey(String key) {
-    return key.split(SEPERATOR);
+    return key.split(KEY_SEPARATOR);
   }
 
   /**
@@ -70,7 +70,7 @@ public class OpalDao {
     HashMap<String, Value> map = new HashMap<String, Value>();
 
     Scanner scanner = getScanner(auths);
-    scanner.setRange(Range.exact(namespace + SEPERATOR + kind + SEPERATOR + id));
+    scanner.setRange(toRange(namespace, kind, id));
     Iterator<Entry<Key, Value>> iter = scanner.iterator();
     if (!iter.hasNext()) {
       return Optional.empty();
@@ -99,7 +99,7 @@ public class OpalDao {
   protected Optional<Value> getFieldValue(String namespace, String kind, String id,
       String requestedFieldName, Authorizations auths) {
     Scanner scanner = getScanner(auths);
-    scanner.setRange(Range.exact(namespace + SEPERATOR + kind + SEPERATOR + id));
+    scanner.setRange(toRange(namespace, kind, id));
     Iterator<Entry<Key, Value>> iter = scanner.iterator();
 
     while (iter.hasNext()) {
@@ -116,5 +116,19 @@ public class OpalDao {
     }
 
     return Optional.empty();
+  }
+
+  /**
+   * Converts key to range covering row.
+   */
+  protected Range toRange(String namespace, String kind, String id) {
+    return Range.exact(namespace + KEY_SEPARATOR + kind + KEY_SEPARATOR + id);
+  }
+
+  /**
+   * Converts key in ObjectStore namespace to range covering row.
+   */
+  protected Range toRange(String kind, String id) {
+    return toRange(ObjectStore, kind, id);
   }
 }

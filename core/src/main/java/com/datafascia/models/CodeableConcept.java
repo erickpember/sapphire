@@ -19,6 +19,7 @@ import lombok.Setter;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName("CodeableConcept")
 public class CodeableConcept {
+
   // Coding Code defined by a terminology system.
   @JsonProperty("code")
   private String code;
@@ -26,4 +27,9 @@ public class CodeableConcept {
   // Plain text representation of the concept.
   @JsonProperty("text")
   private String text;
+
+  public CodeableConcept(String code, String text) {
+    this.code = code;
+    this.text = text;
+  }
 }

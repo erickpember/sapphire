@@ -58,7 +58,7 @@ public class OpalDao {
     }
   }
 
-  private String[] splitKey(String key) {
+  protected String[] splitKey(String key) {
     return key.split(KEY_SEPARATOR);
   }
 

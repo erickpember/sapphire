@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.dao;
 
+import com.datafascia.common.time.Interval;
 import com.datafascia.models.CodeableConcept;
 import com.datafascia.models.Observation;
 import com.datafascia.models.ObservationValue;
@@ -35,25 +36,26 @@ public class ObservationDao extends OpalDao {
   }
 
   /**
-   * Finds observations for the patient in the time range specified by the open interval
-   * [startCaptureTime, endCaptureTime).  That is, each found item must have a time less than the
-   * upper bound endpoint.
+   * Finds observations for the patient, optionally filtered to capture times in a time interval.
    *
    * @param patientId
    *     patient identifier
-   * @param startCaptureTime
-   *     minimum capture time to include
-   * @param endCaptureTime
-   *     upper bound of capture time to include
+   * @param captureTimeInterval
+   *     capture time interval to include
    * @param auths
    *     authorizations
    * @return collection of observations, empty if none found
    */
   public Collection<Observation> findObservationsByPatientId(
-      String patientId, Instant startCaptureTime, Instant endCaptureTime, String auths)
+      String patientId, Optional<Interval<Instant>> captureTimeInterval, String auths)
   {
-    Date startIssued = Date.from(startCaptureTime);
-    Date endIssued = Date.from(endCaptureTime);
+    Date startIssued = null;
+    Date endIssued = null;
+    if (captureTimeInterval.isPresent()) {
+      startIssued = Date.from(captureTimeInterval.get().getStartInclusive());
+      endIssued = Date.from(captureTimeInterval.get().getEndExclusive());
+    }
+
     Authorizations authorizations = new Authorizations(auths);
 
     Collection<Observation> foundObservations = new ArrayList<>();
@@ -63,10 +65,12 @@ public class ObservationDao extends OpalDao {
       for (String updateId : updateIds) {
         List<Observation> candidateObservations = findObservations(updateId, authorizations);
         for (Observation observation : candidateObservations) {
-          if (!observation.getIssued().before(startIssued) &&
-              observation.getIssued().before(endIssued)) {
-            foundObservations.add(observation);
+          if (startIssued != null &&
+              (observation.getIssued().before(startIssued) ||
+               !observation.getIssued().before(endIssued))) {
+            continue;
           }
+          foundObservations.add(observation);
         }
       }
     }

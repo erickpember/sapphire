@@ -3,9 +3,9 @@
 package com.datafascia.dao;
 
 import com.datafascia.models.Observation;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
@@ -24,7 +24,7 @@ public class ObservationDaoTest extends DaoTest {
     ObservationDao observationDao = new ObservationDao(connect);
     for (String patientId : patientIds) {
       Collection<Observation> observations = observationDao.findObservationsByPatientId(
-          patientId, Instant.EPOCH, Instant.now(), AUTHORIZATIONS);
+          patientId, Optional.empty(), AUTHORIZATIONS);
       if (!observations.isEmpty()) {
         log.debug("patientId [{}]", patientId);
       }

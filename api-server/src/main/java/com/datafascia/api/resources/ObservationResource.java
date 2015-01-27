@@ -4,6 +4,7 @@ package com.datafascia.api.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.datafascia.api.authenticator.User;
+import com.datafascia.common.time.Interval;
 import com.datafascia.dao.ObservationDao;
 import com.datafascia.models.Observation;
 import com.google.common.base.Strings;
@@ -11,6 +12,7 @@ import io.dropwizard.auth.Auth;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
+import java.util.Optional;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -37,7 +39,7 @@ public class ObservationResource {
   }
 
   /**
-   * Finds observations for the patient in the time range specified by the open interval
+   * Finds observations for the patient, optionally filtered to capture times in the open interval
    * [startCaptureTime, endCaptureTime).  That is, each found item must have a time less than the
    * upper bound endpoint.
    *
@@ -56,16 +58,28 @@ public class ObservationResource {
       @QueryParam("startCaptureTime") String startCaptureTimeString,
       @QueryParam("endCaptureTime") String endCaptureTimeString) {
 
-    if (Strings.isNullOrEmpty(patientId) ||
-        Strings.isNullOrEmpty(startCaptureTimeString) ||
-        Strings.isNullOrEmpty(endCaptureTimeString)) {
-      throw new WebApplicationException(Response.Status.BAD_REQUEST);
+    if (Strings.isNullOrEmpty(patientId)) {
+     throw new WebApplicationException(
+         "Required parameter patientId is missing", Response.Status.BAD_REQUEST);
     }
-    Instant startCaptureTime = parseDateTime(startCaptureTimeString);
-    Instant endCaptureTime = parseDateTime(endCaptureTimeString);
+
+    Interval<Instant> captureTimeRange;
+    if (!Strings.isNullOrEmpty(startCaptureTimeString) ||
+        !Strings.isNullOrEmpty(endCaptureTimeString)) {
+      if (Strings.isNullOrEmpty(startCaptureTimeString) ||
+          Strings.isNullOrEmpty(endCaptureTimeString)) {
+        throw new WebApplicationException(
+            "Both startCaptureTime and endCaptureTime parameters are required if either is passed",
+            Response.Status.BAD_REQUEST);
+      }
+      captureTimeRange = new Interval<>(
+          parseDateTime(startCaptureTimeString), parseDateTime(endCaptureTimeString));
+    } else {
+      captureTimeRange = null;
+    }
 
     return observationDao.findObservationsByPatientId(
-        patientId, startCaptureTime, endCaptureTime, AUTHORIZATIONS);
+        patientId, Optional.ofNullable(captureTimeRange), AUTHORIZATIONS);
   }
 
   private Instant parseDateTime(String input) {

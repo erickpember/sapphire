@@ -11,6 +11,7 @@ import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.api.health.AccumuloHealthCheck;
 import com.datafascia.api.resources.APIConfigurationResource;
 import com.datafascia.api.resources.EmergeResource;
+import com.datafascia.api.resources.ObservationResource;
 import com.datafascia.api.resources.PatientResource;
 import com.datafascia.api.resources.EncounterResource;
 import com.datafascia.api.resources.VersionResource;
@@ -60,6 +61,7 @@ public class APIService extends Application<APIConfiguration> {
         SimpleAuthenticator(), "dataFascia-API", User.class)));
 
     // Resources
+    environment.jersey().register(injector.getInstance(ObservationResource.class));
     environment.jersey().register(injector.getInstance(PatientResource.class));
     environment.jersey().register(injector.getInstance(EncounterResource.class));
     environment.jersey().register(injector.getInstance(APIConfigurationResource.class));

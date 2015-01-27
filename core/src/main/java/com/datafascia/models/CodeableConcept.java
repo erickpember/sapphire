@@ -5,17 +5,15 @@ package com.datafascia.models;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import lombok.EqualsAndHashCode;
-import lombok.extern.slf4j.Slf4j;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 /**
  * Represents a value that is usually supplied by providing a reference to one or more terminologies
  * or ontologies, but may also be defined by the provision of text.
  */
-@Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode
+@AllArgsConstructor @Data @NoArgsConstructor
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName("CodeableConcept")
 public class CodeableConcept {
@@ -27,9 +25,4 @@ public class CodeableConcept {
   // Plain text representation of the concept.
   @JsonProperty("text")
   private String text;
-
-  public CodeableConcept(String code, String text) {
-    this.code = code;
-    this.text = text;
-  }
 }

@@ -26,8 +26,7 @@ import org.apache.accumulo.core.security.Authorizations;
 /**
  * Observation data access.
  */
-@Singleton
-@Slf4j
+@Singleton @Slf4j
 public class ObservationDao extends OpalDao {
 
   @Inject
@@ -53,9 +52,9 @@ public class ObservationDao extends OpalDao {
   public Collection<Observation> findObservationsByPatientId(
       String patientId, Instant startCaptureTime, Instant endCaptureTime, String auths)
   {
-    Authorizations authorizations = new Authorizations(auths);
     Date startIssued = Date.from(startCaptureTime);
     Date endIssued = Date.from(endCaptureTime);
+    Authorizations authorizations = new Authorizations(auths);
 
     Collection<Observation> foundObservations = new ArrayList<>();
     List<String> visitIds = findVisitIds(patientId, authorizations);

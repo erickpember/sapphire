@@ -24,9 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Observation API endpoint
  */
-@Path("/observation")
-@Produces(MediaType.APPLICATION_JSON)
-@Slf4j
+@Path("/observation") @Produces(MediaType.APPLICATION_JSON) @Slf4j
 public class ObservationResource {
 
   private static final String AUTHORIZATIONS = "System";
@@ -51,14 +49,13 @@ public class ObservationResource {
    *     upper bound of capture time to include
    * @return collection of observations, empty if none found
    */
-  @GET
-  @Timed
+  @GET @Timed
   public Collection<Observation> findObservations(
       @Auth User user,
       @QueryParam("patientId") String patientId,
       @QueryParam("startCaptureTime") String startCaptureTimeString,
-      @QueryParam("endCaptureTime") String endCaptureTimeString)
-  {
+      @QueryParam("endCaptureTime") String endCaptureTimeString) {
+
     if (Strings.isNullOrEmpty(patientId) ||
         Strings.isNullOrEmpty(startCaptureTimeString) ||
         Strings.isNullOrEmpty(endCaptureTimeString)) {

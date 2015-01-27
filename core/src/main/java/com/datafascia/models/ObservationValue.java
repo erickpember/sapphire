@@ -5,16 +5,13 @@ package com.datafascia.models;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import lombok.EqualsAndHashCode;
-import lombok.extern.slf4j.Slf4j;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 /**
  * Holds a given value for an observation.
  */
-@Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode
+@Data @NoArgsConstructor
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName("ObservationValue")
 public class ObservationValue {

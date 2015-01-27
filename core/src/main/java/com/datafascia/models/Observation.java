@@ -9,16 +9,13 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
-import lombok.EqualsAndHashCode;
-import lombok.extern.slf4j.Slf4j;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 /**
  * Represents a patient observation.
  */
-@Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode
+@Data @NoArgsConstructor
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName("Observation")
 public class Observation {

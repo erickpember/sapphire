@@ -2,7 +2,6 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.csv;
 
-import com.beust.jcommander.JCommander;
 import com.datafascia.api.client.DatafasciaApi;
 import com.datafascia.api.client.DatafasciaApiBuilder;
 import com.datafascia.csv.CSVMapper;
@@ -12,7 +11,6 @@ import com.datafascia.models.Hospitalization;
 import com.datafascia.models.Name;
 import com.datafascia.models.Observation;
 import com.datafascia.models.Patient;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Joiner;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -29,10 +27,9 @@ import lombok.extern.slf4j.Slf4j;
  * The main application class for the Emerge CSV generator.
  */
 @Slf4j
-public class EmergeCSV {
+public class EmergeDemographicCSVGenerator {
 
   // Date format the CSV is expecting.
-
   private static final DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
   // Name format
   private static final String NAME_FMT
@@ -47,17 +44,24 @@ public class EmergeCSV {
   private static CSVMapper<Demographic> mapper;
 
   /**
-   * The main entry point for the application
+   * Generates Emerge CSV file.
    *
-   * @param args the command line arguments
+   * @param apiEndpoint
+   *     API endpoint URI
+   * @param user
+   *     user name for API access
+   * @param password
+   *     password for API access
+   * @param csvFile
+   *     output CSV file name
    */
-  public static void main(String[] args) throws JsonProcessingException, IOException {
-    EmergeCSVOpts opts = new EmergeCSVOpts();
-    new JCommander(opts, args);
+  public static void generate(URI apiEndpoint, String user, String password, String csvFile)
+      throws IOException {
+
     mapper = new CSVMapper<>(Demographic.class);
 
-    try (PrintWriter pw = new PrintWriter(new FileWriter(opts.csvFile))) {
-      DatafasciaApi api = DatafasciaApiBuilder.endpoint(opts.apiEndpoint, opts.user, opts.password);
+    try (PrintWriter pw = new PrintWriter(new FileWriter(csvFile))) {
+      DatafasciaApi api = DatafasciaApiBuilder.endpoint(apiEndpoint, user, password);
       pw.write(Joiner.on(",").join(mapper.getHeaders()));
 
       int entry = 0;

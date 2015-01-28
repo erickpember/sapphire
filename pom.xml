@@ -56,6 +56,7 @@
     <module>core</module>
     <module>dropwizard-testing</module>
     <module>emerge-apps</module>
+    <module>shell</module>
   </modules>
 
   <dependencyManagement>

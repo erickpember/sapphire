@@ -41,6 +41,7 @@
     <jcommander.version>1.47</jcommander.version>
     <jetty.version>9.2.4.v20141103</jetty.version>
     <jsonSchema.version>2.4.0</jsonSchema.version>
+    <kafka.version>0.8.2-beta</kafka.version>
     <lombok.version>1.14.8</lombok.version>
     <neovisionaries.version>1.14</neovisionaries.version>
     <reflections.version>0.9.9</reflections.version>
@@ -128,15 +129,27 @@
         </exclusions>
       </dependency>
 
+    <dependency>
+      <groupId>org.apache.kafka</groupId>
+      <artifactId>kafka_2.10</artifactId>
+      <version>${kafka.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-log4j12</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
       <dependency>
         <groupId>org.atmosphere</groupId>
         <artifactId>atmosphere-annotations</artifactId>
-        <version>${atmosphere-version}</version>
+        <version>${atmosphere.version}</version>
       </dependency>
       <dependency>
         <groupId>org.atmosphere</groupId>
         <artifactId>atmosphere-guice</artifactId>
-        <version>${atmosphere-version}</version>
+        <version>${atmosphere.version}</version>
         <exclusions>
           <exclusion>
             <groupId>com.sun.jersey.contribs</groupId>
@@ -147,7 +160,7 @@
       <dependency>
         <groupId>org.atmosphere</groupId>
         <artifactId>atmosphere-runtime</artifactId>
-        <version>${atmosphere-version}</version>
+        <version>${atmosphere.version}</version>
       </dependency>
 
       <dependency>

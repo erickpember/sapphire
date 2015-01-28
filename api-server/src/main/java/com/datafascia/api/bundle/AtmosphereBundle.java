@@ -21,9 +21,9 @@ public class AtmosphereBundle implements ConfiguredBundle<APIConfiguration> {
     log.info("Initializing Atmosphere bundle for Dropwizard.");
     AtmosphereGuiceServlet atmosphereServlet = new AtmosphereGuiceServlet();
     final ServletRegistration.Dynamic websocket =
-      environment.servlets().addServlet("socket", atmosphereServlet);
+        environment.servlets().addServlet("websocket", atmosphereServlet);
     websocket.setAsyncSupported(true);
-    websocket.addMapping("/socket/*");
+    websocket.addMapping("/websocket/*");
     websocket.setInitParameter("com.sun.jersey.config.property.packages",
         "com.datafascia.api.resources.socket");
 

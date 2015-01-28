@@ -4,7 +4,6 @@ package com.datafascia.api.resources.socket;
 
 import com.datafascia.kafka.KafkaConfig;
 import javax.inject.Inject;
-import javax.ws.rs.Path;
 import lombok.extern.slf4j.Slf4j;
 import org.atmosphere.config.service.Disconnect;
 import org.atmosphere.config.service.ManagedService;
@@ -18,12 +17,15 @@ import org.atmosphere.util.IOUtils;
 /**
  * Example resource to show integration of Atmosphere within Dropwizard.
  */
-@Slf4j @Path("/") @ManagedService(interceptors = AtmosphereResourceLifecycleInterceptor.class)
+@Slf4j @ManagedService( path = "/websocket/test",
+        interceptors = AtmosphereResourceLifecycleInterceptor.class)
 public final class SocketResource {
   private KafkaConfig config;
 
   /**
    * Construct the resource
+   *
+   * @param config the Kafka configuration
    */
   @Inject
   public SocketResource(KafkaConfig config) {
@@ -47,7 +49,7 @@ public final class SocketResource {
    * Invoked when the client disconnect or when an unexpected closing of the underlying connection
    * happens.
    *
-   * @param event the event
+   * @param event the Atmosphere event
    */
   @Disconnect
   public void onDisconnect(final AtmosphereResourceEvent event) {

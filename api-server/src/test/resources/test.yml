@@ -9,9 +9,14 @@ accumuloConfig:
   zooKeepers: zookeeper1.datafascia.com
   type: mock
 
+# Kafka Consumer parameters
 kafkaConfig:
-  zooKeepers: zookeeper1.datafascia.com
-  groupId: group
+    zookeeperConnect: 0.0.0.0:2181
+    # uniquely identifies a set of consumers within the same consumer group
+    groupId: group
+    autoOffsetReset: smallest
+    # timeout for consuming Kafka messages. -1 for no timeout.
+    consumerTimeoutMs: -1
 
 server:
   applicationConnectors:

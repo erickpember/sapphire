@@ -28,7 +28,7 @@ import org.apache.accumulo.core.security.Authorizations;
 public class EncounterDao extends OpalDao {
   public static final String WEIGHT = "Weight";
   public static final String HEIGHT = "Height";
-  private final SimpleDateFormat adminDateFormatter = new SimpleDateFormat("yyyyMMddHHmmssX");
+  private static final String ADMIN_DATE_FORMAT = "yyyyMMddHHmmssX";
 
   public EncounterDao(Connector connector) {
     super(connector);
@@ -86,14 +86,13 @@ public class EncounterDao extends OpalDao {
       return Optional.empty();
     }
 
-    Date date;
     try {
-      date = adminDateFormatter.parse(decodeString(valdate.get()) + "-00");
+      SimpleDateFormat dateFormat = new SimpleDateFormat(ADMIN_DATE_FORMAT);
+      Date date = dateFormat.parse(decodeString(valdate.get()) + "-00");
+      return Optional.of(date);
     } catch (ParseException ex) {
       return Optional.empty();
     }
-
-    return Optional.of(date);
   }
 
   /**

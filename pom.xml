@@ -46,6 +46,7 @@
     <string-template.version>4.0.2</string-template.version>
     <testng.version>6.8.13</testng.version>
     <zookeeper.version>3.4.5</zookeeper.version>
+    <reflections.version>0.9.9</reflections.version>
   </properties>
 
   <modules>
@@ -224,6 +225,11 @@
         <groupId>org.testng</groupId>
         <artifactId>testng</artifactId>
         <version>${testng.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.reflections</groupId>
+        <artifactId>reflections</artifactId>
+        <version>${reflections.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

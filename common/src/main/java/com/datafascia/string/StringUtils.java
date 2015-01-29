@@ -11,24 +11,6 @@ import org.apache.commons.codec.binary.Base64;
  */
 @Slf4j
 public class StringUtils {
-  /**
-   * Remove whitespace and quotes from start and end of string
-   *
-   * @param string the string to clean
-   *
-   * @return the cleaned string
-   */
-  public static String trimQuote(String string) {
-    String str = string.trim();
-    if (str.startsWith("\"")) {
-      str = str.substring(1, str.length());
-    }
-    if (str.endsWith("\"")) {
-      str = str.substring(0, str.length() - 1);
-    }
-
-    return str;
-  }
 
   /**
    * Convert string to base64 form

@@ -9,7 +9,6 @@ import com.datafascia.models.Observation;
 import com.datafascia.models.ObservationValue;
 import com.datafascia.models.Period;
 import com.datafascia.models.Quantity;
-import com.datafascia.string.StringUtils;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -89,7 +88,7 @@ public class EncounterDao extends OpalDao {
 
     Date date;
     try {
-      date = adminDateFormatter.parse(StringUtils.trimQuote(valdate.get().toString()) + "-00");
+      date = adminDateFormatter.parse(decodeString(valdate.get()) + "-00");
     } catch (ParseException ex) {
       return Optional.empty();
     }

@@ -19,6 +19,7 @@ import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.Authorizations;
+import org.apache.hadoop.io.Text;
 
 /**
  * Handles interacting with Accumulo instances that are formatted in the style of Opal.
@@ -33,7 +34,7 @@ public class OpalDao {
   protected static final String admitHeight = "df_obxHeight";
   protected static final String admitTime = "dF_pv1AdmitDateTime";
   protected static final String LastVisitOiid = "LastVisitOiid";
-  protected static final String KEY_SEPARATOR = "\0";
+  private static final String KEY_SEPARATOR = "\0";
   protected static final String PatientObject = "PatientObject";
   protected static final String OPAL_DATA = "opal_dF_data";
 
@@ -50,7 +51,7 @@ public class OpalDao {
    * @return A scanner for the opal_dF_data table.
    * @throws RuntimeException if table not found.
    */
-  public Scanner getScanner(Authorizations auths) {
+  protected Scanner getScanner(Authorizations auths) {
     try {
       return connector.createScanner(OPAL_DATA, auths);
     } catch (TableNotFoundException e) {
@@ -58,7 +59,7 @@ public class OpalDao {
     }
   }
 
-  protected String[] splitKey(String key) {
+  protected static String[] splitKey(String key) {
     return key.split(KEY_SEPARATOR);
   }
 
@@ -127,15 +128,29 @@ public class OpalDao {
   /**
    * Converts key to range covering row.
    */
-  protected Range toRange(String namespace, String kind, String id) {
+  protected static Range toRange(String namespace, String kind, String id) {
     return Range.exact(namespace + KEY_SEPARATOR + kind + KEY_SEPARATOR + id);
   }
 
   /**
    * Converts key in ObjectStore namespace to range covering row.
    */
-  protected Range toRange(String kind, String id) {
+  protected static Range toRange(String kind, String id) {
     return toRange(ObjectStore, kind, id);
+  }
+
+  /**
+   * Converts kind in ObjectStore namespace to range covering rows containing that kind.
+   */
+  protected static Range toRange(String kind) {
+    return Range.prefix(ObjectStore + KEY_SEPARATOR + kind + KEY_SEPARATOR);
+  }
+
+  /**
+   * Converts field type and field name to column family.
+   */
+  protected static Text toColumnFamily(FieldType fieldType, String fieldName) {
+    return new Text(fieldType.name() + KEY_SEPARATOR + fieldName);
   }
 
   /**

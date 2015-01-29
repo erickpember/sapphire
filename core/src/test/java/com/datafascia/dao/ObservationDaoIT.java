@@ -3,8 +3,8 @@
 package com.datafascia.dao;
 
 import com.datafascia.models.Observation;
-import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
@@ -20,8 +20,10 @@ public class ObservationDaoIT extends DaoIT {
 
   @Test
   public void should_find_observations() throws Exception {
-    ArrayList<String> patientIds = PatientDao.getPatientIds(connect, "true");
     ObservationDao observationDao = new ObservationDao(connect);
+
+    PatientDao patientDao = new PatientDao(connect);
+    List<String> patientIds = patientDao.getPatientIds(true);
     for (String patientId : patientIds) {
       Collection<Observation> observations = observationDao.findObservationsByPatientId(
           patientId, Optional.empty(), AUTHORIZATIONS);

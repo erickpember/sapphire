@@ -27,16 +27,13 @@ import org.apache.accumulo.core.client.Connector;
 public class EncounterResource {
 
   private final Connector connect;
+  private PatientDao patientDao;
   public final String authsString = "System";
 
-  /**
-   * Default constructor for patient resource
-   *
-   * @param connect the connection to Accumulo
-   */
   @Inject
-  public EncounterResource(Connector connect) {
+  public EncounterResource(Connector connect, PatientDao patientDao) {
     this.connect = connect;
+    this.patientDao = patientDao;
   }
 
   /**
@@ -53,7 +50,7 @@ public class EncounterResource {
    */
   @GET @Timed @Path("last/{patientid}")
   public Encounter getlast(@Auth User user, @PathParam("patientid") String id) {
-    Optional<String> lastVisit = PatientDao.lastVisitId(connect, id);
+    Optional<String> lastVisit = patientDao.lastVisitId(id);
     if (!lastVisit.isPresent()) {
       throw new WebApplicationException(Response.Status.NOT_FOUND);
     }

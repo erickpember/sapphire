@@ -2,18 +2,12 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.dao;
 
-import com.datafascia.dao.PatientDao;
+import static org.testng.Assert.assertEquals;
+
 import com.datafascia.models.Patient;
-import java.io.IOException;
 import java.util.Iterator;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.accumulo.core.client.AccumuloException;
-import org.apache.accumulo.core.client.AccumuloSecurityException;
-import org.apache.accumulo.core.client.TableExistsException;
-import org.apache.accumulo.core.client.TableNotFoundException;
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.assertEquals;
 
 /**
  * Integration test for Patient DAO
@@ -21,10 +15,10 @@ import static org.testng.Assert.assertEquals;
 @Slf4j
 public class PatientDaoIT extends DaoIT {
   @Test
-  public void patients() throws AccumuloException, AccumuloSecurityException, IOException,
-      TableExistsException, TableNotFoundException, InterruptedException {
+  public void patients() throws Exception {
     log.info("Getting the patients");
-    Iterator<Patient> patients = PatientDao.patients(connect);
+    PatientDao patientDao = new PatientDao(connect);
+    Iterator<Patient> patients = patientDao.patients();
 
     int count = 0;
     while (patients.hasNext()) {

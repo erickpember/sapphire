@@ -14,18 +14,17 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map.Entry;
 import java.util.Optional;
+import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Scanner;
-import org.apache.accumulo.core.client.TableNotFoundException;
 import org.apache.accumulo.core.data.Key;
-import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
+import org.apache.accumulo.core.security.Authorizations;
 import org.apache.hadoop.io.Text;
-
-import static com.datafascia.string.StringUtils.trimQuote;
 
 /**
  * Patient data access to/from Accumulo. This class expects the Accumulo connector object to be
@@ -57,19 +56,30 @@ import static com.datafascia.string.StringUtils.trimQuote;
  *
  */
 @Slf4j
-public class PatientDao extends AbstractDao {
+public class PatientDao extends OpalDao {
+
+  private static final Authorizations AUTHORIZATIONS = new Authorizations("System");
   private static final SimpleDateFormat dateOfBirthFormat = new SimpleDateFormat("yyyyMMdd");
 
+  /** patient present column family */
+  private static final Text PATIENT_PRESENT = toColumnFamily(FieldType.BOOLEAN, "PatientPresent");
+
+  /** last visit identifier column family */
+  private static final Text LAST_VISIT_ID = toColumnFamily(FieldType.STRING, "LastVisitOiid");
+
+  @Inject
+  public PatientDao(Connector connector) {
+    super(connector);
+  }
+
   /**
-   * @param connect the Accumulo connection
-   *
    * @return the list of active patients
    */
-  public static Iterator<Patient> patients(Connector connect) {
-    ArrayList<Patient> patients = new ArrayList<Patient>();
-    ArrayList<String> patientIds = getPatientIds(connect, "true");
+  public Iterator<Patient> patients() {
+    List<Patient> patients = new ArrayList<Patient>();
+    List<String> patientIds = getPatientIds(true);
     for (String patientId : patientIds) {
-      Optional<Patient> patient = patient(connect, patientId, lastVisitId(connect, patientId));
+      Optional<Patient> patient = patient(patientId, lastVisitId(patientId));
       if (patient.isPresent()) {
         patients.add(patient.get());
       }
@@ -80,118 +90,102 @@ public class PatientDao extends AbstractDao {
 
   /**
    * @param activeFlag the active flag setting to filter with
-   *
    * @return the list of active patient identifiers in the unit
    */
-  public static ArrayList<String> getPatientIds(Connector connect, String activeFlag) {
+  public List<String> getPatientIds(boolean activeFlag) {
     log.debug("Getting list of active patient ids...");
     ArrayList<String> patientIds = new ArrayList<>();
-    try {
-      Scanner scan = connect.createScanner(OPAL_DF_DATA, auths);
-      scan.fetchColumnFamily(new Text(PATIENT_PRESENT));
+    Scanner scanner = getScanner(AUTHORIZATIONS);
+    scanner.setRange(toRange(Kinds.PATIENT_OBJECT));
+    scanner.fetchColumnFamily(PATIENT_PRESENT);
 
-      Iterator<Entry<Key,Value>> iter = scan.iterator();
-      while (iter.hasNext()) {
-        Entry<Key,Value> e = iter.next();
-        if (e.getValue().toString().equals(activeFlag)) {
-          String str[] = e.getKey().getRow().toString().split(NUL);
-          if (str[2] != null) {
-            patientIds.add(str[2]);
-          } else {
-            log.error("Invalid row identifier: " + e.getKey().getRow().toString());
-          }
+    for (Entry<Key, Value> entry : scanner) {
+      boolean patientPresent = decodeBoolean(entry.getValue());
+      if (patientPresent == activeFlag) {
+        String str[] = splitKey(entry.getKey().getRow().toString());
+        if (str[2] != null) {
+          patientIds.add(str[2]);
+        } else {
+          log.error("Invalid row identifier: " + entry.getKey().getRow().toString());
         }
       }
-    } catch (TableNotFoundException e) {
-      log.error("Table not found: " + OPAL_DF_DATA);
     }
 
     return patientIds;
   }
 
   /**
-   * @param connect the Accumulo connection object
    * @param patientId the patient identifier
-   *
    * @return return the latest/last visit identifier for the patient
    */
-  public static Optional<String> lastVisitId(Connector connect, String patientId) {
-    log.debug("Fetching visit id for patient " + patientId);
-    try {
-      Scanner scan = connect.createScanner(OPAL_DF_DATA, auths);
-      scan.setRange(Range.exact(PATIENT_OBJECT_KEY_PREFIX + patientId));
-      scan.fetchColumnFamily(new Text(VISIT_ID));
+  public Optional<String> lastVisitId(String patientId) {
+    log.debug("Fetching last visit ID for patient ID " + patientId);
+    Scanner scanner = getScanner(AUTHORIZATIONS);
+    scanner.setRange(toRange(Kinds.PATIENT_OBJECT, patientId));
+    scanner.fetchColumnFamily(LAST_VISIT_ID);
 
-      Iterator<Entry<Key,Value>> iter = scan.iterator();
-      while (iter.hasNext()) {
-        Entry<Key,Value> e = iter.next();
-
-        return Optional.of(trimQuote(e.getValue().toString()));
-      }
-    } catch (TableNotFoundException e) {
-      log.error("Table not found: " + OPAL_DF_DATA);
+    Iterator<Entry<Key, Value>> iter = scanner.iterator();
+    if (iter.hasNext()) {
+      Entry<Key, Value> entry = iter.next();
+      return Optional.of(decodeString(entry.getValue()));
     }
 
     return Optional.empty();
   }
 
   /**
-   * @param connect the Accumulo connection
    * @param patientId the patient identifier
    * @param visitId the visit map identifier
-   *
-   * @return the patient 
+   * @return the patient
    */
-  public static Optional<Patient> patient(Connector connect, String patientId, Optional<String>
-      visitId) {
+  public Optional<Patient> patient(String patientId, Optional<String> visitId) {
     if (!visitId.isPresent()) {
       return Optional.empty();
     }
 
     try {
-      Scanner scan = connect.createScanner(OPAL_DF_DATA, auths);
-      scan.setRange(Range.exact(VISIT_KEY_PREFIX + visitId.get()));
+      Scanner scanner = getScanner(AUTHORIZATIONS);
+      scanner.setRange(toRange(Kinds.PATIENT_VISIT_MAP, visitId.get()));
+
       Patient patient = new Patient();
       patient.setId(URNFactory.patientId(patientId));
       patient.setGender(Gender.Unknown);
       patient.setRace(Race.Unknown);
       Name name = new Name();
 
-      Iterator<Entry<Key,Value>> iter = scan.iterator();
-      while (iter.hasNext()) {
-        Entry<Key,Value> e = iter.next();
-        Value value = e.getValue();
+      for (Entry<Key, Value> entry : scanner) {
+        Value value = entry.getValue();
 
-        String colfStr[] = e.getKey().getColumnFamily().toString().split(NUL);
+        String colfStr[] = splitKey(entry.getKey().getColumnFamily().toString());
         VisitMapColFamily colFam = Enums.getIfPresent(VisitMapColFamily.class,
             colfStr[1].trim()).or(VisitMapColFamily.df_IGNORE);
         switch (colFam) {
           case dF_pidGivenName :
-            name.setFirst(trimQuote(value.toString()));
+            name.setFirst(decodeString(value));
             break;
           case dF_pidFamilyName :
-            name.setLast(trimQuote(value.toString()));
+            name.setLast(decodeString(value));
             break;
           case dF_pidMiddleInitialOrName :
-            name.setMiddle(trimQuote(value.toString()));
+            name.setMiddle(decodeString(value));
             break;
           case dF_pidSex :
             Gender gender =
-                Enums.getIfPresent(Gender.class, trimQuote(value.toString())).or(Gender.Unknown);
+                Enums.getIfPresent(Gender.class, decodeString(value)).or(Gender.Unknown);
             patient.setGender(gender);
             break;
           case dF_pidRace :
             Race race =
-                Enums.getIfPresent(Race.class, trimQuote(value.toString())).or(Race.Unknown);
+                Enums.getIfPresent(Race.class, decodeString(value)).or(Race.Unknown);
             patient.setRace(race);
             break;
           case dF_pidPatientId :
             String fields[] = visitId.get().split("\\|");
             patient.setInstitutionPatientId(URNFactory.institutionPatientId(fields[0].trim(),
-                fields[1].trim(), trimQuote(value.toString())));
+                fields[1].trim(), decodeString(value)));
             break;
           case dF_pidDateTimeOfBirth :
-            patient.setBirthDate(dateOfBirthFormat.parse(trimQuote(value.toString())));
+            patient.setBirthDate(dateOfBirthFormat.parse(decodeString(value)));
             break;
           default :
             break;
@@ -200,9 +194,8 @@ public class PatientDao extends AbstractDao {
       patient.setName(name);
 
       return Optional.of(patient);
-    } catch (TableNotFoundException | ParseException | URISyntaxException |
-        UnsupportedEncodingException exp) {
-      log.error("Error building patient object", exp);
+    } catch (ParseException | URISyntaxException | UnsupportedEncodingException e) {
+      log.error("Error building patient object", e);
     }
 
     return Optional.empty();

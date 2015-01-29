@@ -5,7 +5,7 @@ package com.datafascia.api.resources;
 import com.codahale.metrics.annotation.Timed;
 import com.datafascia.api.authenticator.User;
 import com.datafascia.common.time.Interval;
-import com.datafascia.dao.ObservationDao;
+import com.datafascia.dao.FindObservationsCoordinator;
 import com.datafascia.models.Observation;
 import com.google.common.base.Strings;
 import io.dropwizard.auth.Auth;
@@ -31,11 +31,11 @@ public class ObservationResource {
 
   private static final String AUTHORIZATIONS = "System";
 
-  private ObservationDao observationDao;
+  private FindObservationsCoordinator findObservationsCoordinator;
 
   @Inject
-  public ObservationResource(ObservationDao observationDao) {
-    this.observationDao = observationDao;
+  public ObservationResource(FindObservationsCoordinator findObservationsCoordinator) {
+    this.findObservationsCoordinator = findObservationsCoordinator;
   }
 
   /**
@@ -78,7 +78,7 @@ public class ObservationResource {
       captureTimeRange = null;
     }
 
-    return observationDao.findObservationsByPatientId(
+    return findObservationsCoordinator.findObservationsByPatientId(
         patientId, Optional.ofNullable(captureTimeRange), AUTHORIZATIONS);
   }
 

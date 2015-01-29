@@ -13,9 +13,12 @@ import java.math.BigDecimal;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.data.Value;
@@ -30,6 +33,7 @@ public class EncounterDao extends OpalDao {
   public static final String HEIGHT = "Height";
   private static final String ADMIN_DATE_FORMAT = "yyyyMMddHHmmssX";
 
+  @Inject
   public EncounterDao(Connector connector) {
     super(connector);
   }
@@ -155,5 +159,24 @@ public class EncounterDao extends OpalDao {
     oHeight.setName(new CodeableConcept(){{ setCode(HEIGHT); }});
 
     return Optional.of(oHeight);
+  }
+
+  /**
+   * Finds update identifiers for the visit.
+   *
+   * @param visitId
+   *     visit identifier
+   * @param authorizations
+   *     controls access to entries
+   * @return collection of update identifiers, empty if none found
+   */
+  public List<String> findUpdateIds(String visitId, Authorizations authorizations) {
+    Optional<Value> value = getFieldValue(
+        ObjectStore, Kinds.PATIENT_VISIT_MAP, visitId, VisitFields.UPDATE_OIIDS, authorizations);
+    if (value.isPresent()) {
+      return Arrays.asList(decodeStringArray(value.get()));
+    } else {
+      return Collections.emptyList();
+    }
   }
 }

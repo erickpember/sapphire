@@ -2,15 +2,10 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.dao;
 
-import com.datafascia.common.time.Interval;
 import com.datafascia.models.CodeableConcept;
 import com.datafascia.models.Observation;
 import com.datafascia.models.ObservationValue;
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -36,69 +31,15 @@ public class ObservationDao extends OpalDao {
   }
 
   /**
-   * Finds observations for the patient, optionally filtered to capture times in a time interval.
+   * Finds observations for the update.
    *
-   * @param patientId
-   *     patient identifier
-   * @param captureTimeInterval
-   *     capture time interval to include
-   * @param auths
-   *     authorizations
+   * @param updateId
+   *     update identifier
+   * @param authorizations
+   *     controls access to entries
    * @return collection of observations, empty if none found
    */
-  public Collection<Observation> findObservationsByPatientId(
-      String patientId, Optional<Interval<Instant>> captureTimeInterval, String auths)
-  {
-    Date startIssued = null;
-    Date endIssued = null;
-    if (captureTimeInterval.isPresent()) {
-      startIssued = Date.from(captureTimeInterval.get().getStartInclusive());
-      endIssued = Date.from(captureTimeInterval.get().getEndExclusive());
-    }
-
-    Authorizations authorizations = new Authorizations(auths);
-
-    Collection<Observation> foundObservations = new ArrayList<>();
-    List<String> visitIds = findVisitIds(patientId, authorizations);
-    for (String visitId : visitIds) {
-      List<String> updateIds = findUpdateIds(visitId, authorizations);
-      for (String updateId : updateIds) {
-        List<Observation> candidateObservations = findObservations(updateId, authorizations);
-        for (Observation observation : candidateObservations) {
-          if (startIssued != null &&
-              (observation.getIssued().before(startIssued) ||
-               !observation.getIssued().before(endIssued))) {
-            continue;
-          }
-          foundObservations.add(observation);
-        }
-      }
-    }
-
-    return foundObservations;
-  }
-
-  private List<String> findVisitIds(String patientId, Authorizations authorizations) {
-    Optional<Value> value = getFieldValue(
-        ObjectStore, Kinds.PATIENT_OBJECT, patientId, PatientFields.VISIT_OIIDS, authorizations);
-    if (value.isPresent()) {
-      return Arrays.asList(decodeStringArray(value.get()));
-    } else {
-      return Collections.emptyList();
-    }
-  }
-
-  private List<String> findUpdateIds(String visitId, Authorizations authorizations) {
-    Optional<Value> value = getFieldValue(
-        ObjectStore, Kinds.PATIENT_VISIT_MAP, visitId, VisitFields.UPDATE_OIIDS, authorizations);
-    if (value.isPresent()) {
-      return Arrays.asList(decodeStringArray(value.get()));
-    } else {
-      return Collections.emptyList();
-    }
-  }
-
-  private List<Observation> findObservations(String updateId, Authorizations authorizations) {
+  public List<Observation> findObservations(String updateId, Authorizations authorizations) {
     List<Observation> observations = new ArrayList<>();
     Date issued = null;
 

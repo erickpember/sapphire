@@ -13,6 +13,8 @@ import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map.Entry;
@@ -112,6 +114,25 @@ public class PatientDao extends OpalDao {
     }
 
     return patientIds;
+  }
+
+  /**
+   * Finds visit identifiers for the patient.
+   *
+   * @param patientId
+   *     patient identifier
+   * @param authorizations
+   *     controls access to entries
+   * @return collection of visit identifiers, empty if none found
+   */
+  public List<String> findVisitIds(String patientId, Authorizations authorizations) {
+    Optional<Value> value = getFieldValue(
+        ObjectStore, Kinds.PATIENT_OBJECT, patientId, PatientFields.VISIT_OIIDS, authorizations);
+    if (value.isPresent()) {
+      return Arrays.asList(decodeStringArray(value.get()));
+    } else {
+      return Collections.emptyList();
+    }
   }
 
   /**

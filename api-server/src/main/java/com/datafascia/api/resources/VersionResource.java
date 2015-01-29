@@ -19,19 +19,20 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j @Path("/version") @Produces(MediaType.APPLICATION_JSON)
 public class VersionResource {
-  private final String defaultPackage;
+  /** Default package */
+  public static final String DEFAULT_PACKAGE = "com.datafascia.api.services";
+
   private final AtomicLong counter;
 
   /**
    * default constructor
    */
-  public VersionResource(String defaultPackage) {
-    this.defaultPackage = defaultPackage;
+  public VersionResource() {
     this.counter = new AtomicLong();
   }
 
   @GET @Timed
   public Version version(@QueryParam("package") Optional<String> packageName) {
-    return new Version(counter.incrementAndGet(), packageName.or(defaultPackage));
+    return new Version(counter.incrementAndGet(), packageName.or(DEFAULT_PACKAGE));
   }
 }

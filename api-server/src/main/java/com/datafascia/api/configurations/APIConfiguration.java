@@ -15,8 +15,5 @@ import lombok.Setter;
 @JsonAutoDetect
 public class APIConfiguration extends Configuration {
   @NotNull @Getter @Setter
-  private String defaultPackage;
-
-  @NotNull @Getter @Setter
   private AccumuloConfig accumuloConfig;
 }

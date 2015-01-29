@@ -9,12 +9,7 @@ import com.datafascia.api.authenticator.User;
 import com.datafascia.api.bundle.AtmosphereBundle;
 import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.api.health.AccumuloHealthCheck;
-import com.datafascia.api.resources.APIConfigurationResource;
-import com.datafascia.api.resources.EmergeResource;
-import com.datafascia.api.resources.ObservationResource;
-import com.datafascia.api.resources.PatientResource;
-import com.datafascia.api.resources.EncounterResource;
-import com.datafascia.api.resources.VersionResource;
+import com.datafascia.reflections.PackageUtils;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -31,6 +26,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class APIService extends Application<APIConfiguration> {
+  /** Package name for resources */
+  public static final String RESOURCES_PKG = "com.datafascia.api.resources";
+
   /**
    * The main entry point for the application
    *
@@ -61,12 +59,10 @@ public class APIService extends Application<APIConfiguration> {
         SimpleAuthenticator(), "dataFascia-API", User.class)));
 
     // Resources
-    environment.jersey().register(injector.getInstance(ObservationResource.class));
-    environment.jersey().register(injector.getInstance(PatientResource.class));
-    environment.jersey().register(injector.getInstance(EncounterResource.class));
-    environment.jersey().register(injector.getInstance(APIConfigurationResource.class));
-    environment.jersey().register(injector.getInstance(EmergeResource.class));
-    environment.jersey().register(new VersionResource(configuration.getDefaultPackage()));
+    for (Class<?> resClass : PackageUtils.classes(RESOURCES_PKG)) {
+      environment.jersey().register(injector.getInstance(resClass));
+      log.info("Registering resource class: " + resClass.getCanonicalName());
+    }
 
     // Health checkers
     environment.healthChecks().register("accumulo", injector.getInstance(AccumuloHealthCheck.class));

@@ -9,6 +9,10 @@ accumuloConfig:
   zooKeepers: zookeeper1.datafascia.com
   type: mock
 
+kafkaConfig:
+  zooKeepers: zookeeper1.datafascia.com
+  groupId: group
+
 server:
   applicationConnectors:
   - type: http 

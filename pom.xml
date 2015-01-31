@@ -129,6 +129,40 @@
       </dependency>
 
       <dependency>
+        <groupId>org.atmosphere</groupId>
+        <artifactId>atmosphere-annotations</artifactId>
+        <version>${atmosphere-version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.atmosphere</groupId>
+        <artifactId>atmosphere-guice</artifactId>
+        <version>${atmosphere-version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.sun.jersey.contribs</groupId>
+            <artifactId>jersey-guice</artifactId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.atmosphere</groupId>
+        <artifactId>atmosphere-runtime</artifactId>
+        <version>${atmosphere-version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.eclipse.jetty.websocket</groupId>
+        <artifactId>websocket-server</artifactId>
+        <version>${jetty.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.dropwizard</groupId>
+        <artifactId>dropwizard-auth</artifactId>
+        <version>${dropwizard.version}</version>
+      </dependency>
+
+      <dependency>
         <groupId>org.antlr</groupId>
         <artifactId>stringtemplate</artifactId>
         <version>${string-template.version}</version>

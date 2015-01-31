@@ -8,7 +8,7 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import javax.servlet.ServletRegistration;
 import lombok.extern.slf4j.Slf4j;
-import org.atmosphere.cpr.AtmosphereServlet;
+import org.atmosphere.guice.AtmosphereGuiceServlet;
 
 /**
  * Initialize the websockets setup through Atmosphere
@@ -19,9 +19,9 @@ public class AtmosphereBundle implements ConfiguredBundle<APIConfiguration> {
   public void run(final APIConfiguration configuration, final Environment environment)
       throws Exception {
     log.info("Initializing Atmosphere bundle for Dropwizard.");
-    AtmosphereServlet atmosphereServlet = new AtmosphereServlet();
+    AtmosphereGuiceServlet atmosphereServlet = new AtmosphereGuiceServlet();
     final ServletRegistration.Dynamic websocket =
-        environment.servlets().addServlet("socket", atmosphereServlet);
+      environment.servlets().addServlet("socket", atmosphereServlet);
     websocket.setAsyncSupported(true);
     websocket.addMapping("/socket/*");
     websocket.setInitParameter("com.sun.jersey.config.property.packages",

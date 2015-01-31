@@ -11,11 +11,13 @@ import com.datafascia.api.health.AccumuloHealthCheck;
 import com.datafascia.common.shiro.FakeRealm;
 import com.datafascia.common.shiro.RealmInjectingEnvironmentLoaderListener;
 import com.datafascia.common.shiro.RoleExposingRealm;
+import com.datafascia.kafka.KafkaConfig;
 import com.datafascia.reflections.PackageUtils;
 import com.datafascia.urn.URNMap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.servlet.GuiceServletContextListener;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -62,6 +64,14 @@ public class APIService extends Application<APIConfiguration> {
     URNMap.idNSMapping(MODELS_PKG);
     Injector injector = createInjector(configuration, environment);
 
+    // Register Guice injector
+    environment.servlets().addServletListeners(new GuiceServletContextListener() {
+      @Override
+      protected Injector getInjector() {
+        return injector;
+      }
+    });
+
     // Authenticator
     environment.servlets()
         .addServletListeners(injector.getInstance(RealmInjectingEnvironmentLoaderListener.class));
@@ -94,6 +104,7 @@ public class APIService extends Application<APIConfiguration> {
           protected void configure() {
             bind(APIConfiguration.class).toInstance(config);
             bind(AccumuloConfig.class).toInstance(config.getAccumuloConfig());
+            bind(KafkaConfig.class).toInstance(config.getKafkaConfig());
             bind(MetricRegistry.class).toInstance(environment.metrics());
             bind(Realm.class).toInstance(realm);
             bind(RoleExposingRealm.class).toInstance(realm);

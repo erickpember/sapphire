@@ -2,6 +2,8 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.resources.socket;
 
+import com.datafascia.kafka.KafkaConfig;
+import javax.inject.Inject;
 import javax.ws.rs.Path;
 import lombok.extern.slf4j.Slf4j;
 import org.atmosphere.config.service.Disconnect;
@@ -18,6 +20,16 @@ import org.atmosphere.util.IOUtils;
  */
 @Slf4j @Path("/") @ManagedService(interceptors = AtmosphereResourceLifecycleInterceptor.class)
 public final class SocketResource {
+  private KafkaConfig config;
+
+  /**
+   * Construct the resource
+   */
+  @Inject
+  public SocketResource(KafkaConfig config) {
+    this.config = config;
+  }
+
   /**
    * Invoked when the connection as been fully established and suspended, e.g ready for receiving
    * messages.
@@ -51,6 +63,6 @@ public final class SocketResource {
   @Post
   public void onMessage(final AtmosphereResource resource) {
     String message = IOUtils.readEntirely(resource).toString();
-    log.info(message);
+    log.info("Test message: " + message + ", " + config.getGroupId());
   }
 }

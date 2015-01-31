@@ -2,6 +2,8 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.models;
 
+import com.datafascia.urn.annotations.IDNamespace;
+import com.datafascia.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -17,7 +19,7 @@ import lombok.NoArgsConstructor;
  */
 @Data @NoArgsConstructor
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
-@JsonTypeName("Observation")
+@JsonTypeName("Observation") @IDNamespace(URNFactory.NS_OBSERVATION_ID)
 public class Observation {
   /** Unique identifier for observation */
   @JsonProperty("@id")

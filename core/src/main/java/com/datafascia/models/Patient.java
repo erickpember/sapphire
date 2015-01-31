@@ -2,6 +2,8 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.models;
 
+import com.datafascia.urn.annotations.IDNamespace;
+import com.datafascia.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -21,7 +23,7 @@ import lombok.Setter;
  */
 @Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode(callSuper = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
-@JsonTypeName("Patient")
+@JsonTypeName("Patient") @IDNamespace(URNFactory.NS_PATIENT_ID)
 public class Patient extends Person {
   @JsonProperty("@id")
   private URI id;

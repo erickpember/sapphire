@@ -19,6 +19,12 @@ public class URNFactory {
   public static final String NS_INSTITUTION_PATIENT_ID = "df-institution-patientId-1";
   /** Namespace for dataFascia patient identifier */
   public static final String NS_PATIENT_ID = "df-patientId-1";
+  /** Namespace for dataFascia patient encounter identifier */
+  public static final String NS_ENCOUNTER_ID = "df-observationId-1";
+  /** Namespace for dataFascia patient observation identifier */
+  public static final String NS_OBSERVATION_ID = "df-encounterId-1";
+  /** Namespace for dataFascia patient hospitalization identifier */
+  public static final String NS_HOSPITALIZATION_ID = "df-hospitalizationId-1";
 
   /**
    * The URN of this type have the schema:

@@ -2,9 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.urn;
 
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
-import java.net.URISyntaxException;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
@@ -17,50 +15,30 @@ import static org.testng.Assert.fail;
 public class URNFactoryTest {
   @Test
   public void oneParam() {
-    try {
-      URI dfId = URNFactory.institutionPatientId("inst-id", "", "");
-      assertEquals(dfId.toString(), "urn:df-institution-patientId-1:inst-id::");
-    } catch (Exception e) {
-      fail("Exception constructing URN not expected " + e.getMessage());
-    }
+    URI dfId = URNFactory.institutionPatientId("inst-id", "", "");
+    assertEquals(dfId.toString(), "urn:df-institution-patientId-1:inst-id::");
   }
 
   @Test
   public void twoParams() {
-    try {
-      URI dfId = URNFactory.institutionPatientId("inst-id", "", "pat-id");
-      assertEquals(dfId.toString(), "urn:df-institution-patientId-1:inst-id::pat-id");
-    } catch (Exception e) {
-      fail("Exception constructing URN not expected " + e.getMessage());
-    }
+    URI dfId = URNFactory.institutionPatientId("inst-id", "", "pat-id");
+    assertEquals(dfId.toString(), "urn:df-institution-patientId-1:inst-id::pat-id");
   }
 
   @Test
   public void patientId() {
-    try {
-      URI dfId = URNFactory.patientId("23434:342342");
-      assertEquals(dfId.toString(), "urn:df-patientId-1:23434%253A342342");
-    } catch (Exception e) {
-      fail("Exception constructing URN not expected " + e.getMessage());
-    }
+    URI dfId = URNFactory.patientId("23434:342342");
+    assertEquals(dfId.toString(), "urn:df-patientId-1:23434%3A342342");
   }
 
   @Test
   public void allParams() {
-    try {
-      URI dfId = URNFactory.institutionPatientId("inst-id", "fac-id", "pat-id");
-      assertEquals(dfId.toString(), "urn:df-institution-patientId-1:inst-id:fac-id:pat-id");
-    } catch (Exception e) {
-      fail("Exception constructing URN not expected " + e.getMessage());
-    }
+    URI dfId = URNFactory.institutionPatientId("inst-id", "fac-id", "pat-id");
+    assertEquals(dfId.toString(), "urn:df-institution-patientId-1:inst-id:fac-id:pat-id");
   }
 
   @Test(expectedExceptions = IllegalArgumentException.class)
   public void nullParam() {
-    try {
-      URNFactory.institutionPatientId(null, "fac-id", "pat-id");
-    } catch (URISyntaxException | UnsupportedEncodingException e) {
-      fail("Exception constructing URN not expected " + e.getMessage());
-    }
+    URNFactory.institutionPatientId(null, "fac-id", "pat-id");
   }
 }

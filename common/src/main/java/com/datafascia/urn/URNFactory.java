@@ -5,6 +5,8 @@ package com.datafascia.urn;
 import com.google.common.base.Joiner;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 import java.net.URISyntaxException;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,6 +17,10 @@ import static java.net.URLEncoder.encode;
  */
 @Slf4j
 public class URNFactory {
+  /** URN scheme identifier */
+  public static final String URN = "urn";
+  /** URN separator */
+  public static final String URN_SEP = ":";
   /** Namespace for Institution patient identifier */
   public static final String NS_INSTITUTION_PATIENT_ID = "df-institution-patientId-1";
   /** Namespace for dataFascia patient identifier */
@@ -25,6 +31,9 @@ public class URNFactory {
   public static final String NS_OBSERVATION_ID = "df-encounterId-1";
   /** Namespace for dataFascia patient hospitalization identifier */
   public static final String NS_HOSPITALIZATION_ID = "df-hospitalizationId-1";
+
+  /** Encoding */
+  private static final String UTF8 = "UTF-8";
 
   /**
    * The URN of this type have the schema:
@@ -37,17 +46,15 @@ public class URNFactory {
    *
    * @return URN of type df-institution-patientId-1
    */
-  public static URI institutionPatientId(String instId, String facilityId, String patientId)
-    throws URISyntaxException, UnsupportedEncodingException {
+  public static URI institutionPatientId(String instId, String facilityId, String patientId) {
     if (instId == null || facilityId == null || patientId == null) {
       throw new IllegalArgumentException("Institution patient identifiers cannot be null");
     }
-
-    Joiner join = Joiner.on(":");
-    String path = join.join(encode(instId, "UTF-8"), encode(facilityId, "UTF-8"), encode(patientId,
-        "UTF-8"));
-
-    return new URI("urn", join.join(NS_INSTITUTION_PATIENT_ID, path), null);
+    try {
+      return new URI(urn(NS_INSTITUTION_PATIENT_ID, instId, facilityId, patientId));
+    } catch(URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
   }
 
   /**
@@ -59,14 +66,39 @@ public class URNFactory {
    *
    * @return URN of type df-patientId-1
    */
-  public static URI patientId(String patientId) throws URISyntaxException,
-      UnsupportedEncodingException {
+  public static URI patientId(String patientId) {
     if (patientId == null) {
       throw new IllegalArgumentException("Patient identifier cannot be null");
     }
 
-    Joiner join = Joiner.on(":");
+    try {
+      return new URI(urn(NS_PATIENT_ID, patientId));
+    } catch(URISyntaxException e) {
+      throw new RuntimeException(e);
+    }
+  }
 
-    return new URI("urn", join.join(NS_PATIENT_ID, encode(patientId, "UTF-8")), null);
+  /**
+   * @param ns the URN namespaceifier
+   * @param value the URN value
+   *
+   * @return string with URN of asked type
+   */
+  public static String urn(String ns, String... values) {
+    if ((ns == null) || (values == null)) {
+      throw new IllegalArgumentException("Null arguments cannot be passed for URN construction");
+    }
+    try {
+      List<String> paths = new ArrayList<>();
+      paths.add(URN);
+      paths.add(encode(ns, UTF8));
+      for (String value : values) {
+        paths.add(encode(value, UTF8));
+      }
+
+      return Joiner.on(URN_SEP).join(paths);
+    } catch (UnsupportedEncodingException e) {
+      throw new RuntimeException(e);
+    }
   }
 }

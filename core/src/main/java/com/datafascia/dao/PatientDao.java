@@ -8,8 +8,6 @@ import com.datafascia.models.Patient;
 import com.datafascia.models.Race;
 import com.datafascia.urn.URNFactory;
 import com.google.common.base.Enums;
-import java.io.UnsupportedEncodingException;
-import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -215,7 +213,7 @@ public class PatientDao extends OpalDao {
       patient.setName(name);
 
       return Optional.of(patient);
-    } catch (ParseException | URISyntaxException | UnsupportedEncodingException e) {
+    } catch (ParseException e) {
       log.error("Error building patient object", e);
     }
 

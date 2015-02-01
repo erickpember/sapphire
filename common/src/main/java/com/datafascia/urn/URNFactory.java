@@ -101,4 +101,32 @@ public class URNFactory {
       throw new RuntimeException(e);
     }
   }
+
+  /**
+   * @parm urn the URN
+   *
+   * @return the namespace from the URN
+   */
+  public static String namespace(String urn) throws URISyntaxException {
+    String[] parts = urn.split(URN_SEP);
+    if ((parts.length >= 2) && (parts[0].compareToIgnoreCase(URN) == 0)) {
+      return parts[1];
+    }
+
+    throw new URISyntaxException(urn, "Invalid URN");
+  }
+
+  /**
+   * @parm urn the URN
+   *
+   * @return the path from the URN
+   */
+  public static String path(String urn) throws URISyntaxException {
+    String[] parts = urn.split(URN_SEP);
+    if ((parts.length >= 3) && (parts[0].compareToIgnoreCase(URN) == 0)) {
+      return parts[2];
+    }
+
+    throw new URISyntaxException(urn, "Invalid URN");
+  }
 }

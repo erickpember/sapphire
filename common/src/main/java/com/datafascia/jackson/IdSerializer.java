@@ -1,22 +1,27 @@
-// Copyright (C) 2015 dataFascia Corporation.  All rights reserved.
+// Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.common.json;
+package com.datafascia.jackson;
 
 import com.datafascia.common.persist.Id;
+import com.datafascia.urn.URNFactory;
+import com.datafascia.urn.URNMap;
 import com.fasterxml.jackson.core.JsonGenerator;
-import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ser.ContextualSerializer;
+import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.fasterxml.jackson.databind.ser.ContextualSerializer;
 import com.fasterxml.jackson.databind.ser.std.StdSerializer;
 import java.io.IOException;
+import lombok.extern.slf4j.Slf4j;
 
 /**
- * Custom JSON serializer for {@link Id} instances.
+ * Jackson serializer for Id
+ * 
+ * NOTE: the SuppressWarnings is necessary because we do not have the underlying type for the Id.
  */
+@Slf4j @SuppressWarnings("rawtypes")
 public class IdSerializer extends StdSerializer<Id> implements ContextualSerializer {
-
   public IdSerializer() {
     super(Id.class);
   }
@@ -24,22 +29,30 @@ public class IdSerializer extends StdSerializer<Id> implements ContextualSeriali
   @Override
   public JsonSerializer<?> createContextual(
       SerializerProvider prov, BeanProperty property) throws JsonMappingException {
-
     Class<?> declaringClass = property.getMember().getDeclaringClass();
-    return new NamespacePrefixingIdSerializer(declaringClass);
+
+    return new IdURNSerializer(declaringClass);
   }
 
   @Override
   public void serialize(Id value, JsonGenerator jgen, SerializerProvider provider)
       throws IOException {
-
-    throw new UnsupportedOperationException("serialize not implemented");
+    log.error("IdSerializer serializer should never be called.");
+    throw new UnsupportedOperationException("IdSerializer serializer should never be called.");
   }
 
-  private static class NamespacePrefixingIdSerializer extends StdSerializer<Id> {
+  /*
+   * The actual serializer
+   */
+  private static class IdURNSerializer extends StdSerializer<Id> {
     private Class<?> declaringClass;
 
-    public NamespacePrefixingIdSerializer(Class<?> declaringClass) {
+    /**
+     * default constructor
+     *
+     * @param declaringClass the declaring class
+     */
+    public IdURNSerializer(Class<?> declaringClass) {
       super(Id.class);
       this.declaringClass = declaringClass;
     }
@@ -47,8 +60,7 @@ public class IdSerializer extends StdSerializer<Id> implements ContextualSeriali
     @Override
     public void serialize(Id value, JsonGenerator jgen, SerializerProvider provider)
         throws IOException {
-      
-      jgen.writeString(declaringClass.getSimpleName() + ':' + value.toString());
+      jgen.writeString(URNFactory.urn(URNMap.getIDNamespace(declaringClass), value.toString()));
     }
   }
 }

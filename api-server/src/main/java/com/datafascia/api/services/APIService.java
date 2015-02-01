@@ -10,6 +10,7 @@ import com.datafascia.api.bundle.AtmosphereBundle;
 import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.api.health.AccumuloHealthCheck;
 import com.datafascia.reflections.PackageUtils;
+import com.datafascia.urn.URNMap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -28,6 +29,8 @@ import lombok.extern.slf4j.Slf4j;
 public class APIService extends Application<APIConfiguration> {
   /** Package name for resources */
   public static final String RESOURCES_PKG = "com.datafascia.api.resources";
+  /** Package name for models */
+  public static final String MODELS_PKG = "com.datafascia.models";
 
   /**
    * The main entry point for the application
@@ -52,6 +55,7 @@ public class APIService extends Application<APIConfiguration> {
 
   @Override
   public void run(APIConfiguration configuration, Environment environment) {
+    URNMap.idNSMapping(MODELS_PKG);
     Injector injector = createInjector(configuration);
 
     // Authenticator

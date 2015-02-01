@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.models;
 
+import com.datafascia.common.persist.Id;
 import com.neovisionaries.i18n.CountryCode;
 import com.neovisionaries.i18n.LanguageCode;
 import java.math.BigDecimal;
@@ -84,7 +85,7 @@ public class TestModels {
     setContactDetails(Arrays.asList(contact, contact));
     setCreationDate(getDate());
     setDeceased(false);
-    setId(getURI());
+    setId(Id.of("1234"));
     setLangs(Arrays.asList(LanguageCode.en, LanguageCode.ch));
     setManagingOrg("Test Corp.");
     setMaritalStatus(MaritalStatus.DomesticPartner);
@@ -171,7 +172,7 @@ public class TestModels {
   }};
 
   public static Observation observation = new Observation(){{
-    setId(getURI());
+    setId(Id.of("1234"));
     setName(codeable);
     setValues(observationValue);
     setInterpretation(ObservationInterpretation.A);
@@ -196,7 +197,7 @@ public class TestModels {
   }};
 
   public static Hospitalization hospitalization = new Hospitalization(){{
-    setId(getURI());
+    setId(Id.of("1234"));
     setOrigin(getURI());
     setPeriod(period);
     setAccomodation(accomodation);
@@ -210,7 +211,7 @@ public class TestModels {
   }};
 
   public static Encounter encounter = new Encounter() {{
-    setId(getURI());
+    setId(Id.of("1234"));
     setStatus(EncounterStatus.InProgress);
     setEclass(EncounterClass.Ambulatory);
     setType(EncounterType.OKI);

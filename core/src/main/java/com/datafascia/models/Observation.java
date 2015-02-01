@@ -2,12 +2,17 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.models;
 
+import com.datafascia.common.persist.Id;
+import com.datafascia.jackson.IdDeserializer;
+import com.datafascia.jackson.IdSerializer;
 import com.datafascia.urn.annotations.IDNamespace;
 import com.datafascia.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.net.URI;
 import java.util.Date;
 import java.util.List;
@@ -23,7 +28,8 @@ import lombok.NoArgsConstructor;
 public class Observation {
   /** Unique identifier for observation */
   @JsonProperty("@id")
-  private URI id;
+  @JsonDeserialize(using = IdDeserializer.class) @JsonSerialize(using = IdSerializer.class)
+  private Id<Observation> id;
 
   /** Describes what was observed. Sometimes this is called the observation "code". */
   @JsonProperty("name")

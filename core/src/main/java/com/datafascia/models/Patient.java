@@ -2,12 +2,17 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.models;
 
+import com.datafascia.common.persist.Id;
+import com.datafascia.jackson.IdDeserializer;
+import com.datafascia.jackson.IdSerializer;
 import com.datafascia.urn.annotations.IDNamespace;
 import com.datafascia.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.neovisionaries.i18n.LanguageCode;
 import java.net.URI;
 import java.util.Date;
@@ -26,7 +31,8 @@ import lombok.Setter;
 @JsonTypeName("Patient") @IDNamespace(URNFactory.NS_PATIENT_ID)
 public class Patient extends Person {
   @JsonProperty("@id")
-  private URI id;
+  @JsonDeserialize(using = IdDeserializer.class) @JsonSerialize(using = IdSerializer.class)
+  private Id<Patient> id;
   @JsonProperty("contacts")
   private List<Contact> contactDetails;
   @JsonProperty("creationDate")

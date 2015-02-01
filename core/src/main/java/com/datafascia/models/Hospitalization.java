@@ -2,11 +2,16 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.models;
 
+import com.datafascia.common.persist.Id;
+import com.datafascia.jackson.IdDeserializer;
+import com.datafascia.jackson.IdSerializer;
 import com.datafascia.urn.annotations.IDNamespace;
 import com.datafascia.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.net.URI;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
@@ -24,7 +29,8 @@ import lombok.Setter;
 public class Hospitalization {
   /** Pre-admission identifier. */
   @JsonProperty("@id")
-  private URI id;
+  @JsonDeserialize(using = IdDeserializer.class) @JsonSerialize(using = IdSerializer.class)
+  private Id<Hospitalization> id;
 
   /** The location from which the patient came befor admission */
   @JsonProperty("origin")

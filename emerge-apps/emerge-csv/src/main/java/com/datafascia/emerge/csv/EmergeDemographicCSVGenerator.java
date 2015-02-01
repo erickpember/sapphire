@@ -91,7 +91,7 @@ public class EmergeDemographicCSVGenerator {
   private static Demographic getDemographic(Patient pat, Encounter encount, int entry)
           throws MissingUrnException {
     if (pat.getInstitutionPatientId() == null) {
-      throw new MissingUrnException("Institution patient ID missing " + pat.getId().getRawPath());
+      throw new MissingUrnException("Institution patient ID missing " + pat.getId());
     }
 
     Demographic demo = new Demographic();

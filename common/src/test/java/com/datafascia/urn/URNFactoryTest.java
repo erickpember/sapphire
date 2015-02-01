@@ -26,12 +26,6 @@ public class URNFactoryTest {
   }
 
   @Test
-  public void patientId() {
-    URI dfId = URNFactory.patientId("23434:342342");
-    assertEquals(dfId.toString(), "urn:df-patientId-1:23434%3A342342");
-  }
-
-  @Test
   public void allParams() {
     URI dfId = URNFactory.institutionPatientId("inst-id", "fac-id", "pat-id");
     assertEquals(dfId.toString(), "urn:df-institution-patientId-1:inst-id:fac-id:pat-id");

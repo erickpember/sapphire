@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.dao;
 
+import com.datafascia.common.persist.Id;
 import com.datafascia.models.Gender;
 import com.datafascia.models.Name;
 import com.datafascia.models.Patient;
@@ -167,7 +168,7 @@ public class PatientDao extends OpalDao {
       scanner.setRange(toRange(Kinds.PATIENT_VISIT_MAP, visitId.get()));
 
       Patient patient = new Patient();
-      patient.setId(URNFactory.patientId(patientId));
+      patient.setId(Id.of(patientId));
       patient.setGender(Gender.Unknown);
       patient.setRace(Race.Unknown);
       Name name = new Name();

@@ -58,27 +58,6 @@ public class URNFactory {
   }
 
   /**
-   * The URN of this type have the schema:
-   *
-   * urn:df-patientId-1:[dataFascia patient id]
-   *
-   * @param patientId the patient identifier
-   *
-   * @return URN of type df-patientId-1
-   */
-  public static URI patientId(String patientId) {
-    if (patientId == null) {
-      throw new IllegalArgumentException("Patient identifier cannot be null");
-    }
-
-    try {
-      return new URI(urn(NS_PATIENT_ID, patientId));
-    } catch(URISyntaxException e) {
-      throw new RuntimeException(e);
-    }
-  }
-
-  /**
    * @param ns the URN namespaceifier
    * @param value the URN value
    *

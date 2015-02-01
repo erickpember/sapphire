@@ -2,17 +2,23 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.models;
 
+import com.datafascia.common.persist.Id;
+import com.datafascia.jackson.IdDeserializer;
+import com.datafascia.jackson.IdSerializer;
 import com.datafascia.urn.annotations.IDNamespace;
 import com.datafascia.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.net.URI;
 import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.extern.slf4j.Slf4j;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.Setter;
 
 /**
@@ -24,7 +30,8 @@ import lombok.Setter;
 public class Encounter {
   /** Identifies the encounter. */
   @JsonProperty("@id")
-  private URI id;
+  @JsonDeserialize(using = IdDeserializer.class) @JsonSerialize(using = IdSerializer.class)
+  private Id<Encounter> id;
 
   /** Status of the encounter. */
   @JsonProperty("status")

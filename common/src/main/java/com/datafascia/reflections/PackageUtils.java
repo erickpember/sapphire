@@ -25,7 +25,7 @@ public class PackageUtils {
    */
   public static Set<Class<?>> classes(String packageName) {
     Reflections reflections = new Reflections(new ConfigurationBuilder()
-        .setScanners(new SubTypesScanner(false), new ResourcesScanner())
+        .setScanners(new SubTypesScanner(false))
         .setUrls(ClasspathHelper.forPackage(packageName))
         .filterInputsBy(new FilterBuilder().include(FilterBuilder.prefix(packageName))));
 

@@ -52,7 +52,7 @@ public class IdDeserializer extends JsonDeserializer<Id> implements ContextualDe
     String text = jp.getText();
     try {
       String ns = URNFactory.namespace(text);
-      if (URNMap.getClassFromIDNamespace(ns).equals(declaringClass)) {
+      if (URNMap.getClassFromIdNamespace(ns).equals(declaringClass)) {
         return Id.of(URNFactory.path(text));
       }
     } catch (URISyntaxException e) {

@@ -5,7 +5,7 @@ package com.datafascia.models;
 import com.datafascia.common.persist.Id;
 import com.datafascia.jackson.IdDeserializer;
 import com.datafascia.jackson.IdSerializer;
-import com.datafascia.urn.annotations.IDNamespace;
+import com.datafascia.urn.annotations.IdNamespace;
 import com.datafascia.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
  */
 @Data @NoArgsConstructor
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
-@JsonTypeName("Observation") @IDNamespace(URNFactory.NS_OBSERVATION_ID)
+@JsonTypeName("Observation") @IdNamespace(URNFactory.NS_OBSERVATION_ID)
 public class Observation {
   /** Unique identifier for observation */
   @JsonProperty("@id")

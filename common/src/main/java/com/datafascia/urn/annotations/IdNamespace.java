@@ -14,12 +14,12 @@ import java.lang.annotation.Target;
  * different classes Foo and Bar that extend BaseClass, then this annotation needs to be in both Foo
  * and Bar with different values for the namespace.
  *
- * Essentially IDNamespace annotation is a bijective function between class name and the associated
+ * Essentially IdNamespace annotation is a bijective function between class name and the associated
  * URN namespace.
  */
 @Target({ElementType.TYPE})
 @Retention(RetentionPolicy.RUNTIME)
-public @interface IDNamespace {
+public @interface IdNamespace {
   /**
    * Hardcoded version for compatibility tests
    */

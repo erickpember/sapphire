@@ -3,7 +3,7 @@
 package com.datafascia.jackson;
 
 import com.datafascia.common.persist.Id;
-import com.datafascia.urn.annotations.IDNamespace;
+import com.datafascia.urn.annotations.IdNamespace;
 import com.datafascia.urn.URNMap;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
@@ -22,7 +22,7 @@ public class IdBaseTest {
     URNMap.idNSMapping("com.datafascia.jackson");
   }
 
-  @Data @IDNamespace("test-ns")
+  @Data @IdNamespace("test-ns")
   protected static class Observation {
     @JsonDeserialize(using = IdDeserializer.class) @JsonSerialize(using = IdSerializer.class)
     @JsonProperty("@id")

@@ -5,7 +5,7 @@ package com.datafascia.models;
 import com.datafascia.common.persist.Id;
 import com.datafascia.jackson.IdDeserializer;
 import com.datafascia.jackson.IdSerializer;
-import com.datafascia.urn.annotations.IDNamespace;
+import com.datafascia.urn.annotations.IdNamespace;
 import com.datafascia.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -28,7 +28,7 @@ import lombok.Setter;
  */
 @Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode(callSuper = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
-@JsonTypeName("Patient") @IDNamespace(URNFactory.NS_PATIENT_ID)
+@JsonTypeName("Patient") @IdNamespace(URNFactory.NS_PATIENT_ID)
 public class Patient extends Person {
   @JsonProperty("@id")
   @JsonDeserialize(using = IdDeserializer.class) @JsonSerialize(using = IdSerializer.class)

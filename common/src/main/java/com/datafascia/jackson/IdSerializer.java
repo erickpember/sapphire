@@ -60,7 +60,7 @@ public class IdSerializer extends StdSerializer<Id> implements ContextualSeriali
     @Override
     public void serialize(Id value, JsonGenerator jgen, SerializerProvider provider)
         throws IOException {
-      jgen.writeString(URNFactory.urn(URNMap.getIDNamespace(declaringClass), value.toString()));
+      jgen.writeString(URNFactory.urn(URNMap.getIdNamespace(declaringClass), value.toString()));
     }
   }
 }

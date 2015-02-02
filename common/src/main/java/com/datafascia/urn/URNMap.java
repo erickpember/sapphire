@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.urn;
 
-import com.datafascia.urn.annotations.IDNamespace;
+import com.datafascia.urn.annotations.IdNamespace;
 import com.datafascia.reflections.PackageUtils;
 import java.util.HashMap;
 import java.util.Map;
@@ -26,15 +26,15 @@ public class URNMap {
    * @param packageName the package to load from
    */
   public static void idNSMapping(String packageName) {
-    for (Class<?> clazz : PackageUtils.withTypeAnnotations(packageName, IDNamespace.class)) {
-      IDNamespace idNS = clazz.getAnnotation(IDNamespace.class);
+    for (Class<?> clazz : PackageUtils.withTypeAnnotations(packageName, IdNamespace.class)) {
+      IdNamespace idNS = clazz.getAnnotation(IdNamespace.class);
       // Annonymous inner class initialization seems to cause this
       if (idNS == null) {
         continue;
       }
-      log.info("Found IDNamespace annotation in " + clazz.getName());
-      if ((getClassFromIDNamespace(idNS.value()) != null) ||
-          (getIDNamespace(clazz) != null)) {
+      log.info("Found IdNamespace annotation in " + clazz.getName());
+      if ((getClassFromIdNamespace(idNS.value()) != null) ||
+          (getIdNamespace(clazz) != null)) {
         log.error("Duplicate ID namespace mapping found for " + idNS.value());
       } else {
         ID_CLASS_NS.put(clazz.getName(), idNS.value());
@@ -48,12 +48,12 @@ public class URNMap {
    *
    * @return the ID namespace associated with class.
    */
-  public static String getIDNamespace(Class<?> clazz) {
+  public static String getIdNamespace(Class<?> clazz) {
     if (clazz == null) {
       throw new IllegalArgumentException("Class name cannot be null");
     }
 
-    return getIDNamespace(clazz.getName());
+    return getIdNamespace(clazz.getName());
   }
 
   /**
@@ -61,7 +61,7 @@ public class URNMap {
    *
    * @return the ID namespace associated with class.
    */
-  public static String getIDNamespace(String name) {
+  public static String getIdNamespace(String name) {
     if (name == null) {
       throw new IllegalArgumentException("Class name cannot be null");
     }
@@ -74,7 +74,7 @@ public class URNMap {
    *
    * @return class associated with ID namespace
    */
-  public static Class<?> getClassFromIDNamespace(String ns) {
+  public static Class<?> getClassFromIdNamespace(String ns) {
     if (ns == null) {
       throw new IllegalArgumentException("URN namespace cannot be null");
     }

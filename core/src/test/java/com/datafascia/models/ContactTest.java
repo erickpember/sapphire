@@ -20,7 +20,7 @@ public class ContactTest extends ModelTestBase {
     assertEquals(decoded.getName(), TestModels.name);
     assertEquals(decoded.getGender(), Gender.Undifferentiated);
     assertEquals(decoded.getBirthDate(), TestModels.getDate());
-    assertEquals(decoded.getPhoto(), TestModels.getURI());
+    assertEquals(decoded.getPhoto(), TestModels.getPhoto());
     assertEquals(decoded.getOrganization(), "Test Corp.");
     assertEquals(decoded.getRelationship(), "Tester");
   }

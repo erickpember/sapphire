@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import java.net.URI;
+import java.awt.Image;
 import java.time.LocalDate;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -34,7 +34,7 @@ public class Person {
   @JsonDeserialize(using = LocalDateDeserializer.class)
   private LocalDate birthDate;
   @JsonProperty("photo")
-  private URI photo;
+  private Link<Image> photo;
   @JsonProperty("organization")
   private String organization;
 }

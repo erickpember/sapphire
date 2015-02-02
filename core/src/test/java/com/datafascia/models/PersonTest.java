@@ -20,7 +20,7 @@ public class PersonTest extends ModelTestBase {
     assertEquals(decoded.getAddress(), TestModels.address);
     assertEquals(decoded.getGender(), Gender.Male);
     assertEquals(decoded.getBirthDate(), TestModels.getDate());
-    assertEquals(decoded.getPhoto(), TestModels.getURI());
+    assertEquals(decoded.getPhoto(), TestModels.getPhoto());
     assertEquals(decoded.getOrganization(), "Some Ficticious Hospital");
   }
 

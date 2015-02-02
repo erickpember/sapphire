@@ -5,7 +5,9 @@ package com.datafascia.models;
 import com.datafascia.common.persist.Id;
 import com.neovisionaries.i18n.CountryCode;
 import com.neovisionaries.i18n.LanguageCode;
+import java.awt.Image;
 import java.math.BigDecimal;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.time.Instant;
@@ -27,6 +29,14 @@ public class TestModels {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z");
     LocalDateTime dateTime = LocalDateTime.parse("2009-12-31 12:12:12 +0000", formatter);
     return dateTime.toInstant(ZoneOffset.UTC);
+  }
+
+  public static Link<Image> getPhoto() {
+    try {
+      return Link.of("http://image.datafascia.com/image1", LinkRelation.Icon, "image/png", null);
+    } catch (MalformedURLException ex) {
+      throw new RuntimeException("Unexpected invalid URL for test.", ex);
+    }
   }
 
   public static LocalDate getDate() {
@@ -67,7 +77,7 @@ public class TestModels {
       setName(name);
       setGender(Gender.Undifferentiated);
       setBirthDate(getDate());
-      setPhoto(getURI());
+      setPhoto(TestModels.getPhoto());
       setOrganization("Test Corp.");
     }
   };
@@ -78,7 +88,7 @@ public class TestModels {
       setName(name);
       setGender(Gender.Undifferentiated);
       setBirthDate(getDate());
-      setPhoto(getURI());
+      setPhoto(TestModels.getPhoto());
       setOrganization("Test Corp.");
       setRelationship("Tester");
     }
@@ -89,7 +99,7 @@ public class TestModels {
       setActive(true);
       setAddress(address);
       setBirthDate(getDate());
-      setPhoto(getURI());
+      setPhoto(TestModels.getPhoto());
       setOrganization("Test Corp.");
       setName(name);
       setCareProvider(Arrays.asList(caregiver, caregiver));
@@ -250,7 +260,7 @@ public class TestModels {
       setAddress(address);
       setGender(Gender.Male);
       setBirthDate(getDate());
-      setPhoto(getURI());
+      setPhoto(TestModels.getPhoto());
       setOrganization("Some Ficticious Hospital");
     }
   };

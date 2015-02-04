@@ -49,7 +49,7 @@ public class EncounterResource {
    */
   @GET @Timed @Path("last/{patientid}")
   public Encounter getlast(@Auth User user, @PathParam("patientid") String id) {
-    Optional<String> lastVisit = patientDao.lastVisitId(id);
+    Optional<String> lastVisit = patientDao.getLastVisitId(id);
     if (!lastVisit.isPresent()) {
       throw new WebApplicationException(Response.Status.NOT_FOUND);
     }

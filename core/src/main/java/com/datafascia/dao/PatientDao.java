@@ -80,9 +80,11 @@ public class PatientDao extends OpalDao {
     List<Patient> patients = new ArrayList<Patient>();
     List<String> patientIds = getPatientIds(true);
     for (String patientId : patientIds) {
-      Optional<Patient> patient = patient(patientId, lastVisitId(patientId));
-      if (patient.isPresent()) {
-        patients.add(patient.get());
+      Optional<Patient> optionalPatient = patient(patientId, getLastVisitId(patientId));
+      if (optionalPatient.isPresent()) {
+        Patient patient = optionalPatient.get();
+        patient.setActive(active);
+        patients.add(patient);
       }
     }
 
@@ -138,7 +140,7 @@ public class PatientDao extends OpalDao {
    * @param patientId the patient identifier
    * @return return the latest/last visit identifier for the patient
    */
-  public Optional<String> lastVisitId(String patientId) {
+  public Optional<String> getLastVisitId(String patientId) {
     log.debug("Fetching last visit ID for patient ID " + patientId);
     Scanner scanner = getScanner(AUTHORIZATIONS);
     scanner.setRange(toRange(Kinds.PATIENT_OBJECT, patientId));

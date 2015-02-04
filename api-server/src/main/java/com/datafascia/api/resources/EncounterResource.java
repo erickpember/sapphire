@@ -18,7 +18,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.accumulo.core.client.Connector;
 
 /**
  * Resource object to model encounter information
@@ -28,13 +27,13 @@ public class EncounterResource {
 
   private static final String AUTHORIZATIONS = "System";
 
-  private final Connector connect;
   private PatientDao patientDao;
+  private EncounterDao encounterDao;
 
   @Inject
-  public EncounterResource(Connector connect, PatientDao patientDao) {
-    this.connect = connect;
+  public EncounterResource(PatientDao patientDao, EncounterDao encounterDao) {
     this.patientDao = patientDao;
+    this.encounterDao = encounterDao;
   }
 
   /**
@@ -42,8 +41,7 @@ public class EncounterResource {
    */
   @GET @Timed @Path("{id}")
   public Encounter encounter(@Auth User user, @PathParam("id") String id) {
-    EncounterDao dao = new EncounterDao(connect);
-    return dao.getEncounter(id, AUTHORIZATIONS);
+    return encounterDao.getEncounter(id, AUTHORIZATIONS);
   }
 
   /**
@@ -56,7 +54,6 @@ public class EncounterResource {
       throw new WebApplicationException(Response.Status.NOT_FOUND);
     }
 
-    EncounterDao dao = new EncounterDao(connect);
-    return dao.getEncounter(lastVisit.get(), AUTHORIZATIONS);
+    return encounterDao.getEncounter(lastVisit.get(), AUTHORIZATIONS);
   }
 }

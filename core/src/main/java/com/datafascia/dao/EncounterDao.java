@@ -19,6 +19,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.data.Value;
@@ -27,7 +28,7 @@ import org.apache.accumulo.core.security.Authorizations;
 /**
  * Encounter data access to/from Accumulo.
  */
-@Slf4j
+@Singleton @Slf4j
 public class EncounterDao extends OpalDao {
   public static final String WEIGHT = "Weight";
   public static final String HEIGHT = "Height";

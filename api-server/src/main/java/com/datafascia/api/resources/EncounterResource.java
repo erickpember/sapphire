@@ -26,9 +26,10 @@ import org.apache.accumulo.core.client.Connector;
 @Slf4j @Path("/encounter") @Produces(MediaType.APPLICATION_JSON)
 public class EncounterResource {
 
+  private static final String AUTHORIZATIONS = "System";
+
   private final Connector connect;
   private PatientDao patientDao;
-  public final String authsString = "System";
 
   @Inject
   public EncounterResource(Connector connect, PatientDao patientDao) {
@@ -42,7 +43,7 @@ public class EncounterResource {
   @GET @Timed @Path("{id}")
   public Encounter encounter(@Auth User user, @PathParam("id") String id) {
     EncounterDao dao = new EncounterDao(connect);
-    return dao.getEncounter(id, authsString);
+    return dao.getEncounter(id, AUTHORIZATIONS);
   }
 
   /**
@@ -56,6 +57,6 @@ public class EncounterResource {
     }
 
     EncounterDao dao = new EncounterDao(connect);
-    return dao.getEncounter(lastVisit.get(), authsString);
+    return dao.getEncounter(lastVisit.get(), AUTHORIZATIONS);
   }
 }

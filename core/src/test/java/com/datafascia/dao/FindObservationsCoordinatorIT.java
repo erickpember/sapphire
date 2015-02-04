@@ -20,9 +20,9 @@ public class FindObservationsCoordinatorIT extends DaoIT {
 
   @Test
   public void should_find_observations() throws Exception {
-    PatientDao patientDao = new PatientDao(connect);
+    PatientDao patientDao = new PatientDao(queryTemplate);
     FindObservationsCoordinator findObservationsCoordinator = new FindObservationsCoordinator(
-        patientDao, new EncounterDao(connect), new ObservationDao(connect));
+        patientDao, new EncounterDao(queryTemplate), new ObservationDao(queryTemplate));
 
     List<String> patientIds = patientDao.getPatientIds(true);
     for (String patientId : patientIds) {

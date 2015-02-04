@@ -2,17 +2,16 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.dao;
 
+import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
+
 import com.datafascia.models.Encounter;
 import com.datafascia.models.Observation;
 import java.math.BigDecimal;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
-
-import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 /**
  * Test for Encounter DAO
@@ -25,7 +24,7 @@ public class EncounterDaoIT extends DaoIT {
   @Test
   public void encounters() throws Exception {
     log.info("Getting test encounters");
-    EncounterDao dao = new EncounterDao(connect);
+    EncounterDao dao = new EncounterDao(queryTemplate);
 
     SimpleDateFormat adminDateFormatter = new SimpleDateFormat("yyyyMMddHHmmssX");
     Encounter enco1 = dao.getEncounter("UCSF | SICU | a5096a63-09b2-4758-9eaf-6581e6541a06", auths);

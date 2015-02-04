@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.services;
 
+import com.codahale.metrics.MetricRegistry;
 import com.datafascia.accumulo.AccumuloConfig;
 import com.datafascia.accumulo.AccumuloConnector;
 import com.datafascia.api.authenticator.SimpleAuthenticator;
@@ -56,7 +57,7 @@ public class APIService extends Application<APIConfiguration> {
   @Override
   public void run(APIConfiguration configuration, Environment environment) {
     URNMap.idNSMapping(MODELS_PKG);
-    Injector injector = createInjector(configuration);
+    Injector injector = createInjector(configuration, environment);
 
     // Authenticator
     environment.jersey().register(AuthFactory.binder(new BasicAuthFactory<>(new
@@ -77,12 +78,13 @@ public class APIService extends Application<APIConfiguration> {
    *
    * @param config the API configuration
    */
-  private Injector createInjector(APIConfiguration config) {
+  private Injector createInjector(APIConfiguration config, Environment environment) {
     return Guice.createInjector(new AbstractModule() {
       @Override
       protected void configure() {
         bind(APIConfiguration.class).toInstance(config);
         bind(AccumuloConfig.class).toInstance(config.getAccumuloConfig());
+        bind(MetricRegistry.class).toInstance(environment.metrics());
       }
     }, new AccumuloConnector());
   }

@@ -2,9 +2,11 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.dao;
 
+import com.codahale.metrics.MetricRegistry;
 import com.datafascia.accumulo.AccumuloConfig;
 import com.datafascia.accumulo.AccumuloConnector;
 import com.datafascia.accumulo.AccumuloImport;
+import com.datafascia.accumulo.QueryTemplate;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
 import com.google.inject.AbstractModule;
@@ -12,13 +14,8 @@ import com.google.inject.Guice;
 import com.google.inject.Inject;
 import com.google.inject.Injector;
 import java.io.File;
-import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.accumulo.core.client.AccumuloException;
-import org.apache.accumulo.core.client.AccumuloSecurityException;
 import org.apache.accumulo.core.client.Connector;
-import org.apache.accumulo.core.client.TableExistsException;
-import org.apache.accumulo.core.client.TableNotFoundException;
 import org.testng.annotations.BeforeSuite;
 
 /**
@@ -30,6 +27,7 @@ public abstract class DaoIT {
 
   private static AccumuloConfig config = new AccumuloConfig(System.getProperty("accumuloConfig"));
   protected static Connector connect;
+  protected static QueryTemplate queryTemplate;
 
   static class Connection {
     @Inject
@@ -37,8 +35,7 @@ public abstract class DaoIT {
   }
 
   @BeforeSuite
-  public static void setup() throws AccumuloException, AccumuloSecurityException, IOException,
-      TableExistsException, TableNotFoundException, InterruptedException {
+  public static void setup() throws Exception {
     Injector injector = Guice.createInjector(new AbstractModule() {
       @Override
       protected void configure() {
@@ -47,6 +44,7 @@ public abstract class DaoIT {
 
     Connection test = injector.getInstance(Connection.class);
     connect = test.connect;
+    queryTemplate = new QueryTemplate(connect, new MetricRegistry());
 
     String resourceFile = Resources.getResource("version.json").getPath();
     String path = resourceFile.substring(0, resourceFile.lastIndexOf(File.separator));

@@ -17,7 +17,7 @@ public class PatientDaoIT extends DaoIT {
   @Test
   public void patients() throws Exception {
     log.info("Getting the patients");
-    PatientDao patientDao = new PatientDao(connect);
+    PatientDao patientDao = new PatientDao(queryTemplate);
     Iterator<Patient> patients = patientDao.patients();
 
     int count = 0;

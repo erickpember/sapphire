@@ -2,6 +2,8 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.dao;
 
+import com.codahale.metrics.Timer;
+import com.datafascia.accumulo.QueryTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -12,9 +14,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Scanner;
-import org.apache.accumulo.core.client.TableNotFoundException;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
@@ -38,10 +38,10 @@ public class OpalDao {
   protected static final String PatientObject = "PatientObject";
   protected static final String OPAL_DATA = "opal_dF_data";
 
-  private final Connector connector;
+  protected QueryTemplate queryTemplate;
 
-  public OpalDao(Connector connector) {
-    this.connector = connector;
+  public OpalDao(QueryTemplate queryTemplate) {
+    this.queryTemplate = queryTemplate;
   }
 
   /**
@@ -52,11 +52,7 @@ public class OpalDao {
    * @throws RuntimeException if table not found.
    */
   protected Scanner getScanner(Authorizations auths) {
-    try {
-      return connector.createScanner(OPAL_DATA, auths);
-    } catch (TableNotFoundException e) {
-      throw new IllegalStateException("Table " + OPAL_DATA + " not found", e);
-    }
+    return queryTemplate.createScanner(OPAL_DATA, auths);
   }
 
   protected static String[] splitKey(String key) {
@@ -105,24 +101,31 @@ public class OpalDao {
    */
   protected Optional<Value> getFieldValue(String namespace, String kind, String id,
       String requestedFieldName, Authorizations auths) {
-    Scanner scanner = getScanner(auths);
-    scanner.setRange(toRange(namespace, kind, id));
-    Iterator<Entry<Key, Value>> iter = scanner.iterator();
 
-    while (iter.hasNext()) {
-      Entry<Key, Value> e = iter.next();
+    Timer.Context timerContext = queryTemplate.getTimerContext(
+        getClass(), "getFieldValue", kind, requestedFieldName);
+    try {
+      Scanner scanner = getScanner(auths);
+      scanner.setRange(toRange(namespace, kind, id));
+      Iterator<Entry<Key, Value>> iter = scanner.iterator();
 
-      // The column family contains the field name and the field type.
-      String[] colfStr = splitKey(e.getKey().getColumnFamily().toString());
-      String fieldType = colfStr[0];
-      String fieldName = colfStr[1];
+      while (iter.hasNext()) {
+        Entry<Key, Value> e = iter.next();
 
-      if (fieldName.equals(requestedFieldName)) {
-        return Optional.of(e.getValue());
+        // The column family contains the field name and the field type.
+        String[] colfStr = splitKey(e.getKey().getColumnFamily().toString());
+        String fieldType = colfStr[0];
+        String fieldName = colfStr[1];
+
+        if (fieldName.equals(requestedFieldName)) {
+          return Optional.of(e.getValue());
+        }
       }
-    }
 
-    return Optional.empty();
+      return Optional.empty();
+    } finally {
+      timerContext.stop();
+    }
   }
 
   /**

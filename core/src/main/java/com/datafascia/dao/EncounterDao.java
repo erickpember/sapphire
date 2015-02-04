@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.dao;
 
+import com.datafascia.accumulo.QueryTemplate;
 import com.datafascia.models.CodeableConcept;
 import com.datafascia.models.Encounter;
 import com.datafascia.models.Hospitalization;
@@ -21,7 +22,6 @@ import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.data.Value;
 import org.apache.accumulo.core.security.Authorizations;
 
@@ -35,8 +35,8 @@ public class EncounterDao extends OpalDao {
   private static final String ADMIN_DATE_FORMAT = "yyyyMMddHHmmssX";
 
   @Inject
-  public EncounterDao(Connector connector) {
-    super(connector);
+  public EncounterDao(QueryTemplate queryTemplate) {
+    super(queryTemplate);
   }
 
   /**

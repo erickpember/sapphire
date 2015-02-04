@@ -2,6 +2,9 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.dao;
 
+import com.datafascia.accumulo.QueryTemplate;
+import com.datafascia.accumulo.RowMapper;
+import com.datafascia.accumulo.SingleValueRowMapper;
 import com.datafascia.common.persist.Id;
 import com.datafascia.models.Gender;
 import com.datafascia.models.Name;
@@ -20,7 +23,6 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
@@ -69,8 +71,8 @@ public class PatientDao extends OpalDao {
   private static final Text LAST_VISIT_ID = toColumnFamily(FieldType.STRING, "LastVisitOiid");
 
   @Inject
-  public PatientDao(Connector connector) {
-    super(connector);
+  public PatientDao(QueryTemplate queryTemplate) {
+    super(queryTemplate);
   }
 
   /**
@@ -91,30 +93,49 @@ public class PatientDao extends OpalDao {
     return patients.iterator();
   }
 
+  @Slf4j
+  private static class GetPatientIdsRowMapper implements RowMapper<String> {
+    private boolean activeFlag;
+    private String patientId;
+    private boolean patientPresent;
+
+    public GetPatientIdsRowMapper(boolean activeFlag) {
+      this.activeFlag = activeFlag;
+    }
+
+    @Override
+    public void onBeginRow(Key key) {
+      String str[] = splitKey(key.getRow().toString());
+      if (str.length == 3) {
+        patientId = str[2];
+      } else {
+        log.warn("Invalid row identifier: " + key.getRow().toString());
+      }
+
+      patientPresent = false;
+    }
+
+    @Override
+    public void onReadEntry(Entry<Key, Value> entry) {
+      patientPresent = decodeBoolean(entry.getValue());
+    }
+
+    @Override
+    public String onEndRow() {
+      return (patientPresent == activeFlag) ? patientId : null;
+    }
+  }
+
   /**
    * @param activeFlag the active flag setting to filter with
    * @return the list of active patient identifiers in the unit
    */
   public List<String> getPatientIds(boolean activeFlag) {
-    log.debug("Getting list of active patient ids...");
-    ArrayList<String> patientIds = new ArrayList<>();
     Scanner scanner = getScanner(AUTHORIZATIONS);
     scanner.setRange(toRange(Kinds.PATIENT_OBJECT));
     scanner.fetchColumnFamily(PATIENT_PRESENT);
 
-    for (Entry<Key, Value> entry : scanner) {
-      boolean patientPresent = decodeBoolean(entry.getValue());
-      if (patientPresent == activeFlag) {
-        String str[] = splitKey(entry.getKey().getRow().toString());
-        if (str[2] != null) {
-          patientIds.add(str[2]);
-        } else {
-          log.error("Invalid row identifier: " + entry.getKey().getRow().toString());
-        }
-      }
-    }
-
-    return patientIds;
+    return queryTemplate.queryForList(scanner, new GetPatientIdsRowMapper(activeFlag));
   }
 
   /**
@@ -136,23 +157,24 @@ public class PatientDao extends OpalDao {
     }
   }
 
+  private static class LastVisitIdRowMapper extends SingleValueRowMapper<String> {
+    @Override
+    public void onReadEntry(Entry<Key, Value> entry) {
+      setValue(decodeString(entry.getValue()));
+    }
+  }
+
   /**
    * @param patientId the patient identifier
    * @return return the latest/last visit identifier for the patient
    */
   public Optional<String> getLastVisitId(String patientId) {
-    log.debug("Fetching last visit ID for patient ID " + patientId);
     Scanner scanner = getScanner(AUTHORIZATIONS);
     scanner.setRange(toRange(Kinds.PATIENT_OBJECT, patientId));
     scanner.fetchColumnFamily(LAST_VISIT_ID);
 
-    Iterator<Entry<Key, Value>> iter = scanner.iterator();
-    if (iter.hasNext()) {
-      Entry<Key, Value> entry = iter.next();
-      return Optional.of(decodeString(entry.getValue()));
-    }
-
-    return Optional.empty();
+    String lastVisitId = queryTemplate.queryForObject(scanner, new LastVisitIdRowMapper());
+    return Optional.ofNullable(lastVisitId);
   }
 
   /**

@@ -65,7 +65,7 @@ public class EmergeDemographicCSVGenerator {
       pw.write(Joiner.on(",").join(mapper.getHeaders()));
 
       int entry = 0;
-      for (Patient pat : api.patients()) {
+      for (Patient pat : api.patients(true)) {
         try {
           String[] urnparts = pat.getId().toString().split(":");
           String patientId = urnparts[urnparts.length - 1];

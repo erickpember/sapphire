@@ -76,11 +76,14 @@ public class PatientDao extends OpalDao {
   }
 
   /**
+   * @param active flag to indicate status of patients to return
+   *
    * @return the list of active patients
    */
-  public Iterator<Patient> patients() {
+  public Iterator<Patient> patients(boolean active) {
     List<Patient> patients = new ArrayList<Patient>();
-    List<String> patientIds = getPatientIds(true);
+
+    List<String> patientIds = getPatientIds(active);
     for (String patientId : patientIds) {
       Optional<Patient> optionalPatient = patient(patientId, getLastVisitId(patientId));
       if (optionalPatient.isPresent()) {

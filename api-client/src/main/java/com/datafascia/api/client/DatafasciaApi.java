@@ -8,6 +8,7 @@ import com.datafascia.models.Version;
 import java.util.List;
 import retrofit.http.GET;
 import retrofit.http.Path;
+import retrofit.http.Query;
 
 /**
  * Base interface for interacting with the dataFascia API.
@@ -17,7 +18,7 @@ public interface DatafasciaApi {
    * @return list of all patients.
    */
   @GET("/patient")
-  List<Patient> patients();
+  List<Patient> patients(@Query("active") boolean active);
 
   /**
    * @return An encounter for the id given.

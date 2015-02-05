@@ -2,6 +2,8 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.services;
 
+import static org.testng.Assert.assertEquals;
+
 import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.dropwizard.testing.DropwizardTestApp;
 import com.datafascia.models.Version;
@@ -15,8 +17,6 @@ import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.assertEquals;
-
 /**
  * Integration test for the various API resources
  */
@@ -26,8 +26,13 @@ public class APIIntegrationTest {
 
   @BeforeSuite
   public void before() throws Exception {
-    app = new DropwizardTestApp<>(APIService.class, Resources.getResource("test.yml").getPath());
-    app.start();
+    try {
+      app = new DropwizardTestApp<>(APIService.class, Resources.getResource("test.yml").getPath());
+      app.start();
+    } catch (Exception e) {
+      e.printStackTrace();
+      throw e;
+    }
   }
 
   @AfterSuite

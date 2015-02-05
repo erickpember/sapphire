@@ -4,6 +4,8 @@ package com.datafascia.accumulo;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import com.datafascia.common.shiro.RoleExposingRealm;
+import com.google.common.collect.Lists;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,12 +23,14 @@ import org.apache.accumulo.core.security.Authorizations;
 @Singleton @Slf4j
 public class QueryTemplate {
 
+  private RoleExposingRealm realm;
   private Connector connector;
   private MetricRegistry metrics;
   private Map<String, Timer> nameToTimerMap = new HashMap<>();
 
   @Inject
-  public QueryTemplate(Connector connector, MetricRegistry metrics) {
+  public QueryTemplate(RoleExposingRealm realm, Connector connector, MetricRegistry metrics) {
+    this.realm = realm;
     this.connector = connector;
     this.metrics = metrics;
   }
@@ -36,13 +40,13 @@ public class QueryTemplate {
    *
    * @param tableName
    *     table to scan
-   * @param authorizations
-   *     authorize access to entries
    * @return scanner
    * @throws RuntimeException
    *     if table not found
    */
-  public Scanner createScanner(String tableName, Authorizations authorizations) {
+  public Scanner createScanner(String tableName) {
+    List<String> roles = Lists.newArrayList(realm.getRolesForSubject());
+    Authorizations authorizations = new Authorizations(roles.toArray(new String[0]));
     try {
       return connector.createScanner(tableName, authorizations);
     } catch (TableNotFoundException e) {

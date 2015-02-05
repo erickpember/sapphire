@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.data.Value;
-import org.apache.accumulo.core.security.Authorizations;
 
 /**
  * Encounter data access to/from Accumulo.
@@ -43,14 +42,12 @@ public class EncounterDao extends OpalDao {
    * Returns a populated encounter object by its ID.
    *
    * @param id ID of the encounter to return.
-   * @param auths Authorizations to filter on.
    * @return A populated Encounter object.
    */
-  public Encounter getEncounter(String id, String auths) {
+  public Encounter getEncounter(String id) {
     Encounter encounter = new Encounter();
-    Authorizations authorizations = new Authorizations(auths);
 
-    Optional<Date> odate = getAdmissionDate(id, authorizations);
+    Optional<Date> odate = getAdmissionDate(id);
     if (odate.isPresent()) {
       Period period = new Period();
       period.setStart(odate.get());
@@ -63,12 +60,12 @@ public class EncounterDao extends OpalDao {
 
     List<Observation> observations = new ArrayList<Observation>();
 
-    Optional<Observation> weight = getWeight(id, authorizations);
+    Optional<Observation> weight = getWeight(id);
     if (weight.isPresent()) {
       observations.add(weight.get());
     }
 
-    Optional<Observation> height = getHeight(id, authorizations);
+    Optional<Observation> height = getHeight(id);
     if (height.isPresent()) {
       observations.add(height.get());
     }
@@ -82,11 +79,10 @@ public class EncounterDao extends OpalDao {
    * Returns the admission date of a given visit.
    *
    * @param id ID of the visit to fetch.
-   * @param auths Authorizations to filter on.
    * @return A date for the admission.
    */
-  public Optional<Date> getAdmissionDate(String id, Authorizations auths) {
-    Optional<Value> valdate = getFieldValue(ObjectStore, PatientVisitMap, id, admitTime, auths);
+  public Optional<Date> getAdmissionDate(String id) {
+    Optional<Value> valdate = getFieldValue(ObjectStore, PatientVisitMap, id, admitTime);
     if (!valdate.isPresent()) {
       return Optional.empty();
     }
@@ -104,11 +100,10 @@ public class EncounterDao extends OpalDao {
    * Returns the weight for a given visit.
    *
    * @param id ID of the visit to fetch.
-   * @param auths Authorizations to filter on.
    * @return An optional observation for the weight.
    */
-  public Optional<Observation> getWeight(String id, Authorizations auths) {
-    Optional<Value> weightOpt = getFieldValue(ObjectStore, PatientVisitMap, id, admitWeight, auths);
+  public Optional<Observation> getWeight(String id) {
+    Optional<Value> weightOpt = getFieldValue(ObjectStore, PatientVisitMap, id, admitWeight);
     String[] weightl = new String[0];
     if (weightOpt.isPresent()) {
       Value weightVal = (Value) weightOpt.get();
@@ -135,11 +130,10 @@ public class EncounterDao extends OpalDao {
    * Returns the height for a given visit.
    *
    * @param id ID of the visit to fetch.
-   * @param auths Authorizations to filter on.
    * @return An optional observation for the height.
    */
-  public Optional<Observation> getHeight(String id, Authorizations auths) {
-    Optional<Value> heightOpt = getFieldValue(ObjectStore, PatientVisitMap, id, admitHeight, auths);
+  public Optional<Observation> getHeight(String id) {
+    Optional<Value> heightOpt = getFieldValue(ObjectStore, PatientVisitMap, id, admitHeight);
     String[] heightl = new String[0];
     if (heightOpt.isPresent()) {
       Value heightVal = (Value) heightOpt.get();
@@ -167,13 +161,11 @@ public class EncounterDao extends OpalDao {
    *
    * @param visitId
    *     visit identifier
-   * @param authorizations
-   *     controls access to entries
    * @return collection of update identifiers, empty if none found
    */
-  public List<String> findUpdateIds(String visitId, Authorizations authorizations) {
+  public List<String> findUpdateIds(String visitId) {
     Optional<Value> value = getFieldValue(
-        ObjectStore, Kinds.PATIENT_VISIT_MAP, visitId, VisitFields.UPDATE_OIIDS, authorizations);
+        ObjectStore, Kinds.PATIENT_VISIT_MAP, visitId, VisitFields.UPDATE_OIIDS);
     if (value.isPresent()) {
       return Arrays.asList(decodeStringArray(value.get()));
     } else {

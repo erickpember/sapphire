@@ -7,7 +7,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.accumulo.core.security.Authorizations;
 import org.testng.annotations.Test;
 
 /**
@@ -24,11 +23,10 @@ public class FindObservationsCoordinatorIT extends DaoIT {
     FindObservationsCoordinator findObservationsCoordinator = new FindObservationsCoordinator(
         patientDao, new EncounterDao(queryTemplate), new ObservationDao(queryTemplate));
 
-    Authorizations accAuths = new Authorizations(AUTHORIZATIONS);
-    List<String> patientIds = patientDao.getPatientIds(accAuths, true);
+    List<String> patientIds = patientDao.getPatientIds(true);
     for (String patientId : patientIds) {
       Collection<Observation> observations = findObservationsCoordinator.findObservationsByPatientId(
-          patientId, Optional.empty(), AUTHORIZATIONS);
+          patientId, Optional.empty());
       if (!observations.isEmpty()) {
         log.debug("patientId [{}]", patientId);
       }

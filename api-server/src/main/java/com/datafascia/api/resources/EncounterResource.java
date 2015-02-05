@@ -3,11 +3,9 @@
 package com.datafascia.api.resources;
 
 import com.codahale.metrics.annotation.Timed;
-import com.datafascia.api.authenticator.User;
 import com.datafascia.dao.EncounterDao;
 import com.datafascia.dao.PatientDao;
 import com.datafascia.models.Encounter;
-import io.dropwizard.auth.Auth;
 import java.util.Optional;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -38,20 +36,20 @@ public class EncounterResource {
    * @return Return a given encounter by ID.
    */
   @GET @Timed @Path("{id}")
-  public Encounter encounter(@Auth User user, @PathParam("id") String id) {
-    return encounterDao.getEncounter(id, user.getAuths());
+  public Encounter encounter(@PathParam("id") String id) {
+    return encounterDao.getEncounter(id);
   }
 
   /**
    * @return stream list of patients back
    */
   @GET @Timed @Path("last/{patientid}")
-  public Encounter getlast(@Auth User user, @PathParam("patientid") String id) {
-    Optional<String> lastVisit = patientDao.getLastVisitId(user.getAuths(), id);
+  public Encounter getlast(@PathParam("patientid") String id) {
+    Optional<String> lastVisit = patientDao.getLastVisitId(id);
     if (!lastVisit.isPresent()) {
       throw new WebApplicationException(Response.Status.NOT_FOUND);
     }
 
-    return encounterDao.getEncounter(lastVisit.get(), user.getAuths());
+    return encounterDao.getEncounter(lastVisit.get());
   }
 }

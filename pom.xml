@@ -45,6 +45,7 @@
     <neovisionaries.version>1.14</neovisionaries.version>
     <reflections.version>0.9.9</reflections.version>
     <retrofit.version>1.8.0</retrofit.version>
+    <shiro.version>1.2.3</shiro.version>
     <slf4j.version>1.7.7</slf4j.version>
     <string-template.version>4.0.2</string-template.version>
     <testng.version>6.8.13</testng.version>
@@ -111,11 +112,6 @@
 
       <dependency>
         <groupId>io.dropwizard</groupId>
-        <artifactId>dropwizard-auth</artifactId>
-        <version>${dropwizard.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>io.dropwizard</groupId>
         <artifactId>dropwizard-core</artifactId>
         <version>${dropwizard.version}</version>
       </dependency>
@@ -170,6 +166,17 @@
             <artifactId>slf4j-log4j12</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-core</artifactId>
+        <version>${shiro.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.shiro</groupId>
+        <artifactId>shiro-web</artifactId>
+        <version>${shiro.version}</version>
       </dependency>
 
       <dependency>

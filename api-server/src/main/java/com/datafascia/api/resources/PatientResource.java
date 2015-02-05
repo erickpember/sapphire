@@ -3,18 +3,16 @@
 package com.datafascia.api.resources;
 
 import com.codahale.metrics.annotation.Timed;
-import com.datafascia.api.authenticator.User;
 import com.datafascia.api.responses.IteratorResponse;
 import com.datafascia.dao.PatientDao;
 import com.datafascia.models.Patient;
-import io.dropwizard.auth.Auth;
 import javax.inject.Inject;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -34,8 +32,8 @@ public class PatientResource {
    * @return stream list of patients back
    */
   @GET @Timed
-  public IteratorResponse<Patient> patients(@Auth User user,
+  public IteratorResponse<Patient> patients(
       @DefaultValue("true") @QueryParam("active") boolean active) {
-    return new IteratorResponse<Patient>(patientDao.patients(user.getAuths(), active));
+    return new IteratorResponse<Patient>(patientDao.patients(active));
   }
 }

@@ -41,12 +41,10 @@ public class FindObservationsCoordinator {
    *     patient identifier
    * @param captureTimeInterval
    *     capture time interval to include
-   * @param auths
-   *     authorizations
    * @return collection of observations, empty if none found
    */
   public Collection<Observation> findObservationsByPatientId(
-      String patientId, Optional<Interval<Instant>> captureTimeInterval, String auths)
+      String patientId, Optional<Interval<Instant>> captureTimeInterval)
   {
     Date startIssued = null;
     Date endIssued = null;
@@ -55,15 +53,13 @@ public class FindObservationsCoordinator {
       endIssued = Date.from(captureTimeInterval.get().getEndExclusive());
     }
 
-    Authorizations authorizations = new Authorizations(auths);
-
     Collection<Observation> foundObservations = new ArrayList<>();
-    List<String> visitIds = patientDao.findVisitIds(patientId, authorizations);
+    List<String> visitIds = patientDao.findVisitIds(patientId);
     for (String visitId : visitIds) {
-      List<String> updateIds = encounterDao.findUpdateIds(visitId, authorizations);
+      List<String> updateIds = encounterDao.findUpdateIds(visitId);
       for (String updateId : updateIds) {
         List<Observation> candidateObservations =
-            observationDao.findObservations(updateId, authorizations);
+            observationDao.findObservations(updateId);
         for (Observation observation : candidateObservations) {
           if (startIssued != null &&
               (observation.getIssued().before(startIssued) ||

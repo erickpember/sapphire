@@ -47,12 +47,11 @@ public class OpalDao {
   /**
    * Returns a usable scanner of the opal_dF_data table.
    *
-   * @param auths The authorizations to filter on.
    * @return A scanner for the opal_dF_data table.
    * @throws RuntimeException if table not found.
    */
-  protected Scanner getScanner(Authorizations auths) {
-    return queryTemplate.createScanner(OPAL_DATA, auths);
+  protected Scanner getScanner() {
+    return queryTemplate.createScanner(OPAL_DATA);
   }
 
   protected static String[] splitKey(String key) {
@@ -65,14 +64,13 @@ public class OpalDao {
    * @param namespace The Opal namespace (e.g. ObjectStore)
    * @param kind The Opal kind (e.g. PatientVisitMap)
    * @param id The id of the Opal object.
-   * @param auths The auths to connect with.
    * @return An optional map pairing Opal fields to values.
    */
   protected Optional<Map<String, Value>> getObjectFields(String namespace, String kind, String id,
       Authorizations auths) {
     HashMap<String, Value> map = new HashMap<String, Value>();
 
-    Scanner scanner = getScanner(auths);
+    Scanner scanner = getScanner();
     scanner.setRange(toRange(namespace, kind, id));
     Iterator<Entry<Key, Value>> iter = scanner.iterator();
     if (!iter.hasNext()) {
@@ -96,16 +94,15 @@ public class OpalDao {
    * @param kind The Opal kind (e.g. PatientVisitMap)
    * @param id The id of the Opal object.
    * @param requestedFieldName The name of the field to pull.
-   * @param auths The auths to connect with.
    * @return A given field value for an Opal object.
    */
   protected Optional<Value> getFieldValue(String namespace, String kind, String id,
-      String requestedFieldName, Authorizations auths) {
+      String requestedFieldName) {
 
     Timer.Context timerContext = queryTemplate.getTimerContext(
         getClass(), "getFieldValue", kind, requestedFieldName);
     try {
-      Scanner scanner = getScanner(auths);
+      Scanner scanner = getScanner();
       scanner.setRange(toRange(namespace, kind, id));
       Iterator<Entry<Key, Value>> iter = scanner.iterator();
 

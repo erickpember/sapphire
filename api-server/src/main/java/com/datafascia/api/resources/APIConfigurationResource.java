@@ -3,9 +3,7 @@
 package com.datafascia.api.resources;
 
 import com.codahale.metrics.annotation.Timed;
-import com.datafascia.api.authenticator.User;
 import com.datafascia.api.configurations.APIConfiguration;
-import io.dropwizard.auth.Auth;
 import javax.inject.Inject;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.GET;
@@ -34,7 +32,7 @@ public class APIConfigurationResource {
    * @return the server configuration
    */
   @GET @Timed
-  public APIConfiguration configuration(@Auth User user) {
+  public APIConfiguration configuration() {
     return config;
   }
 }

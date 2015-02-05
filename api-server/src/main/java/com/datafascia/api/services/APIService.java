@@ -5,22 +5,25 @@ package com.datafascia.api.services;
 import com.codahale.metrics.MetricRegistry;
 import com.datafascia.accumulo.AccumuloConfig;
 import com.datafascia.accumulo.AccumuloConnector;
-import com.datafascia.api.authenticator.SimpleAuthenticator;
-import com.datafascia.api.authenticator.User;
 import com.datafascia.api.bundle.AtmosphereBundle;
 import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.api.health.AccumuloHealthCheck;
+import com.datafascia.common.shiro.FakeRealm;
+import com.datafascia.common.shiro.RealmInjectingEnvironmentLoaderListener;
+import com.datafascia.common.shiro.RoleExposingRealm;
 import com.datafascia.reflections.PackageUtils;
 import com.datafascia.urn.URNMap;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import io.dropwizard.Application;
-import io.dropwizard.auth.AuthFactory;
-import io.dropwizard.auth.basic.BasicAuthFactory;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import java.util.EnumSet;
+import javax.servlet.DispatcherType;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.realm.Realm;
+import org.apache.shiro.web.servlet.ShiroFilter;
 
 /**
  * The main application class for the Datafascia API end-point as required by the dropwizard
@@ -60,8 +63,11 @@ public class APIService extends Application<APIConfiguration> {
     Injector injector = createInjector(configuration, environment);
 
     // Authenticator
-    environment.jersey().register(AuthFactory.binder(new BasicAuthFactory<>(new
-        SimpleAuthenticator(), "dataFascia-API", User.class)));
+    environment.servlets()
+        .addServletListeners(injector.getInstance(RealmInjectingEnvironmentLoaderListener.class));
+    environment.servlets()
+        .addFilter(ShiroFilter.class.getSimpleName(), new ShiroFilter())
+        .addMappingForUrlPatterns(EnumSet.allOf(DispatcherType.class), true, "/*");
 
     // Resources
     for (Class<?> resClass : PackageUtils.classes(RESOURCES_PKG)) {
@@ -79,13 +85,19 @@ public class APIService extends Application<APIConfiguration> {
    * @param config the API configuration
    */
   private Injector createInjector(APIConfiguration config, Environment environment) {
-    return Guice.createInjector(new AbstractModule() {
-      @Override
-      protected void configure() {
-        bind(APIConfiguration.class).toInstance(config);
-        bind(AccumuloConfig.class).toInstance(config.getAccumuloConfig());
-        bind(MetricRegistry.class).toInstance(environment.metrics());
-      }
-    }, new AccumuloConnector());
+    final RoleExposingRealm realm = new FakeRealm();
+
+    return Guice.createInjector(
+        new AbstractModule() {
+          @Override
+          protected void configure() {
+            bind(APIConfiguration.class).toInstance(config);
+            bind(AccumuloConfig.class).toInstance(config.getAccumuloConfig());
+            bind(MetricRegistry.class).toInstance(environment.metrics());
+            bind(Realm.class).toInstance(realm);
+            bind(RoleExposingRealm.class).toInstance(realm);
+          }
+        },
+        new AccumuloConnector());
   }
 }

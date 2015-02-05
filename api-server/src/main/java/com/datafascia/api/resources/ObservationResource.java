@@ -3,12 +3,10 @@
 package com.datafascia.api.resources;
 
 import com.codahale.metrics.annotation.Timed;
-import com.datafascia.api.authenticator.User;
 import com.datafascia.common.time.Interval;
 import com.datafascia.dao.FindObservationsCoordinator;
 import com.datafascia.models.Observation;
 import com.google.common.base.Strings;
-import io.dropwizard.auth.Auth;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.util.Collection;
@@ -51,7 +49,6 @@ public class ObservationResource {
    */
   @GET @Timed
   public Collection<Observation> findObservations(
-      @Auth User user,
       @QueryParam("patientId") String patientId,
       @QueryParam("startCaptureTime") String startCaptureTimeString,
       @QueryParam("endCaptureTime") String endCaptureTimeString) {
@@ -77,7 +74,7 @@ public class ObservationResource {
     }
 
     return findObservationsCoordinator.findObservationsByPatientId(
-        patientId, Optional.ofNullable(captureTimeRange), user.getAuths());
+        patientId, Optional.ofNullable(captureTimeRange));
   }
 
   private Instant parseDateTime(String input) {

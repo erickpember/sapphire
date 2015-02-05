@@ -18,7 +18,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
-import org.apache.accumulo.core.security.Authorizations;
 
 /**
  * Observation data access.
@@ -36,17 +35,15 @@ public class ObservationDao extends OpalDao {
    *
    * @param updateId
    *     update identifier
-   * @param authorizations
-   *     controls access to entries
    * @return collection of observations, empty if none found
    */
-  public List<Observation> findObservations(String updateId, Authorizations authorizations) {
+  public List<Observation> findObservations(String updateId) {
     Timer.Context timerContext = queryTemplate.getTimerContext(getClass(), "findObservations");
     try {
       List<Observation> observations = new ArrayList<>();
       Date issued = null;
 
-      Scanner scanner = getScanner(authorizations);
+      Scanner scanner = getScanner();
       scanner.setRange(toRange(Kinds.PATIENT_UPDATE_MAP, updateId));
       for (Map.Entry<Key, Value> entry : scanner) {
         String fieldName = splitKey(entry.getKey().getColumnFamily().toString())[1];

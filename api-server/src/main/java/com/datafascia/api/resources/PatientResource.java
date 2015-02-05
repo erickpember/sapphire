@@ -36,6 +36,6 @@ public class PatientResource {
   @GET @Timed
   public IteratorResponse<Patient> patients(@Auth User user,
       @DefaultValue("true") @QueryParam("active") boolean active) {
-    return new IteratorResponse<Patient>(patientDao.patients(active));
+    return new IteratorResponse<Patient>(patientDao.patients(user.getAuths(), active));
   }
 }

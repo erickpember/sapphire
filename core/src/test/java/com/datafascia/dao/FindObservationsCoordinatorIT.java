@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.accumulo.core.security.Authorizations;
 import org.testng.annotations.Test;
 
 /**
@@ -16,7 +17,6 @@ import org.testng.annotations.Test;
 public class FindObservationsCoordinatorIT extends DaoIT {
 
   private static final String PATIENT_ID = "96087004";
-  private static final String AUTHORIZATIONS = "System";
 
   @Test
   public void should_find_observations() throws Exception {
@@ -24,7 +24,8 @@ public class FindObservationsCoordinatorIT extends DaoIT {
     FindObservationsCoordinator findObservationsCoordinator = new FindObservationsCoordinator(
         patientDao, new EncounterDao(queryTemplate), new ObservationDao(queryTemplate));
 
-    List<String> patientIds = patientDao.getPatientIds(true);
+    Authorizations accAuths = new Authorizations(AUTHORIZATIONS);
+    List<String> patientIds = patientDao.getPatientIds(accAuths, true);
     for (String patientId : patientIds) {
       Collection<Observation> observations = findObservationsCoordinator.findObservationsByPatientId(
           patientId, Optional.empty(), AUTHORIZATIONS);

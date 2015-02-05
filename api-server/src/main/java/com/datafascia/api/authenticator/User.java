@@ -11,6 +11,7 @@ import lombok.Getter;
 @Slf4j @Getter
 public class User {
   private final String name;
+  private final String auths = "System";
 
   /**
    * Construct user with name

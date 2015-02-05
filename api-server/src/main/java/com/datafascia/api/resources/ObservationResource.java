@@ -29,8 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 @Path("/observation") @Produces(MediaType.APPLICATION_JSON) @Slf4j
 public class ObservationResource {
 
-  private static final String AUTHORIZATIONS = "System";
-
   private FindObservationsCoordinator findObservationsCoordinator;
 
   @Inject
@@ -79,7 +77,7 @@ public class ObservationResource {
     }
 
     return findObservationsCoordinator.findObservationsByPatientId(
-        patientId, Optional.ofNullable(captureTimeRange), AUTHORIZATIONS);
+        patientId, Optional.ofNullable(captureTimeRange), user.getAuths());
   }
 
   private Instant parseDateTime(String input) {

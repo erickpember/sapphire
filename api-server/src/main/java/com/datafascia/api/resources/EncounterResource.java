@@ -25,8 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j @Path("/encounter") @Produces(MediaType.APPLICATION_JSON)
 public class EncounterResource {
 
-  private static final String AUTHORIZATIONS = "System";
-
   private PatientDao patientDao;
   private EncounterDao encounterDao;
 
@@ -41,7 +39,7 @@ public class EncounterResource {
    */
   @GET @Timed @Path("{id}")
   public Encounter encounter(@Auth User user, @PathParam("id") String id) {
-    return encounterDao.getEncounter(id, AUTHORIZATIONS);
+    return encounterDao.getEncounter(id, user.getAuths());
   }
 
   /**
@@ -49,11 +47,11 @@ public class EncounterResource {
    */
   @GET @Timed @Path("last/{patientid}")
   public Encounter getlast(@Auth User user, @PathParam("patientid") String id) {
-    Optional<String> lastVisit = patientDao.getLastVisitId(id);
+    Optional<String> lastVisit = patientDao.getLastVisitId(user.getAuths(), id);
     if (!lastVisit.isPresent()) {
       throw new WebApplicationException(Response.Status.NOT_FOUND);
     }
 
-    return encounterDao.getEncounter(lastVisit.get(), AUTHORIZATIONS);
+    return encounterDao.getEncounter(lastVisit.get(), user.getAuths());
   }
 }

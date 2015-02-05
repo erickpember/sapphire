@@ -23,6 +23,7 @@ import org.testng.annotations.BeforeSuite;
  */
 @Slf4j
 public abstract class DaoIT {
+  protected static final String AUTHORIZATIONS = "System";
   private static String OPAL_TABLE = "opal_dF_data";
 
   private static AccumuloConfig config = new AccumuloConfig(System.getProperty("accumuloConfig"));

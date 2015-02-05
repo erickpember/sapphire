@@ -61,7 +61,6 @@ import org.apache.hadoop.io.Text;
 @Slf4j
 public class PatientDao extends OpalDao {
 
-  private static final Authorizations AUTHORIZATIONS = new Authorizations("System");
   private static final SimpleDateFormat dateOfBirthFormat = new SimpleDateFormat("yyyyMMdd");
 
   /** patient present column family */
@@ -76,16 +75,20 @@ public class PatientDao extends OpalDao {
   }
 
   /**
+   *
+   * @param auths Authorizations to filter on.
    * @param active flag to indicate status of patients to return
    *
    * @return the list of active patients
    */
-  public Iterator<Patient> patients(boolean active) {
+  public Iterator<Patient> patients(String auths, boolean active) {
     List<Patient> patients = new ArrayList<Patient>();
+    Authorizations accAuths = new Authorizations(auths);
 
-    List<String> patientIds = getPatientIds(active);
+    List<String> patientIds = getPatientIds(accAuths, active);
     for (String patientId : patientIds) {
-      Optional<Patient> optionalPatient = patient(patientId, getLastVisitId(patientId));
+      Optional<Patient> optionalPatient =
+          patient(accAuths, patientId, getLastVisitId(accAuths, patientId));
       if (optionalPatient.isPresent()) {
         Patient patient = optionalPatient.get();
         patient.setActive(active);
@@ -130,11 +133,13 @@ public class PatientDao extends OpalDao {
   }
 
   /**
+   * @param accAuths Authorizations to filter on.
    * @param activeFlag the active flag setting to filter with
+   *
    * @return the list of active patient identifiers in the unit
    */
-  public List<String> getPatientIds(boolean activeFlag) {
-    Scanner scanner = getScanner(AUTHORIZATIONS);
+  public List<String> getPatientIds(Authorizations accAuths, boolean activeFlag) {
+    Scanner scanner = getScanner(accAuths);
     scanner.setRange(toRange(Kinds.PATIENT_OBJECT));
     scanner.fetchColumnFamily(PATIENT_PRESENT);
 
@@ -146,13 +151,13 @@ public class PatientDao extends OpalDao {
    *
    * @param patientId
    *     patient identifier
-   * @param authorizations
+   * @param accAuths
    *     controls access to entries
    * @return collection of visit identifiers, empty if none found
    */
-  public List<String> findVisitIds(String patientId, Authorizations authorizations) {
+  public List<String> findVisitIds(String patientId, Authorizations accAuths) {
     Optional<Value> value = getFieldValue(
-        ObjectStore, Kinds.PATIENT_OBJECT, patientId, PatientFields.VISIT_OIIDS, authorizations);
+        ObjectStore, Kinds.PATIENT_OBJECT, patientId, PatientFields.VISIT_OIIDS, accAuths);
     if (value.isPresent()) {
       return Arrays.asList(decodeStringArray(value.get()));
     } else {
@@ -168,11 +173,23 @@ public class PatientDao extends OpalDao {
   }
 
   /**
+   * @param auths Authorizations to filter on.
    * @param patientId the patient identifier
+   *
    * @return return the latest/last visit identifier for the patient
    */
-  public Optional<String> getLastVisitId(String patientId) {
-    Scanner scanner = getScanner(AUTHORIZATIONS);
+  public Optional<String> getLastVisitId(String auths, String patientId) {
+    return getLastVisitId(new Authorizations(auths), patientId);
+  }
+
+  /**
+   * @param accAuths Authorizations to filter on.
+   * @param patientId the patient identifier
+   *
+   * @return return the latest/last visit identifier for the patient
+   */
+  public Optional<String> getLastVisitId(Authorizations accAuths, String patientId) {
+    Scanner scanner = getScanner(accAuths);
     scanner.setRange(toRange(Kinds.PATIENT_OBJECT, patientId));
     scanner.fetchColumnFamily(LAST_VISIT_ID);
 
@@ -181,17 +198,19 @@ public class PatientDao extends OpalDao {
   }
 
   /**
+   * @param accAuths Authorizations to filter on.
    * @param patientId the patient identifier
    * @param visitId the visit map identifier
    * @return the patient
    */
-  public Optional<Patient> patient(String patientId, Optional<String> visitId) {
+  public Optional<Patient> patient(Authorizations accAuths, String patientId,
+      Optional<String> visitId) {
     if (!visitId.isPresent()) {
       return Optional.empty();
     }
 
     try {
-      Scanner scanner = getScanner(AUTHORIZATIONS);
+      Scanner scanner = getScanner(accAuths);
       scanner.setRange(toRange(Kinds.PATIENT_VISIT_MAP, visitId.get()));
 
       Patient patient = new Patient();

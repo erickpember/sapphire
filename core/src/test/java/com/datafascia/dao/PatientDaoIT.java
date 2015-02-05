@@ -18,7 +18,7 @@ public class PatientDaoIT extends DaoIT {
   public void patients() throws Exception {
     log.info("Getting the patients");
     PatientDao patientDao = new PatientDao(queryTemplate);
-    Iterator<Patient> patients = patientDao.patients(true);
+    Iterator<Patient> patients = patientDao.patients(AUTHORIZATIONS, true);
 
     int count = 0;
     while (patients.hasNext()) {

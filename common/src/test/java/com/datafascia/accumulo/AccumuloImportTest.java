@@ -36,13 +36,13 @@ public class AccumuloImportTest {
   @BeforeClass
   public void setup() throws IOException, InterruptedException {
     tempDir = Files.createTempDir();
-    mac = new MiniAccumuloCluster(new MiniAccumuloConfig(tempDir, AccumuloConfiguration.USER_PASSWORD));
+    mac = new MiniAccumuloCluster(new MiniAccumuloConfig(tempDir, AccumuloConfiguration.TESTING_PASSWORD));
     mac.start();
 
     config = new AccumuloConfiguration() {{
         setInstance(mac.getInstanceName());
-        setUser(AccumuloConfiguration.ROOT);
-        setPassword(AccumuloConfiguration.USER_PASSWORD);
+        setUser(AccumuloConfiguration.TESTING_USER);
+        setPassword(AccumuloConfiguration.TESTING_PASSWORD);
         setZooKeepers(mac.getZooKeepers());
         setType(AccumuloConfiguration.MINI);
         }};

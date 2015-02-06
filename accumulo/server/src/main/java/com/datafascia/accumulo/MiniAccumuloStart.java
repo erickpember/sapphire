@@ -52,7 +52,7 @@ public class MiniAccumuloStart {
     return (() -> {
       try {
         File tmpDir = Files.createTempDir();
-        MiniAccumuloCluster accInst = new MiniAccumuloCluster(tmpDir, AccumuloConfiguration.USER_PASSWORD);
+        MiniAccumuloCluster accInst = new MiniAccumuloCluster(tmpDir, AccumuloConfiguration.TESTING_PASSWORD);
         accInst.start();
         exportConfig(accInst, tmpDir);
         System.out.println("  server started ..");
@@ -96,8 +96,8 @@ public class MiniAccumuloStart {
     Properties props = new Properties();
     props.setProperty(AccumuloConfiguration.INSTANCE, accumulo.getInstanceName());
     props.setProperty(AccumuloConfiguration.ZOOKEEPERS, accumulo.getZooKeepers());
-    props.setProperty(AccumuloConfiguration.USER, AccumuloConfiguration.ROOT);
-    props.setProperty(AccumuloConfiguration.PASSWORD, AccumuloConfiguration.USER_PASSWORD);
+    props.setProperty(AccumuloConfiguration.USER, AccumuloConfiguration.TESTING_USER);
+    props.setProperty(AccumuloConfiguration.PASSWORD, AccumuloConfiguration.TESTING_PASSWORD);
     props.setProperty(AccumuloConfiguration.DIRECTORY, tempDir.getAbsolutePath());
     props.setProperty(AccumuloConfiguration.TYPE, AccumuloConfiguration.MINI);
     props.store(new FileOutputStream(opts.configFile), null);

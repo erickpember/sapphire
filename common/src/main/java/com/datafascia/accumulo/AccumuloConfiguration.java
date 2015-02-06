@@ -30,10 +30,10 @@ public class AccumuloConfiguration {
   /** Property name for Accumulo type */
   public static final String TYPE = "type";
 
-  /** Default user name */
-  public static final String ROOT = "root";
-  /** Default user password */
-  public static final String USER_PASSWORD = "secret";
+  /** user to configure in tests */
+  public static final String TESTING_USER = "root";
+  /** password to configure in tests */
+  public static final String TESTING_PASSWORD = "secret";
 
   /** Accumulo type mock */
   @JsonIgnore

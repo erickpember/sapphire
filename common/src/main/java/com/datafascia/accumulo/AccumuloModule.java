@@ -22,7 +22,7 @@ import org.apache.accumulo.core.security.Authorizations;
  * NOTE: The Accumulo configuration parameters are injected into this class.
  */
 @Slf4j
-public class AccumuloConnector extends AbstractModule {
+public class AccumuloModule extends AbstractModule {
  /**
    * This creates the Accumulo connector. It can be used to create both mock and real instances of
    * Accumulo connectors

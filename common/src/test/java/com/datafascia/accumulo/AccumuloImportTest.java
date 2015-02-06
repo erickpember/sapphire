@@ -50,7 +50,7 @@ public class AccumuloImportTest {
       @Override
       protected void configure() {
         bind(AccumuloConfiguration.class).toInstance(config);
-      }}, new AccumuloConnector());
+      }}, new AccumuloModule());
   }
 
   @AfterClass

@@ -4,7 +4,7 @@ package com.datafascia.api.services;
 
 import com.codahale.metrics.MetricRegistry;
 import com.datafascia.accumulo.AccumuloConfiguration;
-import com.datafascia.accumulo.AccumuloConnector;
+import com.datafascia.accumulo.AccumuloModule;
 import com.datafascia.api.bundle.AtmosphereBundle;
 import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.api.health.AccumuloHealthCheck;
@@ -110,6 +110,6 @@ public class APIService extends Application<APIConfiguration> {
             bind(RoleExposingRealm.class).toInstance(realm);
           }
         },
-        new AccumuloConnector());
+        new AccumuloModule());
   }
 }

@@ -3,8 +3,8 @@
 package com.datafascia.dao;
 
 import com.datafascia.accumulo.AccumuloConfiguration;
-import com.datafascia.accumulo.AccumuloConnector;
 import com.datafascia.accumulo.AccumuloImport;
+import com.datafascia.accumulo.AccumuloModule;
 import com.datafascia.accumulo.QueryTemplate;
 import com.datafascia.common.shiro.FakeRealm;
 import com.datafascia.common.shiro.RoleExposingRealm;
@@ -55,7 +55,7 @@ public abstract class DaoIT {
       protected void configure() {
         bind(AccumuloConfiguration.class).toInstance(config);
         bind(RoleExposingRealm.class).to(FakeRealm.class);
-      }}, new AccumuloConnector());
+      }}, new AccumuloModule());
 
     Connection test = injector.getInstance(Connection.class);
     connect = test.connect;

@@ -15,7 +15,7 @@ import org.testng.annotations.Test;
  * Test for Accumulo connector
  */
 @Slf4j
-public class AccumuloConnectorTest {
+public class AccumuloModuleTest {
   AccumuloConfiguration config = new AccumuloConfiguration() {{
       setInstance("test");
       setUser("user");
@@ -31,7 +31,7 @@ public class AccumuloConnectorTest {
       @Override
       protected void configure() {
         bind(AccumuloConfiguration.class).toInstance(config);
-      }}, new AccumuloConnector());
+      }}, new AccumuloModule());
   }
 
   // Test class for connector injection

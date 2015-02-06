@@ -4,20 +4,20 @@ package com.datafascia.api.configurations;
 
 import com.datafascia.accumulo.AccumuloConfiguration;
 import com.datafascia.kafka.KafkaConfig;
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
 import javax.validation.constraints.NotNull;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 /**
  * Configuration parameters for dataFascia API server
  */
-@JsonAutoDetect
+@Data
 public class APIConfiguration extends Configuration {
-  @NotNull @Getter @Setter
-  private AccumuloConfiguration accumuloConfig;
 
-  @NotNull @Getter @Setter
+  @JsonProperty("accumulo") @NotNull
+  private AccumuloConfiguration accumuloConfiguration;
+
+  @NotNull
   private KafkaConfig kafkaConfig;
 }

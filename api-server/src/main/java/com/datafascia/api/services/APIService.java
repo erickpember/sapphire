@@ -103,7 +103,7 @@ public class APIService extends Application<APIConfiguration> {
           @Override
           protected void configure() {
             bind(APIConfiguration.class).toInstance(config);
-            bind(AccumuloConfiguration.class).toInstance(config.getAccumuloConfig());
+            bind(AccumuloConfiguration.class).toInstance(config.getAccumuloConfiguration());
             bind(KafkaConfig.class).toInstance(config.getKafkaConfig());
             bind(MetricRegistry.class).toInstance(environment.metrics());
             bind(Realm.class).toInstance(realm);

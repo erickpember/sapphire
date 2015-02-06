@@ -2,7 +2,7 @@
 # For license information, please contact http://datafascia.com/contact
 
 # Accumulo configuration: Use mock for testing purposes
-accumuloConfig:
+accumulo:
   instance: test
   user: user
   password: password
@@ -20,5 +20,5 @@ kafkaConfig:
 
 server:
   applicationConnectors:
-  - type: http 
+  - type: http
     port: 9090

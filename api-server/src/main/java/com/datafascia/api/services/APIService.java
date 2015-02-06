@@ -3,7 +3,7 @@
 package com.datafascia.api.services;
 
 import com.codahale.metrics.MetricRegistry;
-import com.datafascia.accumulo.AccumuloConfig;
+import com.datafascia.accumulo.AccumuloConfiguration;
 import com.datafascia.accumulo.AccumuloConnector;
 import com.datafascia.api.bundle.AtmosphereBundle;
 import com.datafascia.api.configurations.APIConfiguration;
@@ -103,7 +103,7 @@ public class APIService extends Application<APIConfiguration> {
           @Override
           protected void configure() {
             bind(APIConfiguration.class).toInstance(config);
-            bind(AccumuloConfig.class).toInstance(config.getAccumuloConfig());
+            bind(AccumuloConfiguration.class).toInstance(config.getAccumuloConfig());
             bind(KafkaConfig.class).toInstance(config.getKafkaConfig());
             bind(MetricRegistry.class).toInstance(environment.metrics());
             bind(Realm.class).toInstance(realm);

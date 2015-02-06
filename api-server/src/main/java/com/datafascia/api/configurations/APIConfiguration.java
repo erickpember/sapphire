@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.configurations;
 
-import com.datafascia.accumulo.AccumuloConfig;
+import com.datafascia.accumulo.AccumuloConfiguration;
 import com.datafascia.kafka.KafkaConfig;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import io.dropwizard.Configuration;
@@ -16,7 +16,7 @@ import lombok.Setter;
 @JsonAutoDetect
 public class APIConfiguration extends Configuration {
   @NotNull @Getter @Setter
-  private AccumuloConfig accumuloConfig;
+  private AccumuloConfiguration accumuloConfig;
 
   @NotNull @Getter @Setter
   private KafkaConfig kafkaConfig;

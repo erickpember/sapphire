@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.dao;
 
-import com.datafascia.accumulo.AccumuloConfig;
+import com.datafascia.accumulo.AccumuloConfiguration;
 import com.datafascia.accumulo.AccumuloConnector;
 import com.datafascia.accumulo.AccumuloImport;
 import com.datafascia.accumulo.QueryTemplate;
@@ -37,7 +37,8 @@ public abstract class DaoIT {
 
   private static String OPAL_TABLE = "opal_dF_data";
 
-  private static AccumuloConfig config = new AccumuloConfig(System.getProperty("accumuloConfig"));
+  private static AccumuloConfiguration config =
+      new AccumuloConfiguration(System.getProperty("accumuloConfig"));
   protected static Connector connect;
   protected static QueryTemplate queryTemplate;
   private static ThreadState threadState;
@@ -52,7 +53,7 @@ public abstract class DaoIT {
     Injector injector = Guice.createInjector(new AbstractModule() {
       @Override
       protected void configure() {
-        bind(AccumuloConfig.class).toInstance(config);
+        bind(AccumuloConfiguration.class).toInstance(config);
         bind(RoleExposingRealm.class).to(FakeRealm.class);
       }}, new AccumuloConnector());
 

@@ -30,26 +30,26 @@ import org.testng.annotations.Test;
 public class AccumuloImportTest {
   private File tempDir;
   private MiniAccumuloCluster mac;
-  private AccumuloConfig config;
+  private AccumuloConfiguration config;
   private Injector injector;
 
   @BeforeClass
   public void setup() throws IOException, InterruptedException {
     tempDir = Files.createTempDir();
-    mac = new MiniAccumuloCluster(new MiniAccumuloConfig(tempDir, AccumuloConfig.USER_PASSWORD));
+    mac = new MiniAccumuloCluster(new MiniAccumuloConfig(tempDir, AccumuloConfiguration.USER_PASSWORD));
     mac.start();
 
-    config = new AccumuloConfig() {{
+    config = new AccumuloConfiguration() {{
         setInstance(mac.getInstanceName());
-        setUser(AccumuloConfig.ROOT);
-        setPassword(AccumuloConfig.USER_PASSWORD);
+        setUser(AccumuloConfiguration.ROOT);
+        setPassword(AccumuloConfiguration.USER_PASSWORD);
         setZooKeepers(mac.getZooKeepers());
-        setType(AccumuloConfig.MINI);
+        setType(AccumuloConfiguration.MINI);
         }};
     injector = Guice.createInjector(new AbstractModule() {
       @Override
       protected void configure() {
-        bind(AccumuloConfig.class).toInstance(config);
+        bind(AccumuloConfiguration.class).toInstance(config);
       }}, new AccumuloConnector());
   }
 

@@ -5,7 +5,6 @@ package com.datafascia.accumulo;
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import com.datafascia.accumulo.AccumuloConfig;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
@@ -32,12 +31,12 @@ public class AccumuloShell {
     props.load(new FileInputStream(opts.configFile));
     String[] shellArgs = new String[] {
         "-u",
-        props.getProperty(AccumuloConfig.USER),
+        props.getProperty(AccumuloConfiguration.USER),
         "-p",
-        props.getProperty(AccumuloConfig.PASSWORD),
+        props.getProperty(AccumuloConfiguration.PASSWORD),
         "-z",
-        props.getProperty(AccumuloConfig.INSTANCE),
-        props.getProperty(AccumuloConfig.ZOOKEEPERS)
+        props.getProperty(AccumuloConfiguration.INSTANCE),
+        props.getProperty(AccumuloConfiguration.ZOOKEEPERS)
     };
     Shell.main(shellArgs);
   }

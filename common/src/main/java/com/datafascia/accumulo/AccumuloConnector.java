@@ -35,7 +35,7 @@ public class AccumuloConnector extends AbstractModule {
    * @throws org.apache.accumulo.core.client.AccumuloSecurityException underlying Accumulo calls
    */
   @Inject @Provides @Singleton
-  public Connector connector(AccumuloConfig config) throws AccumuloException,
+  public Connector connector(AccumuloConfiguration config) throws AccumuloException,
       AccumuloSecurityException {
     Connector connect;
     if (config.isMock()) {
@@ -61,7 +61,7 @@ public class AccumuloConnector extends AbstractModule {
    * @throws org.apache.accumulo.core.client.AccumuloException underlying Accumulo calls
    * @throws org.apache.accumulo.core.client.AccumuloSecurityException underlying Accumulo calls
    */
-  private Connector instance(AccumuloConfig config) throws AccumuloException,
+  private Connector instance(AccumuloConfiguration config) throws AccumuloException,
       AccumuloSecurityException {
     log.info("Accumulo Zookeeper: " + config.getZooKeepers() + ", connector for: " +
         config.getInstance() + ", with user " + config.getUser());
@@ -79,7 +79,7 @@ public class AccumuloConnector extends AbstractModule {
    * @throws org.apache.accumulo.core.client.AccumuloException underlying Accumulo calls
    * @throws org.apache.accumulo.core.client.AccumuloSecurityException underlying Accumulo calls
    */
-  private Connector mockInstance(AccumuloConfig config) throws AccumuloException,
+  private Connector mockInstance(AccumuloConfiguration config) throws AccumuloException,
       AccumuloSecurityException {
     log.info("Accumulo Mock connector with user: " + config.getUser());
 

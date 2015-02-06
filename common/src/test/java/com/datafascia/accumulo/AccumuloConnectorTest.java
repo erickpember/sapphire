@@ -16,12 +16,12 @@ import org.testng.annotations.Test;
  */
 @Slf4j
 public class AccumuloConnectorTest {
-  AccumuloConfig config = new AccumuloConfig() {{
+  AccumuloConfiguration config = new AccumuloConfiguration() {{
       setInstance("test");
       setUser("user");
       setPassword("password");
       setZooKeepers("zookeeper1.datafascia.com");
-      setType(AccumuloConfig.MOCK);
+      setType(AccumuloConfiguration.MOCK);
       }};
   Injector injector;
 
@@ -30,7 +30,7 @@ public class AccumuloConnectorTest {
     injector = Guice.createInjector(new AbstractModule() {
       @Override
       protected void configure() {
-        bind(AccumuloConfig.class).toInstance(config);
+        bind(AccumuloConfiguration.class).toInstance(config);
       }}, new AccumuloConnector());
   }
 

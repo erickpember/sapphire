@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
  * Configuration parameters for Accumulo.
  */
 @Slf4j @Getter @Setter @JsonAutoDetect @NoArgsConstructor
-public class AccumuloConfig {
+public class AccumuloConfiguration {
   /** Property name for ZooKeeper instance */
   public static final String ZOOKEEPERS = "zooKeepers";
   /** Property name for Accumulo instance */
@@ -61,7 +61,7 @@ public class AccumuloConfig {
    *
    * @param config the properties file to load information from
    */
-  public AccumuloConfig(String config) {
+  public AccumuloConfiguration(String config) {
     Properties props = new Properties();
     try {
       props.load(new FileInputStream(config));

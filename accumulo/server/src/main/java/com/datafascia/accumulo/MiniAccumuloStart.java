@@ -3,7 +3,6 @@
 package com.datafascia.accumulo;
 
 import com.beust.jcommander.JCommander;
-import com.datafascia.accumulo.AccumuloConfig;
 import com.google.common.io.Files;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -53,7 +52,7 @@ public class MiniAccumuloStart {
     return (() -> {
       try {
         File tmpDir = Files.createTempDir();
-        MiniAccumuloCluster accInst = new MiniAccumuloCluster(tmpDir, AccumuloConfig.USER_PASSWORD);
+        MiniAccumuloCluster accInst = new MiniAccumuloCluster(tmpDir, AccumuloConfiguration.USER_PASSWORD);
         accInst.start();
         exportConfig(accInst, tmpDir);
         System.out.println("  server started ..");
@@ -95,12 +94,12 @@ public class MiniAccumuloStart {
    */
   private static void exportConfig(MiniAccumuloCluster accumulo, File tempDir) throws IOException {
     Properties props = new Properties();
-    props.setProperty(AccumuloConfig.INSTANCE, accumulo.getInstanceName());
-    props.setProperty(AccumuloConfig.ZOOKEEPERS, accumulo.getZooKeepers());
-    props.setProperty(AccumuloConfig.USER, AccumuloConfig.ROOT);
-    props.setProperty(AccumuloConfig.PASSWORD, AccumuloConfig.USER_PASSWORD);
-    props.setProperty(AccumuloConfig.DIRECTORY, tempDir.getAbsolutePath());
-    props.setProperty(AccumuloConfig.TYPE, AccumuloConfig.MINI);
+    props.setProperty(AccumuloConfiguration.INSTANCE, accumulo.getInstanceName());
+    props.setProperty(AccumuloConfiguration.ZOOKEEPERS, accumulo.getZooKeepers());
+    props.setProperty(AccumuloConfiguration.USER, AccumuloConfiguration.ROOT);
+    props.setProperty(AccumuloConfiguration.PASSWORD, AccumuloConfiguration.USER_PASSWORD);
+    props.setProperty(AccumuloConfiguration.DIRECTORY, tempDir.getAbsolutePath());
+    props.setProperty(AccumuloConfiguration.TYPE, AccumuloConfiguration.MINI);
     props.store(new FileOutputStream(opts.configFile), null);
   }
 }

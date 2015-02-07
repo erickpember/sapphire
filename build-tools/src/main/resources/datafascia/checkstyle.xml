@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<!--
+  Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
+  For license information, please contact http://datafascia.com/contact
+-->
+<!DOCTYPE module PUBLIC
+    "-//Puppy Crawl//DTD Check Configuration 1.3//EN"
+        "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
+<module name="Checker">
+
+  <property name="charset" value="UTF-8"/>
+  <property name="fileExtensions" value="java"/>
+  <property name="severity" value="error"/>
+
+  <!-- Following interprets the header file as regular expressions. -->
+  <module name="RegexpHeader">
+    <property name="header"
+      value="^// Copyright \(C\) (\d\d\d\d)(\-\d\d\d\d)? dataFascia Corporation - All Rights Reserved$\n^// For license information, please contact http://datafascia.com/contact$"/>
+  </module>
+
+  <!-- Checks that there are no tab characters ('\t'). -->
+  <module name="FileTabCharacter">
+    <!-- Report on each line in each file -->
+    <property name="eachLine" value="true"/>
+  </module>
+
+  <!-- Small source code files -->
+  <module name="FileLength">
+    <property name="max" value="250"/>
+  </module>
+
+  <module name="TreeWalker">
+    <!-- Checks that line length <= 100. -->
+    <module name="LineLength">
+      <property name="max" value="100"/>
+    </module>
+
+    <!-- No whitespaces at end of line. -->
+    <module name="NoWhitespaceAfter"/>
+
+    <!-- Trailing comments not allowed -->
+    <module name="TrailingComment"/>
+
+    <!-- Redundant and unused imports -->
+    <module name="RedundantImport"/>
+    <module name="UnusedImports"/>
+    <module name="ImportOrder">
+      <property name="ordered" value="true"/>
+      <property name="separated" value="true"/>
+      <property name="caseSensitive" value="false"/>
+      <property name="option" value="bottom"/>
+    </module>
+
+    <!-- Do not allow static imports -->
+    <module name="AvoidStarImport"/>
+
+    <!-- Do not allow empty statements -->
+    <module name="EmptyStatement"/>
+
+    <!-- Avoid long methods -->
+    <module name="MethodLength">
+      <property name="tokens" value="METHOD_DEF"/>
+      <property name="max" value="40"/>
+      <property name="countEmpty" value="false"/>
+      <property name="severity" value="warning"/>
+    </module>
+
+    <!-- Illegal exception catching -->
+    <module name="IllegalCatch"/>
+
+    <!-- No EOL should be placed before block start ('{') -->
+    <module name="LeftCurly">
+      <property name="option" value="eol"/>
+    </module>
+
+    <!-- '}' should be on the same line as a next statement -->
+    <module name="RightCurly"/>
+
+    <!-- Braces are mandatory around code blocks -->
+    <module name="NeedBraces"/>
+
+    <!-- Check for JavaDoc only on public methods -->
+    <module name="JavadocMethod">
+      <property name="scope" value="public"/>
+    </module>
+
+    <!-- Check for JavaDoc only on public types -->
+    <module name="JavadocType">
+      <property name="scope" value="public"/>
+    </module>
+
+    <!-- Checks correct indentation of Java Code. -->
+    <module name="Indentation">
+      <property name="basicOffset" value="2"/>
+      <property name="braceAdjustment" value="0"/>
+      <property name="caseIndent" value="2"/>
+      <property name="throwsIndent" value="4"/>
+      <property name="lineWrappingIndentation" value="4"/>
+      <property name="arrayInitIndent" value="2"/>
+    </module>
+
+    <!-- Declaration order within a class file -->
+    <module name="DeclarationOrder">
+      <property name="severity" value="warning"/>
+    </module>
+
+    <!-- Reduce complexity of method -->
+    <module name="CyclomaticComplexity">
+      <property name="max" value="6"/>
+      <property name="severity" value="warning"/>
+    </module>
+
+    <!-- Line separators should be there -->
+    <module name="EmptyLineSeparator">
+      <property name="severity" value="warning"/>
+    </module>
+  </module>
+</module>

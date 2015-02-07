@@ -52,22 +52,23 @@ public class MiniAccumuloStart {
     return (() -> {
       try {
         File tmpDir = Files.createTempDir();
-        MiniAccumuloCluster accInst = new MiniAccumuloCluster(tmpDir, AccumuloConfiguration.TESTING_PASSWORD);
-        accInst.start();
-        exportConfig(accInst, tmpDir);
-        System.out.println("  server started ..");
+        MiniAccumuloCluster cluster =
+            new MiniAccumuloCluster(tmpDir, AccumuloConfiguration.TESTING_PASSWORD);
+        cluster.start();
+        exportConfig(cluster);
+        log.info("Started MiniAccumuloCluster");
 
         while (true) {
           Thread.sleep(2000);
           File kill = new File(opts.killFile);
           if (kill.exists()) {
             kill.delete();
-            System.out.println("Kill file detected ...");
-            accInst.stop();
+            log.info("Stopping MiniAccumuloCluster");
+            cluster.stop();
           }
         }
       } catch (IOException | InterruptedException e) {
-        new RuntimeException(e);
+        new IllegalStateException("start", e);
       }
     });
   }
@@ -89,17 +90,14 @@ public class MiniAccumuloStart {
   /**
    * Export mini-cluster parameters
    *
-   * @param accumulo the Accumulo instance
-   * @param tempDir the Accumulo directory
+   * @param cluster the Accumulo instance
    */
-  private static void exportConfig(MiniAccumuloCluster accumulo, File tempDir) throws IOException {
+  private static void exportConfig(MiniAccumuloCluster cluster) throws IOException {
     Properties props = new Properties();
-    props.setProperty(AccumuloConfiguration.INSTANCE, accumulo.getInstanceName());
-    props.setProperty(AccumuloConfiguration.ZOOKEEPERS, accumulo.getZooKeepers());
+    props.setProperty(AccumuloConfiguration.INSTANCE, cluster.getInstanceName());
+    props.setProperty(AccumuloConfiguration.ZOOKEEPERS, cluster.getZooKeepers());
     props.setProperty(AccumuloConfiguration.USER, AccumuloConfiguration.TESTING_USER);
     props.setProperty(AccumuloConfiguration.PASSWORD, AccumuloConfiguration.TESTING_PASSWORD);
-    props.setProperty(AccumuloConfiguration.DIRECTORY, tempDir.getAbsolutePath());
-    props.setProperty(AccumuloConfiguration.TYPE, AccumuloConfiguration.MINI);
     props.store(new FileOutputStream(opts.configFile), null);
   }
 }

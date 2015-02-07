@@ -3,11 +3,10 @@
 
 # Accumulo configuration: Use mock for testing purposes
 accumulo:
-  instance: test
+  instance: mock
+  zooKeepers: zookeeper1.datafascia.com
   user: user
   password: password
-  zooKeepers: zookeeper1.datafascia.com
-  type: mock
 
 # Kafka Consumer parameters
 kafkaConfig:

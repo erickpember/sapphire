@@ -2,59 +2,42 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.accumulo;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Properties;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.extern.slf4j.Slf4j;
+import lombok.experimental.Builder;
 
 /**
  * Configuration parameters for Accumulo.
  */
-@Slf4j @Getter @Setter @JsonAutoDetect @NoArgsConstructor
+@AllArgsConstructor @Builder @Data @NoArgsConstructor
 public class AccumuloConfiguration {
-  /** Property name for ZooKeeper instance */
-  public static final String ZOOKEEPERS = "zooKeepers";
+
   /** Property name for Accumulo instance */
   public static final String INSTANCE = "instance";
+  /** Property name for ZooKeeper instance */
+  public static final String ZOOKEEPERS = "zooKeepers";
   /** Property name for Accumulo user */
   public static final String USER = "user";
   /** Property name for Accumulo password */
   public static final String PASSWORD = "password";
-  /** Property name for Accumulo directory */
-  public static final String DIRECTORY = "directory";
-  /** Property name for Accumulo type */
-  public static final String TYPE = "type";
 
   /** user to configure in tests */
   public static final String TESTING_USER = "root";
   /** password to configure in tests */
   public static final String TESTING_PASSWORD = "secret";
 
-  /** Accumulo type mock */
-  @JsonIgnore
-  public static String MOCK = "mock";
-  /** Accumulo type real */
-  @JsonIgnore
-  public static String REAL = "real";
-  /** Accumulo type mini */
-  @JsonIgnore
-  public static String MINI = "mini";
-
   /** Accumulo instance name */
   private String instance;
+  /** Accumulo ZooKeeper list */
+  private String zooKeepers;
   /** Accumulo user name */
   private String user;
   /** Accumulo user password */
   private String password;
-  /** Accumulo ZooKeeper list */
-  private String zooKeepers;
-  /** Accumulo type instance */
-  private String type = REAL;
 
   /**
    * Create configuration from properties file
@@ -70,30 +53,8 @@ public class AccumuloConfiguration {
     }
 
     instance = props.getProperty(INSTANCE);
+    zooKeepers = props.getProperty(ZOOKEEPERS);
     user = props.getProperty(USER);
     password = props.getProperty(PASSWORD);
-    zooKeepers = props.getProperty(ZOOKEEPERS);
-    type = props.getProperty(TYPE);
-  }
-
-  /**
-   * @return true if Accumulo type is real
-   */
-  public boolean isReal() {
-    return type.equalsIgnoreCase(REAL);
-  }
-
-  /**
-   * @return true if Accumulo type is mock
-   */
-  public boolean isMock() {
-    return type.equalsIgnoreCase(MOCK);
-  }
-
-  /**
-   * @return true if Accumulo type is mini
-   */
-  public boolean isMini() {
-    return type.equalsIgnoreCase(MINI);
   }
 }

@@ -1,4 +1,4 @@
-// Copyright (C) 2015 dataFascia Corporation.  All rights reserved.
+// Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.common.command;
 
@@ -14,6 +14,8 @@ public class CommandLoader {
 
   /**
    * Gets commands.
+   *
+   * @return the commands
    */
   public static Collection<Command> getCommands() {
     ServiceLoader<Command> serviceLoader = ServiceLoader.load(Command.class);

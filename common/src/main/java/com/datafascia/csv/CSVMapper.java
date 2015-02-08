@@ -18,6 +18,8 @@ import lombok.Getter;
 
 /**
  * Jackson mapper class used to read and write CSV models
+ *
+ * @param <T> the class to extrace CSV information from
  */
 @Slf4j
 public class CSVMapper<T> {
@@ -30,14 +32,13 @@ public class CSVMapper<T> {
    * Construct mapper with default header
    *
    * @param clazz the class associated with model
-   * @param headers the headers for the csv
    */
   public CSVMapper(Class<T> clazz) {
     this(clazz, defaultHeaders(clazz));
   }
 
   /**
-   * Construct mapper for associated header
+   * Construct mapper for associated header.
    *
    * @param clazz the class associated with model
    * @param headers the headers for the csv
@@ -57,13 +58,13 @@ public class CSVMapper<T> {
   }
 
   /**
-   * Create object from string using ',' as separators
+   * Create object from string using ',' as separators.
    *
    * @param line the line to parse values from
    *
    * @return model instance created from string
    *
-   * @throws java.io.IOException
+   * @throws java.io.IOException from underlying Jackson errors
    */
   public T fromCSV(String line) throws IOException {
     return reader.readValue(line);
@@ -73,6 +74,8 @@ public class CSVMapper<T> {
    * @param model the model to transform
    *
    * @return model as string
+   *
+   * @throws com.fasterxml.jackson.core.JsonProcessingException from underlying Jackson errors
    */
   public String asCSV(T model) throws JsonProcessingException {
     return writer.writeValueAsString(model).trim();

@@ -5,9 +5,9 @@ package com.datafascia.urn;
 import com.google.common.base.Joiner;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
-import java.net.URISyntaxException;
 import lombok.extern.slf4j.Slf4j;
 
 import static java.net.URLEncoder.encode;
@@ -59,7 +59,7 @@ public class URNFactory {
 
   /**
    * @param ns the URN namespaceifier
-   * @param value the URN value
+   * @param values the URN values
    *
    * @return string with URN of asked type
    */
@@ -82,9 +82,11 @@ public class URNFactory {
   }
 
   /**
-   * @parm urn the URN
+   * @param urn the URN
    *
    * @return the namespace from the URN
+   *
+   * @throws java.net.URISyntaxException for illegal URN values
    */
   public static String namespace(String urn) throws URISyntaxException {
     String[] parts = urn.split(URN_SEP);
@@ -96,9 +98,11 @@ public class URNFactory {
   }
 
   /**
-   * @parm urn the URN
+   * @param urn the URN
    *
    * @return the path from the URN
+   *
+   * @throws java.net.URISyntaxException for illegal URN values
    */
   public static String path(String urn) throws URISyntaxException {
     String[] parts = urn.split(URN_SEP);

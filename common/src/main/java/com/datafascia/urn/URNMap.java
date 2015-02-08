@@ -2,11 +2,10 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.urn;
 
-import com.datafascia.urn.annotations.IdNamespace;
 import com.datafascia.reflections.PackageUtils;
+import com.datafascia.urn.annotations.IdNamespace;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 
 /**

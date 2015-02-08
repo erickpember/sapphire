@@ -1,4 +1,4 @@
-// Copyright (C) 2015 dataFascia Corporation.  All rights reserved.
+// Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.accumulo;
 
@@ -18,6 +18,11 @@ public class RowReader<E> {
   private RowMapper<E> rowMapper;
   private Text rowId;
 
+  /**
+   * Construct from mapper
+   *
+   * @param rowMapper the row mapper
+   */
   public RowReader(RowMapper<E> rowMapper) {
     this.rowMapper = rowMapper;
   }

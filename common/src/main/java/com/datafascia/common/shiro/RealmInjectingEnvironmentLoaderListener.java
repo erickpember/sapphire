@@ -1,4 +1,4 @@
-// Copyright (C) 2015 dataFascia Corporation.  All rights reserved.
+// Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.common.shiro;
 
@@ -17,15 +17,14 @@ public class RealmInjectingEnvironmentLoaderListener extends EnvironmentLoaderLi
 
   private Realm realm;
 
+  /**
+   * Construct with realm
+   *
+   * @param realm the realm
+   */
   @Inject
   public RealmInjectingEnvironmentLoaderListener(Realm realm) {
     this.realm = realm;
-  }
-
-  private void configureRealm(WebEnvironment environment) {
-    RealmSecurityManager realmSecurityManager =
-        (RealmSecurityManager) environment.getSecurityManager();
-    realmSecurityManager.setRealm(realm);
   }
 
   @Override
@@ -33,5 +32,11 @@ public class RealmInjectingEnvironmentLoaderListener extends EnvironmentLoaderLi
     WebEnvironment environment = super.createEnvironment(servletContext);
     configureRealm(environment);
     return environment;
+  }
+
+  private void configureRealm(WebEnvironment environment) {
+    RealmSecurityManager realmSecurityManager =
+        (RealmSecurityManager) environment.getSecurityManager();
+    realmSecurityManager.setRealm(realm);
   }
 }

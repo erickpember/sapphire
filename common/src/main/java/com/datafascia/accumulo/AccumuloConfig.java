@@ -74,7 +74,7 @@ public class AccumuloConfig {
     password = props.getProperty(PASSWORD);
     zooKeepers = props.getProperty(ZOOKEEPERS);
     type = props.getProperty(TYPE);
- }
+  }
 
   /**
    * @return true if Accumulo type is real

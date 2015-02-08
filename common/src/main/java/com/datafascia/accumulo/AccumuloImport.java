@@ -23,6 +23,13 @@ public class AccumuloImport {
    * @param tableName the table name to import data into. The table will be created if non-existent
    * @param path the directory to import files from
    * @param failure the directory to write failure to
+   *
+   * @throws java.io.IOException reading or writing error to Accumulo
+   * @throws org.apache.accumulo.core.client.AccumuloException underlying Accumulo calls
+   * @throws org.apache.accumulo.core.client.AccumuloSecurityException underlying Accumulo calls
+   * @throws org.apache.accumulo.core.client.TableExistsException table already exists
+   * @throws org.apache.accumulo.core.client.TableNotFoundException this should not be thrown as
+   *     the table is being created
    */
   public static void importData(Connector connect, String tableName, String path, String failure)
       throws AccumuloException, AccumuloSecurityException, IOException, TableExistsException,
@@ -38,6 +45,10 @@ public class AccumuloImport {
    *
    * @param tableOps the table operations object
    * @param tableName the table name to import data into. The table will be created if non-existent
+   *
+   * @throws org.apache.accumulo.core.client.AccumuloException underlying Accumulo calls
+   * @throws org.apache.accumulo.core.client.AccumuloSecurityException underlying Accumulo calls
+   * @throws org.apache.accumulo.core.client.TableExistsException table already exists
    */
   private static void createTable(TableOperations tableOps, String tableName) throws
       AccumuloException, AccumuloSecurityException, TableExistsException {

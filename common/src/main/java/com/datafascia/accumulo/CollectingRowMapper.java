@@ -1,4 +1,4 @@
-// Copyright (C) 2015 dataFascia Corporation.  All rights reserved.
+// Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.accumulo;
 
@@ -19,10 +19,18 @@ public class CollectingRowMapper<E> implements RowMapper<Void> {
   private RowMapper<E> rowMapper;
   private List<E> rows = new ArrayList<>();
 
+  /**
+   * Construct from mapper
+   *
+   * @param rowMapper the row mapper
+   */
   public CollectingRowMapper(RowMapper<E> rowMapper) {
     this.rowMapper = rowMapper;
   }
 
+  /**
+   * @return the list of rows
+   */
   public List<E> getRows() {
     return rows;
   }

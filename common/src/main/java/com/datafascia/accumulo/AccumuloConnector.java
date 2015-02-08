@@ -27,7 +27,12 @@ public class AccumuloConnector extends AbstractModule {
    * This creates the Accumulo connector. It can be used to create both mock and real instances of
    * Accumulo connectors
    *
+   * @param config the Accumulo configuration
+   *
    * @return an instance of Accumulo connector
+   *
+   * @throws org.apache.accumulo.core.client.AccumuloException underlying Accumulo calls
+   * @throws org.apache.accumulo.core.client.AccumuloSecurityException underlying Accumulo calls
    */
   @Inject @Provides @Singleton
   public Connector connector(AccumuloConfig config) throws AccumuloException,
@@ -52,6 +57,9 @@ public class AccumuloConnector extends AbstractModule {
    * Return connector to real instance of Accumulo.
    *
    * @param config the accumulo configuration
+   *
+   * @throws org.apache.accumulo.core.client.AccumuloException underlying Accumulo calls
+   * @throws org.apache.accumulo.core.client.AccumuloSecurityException underlying Accumulo calls
    */
   private Connector instance(AccumuloConfig config) throws AccumuloException,
       AccumuloSecurityException {
@@ -67,6 +75,9 @@ public class AccumuloConnector extends AbstractModule {
    * Return connector to mock instance of Accumulo. To be used for testing purposes.
    *
    * @param config the accumulo configuration
+   *
+   * @throws org.apache.accumulo.core.client.AccumuloException underlying Accumulo calls
+   * @throws org.apache.accumulo.core.client.AccumuloSecurityException underlying Accumulo calls
    */
   private Connector mockInstance(AccumuloConfig config) throws AccumuloException,
       AccumuloSecurityException {

@@ -13,9 +13,9 @@ import org.apache.commons.codec.binary.Base64;
 public class StringUtils {
 
   /**
-   * Convert string to base64 form
-   *
    * @param string the string
+   *
+   * @return the string in Base64 form
    */
   public static String base64Encode(String string) {
     try {

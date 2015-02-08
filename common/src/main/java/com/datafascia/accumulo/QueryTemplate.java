@@ -1,4 +1,4 @@
-// Copyright (C) 2015 dataFascia Corporation.  All rights reserved.
+// Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.accumulo;
 
@@ -28,6 +28,13 @@ public class QueryTemplate {
   private MetricRegistry metrics;
   private Map<String, Timer> nameToTimerMap = new HashMap<>();
 
+  /**
+   * Construct the query template.
+   *
+   * @param realm the role realm
+   * @param connector the Accumulo connector
+   * @param metrics the metrics registry
+   */
   @Inject
   public QueryTemplate(RoleExposingRealm realm, Connector connector, MetricRegistry metrics) {
     this.realm = realm;

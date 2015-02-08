@@ -4,8 +4,8 @@ package com.datafascia.jcommander.converters;
 
 import com.beust.jcommander.converters.BaseConverter;
 import com.beust.jcommander.ParameterException;
-import java.net.URISyntaxException;
 import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Convert a string into a URI via JCommander environment
@@ -24,6 +24,10 @@ public class URIConverter extends BaseConverter<URI> {
    * Convert the string into URI
    *
    * @param value the option value
+   *
+   * @return the URI for the string
+   *
+   * @throws com.beust.jcommander.ParameterException on illegal URI values
    */
   public URI convert(String value) throws ParameterException {
     try {

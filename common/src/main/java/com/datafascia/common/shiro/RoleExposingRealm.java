@@ -1,11 +1,11 @@
-// Copyright (C) 2015 dataFascia Corporation.  All rights reserved.
+// Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.common.shiro;
 
 import java.util.Collection;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.realm.AuthorizingRealm;
+import org.apache.shiro.SecurityUtils;
 
 /**
  * Extends realm to get roles of subject.

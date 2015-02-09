@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Jackson serializer for Id
- * 
+ *
  * NOTE: the SuppressWarnings is necessary because we do not have the underlying type for the Id.
  */
 @Slf4j @SuppressWarnings("rawtypes")

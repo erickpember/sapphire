@@ -21,7 +21,7 @@ public final class SocketResource {
   /**
    * Invoked when the connection as been fully established and suspended, e.g ready for receiving
    * messages.
-   * 
+   *
    * @param resource the atmosphere resource
    *
    * @return the connection identifier
@@ -34,7 +34,7 @@ public final class SocketResource {
   /**
    * Invoked when the client disconnect or when an unexpected closing of the underlying connection
    * happens.
-   * 
+   *
    * @param event the event
    */
   @Disconnect
@@ -43,9 +43,9 @@ public final class SocketResource {
   }
 
   /**
-   * 
+   *
    * Invoked when the client sends a message to websocket
-   * 
+   *
    * @param resource the resource information
    */
   @Post

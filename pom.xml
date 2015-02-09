@@ -257,7 +257,8 @@
         <version>2.14</version>
         <configuration>
           <configLocation>datafascia/checkstyle.xml</configLocation>
-          <skip>true</skip>
+          <headerLocation>datafascia/License.txt</headerLocation>
+          <skip>false</skip>
         </configuration>
         <executions>
           <execution>

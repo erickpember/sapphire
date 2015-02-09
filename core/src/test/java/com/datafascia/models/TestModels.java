@@ -188,6 +188,15 @@ public class TestModels {
       setRelatedTo(Arrays.asList(related, related));
       }};
 
+  public static Person person = new Person(){{
+    setName(name);
+    setAddress(address);
+    setGender(Gender.Male);
+    setBirthDate(getDate());
+    setPhoto(getURI());
+    setOrganization("Some Ficticious Hospital");
+  }};
+
   public static EncounterAccomodation accomodation = new EncounterAccomodation() {{
       setBed(getURI());
       setPeriod(period);

@@ -5,6 +5,7 @@ package com.datafascia.models;
 import com.datafascia.resources.ResourceUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.net.URISyntaxException;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -18,12 +19,17 @@ import static org.testng.Assert.assertEquals;
  * after the tests complete successfully.
  */
 @Slf4j
-public class VersionTest {
+public class VersionTest extends ModelTestBase {
   ObjectMapper mapper;
 
   @BeforeMethod
   public void beforeTests() {
     mapper = new ObjectMapper();
+  }
+
+  @Test
+  public <T extends Object> void testSampledData() throws IOException, URISyntaxException {
+    geneticEncodeDecodeTest(TestModels.sampledData);
   }
 
   @Test

@@ -80,6 +80,8 @@
     <!-- Check for JavaDoc only on public methods -->
     <module name="JavadocMethod">
       <property name="scope" value="public"/>
+      <property name="allowedAnnotations" value="Override, Provides"/>
+      <property name="allowMissingPropertyJavadoc" value="true"/>
     </module>
 
     <!-- Check for JavaDoc only on public types -->

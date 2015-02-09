@@ -26,7 +26,7 @@
 
   <!-- Small source code files -->
   <module name="FileLength">
-    <property name="max" value="250"/>
+    <property name="max" value="275"/>
   </module>
 
   <module name="TreeWalker">
@@ -42,7 +42,6 @@
     <module name="TrailingComment"/>
 
     <!-- Redundant and unused imports -->
-    <module name="RedundantImport"/>
     <module name="UnusedImports"/>
     <module name="ImportOrder">
       <property name="ordered" value="true"/>
@@ -112,6 +111,10 @@
 
     <!-- Line separators should be there -->
     <module name="EmptyLineSeparator">
+      <property name="severity" value="warning"/>
+    </module>
+
+    <module name="RedundantImport">
       <property name="severity" value="warning"/>
     </module>
   </module>

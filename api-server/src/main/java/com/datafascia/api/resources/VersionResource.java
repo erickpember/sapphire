@@ -31,6 +31,11 @@ public class VersionResource {
     this.counter = new AtomicLong();
   }
 
+  /**
+   * @param packageName the name of package to return version of
+   *
+   * @return version information associated with package
+   */
   @GET @Timed
   public Version version(@QueryParam("package") Optional<String> packageName) {
     return new Version(counter.incrementAndGet(), packageName.or(DEFAULT_PACKAGE));

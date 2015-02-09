@@ -16,6 +16,9 @@ public class MiniAccumuloStop {
    * Stop the server
    *
    * @param args the command line arguments
+   *
+   * @throws InterruptedException for thread process
+   * @throws IOException should never be thrown. Needed for compilation check
    */
   public static void main(String[] args) throws IOException, InterruptedException {
     MiniAccumuloOpts opts = new MiniAccumuloOpts();

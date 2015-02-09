@@ -16,6 +16,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j @Path("/emerge") @Produces(MediaType.APPLICATION_JSON)
 public class EmergeResource {
+  /**
+   * @return the content of a static file as example data
+   */
   @GET @Timed
   public FileResponse emerge() {
     return new FileResponse(Resources.getResource("emerge.json"));

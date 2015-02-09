@@ -33,6 +33,11 @@ public class EncounterDao extends OpalDao {
   public static final String HEIGHT = "Height";
   private static final String ADMIN_DATE_FORMAT = "yyyyMMddHHmmssX";
 
+  /**
+   * Create data access with query template
+   *
+   * @param queryTemplate the query template to use
+   */
   @Inject
   public EncounterDao(QueryTemplate queryTemplate) {
     super(queryTemplate);
@@ -106,7 +111,7 @@ public class EncounterDao extends OpalDao {
     Optional<Value> weightOpt = getFieldValue(ObjectStore, PatientVisitMap, id, admitWeight);
     String[] weightl = new String[0];
     if (weightOpt.isPresent()) {
-      Value weightVal = (Value) weightOpt.get();
+      Value weightVal = weightOpt.get();
       weightl = decodeString(weightVal).split(" ");
     }
 
@@ -136,7 +141,7 @@ public class EncounterDao extends OpalDao {
     Optional<Value> heightOpt = getFieldValue(ObjectStore, PatientVisitMap, id, admitHeight);
     String[] heightl = new String[0];
     if (heightOpt.isPresent()) {
-      Value heightVal = (Value) heightOpt.get();
+      Value heightVal = heightOpt.get();
       heightl = decodeString(heightVal).split(" ");
     }
 

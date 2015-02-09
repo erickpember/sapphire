@@ -1,4 +1,4 @@
-// Copyright (C) 2015 dataFascia Corporation.  All rights reserved.
+// Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.dao;
 
@@ -13,7 +13,6 @@ import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.accumulo.core.security.Authorizations;
 
 /**
  * Coordinates steps to find observations.
@@ -25,6 +24,13 @@ public class FindObservationsCoordinator {
   private EncounterDao encounterDao;
   private ObservationDao observationDao;
 
+  /**
+   * Construct co-ordinator with the data access objects
+   *
+   * @param patientDao the patient data access object
+   * @param encounterDao the encounter data access object
+   * @param observationDao the observation data access object
+   */
   @Inject
   public FindObservationsCoordinator(
       PatientDao patientDao, EncounterDao encounterDao, ObservationDao observationDao) {
@@ -44,8 +50,7 @@ public class FindObservationsCoordinator {
    * @return collection of observations, empty if none found
    */
   public Collection<Observation> findObservationsByPatientId(
-      String patientId, Optional<Interval<Instant>> captureTimeInterval)
-  {
+      String patientId, Optional<Interval<Instant>> captureTimeInterval) {
     Date startIssued = null;
     Date endIssued = null;
     if (captureTimeInterval.isPresent()) {

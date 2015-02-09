@@ -54,6 +54,8 @@ public class EmergeDemographicCSVGenerator {
    *     password for API access
    * @param csvFile
    *     output CSV file name
+   *
+   * @throws java.io.IOException errors writing to CSV file
    */
   public static void generate(URI apiEndpoint, String user, String password, String csvFile)
       throws IOException {

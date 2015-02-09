@@ -1,4 +1,4 @@
-// Copyright (C) 2015 dataFascia Corporation.  All rights reserved.
+// Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.resources;
 
@@ -7,18 +7,18 @@ import com.datafascia.common.time.Interval;
 import com.datafascia.dao.FindObservationsCoordinator;
 import com.datafascia.models.Observation;
 import com.google.common.base.Strings;
-import java.time.Instant;
 import java.time.format.DateTimeFormatter;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.Optional;
 import javax.inject.Inject;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -29,6 +29,11 @@ public class ObservationResource {
 
   private FindObservationsCoordinator findObservationsCoordinator;
 
+  /**
+   * Construct resource with associated finder
+   *
+   * @param findObservationsCoordinator the observations search co-ordinator
+   */
   @Inject
   public ObservationResource(FindObservationsCoordinator findObservationsCoordinator) {
     this.findObservationsCoordinator = findObservationsCoordinator;
@@ -54,8 +59,8 @@ public class ObservationResource {
       @QueryParam("endCaptureTime") String endCaptureTimeString) {
 
     if (Strings.isNullOrEmpty(patientId)) {
-     throw new WebApplicationException(
-         "Required parameter patientId is missing", Response.Status.BAD_REQUEST);
+      throw new WebApplicationException(
+          "Required parameter patientId is missing", Response.Status.BAD_REQUEST);
     }
 
     Interval<Instant> captureTimeRange;

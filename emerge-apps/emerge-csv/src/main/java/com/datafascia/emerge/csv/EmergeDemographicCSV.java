@@ -18,11 +18,11 @@ import lombok.extern.slf4j.Slf4j;
     commandDescription = "Generate Demographic CSV data for the Emerge application.")
 @Slf4j
 public class EmergeDemographicCSV implements Command {
-  @Parameter(names = "-apiURI", description = "The dataFascia API endpoint URI", required = true,
+  @Parameter(names = "-apiURI", description = "dataFascia API endpoint URI", required = true,
              converter = URIConverter.class)
   private URI apiEndpoint;
 
-  @Parameter(names = "-csvFile", description = "The name of the CSV file to generate", required = true)
+  @Parameter(names = "-csvFile", description = "CSV file name to generate", required = true)
   private String csvFile;
 
   @Parameter(names = "-user", description = "User name for API access", required = true)

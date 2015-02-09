@@ -40,6 +40,11 @@ public class OpalDao {
 
   protected QueryTemplate queryTemplate;
 
+  /**
+   * Create data access with query template
+   *
+   * @param queryTemplate the query template to use
+   */
   public OpalDao(QueryTemplate queryTemplate) {
     this.queryTemplate = queryTemplate;
   }

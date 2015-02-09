@@ -23,8 +23,8 @@ public class DatafasciaApiBuilder {
    */
   public static DatafasciaApi endpoint(URI endpoint, String user, String password) {
     RestAdapter.Builder builder = new RestAdapter.Builder()
-      .setConverter(new JacksonConverter())
-      .setEndpoint(endpoint.toString());
+        .setConverter(new JacksonConverter())
+        .setEndpoint(endpoint.toString());
 
     if ((user != null) && (password != null)) {
       setAuthentication(builder, user, password);

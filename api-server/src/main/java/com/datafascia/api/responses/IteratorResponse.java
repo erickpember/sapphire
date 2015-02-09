@@ -14,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Class to be used to stream items
+ *
+ * @param <T> the type to stream back
  */
 @Slf4j
 public class IteratorResponse<T> implements StreamingOutput {
@@ -32,13 +34,13 @@ public class IteratorResponse<T> implements StreamingOutput {
 
   @Override
   public void write(OutputStream output) throws IOException, WebApplicationException {
-      final JsonGenerator generator = mapper.getFactory().createGenerator(output);
-      generator.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
-      generator.writeStartArray();
-      while (iter.hasNext()) {
-        generator.writeObject(iter.next());
-      }
-      generator.writeEndArray();
-      generator.close();
+    final JsonGenerator generator = mapper.getFactory().createGenerator(output);
+    generator.configure(JsonGenerator.Feature.AUTO_CLOSE_TARGET, false);
+    generator.writeStartArray();
+    while (iter.hasNext()) {
+      generator.writeObject(iter.next());
+    }
+    generator.writeEndArray();
+    generator.close();
   }
 }

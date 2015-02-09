@@ -3,7 +3,8 @@
 package com.datafascia.models;
 
 /**
- * This value set defines the set of codes that can be used to indicate the meaning/use of a reference range
+ * This value set defines the set of codes that can be used to indicate the meaning/use of a
+ * reference range
  */
 public enum ObservationInterpretation {
   Below,

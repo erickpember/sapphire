@@ -8,13 +8,13 @@ import com.datafascia.dao.PatientDao;
 import com.datafascia.models.Encounter;
 import java.util.Optional;
 import javax.inject.Inject;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -26,6 +26,12 @@ public class EncounterResource {
   private PatientDao patientDao;
   private EncounterDao encounterDao;
 
+  /**
+   * Construct resource with associated data access objects
+   *
+   * @param patientDao the patient data access object
+   * @param encounterDao the encounter data access object
+   */
   @Inject
   public EncounterResource(PatientDao patientDao, EncounterDao encounterDao) {
     this.patientDao = patientDao;
@@ -33,6 +39,8 @@ public class EncounterResource {
   }
 
   /**
+   * @param id the encounter identifier
+   *
    * @return Return a given encounter by ID.
    */
   @GET @Timed @Path("{id}")
@@ -41,6 +49,8 @@ public class EncounterResource {
   }
 
   /**
+   * @param id the patient identifier
+   *
    * @return stream list of patients back
    */
   @GET @Timed @Path("last/{patientid}")

@@ -26,6 +26,9 @@ public class MiniAccumuloStart {
    * Start the server
    *
    * @param args the command line arguments
+   *
+   * @throws InterruptedException for thread process
+   * @throws IOException should never be thrown. Needed for compilation check
    */
   public static void main(String[] args) throws IOException, InterruptedException {
     new JCommander(opts, args);
@@ -64,11 +67,11 @@ public class MiniAccumuloStart {
             accInst.stop();
           }
         }
-      } catch (Exception e) {
+      } catch (IOException | InterruptedException e) {
         new RuntimeException(e);
       }
     });
- }
+  }
 
   /**
    * Set up classpath for next executable

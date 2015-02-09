@@ -12,8 +12,8 @@ import java.net.URI;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Test your HTTP client code by writing a JAX-RS test double class and let this rule start and stop a
- * Dropwizard application containing your doubles.
+ * Test your HTTP client code by writing a JAX-RS test double class and let this rule start and
+ * stop a Dropwizard application containing your doubles.
  * <p>
  * Example:
  * <pre><code>
@@ -79,6 +79,8 @@ public class DropwizardTestClient {
 
   /**
    * Start the client
+   *
+   * @throws Exception any error by underlying server
    */
   public void start() throws Exception {
     testApp.start();
@@ -86,6 +88,8 @@ public class DropwizardTestClient {
 
   /**
    * Stop the client
+   *
+   * @throws Exception any error by underlying server
    */
   public void stop() throws Exception {
     testApp.stop();
@@ -103,7 +107,8 @@ public class DropwizardTestClient {
     public void run(Configuration configuration, Environment environment) {
       final SimpleServerFactory serverConfig = new SimpleServerFactory();
       configuration.setServerFactory(serverConfig);
-      final HttpConnectorFactory connectorConfig = (HttpConnectorFactory) serverConfig.getConnector();
+      final HttpConnectorFactory connectorConfig =
+          (HttpConnectorFactory) serverConfig.getConnector();
       connectorConfig.setPort(0);
 
       environment.healthChecks().register("dummy", new DummyHealthCheck());

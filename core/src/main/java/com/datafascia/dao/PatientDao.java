@@ -33,7 +33,6 @@ import org.apache.hadoop.io.Text;
  * injected via Guice framework.
  *
  * The RowID for the patient object in opal_dF_data is composed of these items:
- *
  *   1. The literal string "ObjectStore"
  *   2. The NULL character aka \x00
  *   3. The literal string "PatientObject"
@@ -45,7 +44,6 @@ import org.apache.hadoop.io.Text;
  * "ObjectStore\x00PatientObject\x009752949"
  *
  * The RowID for the patient visit map is composed of these items:
- *
  *   1. The literal string "ObjectStore"
  *   2. The NULL character aka \x00
  *   3. The literal string "PatientVisitMap"
@@ -55,11 +53,9 @@ import org.apache.hadoop.io.Text;
  * Using the above examples, the RowID for the accumulo query could look like:
  *
  * "ObjectStore\x00PatientVisitMap\x00UCSF | SICU | 7d136475-09d0-498c-95e8-26e21e99f789"
- *
  */
 @Slf4j
 public class PatientDao extends OpalDao {
-
   private static final SimpleDateFormat dateOfBirthFormat = new SimpleDateFormat("yyyyMMdd");
 
   /** patient present column family */
@@ -68,6 +64,11 @@ public class PatientDao extends OpalDao {
   /** last visit identifier column family */
   private static final Text LAST_VISIT_ID = toColumnFamily(FieldType.STRING, "LastVisitOiid");
 
+  /**
+   * Create data access with query template
+   *
+   * @param queryTemplate the query template to use
+   */
   @Inject
   public PatientDao(QueryTemplate queryTemplate) {
     super(queryTemplate);
@@ -144,8 +145,7 @@ public class PatientDao extends OpalDao {
   /**
    * Finds visit identifiers for the patient.
    *
-   * @param patientId
-   *     patient identifier
+   * @param patientId patient identifier
    * @return collection of visit identifiers, empty if none found
    */
   public List<String> findVisitIds(String patientId) {

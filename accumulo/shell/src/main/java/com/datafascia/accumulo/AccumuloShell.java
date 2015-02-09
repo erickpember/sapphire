@@ -21,6 +21,8 @@ public class AccumuloShell {
    * Start the shell
    *
    * @param args the command line arguments
+   *
+   * @throws IOException errors reading from configuration file
    */
   public static void main(String[] args) throws IOException {
     Opts opts = new Opts();

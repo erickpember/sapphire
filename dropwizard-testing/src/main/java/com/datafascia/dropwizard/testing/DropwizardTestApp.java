@@ -92,6 +92,8 @@ public class DropwizardTestApp<C extends Configuration> {
 
   /**
    * Stop the application server
+   *
+   * @throws Exception by the underlying Jetty server
    */
   public void stop() throws Exception {
     if (jetty == null) {
@@ -143,6 +145,8 @@ public class DropwizardTestApp<C extends Configuration> {
   }
 
   /**
+   * @param <A> the application type
+   *
    * @return the underlying running application
    */
   @SuppressWarnings("unchecked")

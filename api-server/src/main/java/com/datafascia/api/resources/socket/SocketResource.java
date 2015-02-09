@@ -3,6 +3,7 @@
 package com.datafascia.api.resources.socket;
 
 import javax.ws.rs.Path;
+import lombok.extern.slf4j.Slf4j;
 import org.atmosphere.config.service.Disconnect;
 import org.atmosphere.config.service.ManagedService;
 import org.atmosphere.config.service.Post;
@@ -11,8 +12,10 @@ import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceEvent;
 import org.atmosphere.interceptor.AtmosphereResourceLifecycleInterceptor;
 import org.atmosphere.util.IOUtils;
-import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Example resource to show integration of Atmosphere within Dropwizard.
+ */
 @Slf4j @Path("/") @ManagedService(interceptors = AtmosphereResourceLifecycleInterceptor.class)
 public final class SocketResource {
   /**
@@ -20,6 +23,8 @@ public final class SocketResource {
    * messages.
    * 
    * @param resource the atmosphere resource
+   *
+   * @return the connection identifier
    */
   @Ready
   public String onReady(final AtmosphereResource resource) {
@@ -41,7 +46,7 @@ public final class SocketResource {
    * 
    * Invoked when the client sends a message to websocket
    * 
-   * @param resource
+   * @param resource the resource information
    */
   @Post
   public void onMessage(final AtmosphereResource resource) {

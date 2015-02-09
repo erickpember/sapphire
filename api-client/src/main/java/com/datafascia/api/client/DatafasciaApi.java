@@ -16,18 +16,24 @@ import retrofit.http.Query;
 public interface DatafasciaApi {
   /**
    * @return list of all patients.
+   *
+   * @param active boolean indicating type of patient to return
    */
   @GET("/patient")
   List<Patient> patients(@Query("active") boolean active);
 
   /**
    * @return An encounter for the id given.
+   *
+   * @param id the unique identifier for the encounter
    */
   @GET("/encounter/{id}")
   Encounter encounter(@Path("id") String id);
 
   /**
    * @return The last encounter for the patient
+   *
+   * @param patientId the identity of the patient
    */
   @GET("/encounter/last/{patientId}")
   Encounter lastvisit(@Path("patientId") String patientId);

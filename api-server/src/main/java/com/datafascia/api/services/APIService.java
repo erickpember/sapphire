@@ -41,7 +41,7 @@ public class APIService extends Application<APIConfiguration> {
    *
    * @param args the command line arguments
    *
-   * @throws generic exception to catch all underlying exception types
+   * @throws Exception generic exception to catch all underlying exception types
    */
   public static void main(String[] args) throws Exception {
     new APIService().run(args);
@@ -76,7 +76,8 @@ public class APIService extends Application<APIConfiguration> {
     }
 
     // Health checkers
-    environment.healthChecks().register("accumulo", injector.getInstance(AccumuloHealthCheck.class));
+    environment.healthChecks().register(
+        "accumulo", injector.getInstance(AccumuloHealthCheck.class));
   }
 
   /**

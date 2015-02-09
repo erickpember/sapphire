@@ -8,10 +8,10 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.math.BigDecimal;
 import java.util.List;
 import lombok.EqualsAndHashCode;
-import lombok.extern.slf4j.Slf4j;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * A series of measurements taken by a device, with upper and lower limits. There may be more than

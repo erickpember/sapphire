@@ -5,9 +5,9 @@ package com.datafascia.api.client;
 import com.datafascia.string.StringUtils;
 import java.net.URI;
 import lombok.extern.slf4j.Slf4j;
-import retrofit.converter.JacksonConverter;
 import retrofit.RequestInterceptor;
 import retrofit.RestAdapter;
+import retrofit.converter.JacksonConverter;
 
 /**
  * Creates a DatafasciaApi object that can be used to interact with an API endpoint.

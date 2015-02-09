@@ -5,8 +5,8 @@ package com.datafascia.models;
 import com.datafascia.common.persist.Id;
 import com.datafascia.jackson.IdDeserializer;
 import com.datafascia.jackson.IdSerializer;
-import com.datafascia.urn.annotations.IdNamespace;
 import com.datafascia.urn.URNFactory;
+import com.datafascia.urn.annotations.IdNamespace;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -18,10 +18,10 @@ import java.net.URI;
 import java.util.Date;
 import java.util.List;
 import lombok.EqualsAndHashCode;
-import lombok.extern.slf4j.Slf4j;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Represents a patient record.

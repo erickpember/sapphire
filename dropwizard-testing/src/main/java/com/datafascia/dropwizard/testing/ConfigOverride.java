@@ -3,8 +3,8 @@
 package com.datafascia.dropwizard.testing;
 
 import java.util.Enumeration;
-import lombok.extern.slf4j.Slf4j;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Utility class to override properties

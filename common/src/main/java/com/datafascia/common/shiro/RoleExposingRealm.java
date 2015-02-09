@@ -4,8 +4,8 @@ package com.datafascia.common.shiro;
 
 import java.util.Collection;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.realm.AuthorizingRealm;
 
 /**
  * Extends realm to get roles of subject.

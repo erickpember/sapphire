@@ -7,8 +7,8 @@ import com.google.common.base.Joiner;
 import java.util.List;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.accumulo.core.client.admin.InstanceOperations;
 import org.apache.accumulo.core.client.Connector;
+import org.apache.accumulo.core.client.admin.InstanceOperations;
 
 /**
  * Health checker for Accumulo connection

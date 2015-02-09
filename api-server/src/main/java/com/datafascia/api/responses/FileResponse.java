@@ -5,12 +5,12 @@ package com.datafascia.api.responses;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.dropwizard.jackson.Jackson;
-import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.StreamingOutput;
 import lombok.extern.slf4j.Slf4j;
 
 /**

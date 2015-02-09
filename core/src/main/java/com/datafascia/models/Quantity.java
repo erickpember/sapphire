@@ -8,10 +8,10 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.math.BigDecimal;
 import java.net.URI;
 import lombok.EqualsAndHashCode;
-import lombok.extern.slf4j.Slf4j;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * A measured amount (or an amount that can potentially be measured). Note that measured amounts

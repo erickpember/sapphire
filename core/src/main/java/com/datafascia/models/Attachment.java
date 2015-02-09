@@ -8,10 +8,10 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.neovisionaries.i18n.LanguageCode;
 import java.net.URI;
 import lombok.EqualsAndHashCode;
-import lombok.extern.slf4j.Slf4j;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * For referring to data content defined in other formats.

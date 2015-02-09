@@ -2,8 +2,8 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.jcommander.converters;
 
-import com.beust.jcommander.converters.BaseConverter;
 import com.beust.jcommander.ParameterException;
+import com.beust.jcommander.converters.BaseConverter;
 import java.net.URI;
 import java.net.URISyntaxException;
 

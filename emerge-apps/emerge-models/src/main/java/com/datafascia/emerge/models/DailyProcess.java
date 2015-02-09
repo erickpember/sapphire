@@ -4,10 +4,10 @@ package com.datafascia.emerge.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.EqualsAndHashCode;
-import lombok.extern.slf4j.Slf4j;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * This class is used to hold the Daily Process data for Emerge and can be serialized, deserialized

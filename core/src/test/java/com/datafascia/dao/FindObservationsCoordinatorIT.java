@@ -1,4 +1,4 @@
-// Copyright (C) 2015 dataFascia Corporation.  All rights reserved.
+// Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.dao;
 
@@ -25,8 +25,8 @@ public class FindObservationsCoordinatorIT extends DaoIT {
 
     List<String> patientIds = patientDao.getPatientIds(true);
     for (String patientId : patientIds) {
-      Collection<Observation> observations = findObservationsCoordinator.findObservationsByPatientId(
-          patientId, Optional.empty());
+      Collection<Observation> observations =
+          findObservationsCoordinator.findObservationsByPatientId(patientId, Optional.empty());
       if (!observations.isEmpty()) {
         log.debug("patientId [{}]", patientId);
       }

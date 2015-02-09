@@ -260,7 +260,7 @@ public class DailyProcessTest {
   /**
    * Create test daily process object with default values.
    */
-  private DailyProcess getDailyProcessWithDefaults() { 
+  private DailyProcess getDailyProcessWithDefaults() {
     return new DailyProcess();
   }
 

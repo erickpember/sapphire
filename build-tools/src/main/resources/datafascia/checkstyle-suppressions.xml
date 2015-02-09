@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+  Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
+  For license information, please contact http://datafascia.com/contact
+-->
+<!DOCTYPE suppressions PUBLIC
+    "-//Puppy Crawl//DTD Suppressions 1.1//EN"
+    "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+
+<suppressions>
+  <suppress checks="JavadocMethod" files=".*Test.*\.java"/>
+  <suppress checks="JavadocMethod" files=".*IT\.java"/>
+  <suppress checks="IllegalCatch" files=".*Test.*\.java"/>
+  <suppress checks="IllegalCatch" files=".*IT\.java"/>
+  <suppress checks="FileLength" files=".*Test.*\.java"/>
+  <suppress checks="FileLength" files=".*IT\.java"/>
+</suppressions>
+

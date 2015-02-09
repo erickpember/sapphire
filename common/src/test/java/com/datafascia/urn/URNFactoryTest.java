@@ -7,11 +7,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.fail;
 
 /**
  * Unit tests for URN utilities
  */
+@Slf4j
 public class URNFactoryTest {
   @Test
   public void oneParam() {

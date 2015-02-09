@@ -11,15 +11,15 @@ import static org.testng.Assert.assertEquals;
  */
 public class NameTest {
   Name firstLast = new Name() {{
-    setFirst("John");
-    setLast("Doe");
-  }};
+      setFirst("John");
+      setLast("Doe");
+      }};
 
   Name firstMiddleLast = new Name() {{
-    setFirst("John");
-    setMiddle("Middle");
-    setLast("Doe");
-  }};
+      setFirst("John");
+      setMiddle("Middle");
+      setLast("Doe");
+    }};
 
   @Test
   public void formatFirstLast() {
@@ -28,12 +28,13 @@ public class NameTest {
 
   @Test
   public void formatFirstLastMiddle() {
-    assertEquals(firstMiddleLast.format(Name.FIRST_FM + Name.LAST_FM + Name.MIDDLE_FM), "JohnDoeMiddle");
+    assertEquals(
+        firstMiddleLast.format(Name.FIRST_FM + Name.LAST_FM + Name.MIDDLE_FM), "JohnDoeMiddle");
   }
 
   @Test
   public void optionalMiddle() {
     assertEquals(firstLast.format("<[" + Name.FIRST + "," + Name.MIDDLE + "," + Name.LAST +
-          "]; separator=\" \">"), "John Doe");
+        "]; separator=\" \">"), "John Doe");
   }
 }

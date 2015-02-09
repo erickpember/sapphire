@@ -2,8 +2,6 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.services;
 
-import static org.testng.Assert.assertEquals;
-
 import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.dropwizard.testing.DropwizardTestApp;
 import com.datafascia.models.Version;
@@ -16,6 +14,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertEquals;
 
 /**
  * Integration test for the various API resources

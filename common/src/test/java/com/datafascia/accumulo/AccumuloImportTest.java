@@ -40,12 +40,12 @@ public class AccumuloImportTest {
     mac.start();
 
     config = new AccumuloConfig() {{
-      setInstance(mac.getInstanceName());
-      setUser(AccumuloConfig.ROOT);
-      setPassword(AccumuloConfig.USER_PASSWORD);
-      setZooKeepers(mac.getZooKeepers());
-      setType(AccumuloConfig.MINI);
-    }};
+        setInstance(mac.getInstanceName());
+        setUser(AccumuloConfig.ROOT);
+        setPassword(AccumuloConfig.USER_PASSWORD);
+        setZooKeepers(mac.getZooKeepers());
+        setType(AccumuloConfig.MINI);
+        }};
     injector = Guice.createInjector(new AbstractModule() {
       @Override
       protected void configure() {

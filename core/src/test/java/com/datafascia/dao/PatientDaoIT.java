@@ -2,12 +2,12 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.dao;
 
-import static org.testng.Assert.assertEquals;
-
 import com.datafascia.models.Patient;
 import java.util.Iterator;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertEquals;
 
 /**
  * Integration test for Patient DAO

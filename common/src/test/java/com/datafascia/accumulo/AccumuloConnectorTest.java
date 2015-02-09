@@ -11,20 +11,18 @@ import org.apache.accumulo.core.client.Connector;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.assertEquals;
-
 /**
  * Test for Accumulo connector
  */
 @Slf4j
 public class AccumuloConnectorTest {
   AccumuloConfig config = new AccumuloConfig() {{
-    setInstance("test");
-    setUser("user");
-    setPassword("password");
-    setZooKeepers("zookeeper1.datafascia.com");
-    setType(AccumuloConfig.MOCK);
-  }};
+      setInstance("test");
+      setUser("user");
+      setPassword("password");
+      setZooKeepers("zookeeper1.datafascia.com");
+      setType(AccumuloConfig.MOCK);
+      }};
   Injector injector;
 
   @BeforeClass

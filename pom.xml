@@ -258,6 +258,9 @@
         <configuration>
           <configLocation>datafascia/checkstyle.xml</configLocation>
           <headerLocation>datafascia/License.txt</headerLocation>
+          <includeTestSourceDirectory>true</includeTestSourceDirectory>
+          <suppressionsFileExpression>checkstyle.suppressions.file</suppressionsFileExpression>
+          <suppressionsLocation>datafascia/checkstyle-suppressions.xml</suppressionsLocation>
           <skip>false</skip>
         </configuration>
         <executions>

@@ -11,7 +11,8 @@ import org.testng.annotations.Test;
  */
 public class EncounterAccomodationTest extends ModelTestBase {
   @Test
-  public <T extends Object> void testEncounterAccomodationn() throws IOException, URISyntaxException {
+  public <T extends Object> void testEncounterAccomodationn() throws IOException,
+      URISyntaxException {
     geneticEncodeDecodeTest(TestModels.accomodation);
   }
 }

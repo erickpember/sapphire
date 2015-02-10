@@ -37,22 +37,27 @@ public class TestModels {
     }
   }
 
-  public static Address address = new Address() {{
+  public static Address address = new Address() {
+    {
       setStreet("1234 Test Avenue");
       setCity("Test City");
       setStateProvince("Testlavania");
       setPostalCode("12345-6789");
       setUnit("F");
       setCountry(CountryCode.US);
-      }};
+    }
+  };
 
-  public static Name name = new Name() {{
+  public static Name name = new Name() {
+    {
       setFirst("Tester");
       setMiddle("Testard");
       setLast("Testington");
-      }};
+    }
+  };
 
-  public static Caregiver caregiver = new Caregiver() {{
+  public static Caregiver caregiver = new Caregiver() {
+    {
       setAddress(address);
       setSpecialty(Specialty.Allergy);
       setName(name);
@@ -60,9 +65,11 @@ public class TestModels {
       setBirthDate(getDate());
       setPhoto(getURI());
       setOrganization("Test Corp.");
-      }};
+    }
+  };
 
-  public static Contact contact = new Contact() {{
+  public static Contact contact = new Contact() {
+    {
       setAddress(address);
       setName(name);
       setGender(Gender.Undifferentiated);
@@ -70,9 +77,11 @@ public class TestModels {
       setPhoto(getURI());
       setOrganization("Test Corp.");
       setRelationship("Tester");
-      }};
+    }
+  };
 
-  public static Patient patient = new Patient() {{
+  public static Patient patient = new Patient() {
+    {
       setActive(true);
       setAddress(address);
       setBirthDate(getDate());
@@ -88,52 +97,71 @@ public class TestModels {
       setManagingOrg("Test Corp.");
       setMaritalStatus(MaritalStatus.DomesticPartner);
       setRace(Race.Black);
-    }};
+    }
+  };
 
-  public static Period period = new Period() {{
+  public static Period period = new Period() {
+    {
       setStart(getDate());
       setStop(getDate());
-      }};
+    }
+  };
 
-  public static CodeableConcept codeable = new CodeableConcept() {{
+  public static CodeableConcept codeable = new CodeableConcept() {
+    {
       setCode("Codeable");
       setText("Concept");
-      }};
+    }
+  };
 
-  public static Location location = new Location() {{
+  public static Location location = new Location() {
+    {
       setLocation(getURI());
       setPeriod(period);
-      }};
+    }
+  };
 
-  public static Participant participant = new Participant() {{
+  public static Participant participant = new Participant() {
+    {
       setRole(codeable);
       setIndividual(getURI());
-      }};
+    }
+  };
 
-  public static Attachment attachment = new Attachment() {{
+  public static Attachment attachment = new Attachment() {
+    {
       setContentType("UTF-8");
       setLanguage(LanguageCode.en);
       setData("test text".getBytes());
       setUrl(getURI());
       setTitle("test text");
-      }};
+    }
+  };
 
-  public static Quantity quantity = new Quantity() {{
+  public static Quantity quantity = new Quantity() {
+    {
       setValue(new BigDecimal(10));
       setComparator(QuantityComparator.GreaterThan);
       setUnits("seconds");
       setSystem(getURI());
       setCode(codeable);
-      }};
+    }
+  };
 
-  public static Ratio ratio = new Ratio() {{
+  public static Ratio ratio = new Ratio() {
+    {
       setNumerator(quantity);
       setDenominator(quantity);
-      }};
+    }
+  };
 
-  public static SampledData sampledData = new SampledData() {{ }};
+  public static SampledData sampledData = new SampledData() {
+    {
+    }
+  };
 
-  public static ObservationValue value = new ObservationValue() {{
+  public static ObservationValue value = new ObservationValue() {
+    {
       setQuantity(quantity);
       setCode(codeable);
       setAttachment(attachment);
@@ -141,19 +169,25 @@ public class TestModels {
       setPeriod(period);
       setSampledData(sampledData);
       setText("A value");
-      }};
+    }
+  };
 
-  public static Range range = new Range() {{
+  public static Range range = new Range() {
+    {
       setLow(quantity);
       setHigh(quantity);
-      }};
+    }
+  };
 
-  public static ReferenceRange referenceRange = new ReferenceRange() {{
+  public static ReferenceRange referenceRange = new ReferenceRange() {
+    {
       setMeaning(codeable);
       setAge(range);
-      }};
+    }
+  };
 
-  public static ObservationValue observationValue = new ObservationValue() {{
+  public static ObservationValue observationValue = new ObservationValue() {
+    {
       setQuantity(quantity);
       setCode(codeable);
       setAttachment(attachment);
@@ -161,14 +195,18 @@ public class TestModels {
       setPeriod(period);
       setSampledData(sampledData);
       setText("An observation");
-      }};
+    }
+  };
 
-  public static ObservationRelated related = new ObservationRelated() {{
+  public static ObservationRelated related = new ObservationRelated() {
+    {
       setType(Arrays.asList(ObservationRelationshipType.DerivedFrom));
       setTarget(getURI());
-      }};
+    }
+  };
 
-  public static Observation observation = new Observation() {{
+  public static Observation observation = new Observation() {
+    {
       setId(Id.of("1234"));
       setName(codeable);
       setValues(observationValue);
@@ -186,23 +224,29 @@ public class TestModels {
       setPerformer(getURI());
       setRange(Arrays.asList(referenceRange, referenceRange));
       setRelatedTo(Arrays.asList(related, related));
-      }};
+    }
+  };
 
-  public static Person person = new Person(){{
-    setName(name);
-    setAddress(address);
-    setGender(Gender.Male);
-    setBirthDate(getDate());
-    setPhoto(getURI());
-    setOrganization("Some Ficticious Hospital");
-  }};
+  public static Person person = new Person() {
+    {
+      setName(name);
+      setAddress(address);
+      setGender(Gender.Male);
+      setBirthDate(getDate());
+      setPhoto(getURI());
+      setOrganization("Some Ficticious Hospital");
+    }
+  };
 
-  public static EncounterAccomodation accomodation = new EncounterAccomodation() {{
+  public static EncounterAccomodation accomodation = new EncounterAccomodation() {
+    {
       setBed(getURI());
       setPeriod(period);
-      }};
+    }
+  };
 
-  public static Hospitalization hospitalization = new Hospitalization() {{
+  public static Hospitalization hospitalization = new Hospitalization() {
+    {
       setId(Id.of("1234"));
       setOrigin(getURI());
       setPeriod(period);
@@ -214,9 +258,11 @@ public class TestModels {
       setDischargeDisposition(codeable);
       setDischargeDiagnosis(getURI());
       setReadmission(true);
-      }};
+    }
+  };
 
-  public static Encounter encounter = new Encounter() {{
+  public static Encounter encounter = new Encounter() {
+    {
       setId(Id.of("1234"));
       setStatus(EncounterStatus.InProgress);
       setEclass(EncounterClass.Ambulatory);
@@ -232,5 +278,6 @@ public class TestModels {
       setLinkedTo(getURI());
       setObservations(Arrays.asList(observation, observation));
       setPatient(getURI());
-      }};
+    }
+  };
 }

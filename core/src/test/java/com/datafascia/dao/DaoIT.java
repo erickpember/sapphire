@@ -14,6 +14,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import java.io.File;
+import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.shiro.SecurityUtils;
@@ -44,6 +45,9 @@ public abstract class DaoIT {
 
   @BeforeSuite
   public static void setup() throws Exception {
+    // Delay to allow time for Accumulo mini-cluster to start.
+    TimeUnit.SECONDS.sleep(3);
+
     Injector injector = Guice.createInjector(new AbstractModule() {
       @Override
       protected void configure() {

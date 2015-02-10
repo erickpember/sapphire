@@ -14,7 +14,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import java.io.File;
-import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.shiro.SecurityUtils;
@@ -43,11 +42,6 @@ public abstract class DaoIT {
   protected static QueryTemplate queryTemplate;
   private static ThreadState threadState;
 
-  static class Connection {
-    @Inject
-    Connector connect;
-  }
-
   @BeforeSuite
   public static void setup() throws Exception {
     Injector injector = Guice.createInjector(new AbstractModule() {
@@ -57,8 +51,7 @@ public abstract class DaoIT {
         bind(RoleExposingRealm.class).to(FakeRealm.class);
       }}, new AccumuloModule());
 
-    Connection test = injector.getInstance(Connection.class);
-    connect = test.connect;
+    connect = injector.getInstance(Connector.class);
     queryTemplate = injector.getInstance(QueryTemplate.class);
 
     String resourceFile = Resources.getResource("version.json").getPath();

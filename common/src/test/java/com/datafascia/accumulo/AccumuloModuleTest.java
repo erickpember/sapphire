@@ -4,44 +4,47 @@ package com.datafascia.accumulo;
 
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
-import com.google.inject.Inject;
 import com.google.inject.Injector;
+import com.google.inject.Provides;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.Connector;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import static org.testng.Assert.assertNotNull;
+
 /**
- * Test for Accumulo connector
+ * {@link AccumuloModule} test
  */
 @Slf4j
 public class AccumuloModuleTest {
-  AccumuloConfiguration config = new AccumuloConfiguration() {{
-      setInstance("test");
-      setUser("user");
-      setPassword("password");
-      setZooKeepers("zookeeper1.datafascia.com");
-      setType(AccumuloConfiguration.MOCK);
-      }};
-  Injector injector;
+
+  private Injector injector;
 
   @BeforeClass
-  public void setup() {
-    injector = Guice.createInjector(new AbstractModule() {
-      @Override
-      protected void configure() {
-        bind(AccumuloConfiguration.class).toInstance(config);
-      }}, new AccumuloModule());
-  }
+  public void beforeClass() {
+    injector = Guice.createInjector(
+        new AbstractModule() {
+          @Override
+          protected void configure() {
+          }
 
-  // Test class for connector injection
-  static class TestClass {
-    @Inject
-    Connector connect;
+          @Provides
+          public AccumuloConfiguration getAccumuloConfiguration() {
+            return AccumuloConfiguration.builder()
+                .instance(ConnectorFactory.MOCK_INSTANCE)
+                .zooKeepers("zookeeper1.datafascia.com")
+                .user(AccumuloConfiguration.TESTING_USER)
+                .password(AccumuloConfiguration.TESTING_PASSWORD)
+                .build();
+          }
+        },
+        new AccumuloModule());
   }
 
   @Test
-  public void mockConnector() {
-    TestClass test = injector.getInstance(TestClass.class);
+  public void should_get_connector() {
+    Connector connector = injector.getInstance(Connector.class);
+    assertNotNull(connector);
   }
 }

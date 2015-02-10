@@ -1,1 +1,1 @@
-com.datafascia.emerge.csv.EmergeCsvCommand
+com.datafascia.emerge.csv.EmergeDemographicCSVCommand

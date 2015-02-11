@@ -4,7 +4,10 @@ package com.datafascia.models;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertEquals;
 
 /**
  * Test code for ObservationRelated model.
@@ -12,6 +15,8 @@ import org.testng.annotations.Test;
 public class ObservationRelatedTest extends ModelTestBase {
   @Test
   public <T extends Object> void testObservationRelated() throws IOException, URISyntaxException {
-    geneticEncodeDecodeTest(TestModels.related);
+    ObservationRelated decoded = (ObservationRelated) geneticEncodeDecodeTest(TestModels.related);
+    assertEquals(decoded.getType(), Arrays.asList(ObservationRelationshipType.DerivedFrom));
+    assertEquals(decoded.getTarget(), TestModels.getURI());
   }
 }

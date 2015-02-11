@@ -3,8 +3,11 @@
 package com.datafascia.models;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertEquals;
 
 /**
  * Test code for quantity model.
@@ -12,6 +15,11 @@ import org.testng.annotations.Test;
 public class QuantityTest extends ModelTestBase {
   @Test
   public <T extends Object> void testQuantity() throws IOException, URISyntaxException {
-    geneticEncodeDecodeTest(TestModels.quantity);
+    Quantity decoded = (Quantity) geneticEncodeDecodeTest(TestModels.quantity);
+    assertEquals(decoded.getValue(), new BigDecimal(10));
+    assertEquals(decoded.getComparator(), QuantityComparator.GreaterThan);
+    assertEquals(decoded.getUnits(), "seconds");
+    assertEquals(decoded.getSystem(), TestModels.getURI());
+    assertEquals(decoded.getCode(), TestModels.codeable);
   }
 }

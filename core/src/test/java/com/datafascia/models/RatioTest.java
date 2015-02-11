@@ -6,12 +6,16 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import org.testng.annotations.Test;
 
+import static org.testng.Assert.assertEquals;
+
 /**
  * Test code for ratio model.
  */
 public class RatioTest extends ModelTestBase {
   @Test
   public <T extends Object> void testRatio() throws IOException, URISyntaxException {
-    geneticEncodeDecodeTest(TestModels.ratio);
+    Ratio decoded = (Ratio) geneticEncodeDecodeTest(TestModels.ratio);
+    assertEquals(decoded.getNumerator(), TestModels.quantity);
+    assertEquals(decoded.getDenominator(), TestModels.quantity);
   }
 }

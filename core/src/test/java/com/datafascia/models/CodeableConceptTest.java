@@ -6,12 +6,16 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import org.testng.annotations.Test;
 
+import static org.testng.Assert.assertEquals;
+
 /**
  * Test code for CodeableConcept model.
  */
 public class CodeableConceptTest extends ModelTestBase {
   @Test
   public <T extends Object> void testCodableConcept() throws IOException, URISyntaxException {
-    geneticEncodeDecodeTest(TestModels.codeable);
+    CodeableConcept decoded = (CodeableConcept) geneticEncodeDecodeTest(TestModels.codeable);
+    assertEquals(decoded.getCode(), "Codeable");
+    assertEquals(decoded.getText(), "Concept");
   }
 }

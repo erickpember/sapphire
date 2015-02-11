@@ -6,12 +6,16 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import org.testng.annotations.Test;
 
+import static org.testng.Assert.assertEquals;
+
 /**
  * Test code for range model.
  */
 public class RangeTest extends ModelTestBase {
   @Test
   public <T extends Object> void testRange() throws IOException, URISyntaxException {
-    geneticEncodeDecodeTest(TestModels.range);
+    Range decoded = (Range) geneticEncodeDecodeTest(TestModels.range);
+    assertEquals(decoded.getLow(), TestModels.quantity);
+    assertEquals(decoded.getHigh(), TestModels.quantity);
   }
 }

@@ -6,12 +6,21 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import org.testng.annotations.Test;
 
+import static org.testng.Assert.assertEquals;
+
 /**
  * Test code for caregiver model.
  */
 public class CaregiverTest extends ModelTestBase {
   @Test
   public <T extends Object> void testCaregiver() throws IOException, URISyntaxException {
-    geneticEncodeDecodeTest(TestModels.caregiver);
+    Caregiver decoded = (Caregiver) geneticEncodeDecodeTest(TestModels.caregiver);
+    assertEquals(decoded.getAddress(), TestModels.address);
+    assertEquals(decoded.getSpecialty(), Specialty.Allergy);
+    assertEquals(decoded.getName(), TestModels.name);
+    assertEquals(decoded.getGender(), Gender.Undifferentiated);
+    assertEquals(decoded.getBirthDate(), TestModels.getDate());
+    assertEquals(decoded.getPhoto(), TestModels.getURI());
+    assertEquals(decoded.getOrganization(), "Test Corp.");
   }
 }

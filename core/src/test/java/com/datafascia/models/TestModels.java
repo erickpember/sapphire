@@ -10,6 +10,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
@@ -157,6 +158,19 @@ public class TestModels {
 
   public static SampledData sampledData = new SampledData() {
     {
+      ArrayList<BigDecimal> data = new ArrayList<>();
+      data.add(new BigDecimal(8447));
+      data.add(new BigDecimal(958737));
+      data.add(new BigDecimal(38382672));
+      data.add(new BigDecimal(.000001));
+      data.add(new BigDecimal(-900000000));
+      setData(data);
+      setDimensions(9000l);
+      setFactor(new BigDecimal(5));
+      setLowerLimit(new BigDecimal(3.50));
+      setOrigin(quantity);
+      setPeriod(new BigDecimal(28));
+      setUpperLimit(new BigDecimal(9001));
     }
   };
 

@@ -22,9 +22,10 @@ public class ModelTestBase {
     URNMap.idNSMapping("com.datafascia.models");
   }
 
-  public void geneticEncodeDecodeTest(Object test) throws IOException, URISyntaxException {
+  public Object geneticEncodeDecodeTest(Object test) throws IOException, URISyntaxException {
     String jsonString = mapper.writeValueAsString(test);
     Object decoded= mapper.readValue(jsonString, test.getClass());
     assertEquals(decoded, test);
+    return decoded;
   }
 }

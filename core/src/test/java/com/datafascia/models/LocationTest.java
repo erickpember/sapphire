@@ -6,12 +6,16 @@ import java.io.IOException;
 import java.net.URISyntaxException;
 import org.testng.annotations.Test;
 
+import static org.testng.Assert.assertEquals;
+
 /**
  * Test code for location model.
  */
 public class LocationTest extends ModelTestBase {
   @Test
   public <T extends Object> void testLocation() throws IOException, URISyntaxException {
-    geneticEncodeDecodeTest(TestModels.location);
+    Location decoded = (Location) geneticEncodeDecodeTest(TestModels.location);
+    assertEquals(decoded.getLocation(), TestModels.getURI());
+    assertEquals(decoded.getPeriod(), TestModels.period);
   }
 }

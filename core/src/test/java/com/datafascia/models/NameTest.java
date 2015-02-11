@@ -55,7 +55,10 @@ public class NameTest extends ModelTestBase {
 
   @Test
   public <T extends Object> void testName() throws IOException, URISyntaxException {
-    geneticEncodeDecodeTest(TestModels.name);
+    Name decoded = (Name) geneticEncodeDecodeTest(TestModels.name);
+    assertEquals(decoded.getFirst(), "Tester");
+    assertEquals(decoded.getMiddle(), "Testard");
+    assertEquals(decoded.getLast(), "Testington");
   }
 
   @Test

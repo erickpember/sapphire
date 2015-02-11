@@ -2,10 +2,14 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.models;
 
+import com.datafascia.common.persist.Id;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertEquals;
 
 /**
  * Test for the Encounter model.
@@ -14,6 +18,23 @@ import org.testng.annotations.Test;
 public class EncounterTest extends ModelTestBase {
   @Test
   public <T extends Object> void testEncounter() throws IOException, URISyntaxException {
-    geneticEncodeDecodeTest(TestModels.encounter);
+    Encounter decoded = (Encounter) geneticEncodeDecodeTest(TestModels.encounter);
+    assertEquals(decoded.getId(), Id.of("1234"));
+    assertEquals(decoded.getStatus(), EncounterStatus.InProgress);
+    assertEquals(decoded.getEclass(), EncounterClass.Ambulatory);
+    assertEquals(decoded.getType(), EncounterType.OKI);
+    assertEquals(decoded.getPeriod(), TestModels.period);
+    assertEquals(decoded.getReason(), TestModels.codeable);
+    assertEquals(decoded.getIndication(), TestModels.getURI());
+    assertEquals(decoded.getPriority(), EncounterPriority.SemiUrgent);
+    assertEquals(decoded.getServiceProvider(), TestModels.getURI());
+    assertEquals(decoded.getHospitalisation(), TestModels.hospitalization);
+    assertEquals(decoded.getLocation(), Arrays.asList(TestModels.location, TestModels.location));
+    assertEquals(decoded.getParticipants(),
+        Arrays.asList(TestModels.participant, TestModels.participant));
+    assertEquals(decoded.getLinkedTo(), TestModels.getURI());
+    assertEquals(decoded.getObservations(),
+        Arrays.asList(TestModels.observation, TestModels.observation));
+    assertEquals(decoded.getPatient(), TestModels.getURI());
   }
 }

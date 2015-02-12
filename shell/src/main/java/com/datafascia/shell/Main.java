@@ -7,12 +7,15 @@ import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import com.datafascia.common.command.Command;
 import com.datafascia.common.command.CommandLoader;
+import com.datafascia.urn.URNMap;
 import java.util.HashMap;
 
 /**
  * Parses command line arguments and executes command.
  */
 public class Main {
+  /** Package name for models */
+  private static final String MODELS_PKG = "com.datafascia.models";
 
   private static final String PROGRAM_NAME = "dfp";
 
@@ -22,6 +25,7 @@ public class Main {
    * @param args the arguments for the command
    */
   public static void main(String[] args) {
+    URNMap.idNSMapping(MODELS_PKG);
     Main application = new Main();
     application.run(args);
   }

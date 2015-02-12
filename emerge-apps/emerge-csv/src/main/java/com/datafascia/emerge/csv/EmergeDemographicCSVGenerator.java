@@ -22,6 +22,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
+import retrofit.RetrofitError;
 
 /**
  * The main application class for the Emerge CSV generator.
@@ -67,18 +68,34 @@ public class EmergeDemographicCSVGenerator {
       pw.write(Joiner.on(",").join(mapper.getHeaders()));
 
       int entry = 0;
+      String patientId = "";
       for (Patient pat : api.patients(true)) {
         try {
           String[] urnparts = pat.getId().toString().split(":");
-          String patientId = urnparts[urnparts.length - 1];
-          Encounter encount = api.lastvisit(patientId);
+          patientId = urnparts[urnparts.length - 1];
+          Encounter encount = lastVisit(api, patientId);
 
           pw.write("\n" + mapper.asCSV(getDemographic(pat, encount, entry)));
           entry++;
         } catch (MissingUrnException ex) {
-          log.error("Error processing patient: ", ex);
+          log.error("Error processing patient {} is {}", patientId, ex);
         }
       }
+    }
+  }
+
+  /**
+   * @return the last patient encounter information
+   *
+   * @param api the API end-point
+   * @param patientId the patientId
+   */
+  private static Encounter lastVisit(DatafasciaApi api, String patientId) {
+    try {
+      return api.lastvisit(patientId);
+    } catch (RetrofitError rf) {
+      log.error("No last encounter found for patient {}", patientId);
+      return null;
     }
   }
 

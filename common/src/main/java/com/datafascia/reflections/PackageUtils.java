@@ -46,4 +46,7 @@ public class PackageUtils {
 
     return reflections.getTypesAnnotatedWith(annotation);
   }
+
+  private PackageUtils() {
+  }
 }

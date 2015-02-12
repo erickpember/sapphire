@@ -15,7 +15,7 @@ import org.apache.shiro.web.env.WebEnvironment;
  */
 public class RealmInjectingEnvironmentLoaderListener extends EnvironmentLoaderListener {
 
-  private Realm realm;
+  private final Realm realm;
 
   /**
    * Construct with realm

@@ -27,4 +27,7 @@ public class StringUtils {
       throw new RuntimeException(exp);
     }
   }
+
+  private StringUtils() {
+  }
 }

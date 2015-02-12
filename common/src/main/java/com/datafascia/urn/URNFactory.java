@@ -116,4 +116,7 @@ public class URNFactory {
 
     throw new URISyntaxException(urn, "Invalid URN");
   }
+
+  private URNFactory() {
+  }
 }

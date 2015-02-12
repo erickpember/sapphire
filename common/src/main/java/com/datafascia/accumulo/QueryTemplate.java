@@ -23,10 +23,10 @@ import org.apache.accumulo.core.security.Authorizations;
 @Singleton @Slf4j
 public class QueryTemplate {
 
-  private RoleExposingRealm realm;
-  private Connector connector;
-  private MetricRegistry metrics;
-  private Map<String, Timer> nameToTimerMap = new HashMap<>();
+  private final RoleExposingRealm realm;
+  private final Connector connector;
+  private final MetricRegistry metrics;
+  private final Map<String, Timer> nameToTimerMap = new HashMap<>();
 
   /**
    * Construct the query template.

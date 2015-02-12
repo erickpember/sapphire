@@ -48,14 +48,14 @@ public class IdSerializer extends StdSerializer<Id> implements ContextualSeriali
    * The actual serializer
    */
   private static class IdURNSerializer extends StdSerializer<Id> {
-    private Class<?> declaringClass;
+    private final Class<?> declaringClass;
 
     /**
      * default constructor
      *
      * @param declaringClass the declaring class
      */
-    public IdURNSerializer(Class<?> declaringClass) {
+    IdURNSerializer(Class<?> declaringClass) {
       super(Id.class);
       this.declaringClass = declaringClass;
     }

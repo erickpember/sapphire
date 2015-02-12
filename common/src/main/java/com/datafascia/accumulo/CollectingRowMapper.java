@@ -16,8 +16,8 @@ import org.apache.accumulo.core.data.Value;
  */
 public class CollectingRowMapper<E> implements RowMapper<Void> {
 
-  private RowMapper<E> rowMapper;
-  private List<E> rows = new ArrayList<>();
+  private final RowMapper<E> rowMapper;
+  private final List<E> rows = new ArrayList<>();
 
   /**
    * Construct from mapper

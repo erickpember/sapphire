@@ -20,15 +20,7 @@ public class URIConverter extends BaseConverter<URI> {
     super(optionName);
   }
 
-  /**
-   * Convert the string into URI
-   *
-   * @param value the option value
-   *
-   * @return the URI for the string
-   *
-   * @throws com.beust.jcommander.ParameterException on illegal URI values
-   */
+  @Override
   public URI convert(String value) throws ParameterException {
     try {
       return new URI(value);

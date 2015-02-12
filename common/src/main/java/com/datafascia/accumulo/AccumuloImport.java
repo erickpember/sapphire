@@ -56,4 +56,7 @@ public class AccumuloImport {
       tableOps.create(tableName);
     }
   }
+
+  private AccumuloImport() {
+  }
 }

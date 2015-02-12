@@ -23,10 +23,10 @@ public class ConnectorFactory {
 
   private static final Authorizations AUTHORIZATIONS = new Authorizations("System");
 
-  private String instance;
-  private String zooKeepers;
-  private String user;
-  private String password;
+  private final String instance;
+  private final String zooKeepers;
+  private final String user;
+  private final String password;
 
   private Instance cluster;
   private Connector connector;
@@ -79,7 +79,7 @@ public class ConnectorFactory {
         connectorPassword = password;
       }
 
-      Connector connector = cluster.getConnector(user, new PasswordToken(connectorPassword));
+      connector = cluster.getConnector(user, new PasswordToken(connectorPassword));
 
       connector.securityOperations().changeUserAuthorizations(user, AUTHORIZATIONS);
       return connector;

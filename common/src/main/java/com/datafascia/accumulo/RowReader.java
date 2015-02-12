@@ -15,7 +15,7 @@ import org.apache.hadoop.io.Text;
  */
 public class RowReader<E> {
 
-  private RowMapper<E> rowMapper;
+  private final RowMapper<E> rowMapper;
   private Text rowId;
 
   /**

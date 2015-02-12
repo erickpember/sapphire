@@ -14,10 +14,10 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class URNMap {
   /** Map from Java class name to Id URN namespace */
-  private static Map<String, String> ID_CLASS_NS = new HashMap<>();
+  private static final Map<String, String> ID_CLASS_NS = new HashMap<>();
 
   /** Map from Id URN namespace to Java class */
-  private static Map<String, Class<?>> ID_NS_CLASS = new HashMap<>();
+  private static final Map<String, Class<?>> ID_NS_CLASS = new HashMap<>();
 
   /**
    * Load Id namespace mapping based on annotations on the classes
@@ -79,5 +79,8 @@ public class URNMap {
     }
 
     return ID_NS_CLASS.get(ns);
+  }
+
+  private URNMap() {
   }
 }

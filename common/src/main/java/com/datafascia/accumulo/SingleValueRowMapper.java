@@ -29,6 +29,7 @@ public abstract class SingleValueRowMapper<E> implements RowMapper<E> {
    *
    * @param entry the read entry
    */
+  @Override
   public abstract void onReadEntry(Map.Entry<Key, Value> entry);
 
   @Override

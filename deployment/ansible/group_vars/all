@@ -1,0 +1,2 @@
+jackson_version: 2.4.3
+logback_gelf_version: 1.1.6

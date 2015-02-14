@@ -1,0 +1,9 @@
+---
+- name: Copy Upstart configuration file
+  template:
+      src=storm-drpc.conf
+      dest=/etc/init/storm-drpc.conf
+
+- name: Start storm-drpc
+  command: /sbin/initctl start storm-drpc
+  ignore_errors: True

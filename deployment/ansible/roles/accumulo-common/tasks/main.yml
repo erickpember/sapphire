@@ -1,0 +1,65 @@
+---
+- name: Download Accumulo package
+  get_url:
+      url=http://mirrors.ibiblio.org/apache/accumulo/{{ accumulo_version }}/{{ accumulo_package }}
+      dest={{ company_prefix }}/{{ accumulo_package }}
+
+- name: Extract Accumulo
+  command: tar xzf {{ company_prefix }}/{{ accumulo_package }}
+      chdir={{ company_prefix }}
+      creates={{ accumulo_install_dir }}
+
+- name: Create symbolic link {{ accumulo_home }} to install directory
+  file:
+      src={{ accumulo_install_dir }}
+      path={{ accumulo_home }}
+      state=link
+
+- name: Create directories
+  file:
+      path={{ item }}
+      state=directory
+      mode=775
+      owner=hdfs
+      group=hadoop
+  with_items:
+    - "{{ accumulo_home }}/lib/native"
+    - "{{ accumulo_conf_dir }}"
+    - "{{ accumulo_log_dir }}"
+
+- name: Copy native library
+  copy:
+      src=libaccumulo.so
+      dest={{ accumulo_home }}/lib/native/libaccumulo.so
+      mode=755
+
+- name: Copy configuration files
+  template:
+      src={{ item }}
+      dest={{ accumulo_conf_dir }}/{{ item }}
+      mode=664
+      owner=root
+      group=hadoop
+  with_items:
+    - accumulo-env.sh
+    - accumulo-metrics.xml
+    - accumulo-site.xml
+    - gc
+    - generic_logger.xml
+    - log4j.properties
+    - masters
+    - monitor_logger.xml
+    - slaves
+    - tracers
+
+- name: Copy service script
+  template:
+      src=etc_initd_accumulo
+      dest=/etc/init.d/accumulo
+      mode=755
+
+- name: Set vm.swappiness to Accumulo recommended value
+  sysctl:
+      name=vm.swappiness
+      value=0
+      ignoreerrors=yes

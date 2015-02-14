@@ -1,0 +1,12 @@
+---
+elasticsearch_package: elasticsearch-1.3.2.noarch.rpm
+
+elasticsearch_home: "{{ company_prefix }}/elasticsearch"
+
+elasticsearch_data_dir:
+  - "{{ elasticsearch_home }}/data"
+  - "{{ mnt_dir }}/elasticsearch/data"
+
+elasticsearch_minimum_master_nodes: 2
+
+index_endpoint_url: "http://{{ groups['elasticsearch'][0] }}:9200/refinery_2014093000"

@@ -1,0 +1,36 @@
+# Lock the process address space so it won’t be swapped
+bootstrap.mlockall: true
+
+discovery.zen.minimum_master_nodes: {{ elasticsearch_minimum_master_nodes }}
+
+# Discover other nodes by unicast
+discovery.zen.ping.multicast.enabled: false
+
+# Discover other nodes by asking these nodes
+discovery.zen.ping.unicast.hosts:
+{% for host in groups['elasticsearch'] %}
+  - {{ host }}
+{% endfor %}
+
+# Cluster name identifies your cluster for auto-discovery. If you're running
+# multiple clusters on the same network, make sure you're using unique names.
+cluster.name: refinery1
+
+gateway.expected_nodes: {{ groups['elasticsearch'] | length }}
+gateway.recover_after_nodes: {{ elasticsearch_minimum_master_nodes }}
+gateway.recover_after_time: 5m
+
+# Set node name instead of assigning a random node name at startup.
+node.name: {{ inventory_hostname }}
+
+# Path to directory where this node stores index data
+path.data: {{ elasticsearch_data_dir | join(',') }}
+
+# Path to log files
+path.logs: {{ elasticsearch_home }}/logs
+
+# Path to where plugins are installed
+path.plugins: {{ elasticsearch_home }}/plugins
+
+# Path to temporary files
+path.work: {{ elasticsearch_home }}/work

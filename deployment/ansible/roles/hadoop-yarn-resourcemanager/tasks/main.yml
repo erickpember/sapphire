@@ -1,0 +1,15 @@
+---
+- name: Install YARN resource manager
+  yum: name=hadoop-yarn-resourcemanager-{{ hadoop_version }}
+
+- name: Install YARN proxy server
+  yum: name=hadoop-yarn-proxyserver-{{ hadoop_version }}
+
+- name: Start YARN services
+  service:
+      name={{ item }}
+      state=started
+      enabled=yes
+  with_items:
+    - hadoop-yarn-resourcemanager
+    - hadoop-yarn-proxyserver

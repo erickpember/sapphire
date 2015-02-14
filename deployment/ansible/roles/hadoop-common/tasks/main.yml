@@ -1,0 +1,27 @@
+---
+- name: Install Hadoop
+  yum: name=hadoop-{{ hadoop_version }}
+
+- name: Copy configuration files
+  template:
+      src=roles/hadoop-common/templates/{{ item }}
+      dest={{ hadoop_conf_dir }}/{{ item }}
+      mode=664
+  with_items:
+    - core-site.xml
+    - hdfs-site.xml
+    - mapred-site.xml
+    - masters
+    - slaves
+    - yarn-site.xml
+
+- name: Create work directories
+  file:
+      path={{ item }}
+      state=directory
+      owner=root
+      group=hadoop
+      mode=775
+  with_items:
+    - "{{ company_prefix }}/hadoop"
+    - "{{ hadoop_log_dir }}"

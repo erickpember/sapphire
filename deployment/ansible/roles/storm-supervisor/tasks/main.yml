@@ -1,0 +1,9 @@
+---
+- name: Copy Upstart configuration file
+  template:
+      src=storm-supervisor.conf
+      dest=/etc/init/storm-supervisor.conf
+
+- name: Start storm-supervisor
+  command: /sbin/initctl start storm-supervisor
+  ignore_errors: True

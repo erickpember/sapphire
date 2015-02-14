@@ -1,0 +1,6 @@
+---
+# This role installs the ZooKeeper software but does not start the server.
+# The accumulo role depends on this role for the ZooKeeper library.
+
+- name: Install zookeeper
+  yum: name=zookeeper-{{ zookeeper_version }}

@@ -1,0 +1,6 @@
+---
+# second EC2 ephemeral device
+mnt_dev: xvdc
+
+# mount point of second EC2 ephemeral device
+mnt_dir: /mnt

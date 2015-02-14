@@ -1,0 +1,26 @@
+---
+hadoop_version: 2.5.0+cdh5.3.1+791
+hadoop_home: /usr/lib/hadoop
+hadoop_conf_dir: /etc/hadoop/conf
+hadoop_lib_dir: "{{ hadoop_home }}/lib"
+
+# variables for core-site.xml
+hdfs_fs_defaultfs_port: 8020
+
+# variables for hdfs-site.xml
+hdfs_dfs_data_dir:
+  - "{{ company_prefix }}/hadoop/datanode"
+  - "{{ mnt_dir }}/hadoop/datanode"
+hdfs_dfs_name_dir:
+  - "{{ company_prefix }}/hadoop/namenode"
+hdfs_fs_checkpoint_dir:
+  - "{{ company_prefix }}/hadoop/checkpoint"
+
+# variables for log4j.properties
+hadoop_log_dir: "{{ company_prefix }}/hadoop/logs"
+
+# variables for yarn-site.xml
+yarn_nodemanager_local_dir:
+  - "{{ company_prefix }}/hadoop/nodemanager/local"
+yarn_nodemanager_log_dir:
+  - "{{ company_prefix }}/hadoop/nodemanager/log"

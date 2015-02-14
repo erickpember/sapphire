@@ -1,0 +1,20 @@
+---
+- name: Install YARN node manager
+  yum: name=hadoop-yarn-nodemanager-{{ hadoop_version }}
+
+- name: Create work directories
+  file:
+      path={{ item }}
+      state=directory
+      owner=yarn
+      group=yarn
+      mode=775
+  with_items:
+    - "{{ yarn_nodemanager_local_dir }}"
+    - "{{ yarn_nodemanager_log_dir }}"
+
+- name: Start YARN node manager
+  service:
+      name=hadoop-yarn-nodemanager
+      state=started
+      enabled=yes

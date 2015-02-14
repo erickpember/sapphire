@@ -1,0 +1,25 @@
+---
+- name: Install zookeeper-server
+  yum: name=zookeeper-server-{{ zookeeper_version }}
+
+- name: Copy zookeeper configuration file
+  template:
+      src=zoo.cfg
+      dest=/etc/zookeeper/conf/zoo.cfg
+
+- name: Create zookeeper data directory
+  file:
+      path={{ zookeeper_data_dir }}
+      state=directory
+      owner=zookeeper
+      group=zookeeper
+
+- name: Initialize zookeeper server
+  command: /sbin/service zookeeper-server init --myid={{ zoo_id }}
+      creates={{ zookeeper_data_dir }}/myid
+
+- name: Start zookeeper-server
+  service:
+      name=zookeeper-server
+      state=started
+      enabled=yes

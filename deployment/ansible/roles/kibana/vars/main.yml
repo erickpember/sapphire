@@ -1,0 +1,6 @@
+---
+nginx_document_root_dir: /usr/share/nginx/html
+
+kibana_version: 3.1.1
+kibana_package: kibana-{{ kibana_version }}.tar.gz
+kibana_install_dir: "{{ nginx_document_root_dir }}/kibana-{{ kibana_version }}"

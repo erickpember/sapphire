@@ -1,0 +1,323 @@
+#!/usr/bin/python
+
+# (c) 2013, Romeo Theriault <romeot () hawaii.edu>
+#
+# This file is part of Ansible
+#
+# Ansible is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Ansible is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
+
+import datetime
+import shutil
+import tempfile
+
+DOCUMENTATION = '''
+---
+module: get_artifact
+short_description: Downloads artifact from Maven artifact repository
+description:
+  - Downloads artifact from Maven artifact repository to the remote server.
+    The remote server I(must) have direct access to the repository.
+  - By default, if an environment variable C(<protocol>_proxy) is set on
+    the target host, requests will be sent through that proxy. This
+    behaviour can be overridden by setting a variable for this task
+    (see `setting the environment
+    <http://www.ansibleworks.com/docs/playbooks2.html#setting-the-environment-and-working-with-proxies>`_),
+    or by using the use_proxy option.
+version_added: "1.3"
+options:
+  repository_url:
+    description:
+      - artifact repository URL
+    required: true
+    default: null
+    aliases: []
+  user:
+    description:
+      - username to use for Digest, Basic or WSSE authentication.
+    required: false
+    default: null
+  password:
+    description:
+      - password to use for Digest, Basic or WSSE authentication.
+    required: false
+    default: null
+  groupId:
+    description:
+      - artifact group ID
+    required: true
+    default: null
+    aliases: []
+  artifactId:
+    description:
+      - artifact ID
+    required: true
+    default: null
+    aliases: []
+  version:
+    description:
+      - artifact version
+    required: true
+    default: null
+    aliases: []
+  classifier:
+    description:
+      - artifact classifier
+    required: false
+    default: null
+  packaging:
+    description:
+      - artifact packaging
+    required: false
+    default: 'jar'
+    aliases: []
+  dest:
+    description:
+      - absolute path of where to download the artifact to.
+      - If I(dest) is a directory, the basename of the artifact will be used.
+    required: true
+    default: null
+  force:
+    description:
+      - If C(yes), will download the artifact every time and replace it if the
+        contents change. If C(no), the artifact will only be downloaded if the
+        destination does not exist.
+      - If the version is a SNAPSHOT, will act as if this option is C(yes).
+    required: false
+    default: 'no'
+    choices: [ 'yes', 'no' ]
+    aliases: []
+  others:
+    description:
+      - all arguments accepted by the M(file) module also work here
+    required: false
+notes:
+    - This module doesn't yet support configuration for proxies.
+# informational: requirements for nodes
+requirements: [ httplib2, urlparse ]
+'''
+
+EXAMPLES='''
+- name: Download WAR file
+  get_artifact:
+      repository_url=http://example.com/content/groups/public
+      groupId=com.example
+      artifactId=application-web
+      version=1.0.0
+      packaging=war
+      dest=/usr/local/tomcat/webapps
+      mode=0440
+'''
+
+try:
+    import httplib2
+    HAS_HTTPLIB2 = True
+except ImportError:
+    HAS_HTTPLIB2 = False
+
+try:
+    import urlparse
+    import socket
+    HAS_URLPARSE = True
+except ImportError:
+    HAS_URLPARSE = False
+
+
+def is_snapshot(version):
+    return version.endswith('-SNAPSHOT')
+
+
+def write_file(module, content, dest):
+    # Write content to tempfile
+    fd, tmpsrc = tempfile.mkstemp()
+    f = open(tmpsrc, 'wb')
+    try:
+        f.write(content)
+    except Exception, err:
+        os.remove(tmpsrc)
+        module.fail_json(msg="failed to create temporary content file: %s" % str(err))
+    f.close()
+ 
+    md5sum_src   = None
+    md5sum_dest  = None
+ 
+    # raise an error if there is no tmpsrc file
+    if not os.path.exists(tmpsrc):
+        os.remove(tmpsrc)
+        module.fail_json(msg="Source %s does not exist" % (tmpsrc))
+    if not os.access(tmpsrc, os.R_OK):
+        os.remove(tmpsrc)
+        module.fail_json(msg="Source %s not readable" % (tmpsrc))
+    md5sum_src = module.md5(tmpsrc)
+ 
+    # check if there is no dest file
+    if os.path.exists(dest):
+        # raise an error if copy has no permission on dest
+        if not os.access(dest, os.W_OK):
+            os.remove(tmpsrc)
+            module.fail_json(msg="Destination %s not writable" % (dest))
+        if not os.access(dest, os.R_OK):
+            os.remove(tmpsrc)
+            module.fail_json(msg="Destination %s not readable" % (dest))
+        md5sum_dest = module.md5(dest)
+    else:
+        if not os.access(os.path.dirname(dest), os.W_OK):
+            os.remove(tmpsrc)
+            module.fail_json(msg="Destination dir %s not writable" % (os.path.dirname(dest)))
+     
+    if md5sum_src != md5sum_dest:
+        try:
+            shutil.copyfile(tmpsrc, dest)
+        except Exception, err:
+            os.remove(tmpsrc)
+            module.fail_json(msg="failed to copy %s to %s: %s" % (tmpsrc, dest, str(err)))
+ 
+    os.remove(tmpsrc)
+
+
+def uri(module, url, user, password, dest):
+
+    # Create a Http object and set some default options.
+    h = httplib2.Http(disable_ssl_certificate_validation=True, timeout=30)
+    h.follow_all_redirects = True
+    h.follow_redirects = True
+    h.forward_authorization_headers = True
+
+    # If they have a username or password verify they have both, then add them to the request
+    if user is not None and password is None:
+        module.fail_json(msg="Both a username and password need to be set.")
+    if password is not None and user is None:
+        module.fail_json(msg="Both a username and password need to be set.")
+    if user is not None and password is not None:
+        h.add_credentials(user, password)
+
+    # if destination file already exist, only download if file newer
+    headers = {}
+    if os.path.exists(dest):
+        t = datetime.datetime.utcfromtimestamp(os.path.getmtime(dest))
+        tstamp = t.strftime('%a, %d %b %Y %H:%M:%S +0000')
+        headers['If-Modified-Since'] = tstamp
+
+    # Make the request
+    try: 
+        resp, content = h.request(url, method='GET', headers=headers)
+        return resp, content
+    except httplib2.RedirectMissingLocation:
+        module.fail_json(msg="A 3xx redirect response code was provided but no Location: header was provided to point to the new location.")
+    except httplib2.RedirectLimit:
+        module.fail_json(msg="The maximum number of redirections was reached without coming to a final URI.")
+    except httplib2.ServerNotFoundError:
+        module.fail_json(msg="Unable to resolve the host name given.")
+    except httplib2.RelativeURIError:
+        module.fail_json(msg="A relative, as opposed to an absolute URI, was passed in.")
+    except httplib2.FailedToDecompressContent:
+        module.fail_json(msg="The headers claimed that the content of the response was compressed but the decompression algorithm applied to the content failed.")
+    except httplib2.UnimplementedDigestAuthOptionError:
+        module.fail_json(msg="The server requested a type of Digest authentication that we are unfamiliar with.")
+    except httplib2.UnimplementedHmacDigestAuthOptionError:
+        module.fail_json(msg="The server requested a type of HMACDigest authentication that we are unfamiliar with.")
+    except httplib2.UnimplementedHmacDigestAuthOptionError:
+        module.fail_json(msg="The server requested a type of HMACDigest authentication that we are unfamiliar with.")
+    except socket.error, e:
+        module.fail_json(msg="Socket error: %s to %s" % (e, url))
+
+
+def main():
+
+    module = AnsibleModule(
+        argument_spec = dict(
+            repository_url = dict(required=True),
+            user = dict(required=False, default=None),
+            password = dict(required=False, default=None),
+            groupId = dict(required=True),
+            artifactId = dict(required=True),
+            version = dict(required=True),
+            classifier = dict(required=False, default=None),
+            packaging = dict(required=False, default='jar'),
+            dest = dict(required=True),
+            force = dict(required=False, default='no', type='bool')
+        ),
+        check_invalid_arguments=False,
+        add_file_common_args=True
+    )
+
+    if not HAS_HTTPLIB2:
+        module.fail_json(msg="httplib2 is not installed")
+    if not HAS_URLPARSE:
+        module.fail_json(msg="urlparse is not installed")
+
+    repository_url = module.params['repository_url']
+    user = module.params['user']
+    password = module.params['password']
+    groupId = module.params['groupId']
+    artifactId = module.params['artifactId']
+    version = module.params['version']
+    classifier = module.params['classifier']
+    packaging = module.params['packaging']
+    dest = os.path.expanduser(module.params['dest'])
+    force = module.params['force']
+
+    artifact_file = "{artifactId}-{version}".format(**vars())
+    if classifier:
+        artifact_file = "{artifact_file}-{classifier}".format(**vars())
+    artifact_file = "{artifact_file}.{packaging}".format(**vars())
+
+    if os.path.isdir(dest):
+        dest = os.path.join(dest, artifact_file)
+
+    if is_snapshot(version):
+        force = True
+
+    if not force:
+        if os.path.exists(dest):
+            module.exit_json(msg="file already exists", dest=dest, changed=False)
+
+    if is_snapshot(version):
+        i = repository_url.find('/content')
+        context_url = repository_url[0:i]
+        if classifier:
+            artifact_url = "{context_url}/service/local/artifact/maven/redirect?r=snapshots&g={groupId}&a={artifactId}&v={version}&c={classifier}&e={packaging}".format(**vars())
+        else:
+            artifact_url = "{context_url}/service/local/artifact/maven/redirect?r=snapshots&g={groupId}&a={artifactId}&v={version}&p={packaging}".format(**vars())
+    else:
+        group_path = groupId.replace('.', '/')
+        artifact_url = "{repository_url}/{group_path}/{artifactId}/{version}/{artifact_file}".format(**vars())
+
+    # Make the request
+    resp, content = uri(module, artifact_url, user, password, dest)
+
+    # Write the destination file
+    if resp['status'] == '304':
+        changed = False
+        status_code = '304'
+    else:
+        write_file(module, content, dest)
+
+        # allow file attribute changes
+        changed = True
+        module.params['path'] = dest
+        file_args = module.load_file_common_arguments(module.params)
+        file_args['path'] = dest
+        changed = module.set_file_attributes_if_different(file_args, changed)
+        status_code = '200'
+
+    resp['dest'] = dest
+
+    if resp['status'] != status_code:
+        module.fail_json(msg="Status was not " + str(status_code), **resp)
+    else:
+        module.exit_json(changed=changed, **resp)
+
+# this is magic, see lib/ansible/module_common.py
+#<<INCLUDE_ANSIBLE_MODULE_COMMON>>
+main()

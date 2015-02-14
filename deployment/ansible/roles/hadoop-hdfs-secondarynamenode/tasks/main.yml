@@ -1,0 +1,17 @@
+---
+- name: Install HDFS secondary namenode
+  yum: name=hadoop-hdfs-secondarynamenode-{{ hadoop_version }}
+
+- name: Create checkpoint data directory
+  file:
+      path={{ item }}
+      state=directory
+      owner=hdfs
+      group=hadoop
+  with_items: hdfs_fs_checkpoint_dir
+
+- name: Start HDFS secondary namenode
+  service:
+      name=hadoop-hdfs-secondarynamenode
+      state=started
+      enabled=yes

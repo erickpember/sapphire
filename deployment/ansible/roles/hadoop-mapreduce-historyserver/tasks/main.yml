@@ -1,0 +1,12 @@
+---
+- name: Set HDFS permissions
+  command: sudo -u hdfs hdfs dfs -chmod 777 /
+
+- name: Install map reduce history server
+  yum: name=hadoop-mapreduce-historyserver-{{ hadoop_version }}
+
+- name: Start map reduce history server
+  service:
+      name=hadoop-mapreduce-historyserver
+      state=started
+      enabled=yes

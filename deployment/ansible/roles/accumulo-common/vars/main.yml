@@ -1,0 +1,7 @@
+---
+accumulo_version: 1.6.1
+accumulo_package: accumulo-{{ accumulo_version }}-bin.tar.gz
+accumulo_install_dir: "{{ company_prefix }}/accumulo-{{ accumulo_version }}"
+accumulo_home: "{{ company_prefix }}/accumulo"
+accumulo_conf_dir: "{{ accumulo_home }}/conf"
+accumulo_log_dir: "{{ accumulo_home }}/logs"

@@ -1,0 +1,18 @@
+---
+- name: Read {{ ephemeral_dir }} status
+  stat: path={{ ephemeral_dir }}
+  register: st
+
+- name: Create {{ company_prefix }} directory
+  file:
+      path={{ company_prefix }}
+      state=directory
+      mode=755
+  when: st.stat.exists == False
+
+- name: Create symbolic link {{ company_prefix }} to {{ ephemeral_dir }}
+  file:
+      src={{ ephemeral_dir }}
+      path={{ company_prefix }}
+      state=link
+  when: st.stat.exists == True

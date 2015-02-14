@@ -3,6 +3,7 @@
 *~
 .DS_Store
 .idea
+.vagrant
 nb-configuration.xml
 nbactions.xml
 nbconfig.xml

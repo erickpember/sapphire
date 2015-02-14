@@ -1,0 +1,27 @@
+---
+- name: Copy configuration files
+  template:
+      src={{ item }}
+      dest={{ hadoop_conf_dir }}/{{ item }}
+      mode=664
+  with_items:
+    - task-log4j.properties
+
+- name: Download GELF logging support jar
+  get_artifact:
+      repository_url=http://central.maven.org/maven2
+      groupId=org.graylog2
+      artifactId=gelfj
+      version=1.1.4
+      dest={{ hadoop_lib_dir }}/gelfj-1.1.4.jar
+
+- name: Download JSON Simple jar to support GELF logging
+  get_artifact:
+      repository_url=http://central.maven.org/maven2
+      groupId=com.googlecode.json-simple
+      artifactId=json-simple
+      version=1.1.1
+      dest={{ hadoop_lib_dir }}/json-simple-1.1.1.jar
+
+- name: Install map reduce
+  yum: name=hadoop-mapreduce-{{ hadoop_version }}

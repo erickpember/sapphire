@@ -1,0 +1,10 @@
+---
+# We allow RPM to install software to directories chosen by the packages.
+# Software not installed by RPM will be installed under this directory.
+company_prefix: /datafascia
+
+# Directory containing company-wide configuration files
+company_configuration_dir: "{{ company_prefix }}/conf"
+
+# mount point of EC2 ephemeral store
+ephemeral_dir: /media/ephemeral0

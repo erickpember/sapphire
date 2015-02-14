@@ -1,0 +1,21 @@
+---
+accumulo_instance: operational
+accumulo_password: secret
+
+api_server_version: 0.0.1-SNAPSHOT
+
+hdfs_dfs_data_dir:
+  - "{{ company_prefix }}/hadoop/datanode"
+
+hdfs_namenode_host: localhost
+
+log_host: localhost
+
+storm_cluster_id: 1
+
+storm_drpc_servers:
+  - localhost
+
+storm_nimbus_host: localhost
+
+yarn_resourcemanager_host: localhost

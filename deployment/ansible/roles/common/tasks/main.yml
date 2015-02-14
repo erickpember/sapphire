@@ -1,0 +1,59 @@
+---
+- name: Mount {{ mnt_dir }} directory
+  mount:
+      src=/dev/{{ mnt_dev }}
+      name={{ mnt_dir }}
+      fstype=auto
+      opts=defaults
+      state=mounted
+  when: mnt_dev in ansible_devices
+
+- name: Set iptables INPUT default policy to ACCEPT
+  command: /sbin/iptables -P INPUT ACCEPT
+
+- name: Clear all iptables rules so everything is allowed
+  command: /sbin/iptables -F
+
+- name: Save iptables rules
+  command: /sbin/service iptables save
+
+- name: Increase maximum open files for all users
+  lineinfile:
+      dest=/etc/security/limits.conf
+      line="{{ item }}"
+  with_items:
+    - "* hard nofile 65536"
+    - "* soft nofile 65536"
+
+- name: Set timezone to Pacific
+  file:
+      src=/usr/share/zoneinfo/PST8PDT
+      path=/etc/localtime
+      state=link
+      force=yes
+
+- name: Read /etc/yum.repos.d/epel.repo status
+  stat: path=/etc/yum.repos.d/epel.repo
+  register: epel_repo
+
+- name: Download EPEL YUM repository package
+  command: wget --quiet -O {{ company_prefix }}/epel-release-6-8.noarch.rpm http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
+      creates={{ company_prefix }}/epel-release-6-8.noarch.rpm
+  when: epel_repo.stat.exists == False
+
+- name: Add EPEL YUM repository
+  shell: rpm --install {{ company_prefix }}/epel-release-6-8.noarch.rpm || true
+  when: epel_repo.stat.exists == False
+
+- name: Install python-pip
+  yum:
+      name=python-pip
+      enablerepo=epel
+
+- name: Install httplib2
+  pip: name=httplib2
+
+- name: Add Cloudera YUM repository
+  copy:
+      src=cloudera-cdh5.repo
+      dest=/etc/yum.repos.d/cloudera-cdh5.repo

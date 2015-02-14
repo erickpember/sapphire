@@ -1,0 +1,3 @@
+---
+- name: Start Accumulo services
+  command: sudo -u hdfs nohup {{ accumulo_home }}/bin/start-here.sh

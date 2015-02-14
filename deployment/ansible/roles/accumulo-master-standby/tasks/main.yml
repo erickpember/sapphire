@@ -1,0 +1,4 @@
+---
+- name: Start Accumulo services
+  debug: msg="Start Accumulo services"
+  notify: Start Accumulo services

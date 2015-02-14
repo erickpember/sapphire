@@ -1,0 +1,26 @@
+[accumulo-master]
+localhost
+
+[accumulo-master-standby]
+localhost
+
+[accumulo-slave]
+localhost
+
+[default]
+localhost ansible_ssh_port=2222
+
+[import-master]
+localhost
+
+[import-slave]
+localhost
+
+[kafka]
+localhost kafka_broker_id=0
+
+[log-database]
+localhost
+
+[zookeeper]
+localhost zoo_id=1 ansible_ssh_port=2222

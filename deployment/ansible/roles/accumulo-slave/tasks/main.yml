@@ -1,0 +1,4 @@
+---
+- name: Start tablet server
+  debug: msg="Start tablet server"
+  notify: Start Accumulo services

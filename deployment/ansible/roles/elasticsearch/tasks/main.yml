@@ -1,0 +1,80 @@
+---
+- name: Download Elasticsearch package
+  get_url:
+      url=https://download.elasticsearch.org/elasticsearch/elasticsearch/{{ elasticsearch_package }}
+      dest={{ company_prefix }}/{{ elasticsearch_package }}
+
+- name: Install Elasticsearch
+  command: rpm --install {{ company_prefix }}/{{ elasticsearch_package }}
+      creates=/etc/elasticsearch
+
+- name: Create work directories
+  file:
+      path={{ item }}
+      owner=elasticsearch
+      group=elasticsearch
+      state=directory
+  with_items:
+    - "{{ elasticsearch_home }}"
+    - "{{ elasticsearch_home }}/logs"
+    - "{{ elasticsearch_home }}/plugins"
+    - "{{ elasticsearch_home }}/work"
+
+- name: Create data directory
+  file:
+      path={{ item }}
+      owner=elasticsearch
+      group=elasticsearch
+      state=directory
+  with_items: elasticsearch_data_dir
+
+- name: Copy Elasticsearch init configuration file
+  template:
+      src=elasticsearch
+      dest=/etc/sysconfig/elasticsearch
+
+- name: Copy Elasticsearch configuration file
+  template:
+      src=elasticsearch.yml
+      dest=/etc/elasticsearch/elasticsearch.yml
+
+- name: Start Elasticsearch
+  service:
+      name=elasticsearch
+      state=started
+      enabled=yes
+
+- name: Wait for Elasticsearch to become available
+  wait_for:
+      port=9200
+      delay=1
+  run_once: true
+
+- name: Check index exists
+  uri:
+      url={{ index_endpoint_url }}/_settings
+      status_code=200,404
+  register: settings
+  run_once: true
+
+- name: Create index
+  uri:
+      method=PUT
+      url={{ index_endpoint_url }}
+      body='{{ lookup("file", "refinery_2014093000.json") }}'
+  when: settings.status == 404
+  run_once: true
+
+- name: Create alias which application will read from
+  uri:
+      method=PUT
+      url={{ index_endpoint_url }}/_alias/refineryRead
+  when: settings.status == 404
+  run_once: true
+
+- name: Create alias which application will write to
+  uri:
+      method=PUT
+      url={{ index_endpoint_url }}/_alias/refineryWrite
+  when: settings.status == 404
+  run_once: true

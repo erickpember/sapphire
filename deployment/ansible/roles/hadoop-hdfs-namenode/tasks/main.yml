@@ -1,0 +1,13 @@
+---
+- name: Install HDFS namenode
+  yum: name=hadoop-hdfs-namenode-{{ hadoop_version }}
+
+- name: Format the namenode
+  command: sudo -u hdfs hdfs namenode -format
+      creates={{ hdfs_dfs_name_dir[0] }}
+
+- name: Start HDFS namenode
+  service:
+      name=hadoop-hdfs-namenode
+      state=started
+      enabled=yes

@@ -1,0 +1,5 @@
+---
+- name: Initialize Accumulo instance
+  shell: sudo -u hdfs {{ accumulo_home }}/bin/accumulo init --clear-instance-name --instance-name {{ accumulo_instance }} --password {{ accumulo_password }} && touch {{ accumulo_conf_dir }}/instance.initialized
+      creates={{ accumulo_conf_dir }}/instance.initialized
+  notify: Start Accumulo services

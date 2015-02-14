@@ -1,0 +1,7 @@
+---
+kafka_version: 0.8.2.0
+kafka_package: kafka_2.10-{{ kafka_version }}.tgz
+kafka_install_dir: "{{ company_prefix }}/kafka_2.10-{{ kafka_version }}"
+kafka_home: "{{ company_prefix }}/kafka"
+kafka_data_dir: "{{ kafka_home }}/data"
+kafka_logs_dir: "{{ kafka_home }}/logs"

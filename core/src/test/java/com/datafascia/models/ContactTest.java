@@ -4,6 +4,7 @@ package com.datafascia.models;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -22,5 +23,18 @@ public class ContactTest extends ModelTestBase {
     assertEquals(decoded.getPhoto(), TestModels.getURI());
     assertEquals(decoded.getOrganization(), "Test Corp.");
     assertEquals(decoded.getRelationship(), "Tester");
+  }
+
+  @Test
+  public void testJsonProperties() throws IOException {
+    ArrayList<String> jsonProperties = new ArrayList<>();
+    jsonProperties.add("relationship");
+    jsonProperties.add("name");
+    jsonProperties.add("address");
+    jsonProperties.add("gender");
+    jsonProperties.add("birthDate");
+    jsonProperties.add("photo");
+    jsonProperties.add("organization");
+    geneticJsonContainsFieldsTest(TestModels.contact, jsonProperties);
   }
 }

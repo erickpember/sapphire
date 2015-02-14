@@ -4,6 +4,7 @@ package com.datafascia.models;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -17,5 +18,13 @@ public class ParticipantTest extends ModelTestBase {
     Participant decoded = (Participant) geneticEncodeDecodeTest(TestModels.participant);
     assertEquals(decoded.getRole(), TestModels.codeable);
     assertEquals(decoded.getIndividual(), TestModels.getURI());
+  }
+
+  @Test
+  public void testJsonProperties() throws IOException {
+    ArrayList<String> jsonProperties = new ArrayList<>();
+    jsonProperties.add("role");
+    jsonProperties.add("individual");
+    geneticJsonContainsFieldsTest(TestModels.participant, jsonProperties);
   }
 }

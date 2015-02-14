@@ -5,6 +5,7 @@ package com.datafascia.models;
 import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -21,5 +22,16 @@ public class QuantityTest extends ModelTestBase {
     assertEquals(decoded.getUnits(), "seconds");
     assertEquals(decoded.getSystem(), TestModels.getURI());
     assertEquals(decoded.getCode(), TestModels.codeable);
+  }
+
+  @Test
+  public void testJsonProperties() throws IOException {
+    ArrayList<String> jsonProperties = new ArrayList<>();
+    jsonProperties.add("value");
+    jsonProperties.add("Comparator");
+    jsonProperties.add("units");
+    jsonProperties.add("system");
+    jsonProperties.add("code");
+    geneticJsonContainsFieldsTest(TestModels.quantity, jsonProperties);
   }
 }

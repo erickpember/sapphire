@@ -5,6 +5,7 @@ package com.datafascia.models;
 import com.neovisionaries.i18n.CountryCode;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -22,5 +23,17 @@ public class AddressTest extends ModelTestBase {
     assertEquals(decoded.getPostalCode(), "12345-6789");
     assertEquals(decoded.getUnit(), "F");
     assertEquals(decoded.getCountry(), CountryCode.US);
+  }
+
+  @Test
+  public void testJsonProperties() throws IOException {
+    ArrayList<String> jsonProperties = new ArrayList<>();
+    jsonProperties.add("street");
+    jsonProperties.add("city");
+    jsonProperties.add("stateProvince");
+    jsonProperties.add("postalCode");
+    jsonProperties.add("unit");
+    jsonProperties.add("country");
+    geneticJsonContainsFieldsTest(TestModels.address, jsonProperties);
   }
 }

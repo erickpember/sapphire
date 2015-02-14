@@ -3,12 +3,16 @@
 package com.datafascia.models;
 
 import com.datafascia.urn.URNMap;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import org.testng.annotations.BeforeSuite;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNotNull;
 
 /**
  * Base class for tests of models.
@@ -27,5 +31,27 @@ public class ModelTestBase {
     Object decoded= mapper.readValue(jsonString, test.getClass());
     assertEquals(decoded, test);
     return decoded;
+  }
+
+  /**
+   * Serialize the object to Json and make sure the values have the key names specified in the
+   * JsonProperty annotations.
+   *
+   * @param test tested object
+   * @param jsonProperties Json property names we are looking for
+   * @throws JsonProcessingException
+   * @throws IOException
+   */
+  public void geneticJsonContainsFieldsTest(Object test, ArrayList<String> jsonProperties)
+      throws JsonProcessingException, IOException {
+    String jsonString = mapper.writeValueAsString(test);
+
+    // Deserialize to JsonNode instead of back to the tested class, so Json field names are seen
+    JsonNode jsonObject = mapper.readTree(jsonString);
+
+    for (String property : jsonProperties) {
+      assertNotNull(jsonObject.findValue(property), "Failed to find Json Property:" + property
+          + " in json: " + jsonString);
+    }
   }
 }

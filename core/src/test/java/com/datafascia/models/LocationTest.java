@@ -4,6 +4,7 @@ package com.datafascia.models;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -17,5 +18,13 @@ public class LocationTest extends ModelTestBase {
     Location decoded = (Location) geneticEncodeDecodeTest(TestModels.location);
     assertEquals(decoded.getLocation(), TestModels.getURI());
     assertEquals(decoded.getPeriod(), TestModels.period);
+  }
+
+  @Test
+  public void testJsonProperties() throws IOException {
+    ArrayList<String> jsonProperties = new ArrayList<>();
+    jsonProperties.add("location");
+    jsonProperties.add("period");
+    geneticJsonContainsFieldsTest(TestModels.location, jsonProperties);
   }
 }

@@ -5,6 +5,7 @@ package com.datafascia.models;
 import com.datafascia.common.persist.Id;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -28,5 +29,23 @@ public class HospitalizationTest extends ModelTestBase {
     assertEquals(decoded.getDischargeDisposition(), TestModels.codeable);
     assertEquals(decoded.getDischargeDiagnosis(), TestModels.getURI());
     assertEquals(decoded.isReadmission(), true);
+  }
+
+  @Test
+  public void testJsonProperties() throws IOException {
+    ArrayList<String> jsonProperties = new ArrayList<>();
+    jsonProperties.add("@id");
+    jsonProperties.add("origin");
+    jsonProperties.add("admitSource");
+    jsonProperties.add("period");
+    jsonProperties.add("accomodation");
+    jsonProperties.add("diet");
+    jsonProperties.add("specialCourtesy");
+    jsonProperties.add("specialArrangement");
+    jsonProperties.add("destination");
+    jsonProperties.add("dischargeDisposition");
+    jsonProperties.add("dischargeDiagnosis");
+    jsonProperties.add("readmission");
+    geneticJsonContainsFieldsTest(TestModels.hospitalization, jsonProperties);
   }
 }

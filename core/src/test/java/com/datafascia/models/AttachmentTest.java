@@ -5,6 +5,7 @@ package com.datafascia.models;
 import com.neovisionaries.i18n.LanguageCode;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -21,5 +22,16 @@ public class AttachmentTest extends ModelTestBase {
     assertEquals(decoded.getData(), "test text".getBytes());
     assertEquals(decoded.getUrl(), TestModels.getURI());
     assertEquals(decoded.getTitle(), "test text");
+  }
+
+  @Test
+  public void testJsonProperties() throws IOException {
+    ArrayList<String> jsonProperties = new ArrayList<>();
+    jsonProperties.add("code");
+    jsonProperties.add("language");
+    jsonProperties.add("data");
+    jsonProperties.add("url");
+    jsonProperties.add("title");
+    geneticJsonContainsFieldsTest(TestModels.attachment, jsonProperties);
   }
 }

@@ -5,6 +5,7 @@ package com.datafascia.models;
 import com.datafascia.common.persist.Id;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import org.testng.annotations.Test;
 
@@ -35,5 +36,28 @@ public class ObservationTest extends ModelTestBase {
     assertEquals(decoded.getRange(), Arrays.asList(TestModels.referenceRange,
         TestModels.referenceRange));
     assertEquals(decoded.getRelatedTo(), Arrays.asList(TestModels.related, TestModels.related));
+  }
+
+  @Test
+  public void testJsonProperties() throws IOException {
+    ArrayList<String> jsonProperties = new ArrayList<>();
+    jsonProperties.add("@id");
+    jsonProperties.add("name");
+    jsonProperties.add("values");
+    jsonProperties.add("interpretation");
+    jsonProperties.add("comments");
+    jsonProperties.add("applies");
+    jsonProperties.add("issued");
+    jsonProperties.add("status");
+    jsonProperties.add("reliability");
+    jsonProperties.add("site");
+    jsonProperties.add("method");
+    jsonProperties.add("identifier");
+    jsonProperties.add("subject");
+    jsonProperties.add("specimen");
+    jsonProperties.add("performer");
+    jsonProperties.add("range");
+    jsonProperties.add("relatedTo");
+    geneticJsonContainsFieldsTest(TestModels.observation, jsonProperties);
   }
 }

@@ -4,6 +4,7 @@ package com.datafascia.models;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -99,5 +100,14 @@ public class NameTest extends ModelTestBase {
         + "Zeddemore Gambolputty de von Ausfern Sphlendenschlitt Digger Dagger"
         + "Dongle Tikolensic Grander Knotty Spelltinkle Grumblemeyer Luber Hundsfut Von "
         + "Hauptkopf of Ulm");
+  }
+
+  @Test
+  public void testJsonProperties() throws IOException {
+    ArrayList<String> jsonProperties = new ArrayList<>();
+    jsonProperties.add(Name.FIRST);
+    jsonProperties.add(Name.MIDDLE);
+    jsonProperties.add(Name.LAST);
+    geneticJsonContainsFieldsTest(TestModels.name, jsonProperties);
   }
 }

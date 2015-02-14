@@ -31,4 +31,17 @@ public class SampledDataTest extends ModelTestBase {
     assertEquals(decoded.getPeriod(), new BigDecimal(28));
     assertEquals(decoded.getUpperLimit(), new BigDecimal(9001));
   }
+
+  @Test
+  public void testJsonProperties() throws IOException {
+    ArrayList<String> jsonProperties = new ArrayList<>();
+    jsonProperties.add("origin");
+    jsonProperties.add("period");
+    jsonProperties.add("factor");
+    jsonProperties.add("lowerLimit");
+    jsonProperties.add("upperLimit");
+    jsonProperties.add("dimensions");
+    jsonProperties.add("data");
+    geneticJsonContainsFieldsTest(TestModels.sampledData, jsonProperties);
+  }
 }

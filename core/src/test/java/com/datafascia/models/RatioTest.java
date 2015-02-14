@@ -4,6 +4,7 @@ package com.datafascia.models;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -17,5 +18,13 @@ public class RatioTest extends ModelTestBase {
     Ratio decoded = (Ratio) geneticEncodeDecodeTest(TestModels.ratio);
     assertEquals(decoded.getNumerator(), TestModels.quantity);
     assertEquals(decoded.getDenominator(), TestModels.quantity);
+  }
+
+  @Test
+  public void testJsonProperties() throws IOException {
+    ArrayList<String> jsonProperties = new ArrayList<>();
+    jsonProperties.add("numerator");
+    jsonProperties.add("denominator");
+    geneticJsonContainsFieldsTest(TestModels.ratio, jsonProperties);
   }
 }

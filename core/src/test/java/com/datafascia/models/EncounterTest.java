@@ -5,6 +5,7 @@ package com.datafascia.models;
 import com.datafascia.common.persist.Id;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
@@ -36,5 +37,26 @@ public class EncounterTest extends ModelTestBase {
     assertEquals(decoded.getObservations(),
         Arrays.asList(TestModels.observation, TestModels.observation));
     assertEquals(decoded.getPatient(), TestModels.getURI());
+  }
+
+  @Test
+  public void testJsonProperties() throws IOException {
+    ArrayList<String> jsonProperties = new ArrayList<>();
+    jsonProperties.add("@id");
+    jsonProperties.add("status");
+    jsonProperties.add("class");
+    jsonProperties.add("type");
+    jsonProperties.add("period");
+    jsonProperties.add("reason");
+    jsonProperties.add("indication");
+    jsonProperties.add("priority");
+    jsonProperties.add("serviceProvider");
+    jsonProperties.add("hospitalisation");
+    jsonProperties.add("location");
+    jsonProperties.add("participants");
+    jsonProperties.add("linkedTo");
+    jsonProperties.add("observations");
+    jsonProperties.add("patient");
+    geneticJsonContainsFieldsTest(TestModels.encounter, jsonProperties);
   }
 }

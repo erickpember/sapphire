@@ -4,6 +4,7 @@ package com.datafascia.models;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -23,5 +24,18 @@ public class ObservationValueTest extends ModelTestBase {
     assertEquals(decoded.getPeriod(), TestModels.period);
     assertEquals(decoded.getSampledData(), TestModels.sampledData);
     assertEquals(decoded.getText(), "An observation");
+  }
+
+  @Test
+  public void testJsonProperties() throws IOException {
+    ArrayList<String> jsonProperties = new ArrayList<>();
+    jsonProperties.add("quantity");
+    jsonProperties.add("code");
+    jsonProperties.add("attachment");
+    jsonProperties.add("ratio");
+    jsonProperties.add("period");
+    jsonProperties.add("sampleData");
+    jsonProperties.add("text");
+    geneticJsonContainsFieldsTest(TestModels.observationValue, jsonProperties);
   }
 }

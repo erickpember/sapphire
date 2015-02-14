@@ -121,6 +121,11 @@
         <version>${dropwizard.version}</version>
       </dependency>
       <dependency>
+        <groupId>io.dropwizard.modules</groupId>
+        <artifactId>dropwizard-java8</artifactId>
+        <version>${dropwizard.version}</version>
+      </dependency>
+      <dependency>
         <groupId>io.dropwizard</groupId>
         <artifactId>dropwizard-logging</artifactId>
         <version>${dropwizard.version}</version>

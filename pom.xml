@@ -54,14 +54,17 @@
   </properties>
 
   <modules>
-    <module>build-tools</module>
     <module>accumulo</module>
     <module>api-client</module>
     <module>api-server</module>
+    <module>build-tools</module>
     <module>common</module>
     <module>core</module>
     <module>dropwizard-testing</module>
     <module>emerge-apps</module>
+    <module>etl/hl7-ingest</module>
+    <module>etl/hl7-transform</module>
+    <module>etl/process</module>
     <module>shell</module>
   </modules>
 

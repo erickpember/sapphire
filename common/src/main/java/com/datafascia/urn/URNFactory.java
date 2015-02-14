@@ -31,6 +31,10 @@ public class URNFactory {
   public static final String NS_OBSERVATION_ID = "df-encounterId-1";
   /** Namespace for dataFascia patient hospitalization identifier */
   public static final String NS_HOSPITALIZATION_ID = "df-hospitalizationId-1";
+  /** Namespace for dataFascia model types */
+  public static final String NS_MODEL_TYPE = "df-model-1";
+  /** URN prefix for dataFascia model types */
+  public static final String MODEL_PREFIX = URN + URN_SEP + NS_MODEL_TYPE + URN_SEP;
 
   /** Encoding */
   private static final String UTF8 = "UTF-8";

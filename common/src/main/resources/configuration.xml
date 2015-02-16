@@ -1,0 +1,17 @@
+<configuration>
+  <!--
+  The order of these configuration sources is important.  A property appearing
+  in an earlier configuration source overrides an identically named property
+  in a later configuration source.
+  -->
+
+  <!-- Try to read ${user.home}/.dF/user.yml file from file system. -->
+  <yaml fileName=".dF/user.yml" config-optional="true"/>
+
+  <!-- Try to read /etc/dF/site.yml file from file system. -->
+  <yaml fileName="/etc/dF/site.yml" config-optional="true"/>
+
+  <!-- Read default.yml file from class path. -->
+  <yaml fileName="default.yml"/>
+</configuration>
+

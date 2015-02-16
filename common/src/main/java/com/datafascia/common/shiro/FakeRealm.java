@@ -23,6 +23,13 @@ public class FakeRealm extends RoleExposingRealm {
   private static final String REALM_NAME = FakeRealm.class.getSimpleName();
   private static final String DEFAULT_ROLE = "System";
 
+  /**
+   * Constructor
+   */
+  public FakeRealm() {
+    setCachingEnabled(false);
+  }
+
   @Override
   protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token)
       throws AuthenticationException {

@@ -25,8 +25,7 @@ public class AccumuloModule extends AbstractModule {
   }
 
   @Provides @Singleton
-  public ConnectorFactory getConnectorFactory(AccumuloConfiguration config) {
-    return new ConnectorFactory(
-        config.getInstance(), config.getZooKeepers(), config.getUser(), config.getPassword());
+  public ConnectorFactory getConnectorFactory(AccumuloConfiguration accumuloConfiguration) {
+    return new ConnectorFactory(accumuloConfiguration);
   }
 }

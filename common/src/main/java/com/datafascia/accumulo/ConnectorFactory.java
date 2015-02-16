@@ -34,23 +34,14 @@ public class ConnectorFactory {
   /**
    * Constructor
    *
-   * @param instance
-   *     Accumulo instance name
-   * @param zooKeepers
-   *     comma separated list of ZooKeeper server locations. Each location can contain an optional
-   *     port, of the format host:port.
-   * @param user
-   *     Accumulo user to connect with
-   * @param password
-   *     Accumulo password to connect with
+   * @param accumuloConfiguration
+   *     Accumulo configuration settings
    */
-  public ConnectorFactory(
-      String instance, String zooKeepers, String user, String password) {
-
-    this.instance = instance;
-    this.zooKeepers = zooKeepers;
-    this.user = user;
-    this.password = password;
+  public ConnectorFactory(AccumuloConfiguration accumuloConfiguration) {
+    this.instance = accumuloConfiguration.getInstance();
+    this.zooKeepers = accumuloConfiguration.getZooKeepers();
+    this.user = accumuloConfiguration.getUser();
+    this.password = accumuloConfiguration.getPassword();
   }
 
   /**

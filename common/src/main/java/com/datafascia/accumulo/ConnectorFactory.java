@@ -2,6 +2,9 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.accumulo;
 
+import com.datafascia.common.configuration.ConfigurationNode;
+import com.datafascia.common.configuration.Configure;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
@@ -15,7 +18,7 @@ import org.apache.accumulo.core.security.Authorizations;
 /**
  * Creates Accumulo connector.
  */
-@Slf4j
+@ConfigurationNode("accumulo") @NoArgsConstructor @Slf4j
 public class ConnectorFactory {
 
   /** pass this instance name to create a mock instance */
@@ -23,10 +26,17 @@ public class ConnectorFactory {
 
   private static final Authorizations AUTHORIZATIONS = new Authorizations("System");
 
-  private final String instance;
-  private final String zooKeepers;
-  private final String user;
-  private final String password;
+  @Configure
+  private String instance;
+
+  @Configure
+  private String zooKeepers;
+
+  @Configure
+  private String user;
+
+  @Configure
+  private String password;
 
   private Instance cluster;
   private Connector connector;

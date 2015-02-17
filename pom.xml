@@ -49,6 +49,7 @@
     <shiro.version>1.2.3</shiro.version>
     <slf4j.version>1.7.7</slf4j.version>
     <snakeyaml.version>1.11</snakeyaml.version>
+    <storm.version>0.9.3</storm.version>
     <string-template.version>4.0.2</string-template.version>
     <testng.version>6.8.13</testng.version>
     <zookeeper.version>3.4.5</zookeeper.version>
@@ -223,6 +224,19 @@
         <groupId>org.apache.shiro</groupId>
         <artifactId>shiro-web</artifactId>
         <version>${shiro.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.storm</groupId>
+        <artifactId>storm-core</artifactId>
+        <version>${storm.version}</version>
+        <!-- keep this artifact out of the jar-with-dependencies -->
+        <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.storm</groupId>
+        <artifactId>storm-kafka</artifactId>
+        <version>${storm.version}</version>
       </dependency>
 
       <dependency>

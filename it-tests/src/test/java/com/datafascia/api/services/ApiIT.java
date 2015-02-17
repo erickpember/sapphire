@@ -114,25 +114,11 @@ public class ApiIT {
    */
   @Test
   public static void testSchemaPull() {
-    /* A handful of models to test. Unfortuantely, it seems there's no way to enumerate the
-     package. */
     List<String> models = Arrays.asList(new String[]{"Patient", "Encounter", "Observation"});
 
     List<JsonSchema> schemas = api.schemas();
     assertTrue(schemas.size() > 0);
-
     for (String model : models) {
-      /* Make sure the class exists, so we aren't requesting schemas that we don't know shouldn't
-       exist. */
-      try {
-        Class.forName(MODELS_PKG + "." + model);
-      } catch (ClassNotFoundException e) {
-        log.error("The model " + model
-            + " is referenced in the integration test, but doesn't seem to exist anymore.", e);
-        continue;
-      }
-
-      /* No asserts. Just making sure the schemas are coming across. */
       api.schema(model);
     }
   }
@@ -155,64 +141,37 @@ public class ApiIT {
   @Test
   public static void testPatient() throws Exception {
     List<Patient> patients = api.patients(true);
-    log.info("Found " + patients.size() + " patients");
     for (Patient pat : patients) {
-
       String id = pat.getId().toString();
-
       switch (id) {
         case "urn:df-patientId-1:96087004":
-          validatePatient(pat,
-              "ECMNOTES",
-              null,
-              "TEST",
-              dateFormat.parse("1977-01-01T05:00:00Z"),
-              "urn:df-patientId-1:96087004",
+          validatePatient(pat, "ECMNOTES", null, "TEST",
+              dateFormat.parse("1977-01-01T05:00:00Z"), "urn:df-patientId-1:96087004",
               "urn:df-institution-patientId-1:UCSF::96087004");
           break;
         case "urn:df-patientId-1:96087039":
-          validatePatient(pat,
-              "ONE",
-              "A",
-              "ECM-MSSGE",
-              dateFormat.parse("1960-06-06T04:00:00Z"),
-              "urn:df-patientId-1:96087039",
+          validatePatient(pat, "ONE", "A", "ECM-MSSGE",
+              dateFormat.parse("1960-06-06T04:00:00Z"), "urn:df-patientId-1:96087039",
               "urn:df-institution-patientId-1:UCSF::96087039");
           break;
         case "urn:df-patientId-1:96087047":
-          validatePatient(pat,
-              "ONE",
-              "B",
-              "ECM-MSSGE",
-              dateFormat.parse("1954-10-29T05:00:00Z"),
-              "urn:df-patientId-1:96087047",
+          validatePatient(pat, "ONE", "B", "ECM-MSSGE",
+              dateFormat.parse("1954-10-29T05:00:00Z"), "urn:df-patientId-1:96087047",
               "urn:df-institution-patientId-1:UCSF:SICU:96087047");
           break;
         case "urn:df-patientId-1:96087055":
-          validatePatient(pat,
-              "ONE",
-              "C",
-              "ECM-MSSGE",
-              dateFormat.parse("1996-07-29T04:00:00Z"),
-              "urn:df-patientId-1:96087055",
+          validatePatient(pat, "ONE", "C", "ECM-MSSGE",
+              dateFormat.parse("1996-07-29T04:00:00Z"), "urn:df-patientId-1:96087055",
               "urn:df-institution-patientId-1:UCSF::96087055");
           break;
         case "urn:df-patientId-1:96087063":
-          validatePatient(pat,
-              "ONE",
-              "D",
-              "ECM-MSSGE",
-              dateFormat.parse("1977-10-29T04:00:00Z"),
-              "urn:df-patientId-1:96087063",
+          validatePatient(pat, "ONE", "D", "ECM-MSSGE",
+              dateFormat.parse("1977-10-29T04:00:00Z"), "urn:df-patientId-1:96087063",
               "urn:df-institution-patientId-1:UCSF::96087063");
           break;
         case "urn:df-patientId-1:97534012":
-          validatePatient(pat,
-              "ONEFIVE",
-              "C",
-              "MB-CHILD",
-              dateFormat.parse("1999-02-20T05:00:00Z"),
-              "urn:df-patientId-1:97534012",
+          validatePatient(pat, "ONEFIVE", "C", "MB-CHILD",
+              dateFormat.parse("1999-02-20T05:00:00Z"), "urn:df-patientId-1:97534012",
               "urn:df-institution-patientId-1:UCSF:SICU:97534012");
           break;
       }
@@ -264,18 +223,12 @@ public class ApiIT {
 
   /**
    * Validate an encounter against expected values.
-   *
-   * @param enco
-   * @param weight
-   * @param weightUnits
-   * @param height
-   * @param heightUnits
-   * @param admitDate
    */
   public static void validateEncounter(Encounter enco, BigDecimal weight, String weightUnits,
       BigDecimal height, String heightUnits, Date admitDate) {
     boolean foundHeight = false;
     boolean foundWeight = false;
+
     for (Observation ob : enco.getObservations()) {
       switch (ob.getName().getCode()) {
         case "Weight":
@@ -290,9 +243,9 @@ public class ApiIT {
           break;
       }
     }
+
     assertTrue(foundWeight);
     assertTrue(foundHeight);
-
     assertEquals(admitDate, enco.getHospitalisation().getPeriod().getStart());
   }
 
@@ -333,12 +286,12 @@ public class ApiIT {
     node.putPOJO("kafkaConfig", kafkaConfig());
     String value = mapper.writeValueAsString(node);
 
-    String tmppath = System.getProperty("java.io.tmpdir") + File.separatorChar + "test.yml";
-    FileWriter fw = new FileWriter(tmppath);
+    String configFile = System.getProperty("java.io.tmpdir") + File.separatorChar + "test.yml";
+    FileWriter fw = new FileWriter(configFile);
     fw.write(value, 0, value.length());
     fw.close();
 
-    return tmppath;
+    return configFile;
   }
 
   /**

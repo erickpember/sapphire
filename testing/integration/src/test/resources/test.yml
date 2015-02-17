@@ -3,12 +3,11 @@
 
 # Accumulo configuration: Use mock for testing purposes
 accumulo:
-  instance: mock
-  zooKeepers: zookeeper1.datafascia.com
-  user: user
-  password: password
+  instance: miniInstance
+  user: root
+  password: secret
+  zooKeepers: localhost:5190
 
-# Kafka Consumer parameters
 kafkaConfig:
     zookeeperConnect: 0.0.0.0:2181
     # uniquely identifies a set of consumers within the same consumer group
@@ -19,5 +18,5 @@ kafkaConfig:
 
 server:
   applicationConnectors:
-  - type: http
+  - type: http 
     port: 9090

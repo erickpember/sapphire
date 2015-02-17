@@ -1,6 +1,7 @@
 # dataFascia Platform in Virtual Machine
 
-This project installs the dataFascia Platform in a virtual machine.
+This Vagrant script installs the dataFascia Platform software in a virtual
+machine.
 
 
 ## Requirements
@@ -15,3 +16,10 @@ This project installs the dataFascia Platform in a virtual machine.
 
 * Run the command `vagrant up` from the directory where this README.md file is
   located. This should finish after many minutes.
+
+* On the host machine, add this line to the `/etc/hosts` file:
+
+    192.168.222.222 devbox
+
+  This enables applications running on the host machine to connect to Accumulo
+  by using that name.

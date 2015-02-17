@@ -1,8 +1,6 @@
 ---
 - hosts: default
   sudo: yes
-  vars:
-    local_home: "{{ lookup('env', 'HOME') }}"
   vars_files:
     - environment/{{ environment_name }}/vars.yml
   roles:
@@ -11,6 +9,7 @@
     - storm-supervisor
     - hadoop-hdfs-namenode
     - hadoop-hdfs-datanode
+    - hostname
     - accumulo-master-primary
     - accumulo-slave
     - kafka

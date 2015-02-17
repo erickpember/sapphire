@@ -8,9 +8,6 @@ hadoop_lib_dir: "{{ hadoop_home }}/lib"
 hdfs_fs_defaultfs_port: 8020
 
 # variables for hdfs-site.xml
-hdfs_dfs_data_dir:
-  - "{{ company_prefix }}/hadoop/datanode"
-  - "{{ mnt_dir }}/hadoop/datanode"
 hdfs_dfs_name_dir:
   - "{{ company_prefix }}/hadoop/namenode"
 hdfs_fs_checkpoint_dir:

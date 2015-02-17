@@ -1,26 +1,20 @@
 [accumulo-master]
-localhost
+devbox
 
 [accumulo-master-standby]
-localhost
+devbox
 
 [accumulo-slave]
-localhost
+devbox
 
 [default]
-localhost ansible_ssh_port=2222
-
-[import-master]
-localhost
-
-[import-slave]
-localhost
+devbox ansible_ssh_host=192.168.222.222 ansible_ssh_port=22
 
 [kafka]
-localhost kafka_broker_id=0
+devbox kafka_broker_id=0
 
 [log-database]
-localhost
+devbox
 
 [zookeeper]
-localhost zoo_id=1 ansible_ssh_port=2222
+devbox zoo_id=1

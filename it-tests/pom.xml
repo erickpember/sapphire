@@ -4,26 +4,26 @@
   For license information, please contact http://datafascia.com/contact
 -->
 <project
-  xmlns="http://maven.apache.org/POM/4.0.0"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="
+    xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="
         http://maven.apache.org/POM/4.0.0
         http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>com.datafascia</groupId>
-    <artifactId>testing</artifactId>
+    <artifactId>sapphire</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>integration</artifactId>
+  <artifactId>df-it-tests</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>integration testing</name>
-  <description>dataFascia Integration Testing</description>
-  
+  <name>Integration Tests</name>
+  <description>dataFascia Integration Tests</description>
+
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
@@ -50,7 +50,7 @@
       <groupId>com.fasterxml.jackson.module</groupId>
       <artifactId>jackson-module-jsonSchema</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>com.datafascia</groupId>
       <artifactId>accumulo-server</artifactId>
@@ -74,7 +74,7 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-  
+
   <build>
     <plugins>
       <plugin>
@@ -112,7 +112,7 @@
           </execution>
         </executions>
       </plugin>
-      
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
@@ -134,5 +134,4 @@
       </plugin>
     </plugins>
   </build>
-
 </project>

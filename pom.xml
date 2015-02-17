@@ -42,7 +42,7 @@
     <jetty.version>9.2.4.v20141103</jetty.version>
     <jsonSchema.version>2.4.0</jsonSchema.version>
     <kafka.version>0.8.2-beta</kafka.version>
-    <lombok.version>1.14.8</lombok.version>
+    <lombok.version>1.16.0</lombok.version>
     <neovisionaries.version>1.14</neovisionaries.version>
     <reflections.version>0.9.9</reflections.version>
     <retrofit.version>1.8.0</retrofit.version>

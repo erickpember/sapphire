@@ -11,10 +11,14 @@ import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.common.shiro.FakeRealm;
 import com.datafascia.common.shiro.RoleExposingRealm;
 import com.datafascia.dropwizard.testing.DropwizardTestApp;
+import com.datafascia.kafka.KafkaConfig;
 import com.datafascia.models.Encounter;
 import com.datafascia.models.Observation;
 import com.datafascia.models.Patient;
 import com.datafascia.models.Version;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import com.google.common.io.Files;
 import com.google.common.io.Resources;
@@ -27,11 +31,9 @@ import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.Scanner;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
@@ -59,10 +61,12 @@ import static org.testng.Assert.assertTrue;
 public class ApiIT {
   private static final String MODELS_PKG = "com.datafascia.models";
   private static final String OPAL_TABLE = "opal_dF_data";
-  private static final AccumuloConfiguration config
-      = new AccumuloConfiguration(System.getProperty("accumuloConfig"));
   private static final SimpleDateFormat dateFormat
       = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+
+  private static AccumuloConfiguration accConfig;
+  private static KafkaConfig kafkaConfig;
+  private static Injector injector;
   private static DropwizardTestApp<APIConfiguration> app;
   private static Connector connect;
   private static DatafasciaApi api;
@@ -74,59 +78,24 @@ public class ApiIT {
    * @throws Exception
    */
   @BeforeSuite
-  public static void before() throws Exception {
-    prepAccumulo();
-
-    // Copy test.yml to /tmp/test.yml and update the port number.
-    String ymlPath = Resources.getResource("test.yml").getPath();
-    String tmpYml = updatePort(ymlPath, connect.getInstance().getZooKeepers());
-
-    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
-
-    app = new DropwizardTestApp<>(APIService.class, tmpYml);
-    log.info("Starting dropwizard app");
-    app.start();
-
-    api = DatafasciaApiBuilder.endpoint(new URI("http://localhost:" + app.getLocalPort()),
-        "testuser", "supersecret");
-  }
-
-  /**
-   * Get an accumulo connection and stage it with data.
-   *
-   * @throws Exception
-   */
-  public static void prepAccumulo() throws Exception {
+  public void before() throws Exception {
     // Delay to allow time for Accumulo mini-cluster to start.
     TimeUnit.SECONDS.sleep(3);
 
-    Injector injector = Guice.createInjector(new AbstractModule() {
-      @Override
-      protected void configure() {
-        bind(AccumuloConfiguration.class).toInstance(config);
-        bind(RoleExposingRealm.class).to(FakeRealm.class);
-      }}, new AccumuloModule());
+    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
+    setupGuice();
+    setupShiro();
     connect = injector.getInstance(Connector.class);
-
-    // Find the accumulo data and populate it into our minicluster.
-    File failDir = Files.createTempDir();
-    String resourceFile = Resources.getResource("version.json").getPath();
-    String path = resourceFile.substring(0, resourceFile.lastIndexOf(File.separator));
-    AccumuloImport.importData(connect, OPAL_TABLE, path + "/accumulo_data", failDir.getPath());
-    failDir.delete();
-
-    Factory<SecurityManager> factory = new IniSecurityManagerFactory("classpath:shiro.ini");
-    RealmSecurityManager securityManager = (RealmSecurityManager) factory.getInstance();
-    securityManager.setRealm(new FakeRealm());
-    SecurityUtils.setSecurityManager(securityManager);
-
-    Subject subject = new Subject.Builder()
-        .principals(new SimplePrincipalCollection("root", FakeRealm.class.getSimpleName()))
-        .buildSubject();
-    threadState = new SubjectThreadState(subject);
-    threadState.bind();
+    importData();
     log.info("Accumulo populated and ready.");
+
+    log.info("Starting dropwizard app");
+    app = new DropwizardTestApp<>(APIService.class, apiConfiguration());
+    app.start();
+
+    api = DatafasciaApiBuilder.endpoint(
+        new URI("http://localhost:" + app.getLocalPort()), "testuser", "supersecret");
   }
 
   /**
@@ -328,38 +297,89 @@ public class ApiIT {
   }
 
   /**
-   * Update the port number in a temp test.yml file.
-   *
-   * @param path Path to test.yml
-   * @param zookeeper The zookeeper line to use.
-   * @throws IOException
+   * @return the Accumulo configuration to use
    */
-  public static String updatePort(String path, String zookeeper) throws IOException {
-    // Load the existing test.yml to a string array.
-    Scanner sc = new Scanner(new File(path));
-    List<String> lines = new ArrayList<>();
-    while (sc.hasNextLine()) {
-      lines.add(sc.nextLine());
-    }
-    String[] arr = lines.toArray(new String[0]);
-
-    // Update the zookeepers line.
-    for (int i = 0; i < arr.length; i++) {
-      String line = arr[i];
-      if (line.contains("zooKeepers:")) {
-        line = "  zooKeepers: " + zookeeper;
-      }
-      arr[i] = line;
+  private AccumuloConfiguration accumuloConfig() {
+    if (accConfig == null) {
+      // Passed via system property
+      accConfig = new AccumuloConfiguration(System.getProperty("accumuloConfig"));
     }
 
-    // Write to a new temp test.yml
+    return accConfig;
+  }
+
+  /**
+   * @return the Kafka configuration to use
+   */
+  private KafkaConfig kafkaConfig() {
+    if (kafkaConfig == null) {
+      kafkaConfig = new KafkaConfig();
+      kafkaConfig.setZookeeperConnect(accumuloConfig().getZooKeepers());
+    }
+
+    return kafkaConfig;
+  }
+
+
+  /**
+   * @return the API configuration to use as a file
+   *
+   * @throws IOException error creating API configuration file
+   */
+  private String apiConfiguration() throws IOException {
+    ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
+    ObjectNode node = mapper.createObjectNode();
+    node.putPOJO("accumulo", accumuloConfig());
+    node.putPOJO("kafkaConfig", kafkaConfig());
+    String value = mapper.writeValueAsString(node);
+
     String tmppath = System.getProperty("java.io.tmpdir") + File.separatorChar + "test.yml";
     FileWriter fw = new FileWriter(tmppath);
-    for (int i = 0; i < arr.length; i++) {
-      fw.write(arr[i] + "\n");
-    }
+    fw.write(value, 0, value.length());
     fw.close();
 
     return tmppath;
+  }
+
+  /**
+   * Set up Shiro
+   */
+  private void setupShiro() {
+    Factory<SecurityManager> factory = new IniSecurityManagerFactory("classpath:shiro.ini");
+    RealmSecurityManager securityManager = (RealmSecurityManager) factory.getInstance();
+    securityManager.setRealm(new FakeRealm());
+    SecurityUtils.setSecurityManager(securityManager);
+
+    Subject subject = new Subject.Builder()
+        .principals(new SimplePrincipalCollection("root", FakeRealm.class.getSimpleName()))
+        .buildSubject();
+    threadState = new SubjectThreadState(subject);
+    threadState.bind();
+  }
+
+  /**
+   * Import test data into accumulo
+   *
+   * @throws Exception from underling Accumulo or IO calls
+   */
+  private void importData() throws Exception {
+    // Find the accumulo data and populate it into our minicluster.
+    File failDir = Files.createTempDir();
+    String resourceFile = Resources.getResource("version.json").getPath();
+    String path = resourceFile.substring(0, resourceFile.lastIndexOf(File.separator));
+    AccumuloImport.importData(connect, OPAL_TABLE, path + "/accumulo_data", failDir.getPath());
+    failDir.delete();
+  }
+
+  /**
+   * Set up guice modules
+   */
+  private void setupGuice() {
+    injector = Guice.createInjector(new AbstractModule() {
+      @Override
+      protected void configure() {
+        bind(AccumuloConfiguration.class).toInstance(accumuloConfig());
+        bind(RoleExposingRealm.class).to(FakeRealm.class);
+      }}, new AccumuloModule());
   }
 }

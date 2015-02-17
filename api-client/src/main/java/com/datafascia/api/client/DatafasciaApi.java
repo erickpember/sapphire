@@ -17,47 +17,47 @@ import retrofit.http.Query;
  */
 public interface DatafasciaApi {
   /**
-   * @return list of all patients.
-   *
    * @param active boolean indicating type of patient to return
+   *
+   * @return list of all patients.
    */
   @GET("/patient")
   List<Patient> patients(@Query("active") boolean active);
 
   /**
-   * @param encounterId ID of the encounter
-   * @return An encounter for the id given.
+   * @param encounterId the unique identifier for the encounter
    *
-   * @param id the unique identifier for the encounter
+   * @return encounter associated with the identifier
    */
   @GET("/encounter/{encounterId}")
   Encounter encounter(@Path("encounterId") String encounterId);
 
   /**
-   * @param patientId ID of the patient.
-   * @return The last encounter for the patient
+   * @param patientId the unique identifier for the patient
    *
-   * @param patientId the identity of the patient
+   * @return last encounter for the patient
    */
   @GET("/encounter/last/{patientId}")
   Encounter lastvisit(@Path("patientId") String patientId);
 
   /**
    * @param packageName Specify the name of the package.
-   * @return Version information for a package on the server.
+   *
+   * @return version information for the package on the server.
    */
   @GET("/version")
   Version version(@Query("package") String packageName);
 
   /**
-   * @return A list of schemas used by the API.
+   * @return A list of schemas provided by the API.
    */
   @GET("/schema")
   List<JsonSchema> schemas();
 
   /**
    * @param modelName Name of the model to produce a schema for.
-   * @return A schema used by the API.
+   *
+   * @return schema associated with the model
    */
   @GET("/schema/{modelName}")
   JsonSchema schema(@Path("modelName") String modelName);
@@ -66,6 +66,7 @@ public interface DatafasciaApi {
    * @param patientId ID of the patient to load observations for.
    * @param startCaptureTimeString The starting ISO_DATE_TIME bound for the query. (inclusive)
    * @param endCaptureTimeString The ending ISO_DATE_TIME bound for the query. (exclusive)
+   *
    * @return A list of observations
    */
   @GET("/observation")

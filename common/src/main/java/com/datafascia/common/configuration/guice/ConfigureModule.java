@@ -4,10 +4,7 @@ package com.datafascia.common.configuration.guice;
 
 import com.datafascia.common.configuration.ConfigurationProvider;
 import com.google.inject.AbstractModule;
-import com.google.inject.Provides;
 import com.google.inject.matcher.Matchers;
-import javax.inject.Singleton;
-import org.apache.commons.configuration.HierarchicalConfiguration;
 
 /**
  * Guice module which enables injection of configuration values with
@@ -17,8 +14,8 @@ public abstract class ConfigureModule extends AbstractModule {
 
   @Override
   protected final void configure() {
-    ConfigurationNodeTypeListener listener = new ConfigurationNodeTypeListener();
-    requestInjection(listener);
+    ConfigurationNodeTypeListener listener =
+        new ConfigurationNodeTypeListener(new ConfigurationProvider().get());
     bindListener(Matchers.any(), listener);
 
     onConfigure();
@@ -29,10 +26,5 @@ public abstract class ConfigureModule extends AbstractModule {
    * implementation does nothing.
    */
   protected void onConfigure() {
-  }
-
-  @Provides @Singleton
-  public HierarchicalConfiguration getConfiguration() {
-    return new ConfigurationProvider().get();
   }
 }

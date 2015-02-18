@@ -6,15 +6,15 @@ import com.datafascia.common.configuration.ConfigurationNode;
 import com.google.inject.TypeLiteral;
 import com.google.inject.spi.TypeEncounter;
 import com.google.inject.spi.TypeListener;
-import javax.inject.Inject;
+import lombok.AllArgsConstructor;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 
 /**
  * Receives notification of type injected by Guice.
  */
+@AllArgsConstructor
 public class ConfigurationNodeTypeListener implements TypeListener {
 
-  @Inject
   private HierarchicalConfiguration rootConfiguration;
 
   @Override

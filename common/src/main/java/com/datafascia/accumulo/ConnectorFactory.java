@@ -69,7 +69,7 @@ public class ConnectorFactory {
   private Connector createConnector() {
     log.info(
         "Connecting to Accumulo, instance [{}], zooKeepers [{}], user [{}]",
-        new Object[] { instance, zooKeepers, user });
+        new Object[]{instance, zooKeepers, user});
     try {
       String connectorPassword;
       if (MOCK_INSTANCE.equals(instance)) {

@@ -56,7 +56,7 @@ public class URNFactory {
     }
     try {
       return new URI(urn(NS_INSTITUTION_PATIENT_ID, instId, facilityId, patientId));
-    } catch(URISyntaxException e) {
+    } catch (URISyntaxException e) {
       throw new RuntimeException(e);
     }
   }

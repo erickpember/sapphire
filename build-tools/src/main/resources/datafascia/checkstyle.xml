@@ -128,5 +128,9 @@
     <module name="RedundantImport">
       <property name="severity" value="warning"/>
     </module>
+
+    <!-- White space checks -->
+    <module name="GenericWhitespace"/>
+    <module name="WhitespaceAround"/>
   </module>
 </module>

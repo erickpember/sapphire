@@ -54,7 +54,8 @@ public abstract class DaoIT {
       protected void configure() {
         bind(AccumuloConfiguration.class).toInstance(config);
         bind(RoleExposingRealm.class).to(FakeRealm.class);
-      }}, new AccumuloModule());
+      }
+    }, new AccumuloModule());
 
     connect = injector.getInstance(Connector.class);
     queryTemplate = injector.getInstance(QueryTemplate.class);

@@ -90,12 +90,15 @@ public class HL7MessageToEventTopology extends BaseTridentTopology {
   }
 
   private OpaqueTridentKafkaSpout createSpout(String configurationNode) {
+    String zooKeepers = getZooKeepers();
+
     HierarchicalConfiguration queueConfiguration =
         rootConfiguration.configurationAt(configurationNode);
     String topic = queueConfiguration.getString("topic");
-    log.info("Creating Kafka spout, zooKeepers [{}], topic [{}]", getZooKeepers(), topic);
 
-    BrokerHosts brokerHosts = new ZkHosts("localhost");
+    log.info("Creating Kafka spout, zooKeepers [{}], topic [{}]", zooKeepers, topic);
+
+    BrokerHosts brokerHosts = new ZkHosts(zooKeepers);
     TridentKafkaConfig spoutConfig = new TridentKafkaConfig(brokerHosts, topic);
     return new OpaqueTridentKafkaSpout(spoutConfig);
   }

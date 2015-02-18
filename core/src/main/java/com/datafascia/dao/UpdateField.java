@@ -21,10 +21,10 @@ public enum UpdateField {
   RASS_PAIN_LEVEL_LOW("dF_rassPainLevelLow", "RASS Level (Low)"),
   RASS_PAIN_LEVEL_HIGH("dF_rassPainLevelHigh", "RASS Level (High)");
 
-  private String fieldName;
-  private String displayName;
+  private final String fieldName;
+  private final String displayName;
 
-  private static Map<String, UpdateField> fieldNameToValueMap = new HashMap<>();
+  private static final Map<String, UpdateField> fieldNameToValueMap = new HashMap<>();
 
   static {
     for (UpdateField value : UpdateField.values()) {

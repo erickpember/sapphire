@@ -54,4 +54,7 @@ public class ValueUtils {
       throw new RuntimeException(ex);
     }
   }
+
+  private ValueUtils() {
+  }
 }

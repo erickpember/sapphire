@@ -294,4 +294,7 @@ public class TestModels {
       setPatient(getURI());
     }
   };
+
+  private TestModels() {
+  }
 }

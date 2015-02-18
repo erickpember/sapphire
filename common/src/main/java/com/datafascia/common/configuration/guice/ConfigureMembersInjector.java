@@ -21,10 +21,10 @@ import org.apache.commons.configuration.HierarchicalConfiguration;
 public class ConfigureMembersInjector<T> implements MembersInjector<T> {
 
   private static class Node {
-    private String key;
-    private HierarchicalConfiguration configuration;
+    private final String key;
+    private final HierarchicalConfiguration configuration;
 
-    public Node(String key, HierarchicalConfiguration configuration) {
+    Node(String key, HierarchicalConfiguration configuration) {
       this.key = key;
       this.configuration = configuration;
     }
@@ -34,7 +34,7 @@ public class ConfigureMembersInjector<T> implements MembersInjector<T> {
       "@" + ConfigurationNode.class.getSimpleName();
   private static final String CONFIGURE = "@" + Configure.class.getSimpleName();
 
-  private HierarchicalConfiguration rootConfiguration;
+  private final HierarchicalConfiguration rootConfiguration;
 
   /**
    * Constructor

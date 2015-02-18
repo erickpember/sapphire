@@ -3,7 +3,6 @@
 package com.datafascia.jcommander.converters;
 
 import com.beust.jcommander.ParameterException;
-import com.datafascia.jcommander.converters.URIConverter;
 import java.net.URI;
 import org.testng.annotations.Test;
 

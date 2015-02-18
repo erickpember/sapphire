@@ -20,9 +20,9 @@ import lombok.extern.slf4j.Slf4j;
 @Singleton @Slf4j
 public class FindObservationsCoordinator {
 
-  private PatientDao patientDao;
-  private EncounterDao encounterDao;
-  private ObservationDao observationDao;
+  private final PatientDao patientDao;
+  private final EncounterDao encounterDao;
+  private final ObservationDao observationDao;
 
   /**
    * Construct co-ordinator with the data access objects

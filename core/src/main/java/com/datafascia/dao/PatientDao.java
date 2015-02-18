@@ -98,11 +98,11 @@ public class PatientDao extends OpalDao {
 
   @Slf4j
   private static class GetPatientIdsRowMapper implements RowMapper<String> {
-    private boolean activeFlag;
+    private final boolean activeFlag;
     private String patientId;
     private boolean patientPresent;
 
-    public GetPatientIdsRowMapper(boolean activeFlag) {
+    GetPatientIdsRowMapper(boolean activeFlag) {
       this.activeFlag = activeFlag;
     }
 

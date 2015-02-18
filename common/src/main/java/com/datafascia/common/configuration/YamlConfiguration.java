@@ -16,7 +16,7 @@ import org.yaml.snakeyaml.Yaml;
  */
 public class YamlConfiguration extends AbstractHierarchicalFileConfiguration {
 
-  private Yaml yaml = new Yaml();
+  private final Yaml yaml = new Yaml();
 
   /**
    * Constructor
@@ -39,7 +39,7 @@ public class YamlConfiguration extends AbstractHierarchicalFileConfiguration {
         targetNode.addChild(childNode);
       }
     } else if (source instanceof Collection) {
-      for (Object child : (Collection) source) {
+      for (Object child : (Iterable<? extends Object>) source) {
         Node childNode = new Node("item");
         childNode.setReference(child);
         setNodeValue(childNode, child);

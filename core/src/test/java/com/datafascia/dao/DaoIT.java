@@ -37,9 +37,9 @@ import org.testng.annotations.BeforeSuite;
 @Slf4j
 public abstract class DaoIT {
 
-  private static String OPAL_TABLE = "opal_dF_data";
+  private static final String OPAL_TABLE = "opal_dF_data";
 
-  private static AccumuloConfiguration config = accumuloConfig();
+  private static final AccumuloConfiguration config = accumuloConfig();
   protected static Connector connect;
   protected static QueryTemplate queryTemplate;
   private static ThreadState threadState;

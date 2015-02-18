@@ -43,6 +43,7 @@
     <jsonSchema.version>2.4.0</jsonSchema.version>
     <kafka.version>0.8.2.0</kafka.version>
     <lombok.version>1.16.0</lombok.version>
+    <metrics.version>3.1.0</metrics.version>
     <neovisionaries.version>1.14</neovisionaries.version>
     <reflections.version>0.9.9</reflections.version>
     <retrofit.version>1.8.0</retrofit.version>
@@ -128,11 +129,6 @@
         <version>${dropwizard.version}</version>
       </dependency>
       <dependency>
-        <groupId>io.dropwizard.modules</groupId>
-        <artifactId>dropwizard-java8</artifactId>
-        <version>${dropwizard.version}</version>
-      </dependency>
-      <dependency>
         <groupId>io.dropwizard</groupId>
         <artifactId>dropwizard-logging</artifactId>
         <version>${dropwizard.version}</version>
@@ -142,6 +138,18 @@
             <artifactId>log4j-over-slf4j</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>io.dropwizard.metrics</groupId>
+        <artifactId>metrics-core</artifactId>
+        <version>${metrics.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>io.dropwizard.modules</groupId>
+        <artifactId>dropwizard-java8</artifactId>
+        <version>${dropwizard.version}</version>
       </dependency>
 
       <dependency>

@@ -60,7 +60,7 @@ public class Observation {
    * source of the date/time is not known, only the date/time itself.
    */
   @JsonProperty("applies")
-  private Period  applies;
+  private Period applies;
 
   /** Date/Time this was made available. */
   @JsonProperty("issued")

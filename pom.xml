@@ -41,7 +41,7 @@
     <jcommander.version>1.47</jcommander.version>
     <jetty.version>9.2.4.v20141103</jetty.version>
     <jsonSchema.version>2.4.0</jsonSchema.version>
-    <kafka.version>0.8.2-beta</kafka.version>
+    <kafka.version>0.8.2.0</kafka.version>
     <lombok.version>1.16.0</lombok.version>
     <neovisionaries.version>1.14</neovisionaries.version>
     <reflections.version>0.9.9</reflections.version>
@@ -209,8 +209,8 @@
         <version>${kafka.version}</version>
         <exclusions>
           <exclusion>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
           </exclusion>
         </exclusions>
       </dependency>

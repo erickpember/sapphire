@@ -4,8 +4,6 @@ package com.datafascia.accumulo;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
-import com.datafascia.common.shiro.RoleExposingRealm;
-import com.google.common.collect.Lists;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,7 +13,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.client.TableNotFoundException;
-import org.apache.accumulo.core.security.Authorizations;
 
 /**
  * Accumulo data access template methods
@@ -23,7 +20,7 @@ import org.apache.accumulo.core.security.Authorizations;
 @Singleton @Slf4j
 public class QueryTemplate {
 
-  private final RoleExposingRealm realm;
+  private final AuthorizationsProvider authorizationsProvider;
   private final Connector connector;
   private final MetricRegistry metrics;
   private final Map<String, Timer> nameToTimerMap = new HashMap<>();
@@ -31,13 +28,15 @@ public class QueryTemplate {
   /**
    * Construct the query template.
    *
-   * @param realm the role realm
+   * @param authorizationsProvider authorizations provider
    * @param connector the Accumulo connector
    * @param metrics the metrics registry
    */
   @Inject
-  public QueryTemplate(RoleExposingRealm realm, Connector connector, MetricRegistry metrics) {
-    this.realm = realm;
+  public QueryTemplate(
+      AuthorizationsProvider authorizationsProvider, Connector connector, MetricRegistry metrics) {
+
+    this.authorizationsProvider = authorizationsProvider;
     this.connector = connector;
     this.metrics = metrics;
   }
@@ -52,10 +51,8 @@ public class QueryTemplate {
    *     if table not found
    */
   public Scanner createScanner(String tableName) {
-    List<String> roles = Lists.newArrayList(realm.getRolesForSubject());
-    Authorizations authorizations = new Authorizations(roles.toArray(new String[0]));
     try {
-      return connector.createScanner(tableName, authorizations);
+      return connector.createScanner(tableName, authorizationsProvider.get());
     } catch (TableNotFoundException e) {
       throw new IllegalStateException("Table " + tableName + " not found", e);
     }

@@ -5,7 +5,9 @@ package com.datafascia.dao;
 import com.datafascia.accumulo.AccumuloConfiguration;
 import com.datafascia.accumulo.AccumuloImport;
 import com.datafascia.accumulo.AccumuloModule;
+import com.datafascia.accumulo.AuthorizationsProvider;
 import com.datafascia.accumulo.QueryTemplate;
+import com.datafascia.accumulo.SubjectAuthorizationsProvider;
 import com.datafascia.common.shiro.FakeRealm;
 import com.datafascia.common.shiro.RoleExposingRealm;
 import com.google.common.io.Files;
@@ -49,13 +51,16 @@ public abstract class DaoIT {
     // Delay to allow time for Accumulo mini-cluster to start.
     TimeUnit.SECONDS.sleep(3);
 
-    Injector injector = Guice.createInjector(new AbstractModule() {
-      @Override
-      protected void configure() {
-        bind(AccumuloConfiguration.class).toInstance(config);
-        bind(RoleExposingRealm.class).to(FakeRealm.class);
-      }
-    }, new AccumuloModule());
+    Injector injector = Guice.createInjector(
+        new AbstractModule() {
+          @Override
+          protected void configure() {
+            bind(AccumuloConfiguration.class).toInstance(config);
+            bind(AuthorizationsProvider.class).to(SubjectAuthorizationsProvider.class);
+            bind(RoleExposingRealm.class).to(FakeRealm.class);
+          }
+        },
+        new AccumuloModule());
 
     connect = injector.getInstance(Connector.class);
     queryTemplate = injector.getInstance(QueryTemplate.class);

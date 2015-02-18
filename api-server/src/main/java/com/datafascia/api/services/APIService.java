@@ -5,6 +5,8 @@ package com.datafascia.api.services;
 import com.codahale.metrics.MetricRegistry;
 import com.datafascia.accumulo.AccumuloConfiguration;
 import com.datafascia.accumulo.AccumuloModule;
+import com.datafascia.accumulo.AuthorizationsProvider;
+import com.datafascia.accumulo.SubjectAuthorizationsProvider;
 import com.datafascia.api.bundle.AtmosphereBundle;
 import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.api.health.AccumuloHealthCheck;
@@ -104,6 +106,7 @@ public class APIService extends Application<APIConfiguration> {
           protected void configure() {
             bind(APIConfiguration.class).toInstance(config);
             bind(AccumuloConfiguration.class).toInstance(config.getAccumuloConfiguration());
+            bind(AuthorizationsProvider.class).to(SubjectAuthorizationsProvider.class);
             bind(KafkaConfig.class).toInstance(config.getKafkaConfig());
             bind(MetricRegistry.class).toInstance(environment.metrics());
             bind(Realm.class).toInstance(realm);

@@ -5,6 +5,8 @@ package com.datafascia.api.services;
 import com.datafascia.accumulo.AccumuloConfiguration;
 import com.datafascia.accumulo.AccumuloImport;
 import com.datafascia.accumulo.AccumuloModule;
+import com.datafascia.accumulo.AuthorizationsProvider;
+import com.datafascia.accumulo.SubjectAuthorizationsProvider;
 import com.datafascia.api.client.DatafasciaApi;
 import com.datafascia.api.client.DatafasciaApiBuilder;
 import com.datafascia.api.configurations.APIConfiguration;
@@ -185,15 +187,18 @@ public class ApiIT {
   }
 
   /**
-   * Set up guice modules
+   * Set up Guice modules
    */
   private void setupGuice() {
-    injector = Guice.createInjector(new AbstractModule() {
-      @Override
-      protected void configure() {
-        bind(AccumuloConfiguration.class).toInstance(accumuloConfig());
-        bind(RoleExposingRealm.class).to(FakeRealm.class);
-      }
-    }, new AccumuloModule());
+    injector = Guice.createInjector(
+        new AbstractModule() {
+          @Override
+          protected void configure() {
+            bind(AccumuloConfiguration.class).toInstance(accumuloConfig());
+            bind(AuthorizationsProvider.class).to(SubjectAuthorizationsProvider.class);
+            bind(RoleExposingRealm.class).to(FakeRealm.class);
+          }
+        },
+        new AccumuloModule());
   }
 }

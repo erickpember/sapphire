@@ -1,0 +1,15 @@
+---
+HL7MessageToEventTopology:
+  parallelism:
+    hl7MessageSpout: 1
+    DeserializeMessage: 1
+    SaveMessage: 1
+
+accumulo:
+  instance: operational
+  zooKeepers: devbox
+  user: root
+  password: secret
+
+hl7MessageQueue:
+  topic: hl7Message

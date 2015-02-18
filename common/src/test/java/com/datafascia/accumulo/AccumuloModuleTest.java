@@ -18,6 +18,8 @@ import static org.testng.Assert.assertNotNull;
  */
 @Slf4j
 public class AccumuloModuleTest {
+  private static final String USER = "root";
+  private static final String PASSWORD = "secret";
 
   private Injector injector;
 
@@ -34,8 +36,8 @@ public class AccumuloModuleTest {
             return AccumuloConfiguration.builder()
                 .instance(ConnectorFactory.MOCK_INSTANCE)
                 .zooKeepers("zookeeper1.datafascia.com")
-                .user(AccumuloConfiguration.TESTING_USER)
-                .password(AccumuloConfiguration.TESTING_PASSWORD)
+                .user(USER)
+                .password(PASSWORD)
                 .build();
           }
         },

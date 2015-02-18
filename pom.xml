@@ -30,7 +30,7 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
-    <accumulo.version>1.5.1</accumulo.version>
+    <accumulo.version>1.6.2</accumulo.version>
     <atmosphere.version>2.2.0</atmosphere.version>
     <dropwizard-testing.version>0.0.8</dropwizard-testing.version>
     <dropwizard.version>0.8.0-rc1</dropwizard.version>
@@ -55,7 +55,6 @@
   </properties>
 
   <modules>
-    <module>accumulo</module>
     <module>api-client</module>
     <module>api-server</module>
     <module>build-tools</module>
@@ -159,6 +158,24 @@
         <groupId>org.apache.accumulo</groupId>
         <artifactId>accumulo-minicluster</artifactId>
         <version>${accumulo.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-core</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-json</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-server</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-log4j12</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <dependency>

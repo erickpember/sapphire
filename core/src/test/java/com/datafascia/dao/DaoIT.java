@@ -17,6 +17,8 @@ import java.io.File;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.Connector;
+import org.apache.accumulo.core.client.Instance;
+import org.apache.accumulo.minicluster.MiniAccumuloInstance;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.mgt.RealmSecurityManager;
@@ -37,8 +39,7 @@ public abstract class DaoIT {
 
   private static String OPAL_TABLE = "opal_dF_data";
 
-  private static AccumuloConfiguration config =
-      new AccumuloConfiguration(System.getProperty("accumuloConfig"));
+  private static AccumuloConfiguration config = accumuloConfig();
   protected static Connector connect;
   protected static QueryTemplate queryTemplate;
   private static ThreadState threadState;
@@ -79,5 +80,26 @@ public abstract class DaoIT {
   @AfterSuite
   public void afterSuite() throws Exception {
     threadState.clear();
+  }
+
+  /**
+   * Get the configuration associated with the mini-cluster
+   */
+  private static AccumuloConfiguration accumuloConfig() {
+    try {
+      // Keep the values here in sync with what is in the pom.xml
+      String instanceName = "plugin-it-instance";
+      Instance instance = new MiniAccumuloInstance(instanceName,
+          new File("target/accumulo-maven-plugin/" + instanceName));
+      AccumuloConfiguration accConfig = new AccumuloConfiguration();
+      accConfig.setInstance(instanceName);
+      accConfig.setZooKeepers(instance.getZooKeepers());
+      accConfig.setUser("root");
+      accConfig.setPassword("supersecret");
+
+      return accConfig;
+    } catch (Exception e) {
+      throw new RuntimeException("Error getting mini-cluster configuration", e);
+    }
   }
 }

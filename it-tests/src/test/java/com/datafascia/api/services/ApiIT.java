@@ -22,13 +22,14 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import java.io.File;
 import java.io.FileWriter;
-import java.io.IOException;
 import java.net.URI;
 import java.text.SimpleDateFormat;
 import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.Connector;
+import org.apache.accumulo.core.client.Instance;
+import org.apache.accumulo.minicluster.MiniAccumuloInstance;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.config.IniSecurityManagerFactory;
 import org.apache.shiro.mgt.RealmSecurityManager;
@@ -71,6 +72,7 @@ public class ApiIT {
 
     dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
+    String configFile = apiConfiguration();
     setupGuice();
     setupShiro();
     connect = injector.getInstance(Connector.class);
@@ -78,7 +80,7 @@ public class ApiIT {
     log.info("Accumulo populated and ready.");
 
     log.info("Starting dropwizard app");
-    app = new DropwizardTestApp<>(APIService.class, apiConfiguration());
+    app = new DropwizardTestApp<>(APIService.class, configFile);
     app.start();
 
     api = DatafasciaApiBuilder.endpoint(
@@ -101,8 +103,19 @@ public class ApiIT {
    */
   private AccumuloConfiguration accumuloConfig() {
     if (accConfig == null) {
-      // Passed via system property
-      accConfig = new AccumuloConfiguration(System.getProperty("accumuloConfig"));
+      // Keep the values here in sync with what is in the pom.xml
+      String instanceName = "plugin-it-instance";
+      try {
+        Instance instance = new MiniAccumuloInstance(instanceName,
+            new File("target/accumulo-maven-plugin/" + instanceName));
+        accConfig = new AccumuloConfiguration();
+        accConfig.setInstance(instanceName);
+        accConfig.setZooKeepers(instance.getZooKeepers());
+        accConfig.setUser("root");
+        accConfig.setPassword("supersecret");
+      } catch (Exception e) {
+        throw new RuntimeException("Error get Accumulo instance.", e);
+      }
     }
 
     return accConfig;
@@ -124,9 +137,9 @@ public class ApiIT {
   /**
    * @return the API configuration to use as a file
    *
-   * @throws IOException error creating API configuration file
+   * @throws Exception should not happen
    */
-  private String apiConfiguration() throws IOException {
+  private String apiConfiguration() throws Exception {
     ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
     ObjectNode node = mapper.createObjectNode();
     node.putPOJO("accumulo", accumuloConfig());
@@ -180,6 +193,7 @@ public class ApiIT {
       protected void configure() {
         bind(AccumuloConfiguration.class).toInstance(accumuloConfig());
         bind(RoleExposingRealm.class).to(FakeRealm.class);
-      }}, new AccumuloModule());
+      }
+    }, new AccumuloModule());
   }
 }

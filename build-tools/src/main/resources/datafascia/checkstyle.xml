@@ -91,6 +91,9 @@
       <property name="scope" value="public"/>
     </module>
 
+    <!-- Java style array declaration -->
+    <module name="ArrayTypeStyle"/>
+
     <!-- Checks correct indentation of Java Code. -->
     <module name="Indentation">
       <property name="basicOffset" value="2"/>

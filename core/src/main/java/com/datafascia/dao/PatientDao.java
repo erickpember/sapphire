@@ -108,7 +108,7 @@ public class PatientDao extends OpalDao {
 
     @Override
     public void onBeginRow(Key key) {
-      String str[] = splitKey(key.getRow().toString());
+      String[] str = splitKey(key.getRow().toString());
       if (str.length == 3) {
         patientId = str[2];
       } else {
@@ -202,7 +202,7 @@ public class PatientDao extends OpalDao {
       for (Entry<Key, Value> entry : scanner) {
         Value value = entry.getValue();
 
-        String colfStr[] = splitKey(entry.getKey().getColumnFamily().toString());
+        String[] colfStr = splitKey(entry.getKey().getColumnFamily().toString());
         VisitMapColFamily colFam = Enums.getIfPresent(VisitMapColFamily.class,
             colfStr[1].trim()).or(VisitMapColFamily.df_IGNORE);
         switch (colFam) {
@@ -226,7 +226,7 @@ public class PatientDao extends OpalDao {
             patient.setRace(race);
             break;
           case dF_pidPatientId :
-            String fields[] = visitId.get().split("\\|");
+            String[] fields = visitId.get().split("\\|");
             patient.setInstitutionPatientId(URNFactory.institutionPatientId(fields[0].trim(),
                 fields[1].trim(), decodeString(value)));
             break;

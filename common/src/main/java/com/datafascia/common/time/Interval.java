@@ -6,7 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
- * Range of time in the open interval [startInclusive, endExclusive).  That is, instants must be
+ * Range of time in the open interval [startInclusive, endExclusive). That is, instants must be
  * before the upper bound endpoint.
  *
  * @param <T> instant type

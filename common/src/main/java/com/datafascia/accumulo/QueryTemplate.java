@@ -62,7 +62,7 @@ public class QueryTemplate {
   }
 
   /**
-   * Reads entries from row into an object.  Also closes scanner.
+   * Reads entries from row into an object. Also closes scanner.
    *
    * @param scanner
    *     scanner to read from
@@ -84,7 +84,7 @@ public class QueryTemplate {
   }
 
   /**
-   * Reads entries from rows into a list of objects.  Also closes scanner.
+   * Reads entries from rows into a list of objects. Also closes scanner.
    *
    * @param scanner
    *     scanner to read from

@@ -25,7 +25,7 @@ public abstract class ConfigureModule extends AbstractModule {
   }
 
   /**
-   * Subclasses may override this method to customize this module.  The default
+   * Subclasses may override this method to customize this module. The default
    * implementation does nothing.
    */
   protected void onConfigure() {

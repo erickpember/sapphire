@@ -41,7 +41,7 @@ public class ObservationResource {
 
   /**
    * Finds observations for the patient, optionally filtered to capture times in the open interval
-   * [startCaptureTime, endCaptureTime).  That is, each found item must have a time less than the
+   * [startCaptureTime, endCaptureTime). That is, each found item must have a time less than the
    * upper bound endpoint.
    *
    * @param patientId

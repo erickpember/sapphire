@@ -17,8 +17,9 @@ import org.atmosphere.util.IOUtils;
 /**
  * Example resource to show integration of Atmosphere within Dropwizard.
  */
-@Slf4j @ManagedService( path = "/websocket/test",
-        interceptors = AtmosphereResourceLifecycleInterceptor.class)
+@Slf4j
+@ManagedService(path = "/websocket/test",
+    interceptors = AtmosphereResourceLifecycleInterceptor.class)
 public final class SocketResource {
   private KafkaConfig config;
 

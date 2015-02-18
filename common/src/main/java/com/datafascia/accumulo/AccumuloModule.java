@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.Connector;
 
 /**
- * Guice module that provides the Accumulo connector needed by applications.  The Accumulo
+ * Guice module that provides the Accumulo connector needed by applications. The Accumulo
  * configuration parameters are injected into this module.
  */
 @Slf4j

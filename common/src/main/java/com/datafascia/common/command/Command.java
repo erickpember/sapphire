@@ -3,7 +3,7 @@
 package com.datafascia.common.command;
 
 /**
- * Command invoked from command line.  Implementation classes must be annotated with
+ * Command invoked from command line. Implementation classes must be annotated with
  * {@link com.beust.jcommander.Parameters} and have fields annotated with
  * {@link com.beust.jcommander.Parameter}.
  */

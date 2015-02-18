@@ -9,12 +9,12 @@ storm.zookeeper.servers:
 storm.zookeeper.root: "/storm{{ storm_cluster_id }}"
 
 nimbus.host: {{ storm_nimbus_host }}
-nimbus.childopts: "-Xmx1024m {{ storm_java_opts }} -Xloggc:{{ storm_logs_dir }}/gc-nimbus.log"
+nimbus.childopts: "-Xmx1g {{ storm_java_opts }} -Xloggc:{{ storm_logs_dir }}/gc-nimbus.log"
 
 ui.childopts: "-Xmx768m {{ storm_java_opts }} -Xloggc:{{ storm_logs_dir }}/gc-ui.log"
 
 supervisor.childopts: "-Xmx256m {{ storm_java_opts }} -Xloggc:{{ storm_logs_dir }}/gc-supervisor.log"
-worker.childopts: "-Xms6g -Xmx6g -XX:NewSize=1g -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=75 {{ storm_java_opts }} -Xloggc:{{ storm_logs_dir }}/gc-worker.log"
+worker.childopts: "-Xmx1g -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=75 {{ storm_java_opts }} -Xloggc:{{ storm_logs_dir }}/gc-worker.log"
 
 supervisor.slots.ports:
 {% for port in storm_supervisor_slots_ports %}

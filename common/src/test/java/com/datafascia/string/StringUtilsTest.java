@@ -3,7 +3,7 @@
 package com.datafascia.string;
 
 import java.io.UnsupportedEncodingException;
-import org.apache.commons.codec.binary.Base64;
+import java.util.Base64;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -63,8 +63,8 @@ public class StringUtilsTest {
     assertEquals(StringUtils.base64Encode(PLAINTEXT1), ENCODED1);
     assertEquals(StringUtils.base64Encode(PLAINTEXT2), ENCODED2);
     try {
-      assertEquals(new String(Base64.decodeBase64(StringUtils.base64Encode(PLAINTEXT3)), "UTF-8"),
-          PLAINTEXT3);
+      assertEquals(new String(Base64.getDecoder().decode(StringUtils.base64Encode(PLAINTEXT3)),
+          "UTF-8"), PLAINTEXT3);
     } catch (UnsupportedEncodingException ex) {
       throw new RuntimeException(ex);
     }

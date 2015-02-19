@@ -219,8 +219,11 @@ public class EmergeDemographicCSVGenerator {
   @SuppressWarnings("serial")
   private static class MissingUrnException extends Exception {
 
-    public MissingUrnException(String message) {
+    MissingUrnException(String message) {
       super(message);
     }
+  }
+
+  private EmergeDemographicCSVGenerator() {
   }
 }

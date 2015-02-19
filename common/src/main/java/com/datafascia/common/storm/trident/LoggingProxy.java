@@ -27,7 +27,7 @@ public class LoggingProxy {
     protected Operation delegate;
     private transient String topologyName;
 
-    public LoggingOperation(Operation delegate) {
+    LoggingOperation(Operation delegate) {
       this.delegate = delegate;
     }
 
@@ -56,7 +56,7 @@ public class LoggingProxy {
   }
 
   private static class LoggingFilter extends LoggingOperation implements Filter {
-    public LoggingFilter(Filter delegate) {
+    LoggingFilter(Filter delegate) {
       super(delegate);
     }
 
@@ -72,7 +72,7 @@ public class LoggingProxy {
   }
 
   private static class LoggingFunction extends LoggingOperation implements Function {
-    public LoggingFunction(Function delegate) {
+    LoggingFunction(Function delegate) {
       super(delegate);
     }
 
@@ -96,7 +96,7 @@ public class LoggingProxy {
      * @param delegate
      *     query function to delegate to
      */
-    public LoggingQueryFunction(QueryFunction<S, T> delegate) {
+    LoggingQueryFunction(QueryFunction<S, T> delegate) {
       super(delegate);
     }
 

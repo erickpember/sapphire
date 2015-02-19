@@ -68,7 +68,7 @@ public abstract class BaseTridentTopology {
    * @return comma separated list of host:port
    */
   protected String getZooKeepers() {
-    Map<String, Object> config = (Map<String, Object>) Utils.readStormConfig();
+    Map<String, Object> config = Utils.readStormConfig();
     List<String> zooKeeperServers = (List<String>) config.get(Config.STORM_ZOOKEEPER_SERVERS);
     int zooKeeperPort = ((Number) config.get(Config.STORM_ZOOKEEPER_PORT)).intValue();
 

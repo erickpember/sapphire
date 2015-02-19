@@ -24,7 +24,7 @@ public class DependencyInjectingProxy {
   private static abstract class DependencyInjectingOperation implements Operation {
     protected Operation delegate;
 
-    public DependencyInjectingOperation(Operation delegate) {
+    DependencyInjectingOperation(Operation delegate) {
       this.delegate = delegate;
     }
 
@@ -43,7 +43,7 @@ public class DependencyInjectingProxy {
   private static class DependencyInjectingFilter
       extends DependencyInjectingOperation implements Filter {
 
-    public DependencyInjectingFilter(Filter delegate) {
+    DependencyInjectingFilter(Filter delegate) {
       super(delegate);
     }
 
@@ -56,7 +56,7 @@ public class DependencyInjectingProxy {
   private static class DependencyInjectingFunction
       extends DependencyInjectingOperation implements Function {
 
-    public DependencyInjectingFunction(Function delegate) {
+    DependencyInjectingFunction(Function delegate) {
       super(delegate);
     }
 
@@ -69,7 +69,7 @@ public class DependencyInjectingProxy {
   private static class DependencyInjectingQueryFunction<S extends State, T>
       extends DependencyInjectingOperation implements QueryFunction<S, T> {
 
-    public DependencyInjectingQueryFunction(QueryFunction<S, T> delegate) {
+    DependencyInjectingQueryFunction(QueryFunction<S, T> delegate) {
       super(delegate);
     }
 

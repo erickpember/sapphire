@@ -15,7 +15,7 @@ import org.apache.commons.configuration.HierarchicalConfiguration;
 @AllArgsConstructor
 public class ConfigurationNodeTypeListener implements TypeListener {
 
-  private HierarchicalConfiguration rootConfiguration;
+  private final HierarchicalConfiguration rootConfiguration;
 
   @Override
   public <T> void hear(TypeLiteral<T> typeLiteral, TypeEncounter<T> typeEncounter) {

@@ -12,7 +12,7 @@ import org.apache.accumulo.core.security.Authorizations;
  */
 public class SubjectAuthorizationsProvider implements AuthorizationsProvider {
 
-  private RoleExposingRealm realm;
+  private final RoleExposingRealm realm;
 
   /**
    * Constructor

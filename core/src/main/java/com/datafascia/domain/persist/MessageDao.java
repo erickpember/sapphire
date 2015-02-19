@@ -44,7 +44,7 @@ public class MessageDao {
   private static final MessageRowMapper MESSAGE_ROW_MAPPER = new MessageRowMapper();
 
   private BatchWriter writer;
-  private QueryTemplate queryTemplate;
+  private final QueryTemplate queryTemplate;
 
   /**
    * Constructor

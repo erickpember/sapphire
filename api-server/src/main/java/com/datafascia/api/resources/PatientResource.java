@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j @Path("/patient") @Produces(MediaType.APPLICATION_JSON)
 public class PatientResource {
 
-  private PatientDao patientDao;
+  private final PatientDao patientDao;
 
   /**
    * Construct resource with the relevant data access object

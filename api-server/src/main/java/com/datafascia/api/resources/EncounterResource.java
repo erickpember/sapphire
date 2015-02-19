@@ -23,8 +23,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j @Path("/encounter") @Produces(MediaType.APPLICATION_JSON)
 public class EncounterResource {
 
-  private PatientDao patientDao;
-  private EncounterDao encounterDao;
+  private final PatientDao patientDao;
+  private final EncounterDao encounterDao;
 
   /**
    * Construct resource with associated data access objects

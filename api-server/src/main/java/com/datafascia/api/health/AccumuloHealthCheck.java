@@ -32,7 +32,7 @@ public class AccumuloHealthCheck extends HealthCheck {
     InstanceOperations ops = connect.instanceOperations();
     List<String> tServers = ops.getTabletServers();
 
-    if (tServers.size() == 0) {
+    if (tServers.isEmpty()) {
       return Result.unhealthy("Accumulo connection shaky or running mock instance.");
     }
 

@@ -20,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 public class FileResponse implements StreamingOutput {
   private static final ObjectMapper mapper = Jackson.newObjectMapper();
 
-  private URL resource;
+  private final URL resource;
 
   /**
    * Construct class using passed resource URL

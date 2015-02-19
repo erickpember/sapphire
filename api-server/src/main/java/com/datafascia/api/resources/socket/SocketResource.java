@@ -21,7 +21,7 @@ import org.atmosphere.util.IOUtils;
 @ManagedService(path = "/websocket/test",
     interceptors = AtmosphereResourceLifecycleInterceptor.class)
 public final class SocketResource {
-  private KafkaConfig config;
+  private final KafkaConfig config;
 
   /**
    * Construct the resource

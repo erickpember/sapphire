@@ -27,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Path("/observation") @Produces(MediaType.APPLICATION_JSON) @Slf4j
 public class ObservationResource {
 
-  private FindObservationsCoordinator findObservationsCoordinator;
+  private final FindObservationsCoordinator findObservationsCoordinator;
 
   /**
    * Construct resource with associated finder

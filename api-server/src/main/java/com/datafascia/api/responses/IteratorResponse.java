@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 public class IteratorResponse<T> implements StreamingOutput {
   private static final ObjectMapper mapper = Jackson.newObjectMapper();
 
-  private Iterator<T> iter;
+  private final Iterator<T> iter;
 
   /**
    * Construct class using passed iterator

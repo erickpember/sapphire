@@ -1,15 +1,15 @@
 // Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.dao;
+package com.datafascia.domain.persist;
 
 /**
- * PatientObject field constants
+ * PatientVisitMap field constants
  */
-public class PatientFields {
+public class VisitFields {
 
-  public static final String VISIT_OIIDS = "VisitOiids";
+  public static final String UPDATE_OIIDS = "UpdateOiids";
 
   // Private constructor disallows creating instances of this class
-  private PatientFields() {
+  private VisitFields() {
   }
 }

@@ -4,7 +4,7 @@ package com.datafascia.api.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.datafascia.api.responses.IteratorResponse;
-import com.datafascia.dao.PatientDao;
+import com.datafascia.domain.persist.PatientDao;
 import com.datafascia.models.Patient;
 import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;

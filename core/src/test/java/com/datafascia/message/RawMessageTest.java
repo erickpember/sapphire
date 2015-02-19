@@ -36,11 +36,12 @@ public class RawMessageTest {
   public void encodeTest() throws Exception {
     ObjectMapper objectMapper = new ObjectMapper();
     String json = objectMapper.writeValueAsString(message);
-    assertEquals("{\"@type\":\"urn:df-model-1:RawMessage\",\"timestamp\":\"1970-04-29T10:56:07Z\"" +
+    assertEquals(json,
+        "{\"@type\":\"urn:df-model-1:RawMessage\",\"timestamp\":\"1970-04-29T10:56:07.000Z\"" +
         ",\"institution\":\"urn:df-institution-1:ucsf\"," +
         "\"facility\":\"urn:df-facility-1:parnassus\",\"department\":\"urn:df-icu-1:icu\"," +
         "\"source\":\"urn:df-source-1:bed1\",\"payloadType\":\"urn:df-payload-1:hl7\"" +
-        ",\"payload\":\"XXXXXXXXXXXXXXXXXXXXX\"}", json);
+        ",\"payload\":\"XXXXXXXXXXXXXXXXXXXXX\"}");
   }
 
   @Test

@@ -2,22 +2,23 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.jackson;
 
+import com.datafascia.common.time.InstantFormatter;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import java.io.IOException;
 import java.time.Instant;
-import lombok.extern.slf4j.Slf4j;
 
 /**
- * Serializer for new time in Java
+ * Serializer for Java {@link Instant}
  */
-@Slf4j
 public class InstantSerializer extends JsonSerializer<Instant> {
+
   @Override
   public void serialize(Instant value, JsonGenerator jgen, SerializerProvider provider)
       throws IOException, JsonProcessingException {
-    jgen.writeString(value.toString());
+
+    jgen.writeString(InstantFormatter.ISO_INSTANT_MILLI.format(value));
   }
 }

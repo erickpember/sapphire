@@ -3,6 +3,7 @@
 package com.datafascia.message;
 
 import com.datafascia.common.persist.Id;
+import com.datafascia.common.time.InstantFormatter;
 import com.datafascia.jackson.InstantDeserializer;
 import com.datafascia.jackson.InstantSerializer;
 import com.datafascia.urn.URNFactory;
@@ -68,7 +69,7 @@ public class RawMessage {
   @JsonIgnore
   public Id<RawMessage> getId() {
     String id =
-        getTimestamp().toString() + '|' +
+        InstantFormatter.ISO_INSTANT_MILLI.format(timestamp) + '|' +
         Hashing.sha1().hashString(toString(), StandardCharsets.UTF_8).toString();
     return Id.of(id);
   }

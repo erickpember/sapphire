@@ -13,8 +13,8 @@ import io.dropwizard.setup.Environment;
 import javax.annotation.Nullable;
 import lombok.extern.slf4j.Slf4j;
 import net.sourceforge.argparse4j.inf.Namespace;
+import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
 
 /**
  * A containter for starting and stopping your application at the start and end of a test class.
@@ -123,14 +123,14 @@ public class DropwizardTestApp<C extends Configuration> {
    * @return the port for the server
    */
   public int getLocalPort() {
-    return ((ServerConnector) jetty.getConnectors()[0]).getLocalPort();
+    return ((NetworkConnector) jetty.getConnectors()[0]).getLocalPort();
   }
 
   /**
    * @return the administrative port for the server
    */
   public int getAdminPort() {
-    return ((ServerConnector) jetty.getConnectors()[1]).getLocalPort();
+    return ((NetworkConnector) jetty.getConnectors()[1]).getLocalPort();
   }
 
   /**

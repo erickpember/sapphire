@@ -81,10 +81,6 @@
       <groupId>org.apache.storm</groupId>
       <artifactId>storm-core</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.apache.storm</groupId>
-      <artifactId>storm-kafka</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>org.projectlombok</groupId>

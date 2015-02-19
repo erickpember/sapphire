@@ -49,4 +49,7 @@ public class DatafasciaApiBuilder {
       }
     });
   }
+
+  private DatafasciaApiBuilder() {
+  }
 }

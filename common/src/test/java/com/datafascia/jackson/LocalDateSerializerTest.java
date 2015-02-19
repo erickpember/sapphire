@@ -2,8 +2,9 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.jackson;
 
-import com.datafascia.common.persist.Id;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import java.time.LocalDate;
+import java.time.Month;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -11,14 +12,14 @@ import static org.testng.Assert.assertEquals;
 /**
  * {@link IdSerializer} test
  */
-public class IdSerializerTest extends IdBaseTest {
+public class LocalDateSerializerTest extends LocalDateBaseTest {
   @Test
-  public void should_serialize_id() throws Exception {
+  public void should_serialize_birthDate() throws Exception {
     ObjectMapper objectMapper = new ObjectMapper();
-    Observation observ = new Observation();
-    observ.setId(Id.of("1"));
+    Person person = new Person();
+    person.setBirthDate(LocalDate.of(2009, Month.DECEMBER, 31));
 
-    String json = objectMapper.writeValueAsString(observ);
-    assertEquals(json, "{\"@id\":\"urn:test-IdBaseTest:1\"}");
+    String json = objectMapper.writeValueAsString(person);
+    assertEquals(json, "{\"birthDate\":\"20091231\"}");
   }
 }

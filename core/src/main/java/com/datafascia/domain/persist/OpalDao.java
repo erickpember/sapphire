@@ -7,7 +7,7 @@ import com.datafascia.accumulo.QueryTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -181,11 +181,11 @@ public class OpalDao {
    *     to convert
    * @return converted value
    */
-  protected static Date decodeDate(Value value) {
+  protected static Instant decodeDate(Value value) {
     String json = decodeJson(value);
     try {
       long millis = OBJECT_MAPPER.readValue(json, Long.class);
-      return new Date(millis);
+      return Instant.ofEpochMilli(millis);
     } catch (IOException e) {
       throw new IllegalStateException(String.format("Cannot convert JSON [%s]", json), e);
     }

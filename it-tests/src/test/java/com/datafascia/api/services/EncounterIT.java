@@ -5,7 +5,9 @@ package com.datafascia.api.services;
 import com.datafascia.models.Encounter;
 import com.datafascia.models.Observation;
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
@@ -27,23 +29,24 @@ public class EncounterIT extends ApiIT {
     // Test direct encounter query.
     validateEncounter(api.encounter("UCSF |  | 039ae46a-20a1-4bcd-abb9-68e38d4222c0"),
         new BigDecimal("4.3"), "kg", new BigDecimal("20.98"), "in",
-        dateFormat.parse("2014-11-19T10:00:00Z"));
+        LocalDateTime.parse("2014-11-19T10:00:00Z", dateFormat).toInstant(ZoneOffset.UTC));
 
     validateEncounter(api.encounter("UCSF |  | 0728eb62-2f16-484f-8628-a320e99c635d"),
         new BigDecimal("72.576"), "kg", new BigDecimal("62.99"), "in",
-        dateFormat.parse("2014-11-24T11:39:07Z"));
+        LocalDateTime.parse("2014-11-24T11:39:07Z", dateFormat).toInstant(ZoneOffset.UTC));
 
     // Test getting the last encounter for a patient.
     validateEncounter(api.lastvisit("97540012"),
         new BigDecimal("4.99"), "kg", new BigDecimal("23"), "in",
-        dateFormat.parse("2014-08-04T10:51:00Z"));
+        LocalDateTime.parse("2014-08-04T10:51:00Z", dateFormat).toInstant(ZoneOffset.UTC));
   }
 
   /**
    * Validate an encounter against expected values.
+   * @param admitDate admit date+time for encounter
    */
   public void validateEncounter(Encounter enco, BigDecimal weight, String weightUnits,
-      BigDecimal height, String heightUnits, Date admitDate) {
+      BigDecimal height, String heightUnits, Instant admitDate) {
     boolean foundHeight = false;
     boolean foundWeight = false;
 

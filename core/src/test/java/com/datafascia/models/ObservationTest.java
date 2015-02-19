@@ -24,7 +24,7 @@ public class ObservationTest extends ModelTestBase {
     assertEquals(decoded.getInterpretation(), ObservationInterpretation.A);
     assertEquals(decoded.getComments(), "The patient is alive.");
     assertEquals(decoded.getApplies(), TestModels.period);
-    assertEquals(decoded.getIssued(), TestModels.getDate());
+    assertEquals(decoded.getIssued(), TestModels.getDateTime());
     assertEquals(decoded.getStatus(), ObservationStatus.Final);
     assertEquals(decoded.getReliability(), ObservationReliability.Ok);
     assertEquals(decoded.getSite(), TestModels.codeable);

@@ -25,8 +25,7 @@ import com.google.inject.Injector;
 import java.io.File;
 import java.io.FileWriter;
 import java.net.URI;
-import java.text.SimpleDateFormat;
-import java.util.TimeZone;
+import java.time.format.DateTimeFormatter;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.Connector;
@@ -51,8 +50,8 @@ import org.testng.annotations.BeforeSuite;
 public class ApiIT {
   protected static final String MODELS_PKG = "com.datafascia.models";
   protected static final String OPAL_TABLE = "opal_dF_data";
-  protected static final SimpleDateFormat dateFormat
-      = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
+  protected static final DateTimeFormatter dateFormat
+      = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
   protected static AccumuloConfiguration accConfig;
   protected static KafkaConfig kafkaConfig;
@@ -71,8 +70,6 @@ public class ApiIT {
   public void before() throws Exception {
     // Delay to allow time for Accumulo mini-cluster to start.
     TimeUnit.SECONDS.sleep(3);
-
-    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
 
     String configFile = apiConfiguration();
     setupGuice();

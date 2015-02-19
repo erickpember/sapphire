@@ -16,8 +16,8 @@ public class PeriodTest extends ModelTestBase {
   @Test
   public <T extends Object> void testPeriod() throws IOException, URISyntaxException {
     Period decoded = (Period) geneticEncodeDecodeTest(TestModels.period);
-    assertEquals(decoded.getStart(), TestModels.getDate());
-    assertEquals(decoded.getStop(), TestModels.getDate());
+    assertEquals(decoded.getStart(), TestModels.getDateTime());
+    assertEquals(decoded.getStop(), TestModels.getDateTime());
   }
 
   @Test

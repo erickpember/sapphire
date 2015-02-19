@@ -12,8 +12,9 @@ import com.datafascia.models.Patient;
 import com.datafascia.models.Race;
 import com.datafascia.urn.URNFactory;
 import com.google.common.base.Enums;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -56,8 +57,6 @@ import org.apache.hadoop.io.Text;
  */
 @Slf4j
 public class PatientDao extends OpalDao {
-  private static final SimpleDateFormat dateOfBirthFormat = new SimpleDateFormat("yyyyMMdd");
-
   /** patient present column family */
   private static final Text PATIENT_PRESENT = toColumnFamily(FieldType.BOOLEAN, "PatientPresent");
 
@@ -189,22 +188,22 @@ public class PatientDao extends OpalDao {
       return Optional.empty();
     }
 
-    try {
-      Scanner scanner = getScanner();
-      scanner.setRange(toRange(Kinds.PATIENT_VISIT_MAP, visitId.get()));
+    Scanner scanner = getScanner();
+    scanner.setRange(toRange(Kinds.PATIENT_VISIT_MAP, visitId.get()));
 
-      Patient patient = new Patient();
-      patient.setId(Id.of(patientId));
-      patient.setGender(Gender.Unknown);
-      patient.setRace(Race.Unknown);
-      Name name = new Name();
+    Patient patient = new Patient();
+    patient.setId(Id.of(patientId));
+    patient.setGender(Gender.Unknown);
+    patient.setRace(Race.Unknown);
+    Name name = new Name();
 
-      for (Entry<Key, Value> entry : scanner) {
-        Value value = entry.getValue();
+    for (Entry<Key, Value> entry : scanner) {
+      Value value = entry.getValue();
 
-        String[] colfStr = splitKey(entry.getKey().getColumnFamily().toString());
-        VisitMapColFamily colFam = Enums.getIfPresent(VisitMapColFamily.class,
-            colfStr[1].trim()).or(VisitMapColFamily.df_IGNORE);
+      String[] colfStr = splitKey(entry.getKey().getColumnFamily().toString());
+      VisitMapColFamily colFam = Enums.getIfPresent(VisitMapColFamily.class,
+          colfStr[1].trim()).or(VisitMapColFamily.df_IGNORE);
+      try {
         switch (colFam) {
           case dF_pidGivenName :
             name.setFirst(decodeString(value));
@@ -231,19 +230,19 @@ public class PatientDao extends OpalDao {
                 fields[1].trim(), decodeString(value)));
             break;
           case dF_pidDateTimeOfBirth :
-            patient.setBirthDate(dateOfBirthFormat.parse(decodeString(value)));
+            patient.setBirthDate(LocalDate.parse(decodeString(value),
+                DateTimeFormatter.BASIC_ISO_DATE));
             break;
           default :
             break;
         }
+        patient.setName(name);
+
+        return Optional.of(patient);
+      } catch (DateTimeParseException e) {
+        log.error("Error building patient object", e);
       }
-      patient.setName(name);
-
-      return Optional.of(patient);
-    } catch (ParseException e) {
-      log.error("Error building patient object", e);
     }
-
     return Optional.empty();
   }
 }

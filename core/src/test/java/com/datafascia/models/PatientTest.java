@@ -31,7 +31,7 @@ public class PatientTest extends ModelTestBase {
         Arrays.asList(TestModels.caregiver, TestModels.caregiver));
     assertEquals(decoded.getContactDetails(), Arrays.asList(TestModels.contact,
         TestModels.contact));
-    assertEquals(decoded.getCreationDate(), TestModels.getDate());
+    assertEquals(decoded.getCreationDate(), TestModels.getDateTime());
     assertEquals(decoded.isDeceased(), false);
     assertEquals(decoded.getId(), Id.of("1234"));
     assertEquals(decoded.getLangs(), Arrays.asList(LanguageCode.en, LanguageCode.ch));

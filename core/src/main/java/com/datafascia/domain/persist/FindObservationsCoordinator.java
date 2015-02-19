@@ -7,7 +7,6 @@ import com.datafascia.models.Observation;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -51,11 +50,11 @@ public class FindObservationsCoordinator {
    */
   public Collection<Observation> findObservationsByPatientId(
       String patientId, Optional<Interval<Instant>> captureTimeInterval) {
-    Date startIssued = null;
-    Date endIssued = null;
+    Instant startIssued = null;
+    Instant endIssued = null;
     if (captureTimeInterval.isPresent()) {
-      startIssued = Date.from(captureTimeInterval.get().getStartInclusive());
-      endIssued = Date.from(captureTimeInterval.get().getEndExclusive());
+      startIssued = Instant.from(captureTimeInterval.get().getStartInclusive());
+      endIssued = Instant.from(captureTimeInterval.get().getEndExclusive());
     }
 
     Collection<Observation> foundObservations = new ArrayList<>();
@@ -66,9 +65,9 @@ public class FindObservationsCoordinator {
         List<Observation> candidateObservations =
             observationDao.findObservations(updateId);
         for (Observation observation : candidateObservations) {
-          if (startIssued != null &&
-              (observation.getIssued().before(startIssued) ||
-               !observation.getIssued().before(endIssued))) {
+          if (startIssued != null
+              && (observation.getIssued().isBefore(startIssued)
+              || !observation.getIssued().isBefore(endIssued))) {
             continue;
           }
           foundObservations.add(observation);

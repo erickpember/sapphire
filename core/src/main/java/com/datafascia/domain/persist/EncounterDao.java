@@ -11,12 +11,14 @@ import com.datafascia.models.ObservationValue;
 import com.datafascia.models.Period;
 import com.datafascia.models.Quantity;
 import java.math.BigDecimal;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -52,7 +54,7 @@ public class EncounterDao extends OpalDao {
   public Encounter getEncounter(String id) {
     Encounter encounter = new Encounter();
 
-    Optional<Date> odate = getAdmissionDate(id);
+    Optional<Instant> odate = getAdmissionDate(id);
     if (odate.isPresent()) {
       Period period = new Period();
       period.setStart(odate.get());
@@ -86,17 +88,18 @@ public class EncounterDao extends OpalDao {
    * @param id ID of the visit to fetch.
    * @return A date for the admission.
    */
-  public Optional<Date> getAdmissionDate(String id) {
+  public Optional<Instant> getAdmissionDate(String id) {
     Optional<Value> valdate = getFieldValue(ObjectStore, PatientVisitMap, id, admitTime);
     if (!valdate.isPresent()) {
       return Optional.empty();
     }
-
     try {
-      SimpleDateFormat dateFormat = new SimpleDateFormat(ADMIN_DATE_FORMAT);
-      Date date = dateFormat.parse(decodeString(valdate.get()) + "-00");
+      DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern(ADMIN_DATE_FORMAT);
+      Instant date = LocalDateTime.parse(decodeString(valdate.get()) + "-00", dateFormat)
+          .toInstant(ZoneOffset.UTC);
       return Optional.of(date);
-    } catch (ParseException ex) {
+    } catch (DateTimeParseException e) {
+      log.error("Failed to parse date:" + valdate.get(), e);
       return Optional.empty();
     }
   }

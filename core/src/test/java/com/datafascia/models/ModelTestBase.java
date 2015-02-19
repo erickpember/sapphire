@@ -29,7 +29,7 @@ public class ModelTestBase {
   public Object geneticEncodeDecodeTest(Object test) throws IOException, URISyntaxException {
     String jsonString = mapper.writeValueAsString(test);
     Object decoded = mapper.readValue(jsonString, test.getClass());
-    assertEquals(decoded, test);
+    assertEquals(decoded, test, "Failed to find in Json String: " + jsonString);
     return decoded;
   }
 

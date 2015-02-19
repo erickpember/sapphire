@@ -16,9 +16,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
+import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
@@ -31,7 +30,7 @@ import retrofit.RetrofitError;
 public class EmergeDemographicCSVGenerator {
 
   // Date format the CSV is expecting.
-  private static final DateFormat df = new SimpleDateFormat("yyyy-MM-dd");
+  private static final DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
   // Name format
   private static final String NAME_FMT
           = "<[" + Name.FIRST + "," + Name.MIDDLE + "," + Name.LAST + "]; separator=\" \">";
@@ -161,7 +160,7 @@ public class EmergeDemographicCSVGenerator {
   private static void addEncounterData(Demographic demo, Encounter encount) {
     Hospitalization hosp = encount.getHospitalisation();
     if (hosp != null && hosp.getPeriod() != null && hosp.getPeriod().getStart() != null) {
-      Date admitDate = hosp.getPeriod().getStart();
+      Instant admitDate = hosp.getPeriod().getStart();
       demo.setSicuAdmissionDate(df.format(admitDate));
     }
 

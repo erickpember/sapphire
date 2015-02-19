@@ -5,9 +5,10 @@ package com.datafascia.models;
 import com.datafascia.common.persist.Id;
 import com.datafascia.jackson.IdDeserializer;
 import com.datafascia.jackson.IdSerializer;
+import com.datafascia.jackson.InstantDeserializer;
+import com.datafascia.jackson.InstantSerializer;
 import com.datafascia.urn.URNFactory;
 import com.datafascia.urn.annotations.IdNamespace;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -15,7 +16,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.neovisionaries.i18n.LanguageCode;
 import java.net.URI;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -35,9 +36,9 @@ public class Patient extends Person {
   private Id<Patient> id;
   @JsonProperty("contacts")
   private List<Contact> contactDetails;
-  @JsonProperty("creationDate")
-  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
-  private Date creationDate;
+  @JsonProperty("creationDate") @JsonSerialize(using = InstantSerializer.class)
+  @JsonDeserialize(using = InstantDeserializer.class)
+  private Instant creationDate;
   @JsonProperty("deceased")
   private boolean deceased;
   @JsonProperty("maritalStatus")

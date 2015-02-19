@@ -2,12 +2,15 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.models;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.datafascia.jackson.LocalDateDeserializer;
+import com.datafascia.jackson.LocalDateSerializer;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.net.URI;
-import java.util.Date;
+import java.time.LocalDate;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,9 +30,9 @@ public class Person {
   private Address address;
   @JsonProperty("gender")
   private Gender gender;
-  @JsonProperty("birthDate")
-  @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "UTC")
-  private Date birthDate;
+  @JsonProperty("birthDate") @JsonSerialize(using = LocalDateSerializer.class)
+  @JsonDeserialize(using = LocalDateDeserializer.class)
+  private LocalDate birthDate;
   @JsonProperty("photo")
   private URI photo;
   @JsonProperty("organization")

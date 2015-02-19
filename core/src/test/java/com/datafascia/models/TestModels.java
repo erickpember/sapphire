@@ -8,11 +8,14 @@ import com.neovisionaries.i18n.LanguageCode;
 import java.math.BigDecimal;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.Month;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -20,14 +23,14 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class TestModels {
-  public static Date getDate() {
-    SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
+  public static Instant getDateTime() {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z");
+    LocalDateTime dateTime = LocalDateTime.parse("2009-12-31 12:12:12 +0000", formatter);
+    return dateTime.toInstant(ZoneOffset.UTC);
+  }
 
-    try {
-      return format.parse("2009-12-31 12:12:12 +0000");
-    } catch (ParseException e) {
-      throw new RuntimeException(e);
-    }
+  public static LocalDate getDate() {
+    return LocalDate.of(2009, Month.DECEMBER, 31);
   }
 
   public static URI getURI() {
@@ -91,7 +94,7 @@ public class TestModels {
       setName(name);
       setCareProvider(Arrays.asList(caregiver, caregiver));
       setContactDetails(Arrays.asList(contact, contact));
-      setCreationDate(getDate());
+      setCreationDate(getDateTime());
       setDeceased(false);
       setId(Id.of("1234"));
       setLangs(Arrays.asList(LanguageCode.en, LanguageCode.ch));
@@ -103,8 +106,8 @@ public class TestModels {
 
   public static Period period = new Period() {
     {
-      setStart(getDate());
-      setStop(getDate());
+      setStart(getDateTime());
+      setStop(getDateTime());
     }
   };
 
@@ -227,7 +230,7 @@ public class TestModels {
       setInterpretation(ObservationInterpretation.A);
       setComments("The patient is alive.");
       setApplies(period);
-      setIssued(getDate());
+      setIssued(getDateTime());
       setStatus(ObservationStatus.Final);
       setReliability(ObservationReliability.Ok);
       setSite(codeable);

@@ -4,7 +4,7 @@ package com.datafascia.domain.persist;
 
 import java.io.UnsupportedEncodingException;
 import java.nio.ByteBuffer;
-import java.util.Date;
+import java.time.Instant;
 import org.apache.accumulo.core.data.Value;
 
 /**
@@ -17,8 +17,8 @@ public class ValueUtils {
    * @param value The value to decode.
    * @return A date representation of the Value.
    */
-  public static Date getDate(Value value) {
-    return new Date(getLong(value));
+  public static Instant getDate(Value value) {
+    return Instant.ofEpochMilli(getLong(value));
   }
 
   /**

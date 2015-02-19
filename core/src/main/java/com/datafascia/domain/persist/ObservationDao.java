@@ -7,8 +7,8 @@ import com.datafascia.accumulo.QueryTemplate;
 import com.datafascia.models.CodeableConcept;
 import com.datafascia.models.Observation;
 import com.datafascia.models.ObservationValue;
+import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -46,7 +46,7 @@ public class ObservationDao extends OpalDao {
     Timer.Context timerContext = queryTemplate.getTimerContext(getClass(), "findObservations");
     try {
       List<Observation> observations = new ArrayList<>();
-      Date issued = null;
+      Instant issued = null;
 
       Scanner scanner = getScanner();
       scanner.setRange(toRange(Kinds.PATIENT_UPDATE_MAP, updateId));

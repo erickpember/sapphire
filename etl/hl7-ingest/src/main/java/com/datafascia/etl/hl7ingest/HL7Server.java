@@ -24,7 +24,7 @@ public class HL7Server extends HL7Ingest {
   @Parameter(names = "--port", description = "HAPI MLLP listener port", required = true)
   public int port;
 
-  @Parameter(names = "--useTLS", description = "Use TLS on messages.  Default is false.",
+  @Parameter(names = "--useTLS", description = "Use TLS on messages. Default is false.",
       required = false)
   public boolean useTLS = false;
 

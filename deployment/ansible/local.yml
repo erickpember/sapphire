@@ -13,3 +13,4 @@
     - accumulo-master-primary
     - accumulo-slave
     - kafka
+    - df-platform

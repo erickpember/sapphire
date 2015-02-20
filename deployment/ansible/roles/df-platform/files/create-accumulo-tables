@@ -1,0 +1,3 @@
+setauths -s System,Caregiver
+createtable IngestMessage
+createtable Patient

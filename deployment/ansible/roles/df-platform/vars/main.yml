@@ -1,0 +1,4 @@
+---
+df_platform_version: 0.0.1-SNAPSHOT
+df_platform_home: "{{ company_prefix }}/df-platform"
+df_platform_conf_dir: "{{ df_platform_home }}/conf"

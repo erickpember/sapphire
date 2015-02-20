@@ -1,0 +1,38 @@
+---
+- name: Create directories
+  file:
+      path={{ item }}
+      state=directory
+      mode=755
+  with_items:
+    - "{{ df_platform_home }}"
+    - "{{ df_platform_conf_dir }}"
+
+- name: Copy configuration files
+  copy:
+      src={{ item }}
+      dest={{ df_platform_conf_dir }}/{{ item }}
+  with_items:
+    - create-accumulo-tables
+
+- name: Create Accumulo tables
+  shell: >
+      {{ accumulo_home }}/bin/accumulo shell --user root --password {{ accumulo_password }} --execute-command "execfile {{ df_platform_conf_dir }}/create-accumulo-tables" &&
+      touch {{ df_platform_conf_dir }}/create-accumulo-tables.done
+  args:
+    creates: "{{ df_platform_conf_dir }}/create-accumulo-tables.done"
+
+- name: List Kafka topics
+  command: >
+      {{ kafka_home }}/bin/kafka-topics.sh --zookeeper {{ groups['zookeeper'][0] }} --list
+  register: list_topics
+
+- name: Create Kafka topic
+  command: >
+      {{ kafka_home }}/bin/kafka-topics.sh --zookeeper {{ groups['zookeeper'][0] }} --create --partitions 1 --replication-factor 1 --topic hl7message
+  when: "'hl7Message' not in list_topics.stdout_lines"
+
+- name: Create Kafka topic
+  command: >
+      {{ kafka_home }}/bin/kafka-topics.sh --zookeeper {{ groups['zookeeper'][0] }} --create --partitions 1 --replication-factor 1 --topic event
+  when: "'event' not in list_topics.stdout_lines"

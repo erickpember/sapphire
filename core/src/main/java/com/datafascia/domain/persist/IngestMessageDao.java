@@ -57,7 +57,7 @@ public class IngestMessageDao {
   @Inject
   public IngestMessageDao(Connector connector, QueryTemplate queryTemplate) {
     try {
-      writer = connector.createBatchWriter(Tables.MESSAGE, new BatchWriterConfig());
+      writer = connector.createBatchWriter(Tables.INGEST_MESSAGE, new BatchWriterConfig());
     } catch (TableNotFoundException e) {
       throw new IllegalStateException("createBatchWriter", e);
     }
@@ -115,7 +115,7 @@ public class IngestMessageDao {
    * @return optional entity, not present if not found
    */
   public Optional<IngestMessage> read(Id<IngestMessage> messageId) {
-    Scanner scanner = queryTemplate.createScanner(Tables.MESSAGE);
+    Scanner scanner = queryTemplate.createScanner(Tables.INGEST_MESSAGE);
     scanner.setRange(Range.exact(messageId.toString()));
     scanner.fetchColumnFamily(new Text(COLUMN_FAMILY));
 

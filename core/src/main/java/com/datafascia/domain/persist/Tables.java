@@ -7,7 +7,7 @@ package com.datafascia.domain.persist;
  */
 public class Tables {
 
-  public static final String MESSAGE = "Message";
+  public static final String INGEST_MESSAGE = "IngestMessage";
 
   // Private constructor disallows creating instances of this class.
   private Tables() {

@@ -87,7 +87,7 @@ public class HL7MessageToEventTopologyIT {
 
   @BeforeMethod
   public void beforeMethod() throws Exception {
-    connector.tableOperations().create(Tables.MESSAGE);
+    connector.tableOperations().create(Tables.INGEST_MESSAGE);
 
     ingestMessageDao = Injectors.getInjector().getInstance(IngestMessageDao.class);
 
@@ -104,7 +104,7 @@ public class HL7MessageToEventTopologyIT {
 
   @AfterMethod
   public void afterMethod() throws Exception {
-    connector.tableOperations().delete(Tables.MESSAGE);
+    connector.tableOperations().delete(Tables.INGEST_MESSAGE);
   }
 
   @Test

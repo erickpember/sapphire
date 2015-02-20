@@ -1,6 +1,6 @@
 // Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.message;
+package com.datafascia.domain.model;
 
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.time.InstantFormatter;
@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 @AllArgsConstructor @Builder @Data @NoArgsConstructor @Slf4j
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "RawMessage")
-public class RawMessage {
+public class IngestMessage {
   /** Time stamp */
   @JsonProperty("timestamp")
   @JsonSerialize(using = InstantSerializer.class)
@@ -67,7 +67,7 @@ public class RawMessage {
    * @return primary key
    */
   @JsonIgnore
-  public Id<RawMessage> getId() {
+  public Id<IngestMessage> getId() {
     String id =
         InstantFormatter.ISO_INSTANT_MILLI.format(timestamp) + '|' +
         Hashing.sha1().hashString(toString(), StandardCharsets.UTF_8).toString();

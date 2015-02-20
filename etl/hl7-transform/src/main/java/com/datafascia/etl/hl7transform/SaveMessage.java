@@ -2,8 +2,8 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.hl7transform;
 
+import com.datafascia.domain.model.IngestMessage;
 import com.datafascia.domain.persist.MessageDao;
-import com.datafascia.message.RawMessage;
 import javax.inject.Inject;
 import storm.trident.operation.BaseFilter;
 import storm.trident.tuple.TridentTuple;
@@ -21,7 +21,7 @@ public class SaveMessage extends BaseFilter {
 
   @Override
   public boolean isKeep(TridentTuple tuple) {
-    RawMessage message = (RawMessage) tuple.getValueByField(F.RAW_MESSAGE);
+    IngestMessage message = (IngestMessage) tuple.getValueByField(F.INGEST_MESSAGE);
     messageDao.save(message);
     return true;
   }

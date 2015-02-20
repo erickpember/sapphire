@@ -7,7 +7,7 @@ import backtype.storm.tuple.Values;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.parser.Parser;
-import com.datafascia.message.RawMessage;
+import com.datafascia.domain.model.IngestMessage;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import storm.trident.operation.BaseFunction;
@@ -30,11 +30,11 @@ public class ParseMessage extends BaseFunction {
 
   @Override
   public void execute(TridentTuple tuple, TridentCollector collector) {
-    RawMessage rawMessage = (RawMessage) tuple.getValueByField(F.RAW_MESSAGE);
+    IngestMessage ingestMessage = (IngestMessage) tuple.getValueByField(F.INGEST_MESSAGE);
 
     Message message;
     try {
-      message = parser.parse(rawMessage.getPayload());
+      message = parser.parse(ingestMessage.getPayload());
     } catch (HL7Exception e) {
       log.error("Error parsing HL7", e);
       return;

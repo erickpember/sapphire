@@ -5,7 +5,7 @@ package com.datafascia.domain.persist;
 import com.datafascia.accumulo.QueryTemplate;
 import com.datafascia.accumulo.RowMapper;
 import com.datafascia.common.persist.Id;
-import com.datafascia.message.RawMessage;
+import com.datafascia.domain.model.IngestMessage;
 import java.net.URI;
 import java.time.Instant;
 import java.util.Map;
@@ -32,7 +32,7 @@ import org.apache.hadoop.io.Text;
 @Singleton @Slf4j
 public class MessageDao {
 
-  private static final String COLUMN_FAMILY = RawMessage.class.getSimpleName();
+  private static final String COLUMN_FAMILY = IngestMessage.class.getSimpleName();
   private static final ColumnVisibility COLUMN_VISIBILITY = new ColumnVisibility("System");
   private static final String TIMESTAMP = "timestamp";
   private static final String INSTITUTION = "institution";
@@ -65,12 +65,12 @@ public class MessageDao {
     this.queryTemplate = queryTemplate;
   }
 
-  private static class MessageRowMapper implements RowMapper<RawMessage> {
-    private RawMessage message;
+  private static class MessageRowMapper implements RowMapper<IngestMessage> {
+    private IngestMessage message;
 
     @Override
     public void onBeginRow(Key key) {
-      message = new RawMessage();
+      message = new IngestMessage();
     }
 
     @Override
@@ -102,7 +102,7 @@ public class MessageDao {
     }
 
     @Override
-    public RawMessage onEndRow() {
+    public IngestMessage onEndRow() {
       return message;
     }
   }
@@ -114,7 +114,7 @@ public class MessageDao {
    *     primary key
    * @return optional entity, not present if not found
    */
-  public Optional<RawMessage> read(Id<RawMessage> messageId) {
+  public Optional<IngestMessage> read(Id<IngestMessage> messageId) {
     Scanner scanner = queryTemplate.createScanner(Tables.MESSAGE);
     scanner.setRange(Range.exact(messageId.toString()));
     scanner.fetchColumnFamily(new Text(COLUMN_FAMILY));
@@ -128,7 +128,7 @@ public class MessageDao {
    * @param message
    *     to save
    */
-  public void save(RawMessage message) {
+  public void save(IngestMessage message) {
     try {
       writer.addMutation(toMutation(message));
     } catch (MutationsRejectedException e) {
@@ -136,7 +136,7 @@ public class MessageDao {
     }
   }
 
-  private Mutation toMutation(RawMessage message) {
+  private Mutation toMutation(IngestMessage message) {
     Mutation mutation = new Mutation(message.getId().toString());
     putValue(mutation, TIMESTAMP, message.getTimestamp());
     putValue(mutation, INSTITUTION, message.getInstitution());

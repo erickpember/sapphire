@@ -7,7 +7,7 @@ import backtype.storm.generated.StormTopology;
 import backtype.storm.tuple.Fields;
 import com.datafascia.common.storm.trident.BaseTridentTopology;
 import com.datafascia.common.storm.trident.StreamFactory;
-import com.datafascia.message.RawMessage;
+import com.datafascia.domain.model.IngestMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.configuration.HierarchicalConfiguration;
 import storm.kafka.BrokerHosts;
@@ -47,7 +47,7 @@ public class HL7MessageToEventTopology extends BaseTridentTopology {
 
   @Override
   protected Config configureTopology() {
-    stormConfig.registerSerialization(RawMessage.class);
+    stormConfig.registerSerialization(IngestMessage.class);
     return stormConfig;
   }
 
@@ -73,14 +73,14 @@ public class HL7MessageToEventTopology extends BaseTridentTopology {
         // Save HL7 message to archive.
         .name(SaveMessage.ID)
         .each(
-            new Fields(F.RAW_MESSAGE),
+            new Fields(F.INGEST_MESSAGE),
             wrap(new SaveMessage()))
         .parallelismHint(getParallelism(SaveMessage.ID))
 
         // Parse HL7 message
         .name(ParseMessage.ID)
         .each(
-            new Fields(F.RAW_MESSAGE),
+            new Fields(F.INGEST_MESSAGE),
             wrap(new ParseMessage()),
             ParseMessage.OUTPUT_FIELDS)
         .project(ParseMessage.OUTPUT_FIELDS)

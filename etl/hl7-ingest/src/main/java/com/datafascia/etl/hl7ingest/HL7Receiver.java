@@ -6,7 +6,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.protocol.ReceivingApplication;
 import ca.uhn.hl7v2.protocol.ReceivingApplicationException;
-import com.datafascia.message.RawMessage;
+import com.datafascia.domain.model.IngestMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URI;
@@ -38,7 +38,7 @@ public class HL7Receiver implements ReceivingApplication {
   @Override
   public Message processMessage(Message hl7, Map<String, Object> metadata)
       throws ReceivingApplicationException, HL7Exception {
-    RawMessage msg = new RawMessage();
+    IngestMessage msg = new IngestMessage();
     msg.setTimestamp(Instant.now());
     msg.setInstitution(institution);
     msg.setFacility(facility);

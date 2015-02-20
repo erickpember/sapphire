@@ -1,7 +1,8 @@
 // Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.message;
+package com.datafascia.domain.model;
 
+import com.datafascia.domain.model.IngestMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -15,8 +16,8 @@ import static org.testng.Assert.assertEquals;
  * Unit tests for raw message
  */
 @Slf4j
-public class RawMessageTest {
-  RawMessage message = new RawMessage() {
+public class IngestMessageTest {
+  IngestMessage message = new IngestMessage() {
     {
       try {
         setTimestamp(Instant.ofEpochSecond(10234567));
@@ -48,7 +49,7 @@ public class RawMessageTest {
   public void decodeTest() throws Exception {
     ObjectMapper objectMapper = new ObjectMapper();
     String json = objectMapper.writeValueAsString(message);
-    RawMessage message1 = objectMapper.readValue(json, RawMessage.class);
+    IngestMessage message1 = objectMapper.readValue(json, IngestMessage.class);
     assertEquals(message1, message);
   }
 }

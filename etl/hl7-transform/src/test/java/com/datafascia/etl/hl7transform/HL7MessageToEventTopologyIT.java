@@ -15,9 +15,9 @@ import com.datafascia.common.inject.Injectors;
 import com.datafascia.common.shiro.FakeRealm;
 import com.datafascia.common.shiro.RoleExposingRealm;
 import com.datafascia.common.storm.trident.StreamFactory;
+import com.datafascia.domain.model.IngestMessage;
 import com.datafascia.domain.persist.MessageDao;
 import com.datafascia.domain.persist.Tables;
-import com.datafascia.message.RawMessage;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Provides;
@@ -109,21 +109,21 @@ public class HL7MessageToEventTopologyIT {
 
   @Test
   public void should_save_message() throws Exception {
-    RawMessage originalMessage = RawMessage.builder()
+    IngestMessage originalMessage = IngestMessage.builder()
         .timestamp(Instant.now())
         .payload(PAYLOAD)
         .build();
     feedHL7Message(originalMessage);
 
-    Optional<RawMessage> optionalMessage = messageDao.read(originalMessage.getId());
+    Optional<IngestMessage> optionalMessage = messageDao.read(originalMessage.getId());
     assertTrue(optionalMessage.isPresent());
 
-    RawMessage message = optionalMessage.get();
+    IngestMessage message = optionalMessage.get();
     assertEquals(message.getTimestamp(), originalMessage.getTimestamp());
     assertEquals(message.getPayload(), originalMessage.getPayload());
   }
 
-  private void feedHL7Message(RawMessage message) throws JsonProcessingException {
+  private void feedHL7Message(IngestMessage message) throws JsonProcessingException {
     feedHL7Message(OBJECT_MAPPER.writeValueAsBytes(message));
   }
 

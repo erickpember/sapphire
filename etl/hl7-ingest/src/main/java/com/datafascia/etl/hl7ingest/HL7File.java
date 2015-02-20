@@ -4,7 +4,7 @@ package com.datafascia.etl.hl7ingest;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
-import com.datafascia.message.RawMessage;
+import com.datafascia.domain.model.IngestMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -36,7 +36,7 @@ public class HL7File extends HL7Ingest {
     for (String file : files) {
       try {
         log.info("Sending file {}", file);
-        RawMessage msg = entry(file);
+        IngestMessage msg = entry(file);
         ObjectMapper mapper = new ObjectMapper();
         KeyedMessage<byte[], byte[]> entry =
             new KeyedMessage<>(queueName, mapper.writeValueAsBytes(msg));
@@ -70,8 +70,8 @@ public class HL7File extends HL7Ingest {
   /**
    * @return the queue entry
    */
-  private RawMessage entry(String file) throws IOException {
-    RawMessage msg = new RawMessage();
+  private IngestMessage entry(String file) throws IOException {
+    IngestMessage msg = new IngestMessage();
     msg.setTimestamp(Instant.now());
     msg.setInstitution(institution);
     msg.setFacility(facility);

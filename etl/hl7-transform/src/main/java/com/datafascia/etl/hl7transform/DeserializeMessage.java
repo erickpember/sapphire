@@ -4,7 +4,7 @@ package com.datafascia.etl.hl7transform;
 
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
-import com.datafascia.message.RawMessage;
+import com.datafascia.domain.model.IngestMessage;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;
@@ -21,7 +21,7 @@ public class DeserializeMessage extends BaseFunction {
 
   public static final String ID = DeserializeMessage.class.getSimpleName();
 
-  public static final Fields OUTPUT_FIELDS = new Fields(F.RAW_MESSAGE);
+  public static final Fields OUTPUT_FIELDS = new Fields(F.INGEST_MESSAGE);
 
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
@@ -39,8 +39,8 @@ public class DeserializeMessage extends BaseFunction {
   @Override
   public void execute(TridentTuple tuple, TridentCollector collector) {
     try {
-      RawMessage message = OBJECT_MAPPER.readValue(
-          tuple.getBinaryByField(F.BYTES), RawMessage.class);
+      IngestMessage message = OBJECT_MAPPER.readValue(
+          tuple.getBinaryByField(F.BYTES), IngestMessage.class);
       collector.emit(new Values(message));
     } catch (IOException e) {
       throw new IllegalStateException("Error deserializing JSON", e);

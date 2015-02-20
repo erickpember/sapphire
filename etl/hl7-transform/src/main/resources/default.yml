@@ -4,6 +4,9 @@ HL7MessageToEventTopology:
     hl7MessageSpout: 1
     DeserializeMessage: 1
     SaveMessage: 1
+    ParseMessage: 1
+    HandleAdmitMessage: 1
+    HandleObservationMessage: 1
 
 accumulo:
   instance: operational
@@ -12,4 +15,5 @@ accumulo:
   password: secret
 
 hl7MessageQueue:
+  kafkaBrokers: "devbox:9092"
   topic: hl7Message

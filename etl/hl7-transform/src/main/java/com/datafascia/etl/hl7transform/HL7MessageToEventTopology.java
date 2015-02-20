@@ -55,8 +55,9 @@ public class HL7MessageToEventTopology extends BaseTridentTopology {
   protected StormTopology buildTopology() {
     TridentTopology topology = new TridentTopology();
 
-    // Read serialized HL7 message from queue.
-    createHL7MessageStream(topology)
+    Stream messageStream =
+        // Read serialized HL7 message from queue.
+        createHL7MessageStream(topology)
         .parallelismHint(getParallelism(HL7_MESSAGE_SPOUT_ID))
 
         // Deserialize HL7 message.
@@ -70,12 +71,34 @@ public class HL7MessageToEventTopology extends BaseTridentTopology {
         .parallelismHint(getParallelism(DeserializeMessage.ID))
 
         // Save HL7 message to archive.
-        .shuffle()
         .name(SaveMessage.ID)
         .each(
-            new Fields(F.MESSAGE),
+            new Fields(F.RAW_MESSAGE),
             wrap(new SaveMessage()))
-        .parallelismHint(getParallelism(SaveMessage.ID));
+        .parallelismHint(getParallelism(SaveMessage.ID))
+
+        // Parse HL7 message
+        .name(ParseMessage.ID)
+        .each(
+            new Fields(F.RAW_MESSAGE),
+            wrap(new ParseMessage()),
+            ParseMessage.OUTPUT_FIELDS)
+        .project(ParseMessage.OUTPUT_FIELDS)
+        .parallelismHint(getParallelism(ParseMessage.ID));
+
+    messageStream
+        .name(HandleAdmitMessage.ID)
+        .each(
+            new Fields(F.MESSAGE),
+            wrap(new HandleAdmitMessage()))
+        .parallelismHint(getParallelism(HandleAdmitMessage.ID));
+
+    messageStream
+        .name(HandleObservationMessage.ID)
+        .each(
+            new Fields(F.MESSAGE),
+            wrap(new HandleObservationMessage()))
+        .parallelismHint(getParallelism(HandleObservationMessage.ID));
 
     return topology.build();
   }

@@ -21,7 +21,7 @@ public class SaveMessage extends BaseFilter {
 
   @Override
   public boolean isKeep(TridentTuple tuple) {
-    RawMessage message = (RawMessage) tuple.getValueByField(F.MESSAGE);
+    RawMessage message = (RawMessage) tuple.getValueByField(F.RAW_MESSAGE);
     messageDao.save(message);
     return true;
   }

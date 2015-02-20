@@ -2,6 +2,9 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.hl7transform.inject;
 
+import ca.uhn.hl7v2.DefaultHapiContext;
+import ca.uhn.hl7v2.HapiContext;
+import ca.uhn.hl7v2.parser.Parser;
 import com.codahale.metrics.MetricRegistry;
 import com.datafascia.accumulo.AuthorizationsProvider;
 import com.datafascia.accumulo.ConnectorFactory;
@@ -19,6 +22,8 @@ public class HL7MessageToEventModule extends ConfigureModule {
   @Override
   protected void onConfigure() {
     bind(AuthorizationsProvider.class).to(FixedAuthorizationsProvider.class);
+    bind(HapiContext.class).toInstance(new DefaultHapiContext());
+    bind(MetricRegistry.class).in(Singleton.class);
   }
 
   @Provides @Singleton
@@ -27,7 +32,7 @@ public class HL7MessageToEventModule extends ConfigureModule {
   }
 
   @Provides @Singleton
-  public MetricRegistry getMetricRegistry() {
-    return new MetricRegistry();
+  public Parser getParser(HapiContext context) {
+    return context.getGenericParser();
   }
 }

@@ -21,7 +21,7 @@ public class DeserializeMessage extends BaseFunction {
 
   public static final String ID = DeserializeMessage.class.getSimpleName();
 
-  public static final Fields OUTPUT_FIELDS = new Fields(F.MESSAGE);
+  public static final Fields OUTPUT_FIELDS = new Fields(F.RAW_MESSAGE);
 
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 

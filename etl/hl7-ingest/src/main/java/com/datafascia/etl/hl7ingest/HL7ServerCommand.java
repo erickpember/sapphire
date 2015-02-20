@@ -15,22 +15,23 @@ import kafka.producer.ProducerConfig;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Start an MLLP server to process HL7 messages and write them to the ingest queue.
+ * Starts an MLLP server to receive HL7 messages and write them to the ingest queue.
  */
 @Parameters(commandNames = "ingest-hl7-server",
-    commandDescription = "HL7 MLPP server to copy HL7 messages to ingest queue.")
+    commandDescription = "Run HL7 MLLP server to copy HL7 messages to ingest queue.")
 @Slf4j
-public class HL7Server extends HL7Ingest {
-  @Parameter(names = "--port", description = "HAPI MLLP listener port", required = true)
-  public int port;
+public class HL7ServerCommand extends HL7Ingest {
+
+  @Parameter(names = "--port", description = "MLLP listener port", required = true)
+  private int port;
 
   @Parameter(names = "--useTLS", description = "Use TLS on messages. Default is false.",
       required = false)
-  public boolean useTLS = false;
+  private boolean useTLS = false;
 
   @Override
   public int execute() {
-    log.info("Starting HAPI MLLP server on port: {} with TLS: {}", port, useTLS);
+    log.info("Starting MLLP server on port: {} with TLS: {}", port, useTLS);
 
     // Create the context under which all HAPI operations will execute.
     HapiContext context = new DefaultHapiContext();

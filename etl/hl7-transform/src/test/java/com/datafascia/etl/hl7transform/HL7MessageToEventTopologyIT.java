@@ -16,7 +16,7 @@ import com.datafascia.common.shiro.FakeRealm;
 import com.datafascia.common.shiro.RoleExposingRealm;
 import com.datafascia.common.storm.trident.StreamFactory;
 import com.datafascia.domain.model.IngestMessage;
-import com.datafascia.domain.persist.MessageDao;
+import com.datafascia.domain.persist.IngestMessageDao;
 import com.datafascia.domain.persist.Tables;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -67,7 +67,7 @@ public class HL7MessageToEventTopologyIT {
 
   private static ConnectorFactory connectorFactory;
   private static Connector connector;
-  private static MessageDao messageDao;
+  private static IngestMessageDao ingestMessageDao;
 
   private HL7MessageToEventTopology topology;
   private FeederBatchSpout hl7MessageSpout;
@@ -89,7 +89,7 @@ public class HL7MessageToEventTopologyIT {
   public void beforeMethod() throws Exception {
     connector.tableOperations().create(Tables.MESSAGE);
 
-    messageDao = Injectors.getInjector().getInstance(MessageDao.class);
+    ingestMessageDao = Injectors.getInjector().getInstance(IngestMessageDao.class);
 
     topology = new HL7MessageToEventTopology();
 
@@ -115,7 +115,7 @@ public class HL7MessageToEventTopologyIT {
         .build();
     feedHL7Message(originalMessage);
 
-    Optional<IngestMessage> optionalMessage = messageDao.read(originalMessage.getId());
+    Optional<IngestMessage> optionalMessage = ingestMessageDao.read(originalMessage.getId());
     assertTrue(optionalMessage.isPresent());
 
     IngestMessage message = optionalMessage.get();

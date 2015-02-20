@@ -27,10 +27,10 @@ import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.hadoop.io.Text;
 
 /**
- * Message archive data access.
+ * Ingest message archive data access.
  */
 @Singleton @Slf4j
-public class MessageDao {
+public class IngestMessageDao {
 
   private static final String COLUMN_FAMILY = IngestMessage.class.getSimpleName();
   private static final ColumnVisibility COLUMN_VISIBILITY = new ColumnVisibility("System");
@@ -55,7 +55,7 @@ public class MessageDao {
    *     query template
    */
   @Inject
-  public MessageDao(Connector connector, QueryTemplate queryTemplate) {
+  public IngestMessageDao(Connector connector, QueryTemplate queryTemplate) {
     try {
       writer = connector.createBatchWriter(Tables.MESSAGE, new BatchWriterConfig());
     } catch (TableNotFoundException e) {

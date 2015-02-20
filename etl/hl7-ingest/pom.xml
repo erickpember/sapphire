@@ -27,6 +27,49 @@
 
   <dependencies>
     <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>ca.uhn.hapi</groupId>
+      <artifactId>hapi-base</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ca.uhn.hapi</groupId>
+      <artifactId>hapi-structures-v21</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ca.uhn.hapi</groupId>
+      <artifactId>hapi-structures-v22</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ca.uhn.hapi</groupId>
+      <artifactId>hapi-structures-v23</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ca.uhn.hapi</groupId>
+      <artifactId>hapi-structures-v231</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ca.uhn.hapi</groupId>
+      <artifactId>hapi-structures-v24</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ca.uhn.hapi</groupId>
+      <artifactId>hapi-structures-v25</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ca.uhn.hapi</groupId>
+      <artifactId>hapi-structures-v251</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>ca.uhn.hapi</groupId>
+      <artifactId>hapi-structures-v26</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <scope>provided</scope>

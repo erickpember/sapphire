@@ -31,6 +31,11 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>df-etl-hl7-ingest</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>emerge-csv</artifactId>
       <version>${project.version}</version>
     </dependency>

@@ -11,6 +11,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -18,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
  * include amounts that are not precisely quantified, including amounts involving arbitrary units
  * and floating currencies.
  */
-@Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode
+@Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode @ToString
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName("Quantity")
 public class Quantity {

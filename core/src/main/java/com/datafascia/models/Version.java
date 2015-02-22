@@ -8,13 +8,14 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * Retrieves the relevant information from the manifest file and makes it available to others for
  * processing
  */
-@JsonAutoDetect @Slf4j @NoArgsConstructor
+@JsonAutoDetect @Slf4j @NoArgsConstructor @ToString
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName("Version")
 public class Version {

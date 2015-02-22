@@ -19,11 +19,12 @@ import java.time.Instant;
 import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * Represents a patient observation.
  */
-@Data @NoArgsConstructor
+@Data @NoArgsConstructor @ToString
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName("Observation") @IdNamespace(URNFactory.NS_OBSERVATION_ID)
 public class Observation {

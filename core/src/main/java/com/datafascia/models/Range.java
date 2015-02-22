@@ -9,12 +9,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * A set of ordered Quantities defined by a low and high limit.
  */
-@Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode
+@Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode @ToString
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName("Range")
 public class Range {

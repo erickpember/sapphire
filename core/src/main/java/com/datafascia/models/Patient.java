@@ -22,6 +22,7 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -29,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode(callSuper = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
-@JsonTypeName("Patient") @IdNamespace(URNFactory.NS_PATIENT_ID)
+@JsonTypeName("Patient") @IdNamespace(URNFactory.NS_PATIENT_ID) @ToString(callSuper = true)
 public class Patient extends Person {
   @JsonProperty("@id")
   @JsonDeserialize(using = IdDeserializer.class) @JsonSerialize(using = IdSerializer.class)

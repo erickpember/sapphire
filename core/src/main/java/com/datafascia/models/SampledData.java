@@ -11,13 +11,14 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * A series of measurements taken by a device, with upper and lower limits. There may be more than
  * one dimension in the data.
  */
-@Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode
+@Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode @ToString
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName("SampledData")
 public class SampledData {

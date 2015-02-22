@@ -18,12 +18,13 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * Represents a patient visit.
  */
-@Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode
+@Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode @ToString
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName("Encounter") @IdNamespace(URNFactory.NS_ENCOUNTER_ID)
 public class Encounter {

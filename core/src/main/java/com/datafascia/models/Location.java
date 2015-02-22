@@ -10,13 +10,14 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * An interaction between a patient and healthcare provider(s) for the purpose of providing
  * healthcare service(s) or assessing the health status of a patient.
  */
-@Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode
+@Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode @ToString
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName("Location")
 public class Location {

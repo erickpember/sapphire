@@ -8,12 +8,13 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 /**
  * Represents a value that is usually supplied by providing a reference to one or more terminologies
  * or ontologies, but may also be defined by the provision of text.
  */
-@AllArgsConstructor @Data @NoArgsConstructor
+@AllArgsConstructor @Data @NoArgsConstructor @ToString
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName("CodeableConcept")
 public class CodeableConcept {

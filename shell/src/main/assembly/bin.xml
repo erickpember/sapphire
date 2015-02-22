@@ -18,7 +18,7 @@
       <fileMode>755</fileMode>
     </fileSet>
     <fileSet>
-      <directory>${project.basedir}/src/main/resources</directory>
+      <directory>${project.basedir}/src/main/conf</directory>
       <outputDirectory>conf</outputDirectory>
     </fileSet>
     <fileSet>

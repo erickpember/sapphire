@@ -49,6 +49,13 @@
     </dependency>
 
     <dependency>
+      <groupId>log4j</groupId>
+      <artifactId>log4j</artifactId>
+      <!-- The integration tests run ZooKeeper, which references log4j specific classes. -->
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.apache.accumulo</groupId>
       <artifactId>accumulo-core</artifactId>
     </dependency>

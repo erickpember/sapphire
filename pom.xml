@@ -183,8 +183,8 @@
 
       <!--
       So we don't have to explicitly exclude every transitive dependency on
-      commons-logging.  At runtime, the application will call the
-      jcl-over-slf4j implementation of the commons-logging public API.
+      commons-logging. At runtime, the application will call the jcl-over-slf4j
+      implementation of the commons-logging public API.
       -->
       <dependency>
         <groupId>commons-logging</groupId>
@@ -220,6 +220,12 @@
         <groupId>io.dropwizard.modules</groupId>
         <artifactId>dropwizard-java8</artifactId>
         <version>${dropwizard.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>log4j</groupId>
+        <artifactId>log4j</artifactId>
+        <version>1.2.17</version>
       </dependency>
 
       <dependency>
@@ -287,6 +293,10 @@
           <exclusion>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
+          </exclusion>
+          <exclusion>
+            <groupId>log4j</groupId>
+            <artifactId>log4j</artifactId>
           </exclusion>
           <exclusion>
             <groupId>org.slf4j</groupId>
@@ -406,6 +416,11 @@
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>jcl-over-slf4j</artifactId>
+        <version>${slf4j.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>log4j-over-slf4j</artifactId>
         <version>${slf4j.version}</version>
       </dependency>
       <dependency>

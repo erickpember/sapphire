@@ -5,6 +5,7 @@ package com.datafascia.etl.hl7transform;
 import backtype.storm.Config;
 import backtype.storm.generated.StormTopology;
 import backtype.storm.tuple.Fields;
+import ca.uhn.hl7v2.model.Message;
 import com.datafascia.common.storm.trident.BaseTridentTopology;
 import com.datafascia.common.storm.trident.StreamFactory;
 import com.datafascia.domain.model.IngestMessage;
@@ -48,6 +49,7 @@ public class HL7MessageToEventTopology extends BaseTridentTopology {
   @Override
   protected Config configureTopology() {
     stormConfig.registerSerialization(IngestMessage.class);
+    stormConfig.registerSerialization(Message.class);
     return stormConfig;
   }
 

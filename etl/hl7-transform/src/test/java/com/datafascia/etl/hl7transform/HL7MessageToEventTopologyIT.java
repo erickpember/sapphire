@@ -10,6 +10,9 @@ import com.datafascia.accumulo.AccumuloConfiguration;
 import com.datafascia.accumulo.AuthorizationsProvider;
 import com.datafascia.accumulo.ConnectorFactory;
 import com.datafascia.accumulo.FixedAuthorizationsProvider;
+import com.datafascia.common.avro.Serializer;
+import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
+import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
 import com.datafascia.common.configuration.guice.ConfigureModule;
 import com.datafascia.common.inject.Injectors;
 import com.datafascia.common.shiro.FakeRealm;
@@ -18,9 +21,11 @@ import com.datafascia.common.storm.trident.StreamFactory;
 import com.datafascia.domain.model.IngestMessage;
 import com.datafascia.domain.persist.IngestMessageDao;
 import com.datafascia.domain.persist.Tables;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.inject.Injector;
 import com.google.inject.Provides;
+import java.net.URI;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Optional;
@@ -47,6 +52,7 @@ public class HL7MessageToEventTopologyIT {
     @Override
     protected void onConfigure() {
       bind(AuthorizationsProvider.class).to(FixedAuthorizationsProvider.class);
+      bind(AvroSchemaRegistry.class).to(MemorySchemaRegistry.class).in(Singleton.class);
       bind(RoleExposingRealm.class).to(FakeRealm.class);
     }
 
@@ -61,16 +67,18 @@ public class HL7MessageToEventTopologyIT {
     }
   }
 
+  private static final String TOPIC = "hl7Message";
   private static final String HL7_MESSAGE_SPOUT_ID = "hl7MessageSpout";
-  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
   private static final String PAYLOAD = "MSH";
 
   private static ConnectorFactory connectorFactory;
+  private static Injector injector;
   private static Connector connector;
   private static IngestMessageDao ingestMessageDao;
 
   private HL7MessageToEventTopology topology;
   private FeederBatchSpout hl7MessageSpout;
+  private Serializer serializer;
 
   @BeforeClass
   public void beforeClass() {
@@ -82,14 +90,16 @@ public class HL7MessageToEventTopologyIT {
         .build());
 
     Injectors.overrideWith(new TestModule());
-    connector = Injectors.getInjector().getInstance(Connector.class);
+    injector = Injectors.getInjector();
+
+    connector = injector.getInstance(Connector.class);
   }
 
   @BeforeMethod
   public void beforeMethod() throws Exception {
     connector.tableOperations().create(Tables.INGEST_MESSAGE);
 
-    ingestMessageDao = Injectors.getInjector().getInstance(IngestMessageDao.class);
+    ingestMessageDao = injector.getInstance(IngestMessageDao.class);
 
     topology = new HL7MessageToEventTopology();
 
@@ -100,6 +110,8 @@ public class HL7MessageToEventTopologyIT {
         return topology.newStream(HL7_MESSAGE_SPOUT_ID, hl7MessageSpout);
       }
     });
+
+    serializer = new Serializer(injector.getInstance(AvroSchemaRegistry.class));
   }
 
   @AfterMethod
@@ -111,7 +123,8 @@ public class HL7MessageToEventTopologyIT {
   public void should_save_message() throws Exception {
     IngestMessage originalMessage = IngestMessage.builder()
         .timestamp(Instant.now())
-        .payload(PAYLOAD)
+        .payloadType(URI.create("urn:df-payloadtype:HL7v2"))
+        .payload(ByteBuffer.wrap(PAYLOAD.getBytes(StandardCharsets.UTF_8)))
         .build();
     feedHL7Message(originalMessage);
 
@@ -123,8 +136,8 @@ public class HL7MessageToEventTopologyIT {
     assertEquals(message.getPayload(), originalMessage.getPayload());
   }
 
-  private void feedHL7Message(IngestMessage message) throws JsonProcessingException {
-    feedHL7Message(OBJECT_MAPPER.writeValueAsBytes(message));
+  private void feedHL7Message(IngestMessage message) {
+    feedHL7Message(serializer.encodeReflect(TOPIC, message));
   }
 
   private void feedHL7Message(final byte[] bytes) {

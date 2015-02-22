@@ -8,6 +8,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.parser.Parser;
 import com.datafascia.domain.model.IngestMessage;
+import java.nio.charset.StandardCharsets;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import storm.trident.operation.BaseFunction;
@@ -34,7 +35,8 @@ public class ParseMessage extends BaseFunction {
 
     Message message;
     try {
-      message = parser.parse(ingestMessage.getPayload());
+      String hl7 = new String(ingestMessage.getPayload().array(), StandardCharsets.UTF_8);
+      message = parser.parse(hl7);
     } catch (HL7Exception e) {
       log.error("Error parsing HL7", e);
       return;

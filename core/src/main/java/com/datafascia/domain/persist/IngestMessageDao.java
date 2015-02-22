@@ -7,6 +7,7 @@ import com.datafascia.accumulo.RowMapper;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.model.IngestMessage;
 import java.net.URI;
+import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
@@ -96,7 +97,7 @@ public class IngestMessageDao {
           message.setPayloadType(URI.create(value));
           break;
         case PAYLOAD:
-          message.setPayload(value);
+          message.setPayload(ByteBuffer.wrap(entry.getValue().get()));
           break;
       }
     }
@@ -144,7 +145,7 @@ public class IngestMessageDao {
     putValue(mutation, DEPARTMENT, message.getDepartment());
     putValue(mutation, SOURCE, message.getSource());
     putValue(mutation, PAYLOAD_TYPE, message.getPayloadType());
-    putValue(mutation, PAYLOAD, message.getPayload());
+    mutation.put(COLUMN_FAMILY, PAYLOAD, COLUMN_VISIBILITY, new Value(message.getPayload()));
     return mutation;
   }
 

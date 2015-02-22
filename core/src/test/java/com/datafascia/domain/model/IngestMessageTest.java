@@ -2,54 +2,42 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.model;
 
-import com.datafascia.domain.model.IngestMessage;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.datafascia.common.avro.Deserializer;
+import com.datafascia.common.avro.Serializer;
+import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
 import java.net.URI;
-import java.net.URISyntaxException;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
-import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
 
 /**
- * Unit tests for raw message
+ * {@link IngestMessage} serialization test
  */
-@Slf4j
 public class IngestMessageTest {
-  IngestMessage message = new IngestMessage() {
-    {
-      try {
-        setTimestamp(Instant.ofEpochSecond(10234567));
-        setInstitution(new URI("urn:df-institution-1:ucsf"));
-        setFacility(new URI("urn:df-facility-1:parnassus"));
-        setDepartment(new URI("urn:df-icu-1:icu"));
-        setSource(new URI("urn:df-source-1:bed1"));
-        setPayloadType(new URI("urn:df-payload-1:hl7"));
-        setPayload("XXXXXXXXXXXXXXXXXXXXX");
-      } catch (URISyntaxException ex) {
-        throw new RuntimeException("Internal error generating URI. Not expected.");
-      }
-    }
-  };
+
+  private static final String TOPIC = "hl7Message";
+
+  private MemorySchemaRegistry schemaRegistry = new MemorySchemaRegistry();
+  private Serializer serializer = new Serializer(schemaRegistry);
+  private Deserializer deserializer = new Deserializer(schemaRegistry);
 
   @Test
-  public void encodeTest() throws Exception {
-    ObjectMapper objectMapper = new ObjectMapper();
-    String json = objectMapper.writeValueAsString(message);
-    assertEquals(json,
-        "{\"@type\":\"urn:df-model-1:IngestMessage\",\"timestamp\":\"1970-04-29T10:56:07.000Z\"" +
-        ",\"institution\":\"urn:df-institution-1:ucsf\"," +
-        "\"facility\":\"urn:df-facility-1:parnassus\",\"department\":\"urn:df-icu-1:icu\"," +
-        "\"source\":\"urn:df-source-1:bed1\",\"payloadType\":\"urn:df-payload-1:hl7\"" +
-        ",\"payload\":\"XXXXXXXXXXXXXXXXXXXXX\"}");
-  }
+  public void should_decode() {
+    IngestMessage originalMessage = IngestMessage.builder()
+        .timestamp(Instant.now())
+        .payloadType(URI.create("urn:df-payloadtype:HL7v2"))
+        .payload(ByteBuffer.wrap("MSH".getBytes(StandardCharsets.UTF_8)))
+        .build();
+    byte[] bytes = serializer.encodeReflect(TOPIC, originalMessage);
 
-  @Test
-  public void decodeTest() throws Exception {
-    ObjectMapper objectMapper = new ObjectMapper();
-    String json = objectMapper.writeValueAsString(message);
-    IngestMessage message1 = objectMapper.readValue(json, IngestMessage.class);
-    assertEquals(message1, message);
+    IngestMessage message = deserializer.decodeReflect(TOPIC, bytes, IngestMessage.class);
+    assertEquals(message.getTimestamp(), originalMessage.getTimestamp());
+    assertEquals(message.getPayloadType(), originalMessage.getPayloadType());
+    assertEquals(message.getPayload(), originalMessage.getPayload());
+    assertNull(message.getInstitution());
   }
 }

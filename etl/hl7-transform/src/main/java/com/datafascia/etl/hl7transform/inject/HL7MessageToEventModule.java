@@ -9,6 +9,8 @@ import com.codahale.metrics.MetricRegistry;
 import com.datafascia.accumulo.AuthorizationsProvider;
 import com.datafascia.accumulo.ConnectorFactory;
 import com.datafascia.accumulo.FixedAuthorizationsProvider;
+import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
+import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
 import com.datafascia.common.configuration.guice.ConfigureModule;
 import com.google.inject.Provides;
 import javax.inject.Singleton;
@@ -22,6 +24,7 @@ public class HL7MessageToEventModule extends ConfigureModule {
   @Override
   protected void onConfigure() {
     bind(AuthorizationsProvider.class).to(FixedAuthorizationsProvider.class);
+    bind(AvroSchemaRegistry.class).to(MemorySchemaRegistry.class).in(Singleton.class);
     bind(HapiContext.class).toInstance(new DefaultHapiContext());
     bind(MetricRegistry.class).in(Singleton.class);
   }

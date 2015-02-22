@@ -4,10 +4,11 @@ package com.datafascia.etl.hl7ingest;
 
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.datafascia.common.avro.Serializer;
+import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
 import com.datafascia.domain.model.IngestMessage;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.nio.ByteBuffer;
 import java.time.Instant;
 import java.util.List;
 import java.util.Properties;
@@ -30,16 +31,18 @@ public class HL7File extends HL7Ingest {
       required = true)
   List<String> files;
 
+  private MemorySchemaRegistry schemaRegistry = new MemorySchemaRegistry();
+  private Serializer serializer = new Serializer(schemaRegistry);
+
   @Override
   public int execute() {
     Producer<byte[], byte[]> queue = kafkaProducer();
     for (String file : files) {
       try {
         log.info("Sending file {}", file);
-        IngestMessage msg = entry(file);
-        ObjectMapper mapper = new ObjectMapper();
+        IngestMessage message = entry(file);
         KeyedMessage<byte[], byte[]> entry =
-            new KeyedMessage<>(queueName, mapper.writeValueAsBytes(msg));
+            new KeyedMessage<>(queueName, serializer.encodeReflect(queueName, message));
         queue.send(entry);
       } catch (IOException e) {
         log.error("Error sending file {} is {}", file, e);
@@ -63,23 +66,22 @@ public class HL7File extends HL7Ingest {
   /**
    * @return contents of file as string
    */
-  private String content(String file) throws IOException {
-    return new String(readAllBytes(get(file)), StandardCharsets.UTF_8);
+  private ByteBuffer content(String file) throws IOException {
+    return ByteBuffer.wrap(readAllBytes(get(file)));
   }
 
   /**
    * @return the queue entry
    */
   private IngestMessage entry(String file) throws IOException {
-    IngestMessage msg = new IngestMessage();
-    msg.setTimestamp(Instant.now());
-    msg.setInstitution(institution);
-    msg.setFacility(facility);
-    msg.setDepartment(department);
-    msg.setSource(source);
-    msg.setPayloadType(payloadType);
-    msg.setPayload(content(file));
-
-    return msg;
+    return IngestMessage.builder()
+        .timestamp(Instant.now())
+        .institution(institution)
+        .facility(facility)
+        .department(department)
+        .source(source)
+        .payloadType(payloadType)
+        .payload(content(file))
+        .build();
   }
 }

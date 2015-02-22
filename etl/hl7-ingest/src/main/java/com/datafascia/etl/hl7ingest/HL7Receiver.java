@@ -6,29 +6,35 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.protocol.ReceivingApplication;
 import ca.uhn.hl7v2.protocol.ReceivingApplicationException;
+import com.datafascia.common.avro.Serializer;
+import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
 import com.datafascia.domain.model.IngestMessage;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URI;
+import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.Map;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.KeyedMessage;
-import lombok.AllArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * Handles all HL7 messages and writes to queue
  */
-@Slf4j @AllArgsConstructor
+@Slf4j @RequiredArgsConstructor
 public class HL7Receiver implements ReceivingApplication {
-  private Producer<byte[], byte[]> queue;
-  private String queueName;
-  private URI institution;
-  private URI facility;
-  private URI department;
-  private URI source;
-  private URI payloadType;
+  private final Producer<byte[], byte[]> queue;
+  private final String queueName;
+  private final URI institution;
+  private final URI facility;
+  private final URI department;
+  private final URI source;
+  private final URI payloadType;
+
+  private MemorySchemaRegistry schemaRegistry = new MemorySchemaRegistry();
+  private Serializer serializer = new Serializer(schemaRegistry);
 
   @Override
   public boolean canProcess(Message message) {
@@ -38,19 +44,20 @@ public class HL7Receiver implements ReceivingApplication {
   @Override
   public Message processMessage(Message hl7, Map<String, Object> metadata)
       throws ReceivingApplicationException, HL7Exception {
-    IngestMessage msg = new IngestMessage();
-    msg.setTimestamp(Instant.now());
-    msg.setInstitution(institution);
-    msg.setFacility(facility);
-    msg.setDepartment(department);
-    msg.setSource(source);
-    msg.setPayloadType(payloadType);
-    msg.setPayload(hl7.encode());
+
+    IngestMessage message = IngestMessage.builder()
+        .timestamp(Instant.now())
+        .institution(institution)
+        .facility(facility)
+        .department(department)
+        .source(source)
+        .payloadType(payloadType)
+        .payload(ByteBuffer.wrap(hl7.encode().getBytes(StandardCharsets.UTF_8)))
+        .build();
 
     try {
-      ObjectMapper mapper = new ObjectMapper();
       KeyedMessage<byte[], byte[]> entry =
-          new KeyedMessage<>(queueName, mapper.writeValueAsBytes(msg));
+          new KeyedMessage<>(queueName, serializer.encodeReflect(queueName, message));
       queue.send(entry);
 
       return hl7.generateACK();

@@ -4,18 +4,25 @@ package com.datafascia.etl.hl7transform;
 
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
+import com.datafascia.common.avro.Deserializer;
+import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
+import com.datafascia.common.configuration.ConfigurationNode;
+import com.datafascia.common.configuration.Configure;
 import com.datafascia.domain.model.IngestMessage;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import java.io.IOException;
+import java.util.Map;
+import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.avro.Schema;
+import org.apache.avro.reflect.ReflectData;
 import storm.trident.operation.BaseFunction;
 import storm.trident.operation.TridentCollector;
+import storm.trident.operation.TridentOperationContext;
 import storm.trident.tuple.TridentTuple;
 
 /**
  * Deserializes message read from queue.
  */
-@Slf4j
+@ConfigurationNode("hl7MessageQueue") @Slf4j
 public class DeserializeMessage extends BaseFunction {
   private static final long serialVersionUID = 1L;
 
@@ -23,7 +30,22 @@ public class DeserializeMessage extends BaseFunction {
 
   public static final Fields OUTPUT_FIELDS = new Fields(F.INGEST_MESSAGE);
 
-  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+  @Configure
+  private transient String topic;
+
+  @Inject
+  private transient AvroSchemaRegistry schemaRegistry;
+
+  @Inject
+  private transient Deserializer deserializer;
+
+  @Override
+  public void prepare(Map config, TridentOperationContext context) {
+    super.prepare(config, context);
+
+    Schema schema = ReflectData.get().getSchema(IngestMessage.class);
+    schemaRegistry.putSchema(topic, schema);
+  }
 
   /**
    * Deserializes message.
@@ -38,12 +60,9 @@ public class DeserializeMessage extends BaseFunction {
    */
   @Override
   public void execute(TridentTuple tuple, TridentCollector collector) {
-    try {
-      IngestMessage message = OBJECT_MAPPER.readValue(
-          tuple.getBinaryByField(F.BYTES), IngestMessage.class);
-      collector.emit(new Values(message));
-    } catch (IOException e) {
-      throw new IllegalStateException("Error deserializing JSON", e);
-    }
+    byte[] bytes = tuple.getBinaryByField(F.BYTES);
+
+    IngestMessage message = deserializer.decodeReflect(topic, bytes, IngestMessage.class);
+    collector.emit(new Values(message));
   }
 }

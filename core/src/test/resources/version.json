@@ -1,1 +1,1 @@
-{"@type":"Version","id":1,"revision":"0.0.1-SNAPSHOT","vendor":"dataFascia Corporation","title":"api-server"}
+{"@type":"urn:df-model-1:Version","id":1,"revision":"0.0.1-SNAPSHOT","vendor":"dataFascia Corporation","title":"api-server"}

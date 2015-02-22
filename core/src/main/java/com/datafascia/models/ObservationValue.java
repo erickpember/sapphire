@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.models;
 
+import com.datafascia.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -14,7 +15,7 @@ import lombok.ToString;
  */
 @Data @NoArgsConstructor @ToString
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
-@JsonTypeName("ObservationValue")
+@JsonTypeName(URNFactory.MODEL_PREFIX + "ObservationValue")
 public class ObservationValue {
   @JsonProperty("quantity")
   private Quantity quantity;

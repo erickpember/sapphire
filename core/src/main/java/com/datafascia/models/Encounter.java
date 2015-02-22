@@ -6,6 +6,7 @@ import com.datafascia.common.persist.Id;
 import com.datafascia.jackson.IdDeserializer;
 import com.datafascia.jackson.IdSerializer;
 import com.datafascia.urn.URNFactory;
+import com.datafascia.urn.URNFactory;
 import com.datafascia.urn.annotations.IdNamespace;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -26,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode @ToString
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
-@JsonTypeName("Encounter") @IdNamespace(URNFactory.NS_ENCOUNTER_ID)
+@JsonTypeName(URNFactory.MODEL_PREFIX + "Encounter") @IdNamespace(URNFactory.NS_ENCOUNTER_ID)
 public class Encounter {
   /** Identifies the encounter. */
   @JsonProperty("@id")

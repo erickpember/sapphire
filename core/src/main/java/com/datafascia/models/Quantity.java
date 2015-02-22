@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.models;
 
+import com.datafascia.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -21,7 +22,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode @ToString
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
-@JsonTypeName("Quantity")
+@JsonTypeName(URNFactory.MODEL_PREFIX + "Quantity")
 public class Quantity {
   /**
    * The value of the measured amount. The value includes an implicit precision in the presentation

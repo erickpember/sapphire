@@ -4,6 +4,7 @@ package com.datafascia.models;
 
 import com.datafascia.jackson.InstantDeserializer;
 import com.datafascia.jackson.InstantSerializer;
+import com.datafascia.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -22,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode @ToString
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
-@JsonTypeName("Period")
+@JsonTypeName(URNFactory.MODEL_PREFIX + "Period")
 public class Period {
   @JsonProperty("start") @JsonSerialize(using = InstantSerializer.class)
   @JsonDeserialize(using = InstantDeserializer.class)

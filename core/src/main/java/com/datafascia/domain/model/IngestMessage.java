@@ -29,7 +29,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @AllArgsConstructor @Builder @Data @NoArgsConstructor @Slf4j
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
-@JsonTypeName(URNFactory.MODEL_PREFIX + "RawMessage")
+@JsonTypeName(URNFactory.MODEL_PREFIX + "IngestMessage")
 public class IngestMessage {
   /** Time stamp */
   @JsonProperty("timestamp")

@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.models;
 
+import com.datafascia.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -23,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j @EqualsAndHashCode @NoArgsConstructor @AllArgsConstructor @Getter @Setter @ToString
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
-@JsonTypeName("Link")
+@JsonTypeName(URNFactory.MODEL_PREFIX + "Link")
 public class Link<T> {
   /** Externally retrievable URL of the resource */
   @JsonProperty("href")

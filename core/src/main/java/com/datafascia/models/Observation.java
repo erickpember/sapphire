@@ -26,7 +26,7 @@ import lombok.ToString;
  */
 @Data @NoArgsConstructor @ToString
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
-@JsonTypeName("Observation") @IdNamespace(URNFactory.NS_OBSERVATION_ID)
+@JsonTypeName(URNFactory.MODEL_PREFIX + "Observation") @IdNamespace(URNFactory.NS_OBSERVATION_ID)
 public class Observation {
   /** Unique identifier for observation */
   @JsonProperty("@id")

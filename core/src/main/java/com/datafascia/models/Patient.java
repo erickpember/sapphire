@@ -30,7 +30,8 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode(callSuper = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
-@JsonTypeName("Patient") @IdNamespace(URNFactory.NS_PATIENT_ID) @ToString(callSuper = true)
+@JsonTypeName(URNFactory.MODEL_PREFIX + "Patient") @IdNamespace(URNFactory.NS_PATIENT_ID)
+@ToString(callSuper = true)
 public class Patient extends Person {
   @JsonProperty("@id")
   @JsonDeserialize(using = IdDeserializer.class) @JsonSerialize(using = IdSerializer.class)

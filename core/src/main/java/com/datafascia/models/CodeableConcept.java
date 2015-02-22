@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.models;
 
+import com.datafascia.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -16,7 +17,7 @@ import lombok.ToString;
  */
 @AllArgsConstructor @Data @NoArgsConstructor @ToString
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
-@JsonTypeName("CodeableConcept")
+@JsonTypeName(URNFactory.MODEL_PREFIX + "CodeableConcept")
 public class CodeableConcept {
 
   // Coding Code defined by a terminology system.

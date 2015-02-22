@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.models;
 
+import com.datafascia.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -17,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
  */
 @JsonAutoDetect @Slf4j @NoArgsConstructor @ToString
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
-@JsonTypeName("Version")
+@JsonTypeName(URNFactory.MODEL_PREFIX + "Version")
 public class Version {
   @Getter @Setter
   private long id;

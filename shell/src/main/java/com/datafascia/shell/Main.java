@@ -33,7 +33,9 @@ public class Main {
   private void run(String[] args) {
     Command command = parseCommand(args);
     int exitStatus = command.execute();
-    System.exit(exitStatus);
+    if (exitStatus != Command.EXIT_STATUS_SUCCESS) {
+      System.exit(exitStatus);
+    }
   }
 
   private Command parseCommand(String[] args) {

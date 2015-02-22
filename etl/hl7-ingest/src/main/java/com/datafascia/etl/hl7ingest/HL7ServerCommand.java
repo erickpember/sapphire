@@ -6,7 +6,6 @@ import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.app.HL7Service;
 import ca.uhn.hl7v2.protocol.ReceivingApplication;
-import ca.uhn.hl7v2.validation.builder.support.DefaultValidationBuilder;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import java.util.Properties;
@@ -35,17 +34,13 @@ public class HL7ServerCommand extends HL7Ingest {
 
     // Create the context under which all HAPI operations will execute.
     HapiContext context = new DefaultHapiContext();
-    context.setValidationRuleBuilder(new DefaultValidationBuilder());
     HL7Service server = context.newServer(port, useTLS);
 
     // Create handler for all messages
     ReceivingApplication handler = new HL7Receiver(kafkaProducer(), queueName,
         institution, facility, department, source, payloadType);
     server.registerApplication(handler);
-    try {
-      server.startAndWait();
-    } catch (InterruptedException e) {
-    }
+    server.start();
 
     return EXIT_STATUS_SUCCESS;
   }

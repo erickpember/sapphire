@@ -3,8 +3,8 @@
 package com.datafascia.api.resources;
 
 import com.codahale.metrics.annotation.Timed;
-import com.datafascia.domain.persist.EncounterDao;
-import com.datafascia.domain.persist.PatientDao;
+import com.datafascia.domain.persist.opal.EncounterDao;
+import com.datafascia.domain.persist.opal.PatientDao;
 import com.datafascia.models.Encounter;
 import java.util.Optional;
 import javax.inject.Inject;

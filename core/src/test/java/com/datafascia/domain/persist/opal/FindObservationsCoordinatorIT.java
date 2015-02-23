@@ -1,6 +1,6 @@
 // Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.domain.persist;
+package com.datafascia.domain.persist.opal;
 
 import com.datafascia.models.Observation;
 import java.util.Collection;
@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
 /**
- * {@link FindObservationsCoordinator} integration test
+ * {@link com.datafascia.domain.persist.opal.FindObservationsCoordinator} integration test
  */
 @Slf4j
 public class FindObservationsCoordinatorIT extends DaoIT {

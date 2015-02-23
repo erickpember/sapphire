@@ -4,7 +4,7 @@ package com.datafascia.api.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.datafascia.common.time.Interval;
-import com.datafascia.domain.persist.FindObservationsCoordinator;
+import com.datafascia.domain.persist.opal.FindObservationsCoordinator;
 import com.datafascia.models.Observation;
 import com.google.common.base.Strings;
 import java.time.Instant;

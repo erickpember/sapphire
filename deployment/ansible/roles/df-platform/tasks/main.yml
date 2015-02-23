@@ -1,12 +1,33 @@
 ---
-- name: Create directories
+- name: Start Accumulo services
+  service:
+      name=accumulo
+      state=started
+      enabled=yes
+  when: inventory_hostname == 'devbox'
+
+- name: Copy application package
+  copy:
+      src={{ inventory_dir }}/../../../../shell/target/{{ df_platform_package }}
+      dest={{ company_prefix }}/{{ df_platform_package }}
+
+- name: Remove previous application install
+  command: rm -rf {{ df_platform_install_dir }}.previous
+  ignore_errors: True
+
+- name: Move current application install out of the way
+  command: mv {{ df_platform_install_dir }} {{ df_platform_install_dir }}.previous
+  ignore_errors: True
+
+- name: Extract application package
+  command: tar xzf {{ company_prefix }}/{{ df_platform_package }}
+      chdir={{ company_prefix }}
+
+- name: Create symbolic link to application install
   file:
-      path={{ item }}
-      state=directory
-      mode=755
-  with_items:
-    - "{{ df_platform_home }}"
-    - "{{ df_platform_conf_dir }}"
+      path={{ df_platform_home }}
+      src={{ df_platform_install_dir }}
+      state=link
 
 - name: Copy configuration files
   copy:

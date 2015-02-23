@@ -23,3 +23,44 @@ machine.
 
   This enables applications running on the host machine to connect to Accumulo
   by using that name.
+
+
+## Installed Software
+
+
+### Accumulo
+
+`/datafascia/accumulo/bin`
+:   executables
+
+`/datafascia/accumulo/logs`
+:   log files
+
+When you start or resume the virtual machine, you must start Accumulo with the
+command:
+
+    sudo service accumulo start
+
+
+### Kafka
+
+`/datafascia/kafka/bin`
+:   executables
+
+`/datafascia/kafka/logs`
+:   log files
+
+
+### Storm
+
+`/datafascia/storm/bin`
+:   executables
+
+`/datafascia/storm/logs`
+:   log files
+
+
+### dataFascia Platform shell
+
+`/datafascia/df-platform/bin`
+:   executables

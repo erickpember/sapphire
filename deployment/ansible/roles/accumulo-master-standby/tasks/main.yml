@@ -1,4 +1,6 @@
 ---
 - name: Start Accumulo services
-  debug: msg="Start Accumulo services"
-  notify: Start Accumulo services
+  service:
+      name=accumulo
+      state=started
+      enabled=yes

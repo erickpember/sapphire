@@ -1,4 +1,6 @@
 ---
-- name: Start tablet server
-  debug: msg="Start tablet server"
-  notify: Start Accumulo services
+- name: Start Accumulo services
+  service: 
+      name=accumulo
+      state=started
+      enabled=yes

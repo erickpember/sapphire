@@ -15,12 +15,15 @@
   with_items:
     - create-accumulo-tables
 
+- name: List Accumulo tables
+  shell: >
+      {{ accumulo_home }}/bin/accumulo shell --user root --password {{ accumulo_password }} --execute-command tables
+  register: list_tables
+
 - name: Create Accumulo tables
   shell: >
-      {{ accumulo_home }}/bin/accumulo shell --user root --password {{ accumulo_password }} --execute-command "execfile {{ df_platform_conf_dir }}/create-accumulo-tables" &&
-      touch {{ df_platform_conf_dir }}/create-accumulo-tables.done
-  args:
-    creates: "{{ df_platform_conf_dir }}/create-accumulo-tables.done"
+      {{ accumulo_home }}/bin/accumulo shell --user root --password {{ accumulo_password }} --execute-command "execfile {{ df_platform_conf_dir }}/create-accumulo-tables"
+  when: "'Patient' not in list_tables.stdout_lines"
 
 - name: List Kafka topics
   command: >

@@ -8,6 +8,9 @@ import ca.uhn.hl7v2.app.HL7Service;
 import ca.uhn.hl7v2.protocol.ReceivingApplication;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
+import com.datafascia.common.command.Command;
+import com.datafascia.jcommander.converters.URIConverter;
+import java.net.URI;
 import java.util.Properties;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.ProducerConfig;
@@ -19,7 +22,33 @@ import lombok.extern.slf4j.Slf4j;
 @Parameters(commandNames = "ingest-hl7-server",
     commandDescription = "Run HL7 MLLP server to copy HL7 messages to ingest queue.")
 @Slf4j
-public class HL7ServerCommand extends HL7Ingest {
+public class HL7ServerCommand implements Command {
+
+  @Parameter(names = { "-k", "--kafkaBrokers" }, description = "Kafka brokers", required = true)
+  String kafkaBrokers;
+
+  @Parameter(names = { "-q", "--queueName" }, description = "Name of the queue", required = true)
+  String queueName;
+
+  @Parameter(names = { "-i", "--institution" }, description = "URN for institution",
+      required = true, converter = URIConverter.class)
+  URI institution;
+
+  @Parameter(names = { "-f", "--facility" }, description = "URN for facility", required = true,
+      converter = URIConverter.class)
+  URI facility;
+
+  @Parameter(names = { "-d", "--department" }, description = "URN for department", required = false,
+      converter = URIConverter.class)
+  URI department = null;
+
+  @Parameter(names = { "-s", "--source" }, description = "URN for source", required = false,
+      converter = URIConverter.class)
+  URI source = null;
+
+  @Parameter(names = { "-p", "--payloadType" }, description = "URN for payload type",
+      required = true, converter = URIConverter.class)
+  URI payloadType = null;
 
   @Parameter(names = "--port", description = "MLLP listener port", required = true)
   private int port;

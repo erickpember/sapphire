@@ -53,7 +53,7 @@
 
 - name: Create Kafka topic
   command: >
-      {{ kafka_home }}/bin/kafka-topics.sh --zookeeper {{ groups['zookeeper'][0] }} --create --partitions 1 --replication-factor 1 --topic hl7message
+      {{ kafka_home }}/bin/kafka-topics.sh --zookeeper {{ groups['zookeeper'][0] }} --create --partitions 1 --replication-factor 1 --topic hl7Message
   when: "'hl7Message' not in list_topics.stdout_lines"
 
 - name: Create Kafka topic

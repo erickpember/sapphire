@@ -1,13 +1,13 @@
 ---
 # version of package
-jdk_package_version: 8u31
+java_package_version: 8u31
 
 # build identifier of package
-jdk_package_build: b13
+java_package_build: b13
 
 # version installed by package
-jdk_version: 1.8.0_31
+java_version: 1.8.0_31
 
-jdk_package: jdk-{{ jdk_package_version }}-linux-x64.rpm
+java_package: jre-{{ java_package_version }}-linux-x64.rpm
 
 java_home: /usr/java/default

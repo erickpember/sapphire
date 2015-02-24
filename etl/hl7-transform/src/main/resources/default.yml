@@ -5,14 +5,18 @@ HL7MessageToEventTopology:
     DeserializeMessage: 1
     SaveMessage: 1
     ParseMessage: 1
-    HandleAdmitMessage: 1
-    HandleObservationMessage: 1
+    TransformMessageToEvent: 1
+    PublishEvent: 1
 
 accumulo:
   instance: operational
   zooKeepers: devbox
   user: root
   password: secret
+
+eventQueue:
+  kafkaBrokers: "devbox:9092"
+  topic: event
 
 hl7MessageQueue:
   kafkaBrokers: "devbox:9092"

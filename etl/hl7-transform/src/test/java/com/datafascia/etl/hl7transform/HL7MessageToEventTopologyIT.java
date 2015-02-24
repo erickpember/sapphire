@@ -39,6 +39,9 @@ import storm.trident.Stream;
 import storm.trident.TridentTopology;
 import storm.trident.testing.FeederBatchSpout;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
@@ -65,16 +68,34 @@ public class HL7MessageToEventTopologyIT {
     public Connector getConnector(ConnectorFactory factory) {
       return factory.getConnector();
     }
+
+    @Provides
+    public EventProducer getEventProducer() {
+      return HL7MessageToEventTopologyIT.eventProducer;
+    }
   }
 
   private static final String TOPIC = "hl7Message";
   private static final String HL7_MESSAGE_SPOUT_ID = "hl7MessageSpout";
-  private static final String PAYLOAD = "MSH";
+  private static final String PAYLOAD =
+      "MSH|^~\\&|APeX|UCSF|IE|UCSF|20141001120532|ADTPA|ADT^A01|48213|T|2.4\r" +
+      "PID|1||97546762||NATUS-ADULT^ONE^A||19841001|F|NATUSADULT^ONE^A|U" +
+      "|123 MAIN^^SAN FRANCISCO^CA^94122^000^P||(415)999-9999^P^PH^^^415^9999999||ENG|S||41005438" +
+      "|888-88-8888|||U||||||||N\r" +
+      "ROL|1||General|14852^ROTH^DANIEL^ELI^^^^^EPIC^^^^PROVID|201410010000||||GENERAL|EXTERNAL" +
+      "|1 SHRADER ST #578^^SAN FRANCISCO^CA^94117" +
+      "|(415)876-5762^^PH^^^415^8765762~(415)876-4538^^FX^^^415^8764538\r" +
+      "PV1|1|I|A6A^A6597^28^5102^D^^^^^^OUTADT|R||" +
+      "|51112^CUCINA^RUSSELL^J^^^^^EPIC^^^^PROVID~025888116^CUCINA^RUSSELL^J" +
+      "|51112^CUCINA^RUSSELL^J^^^^^EPIC^^^^PROVID~025888116^CUCINA^RUSSELL^J||Hosp Med||||ACC||" +
+      "|51112^CUCINA^RUSSELL^J^^^^^EPIC^^^^PROVID~025888116^CUCINA^RUSSELL^J|IP|5014212|AETNA||||" +
+      "|||||||||||||||||AD|^^^5102||20141001120100\r";
 
   private static ConnectorFactory connectorFactory;
   private static Injector injector;
   private static Connector connector;
   private static IngestMessageDao ingestMessageDao;
+  private static EventProducer eventProducer;
 
   private HL7MessageToEventTopology topology;
   private FeederBatchSpout hl7MessageSpout;
@@ -88,6 +109,8 @@ public class HL7MessageToEventTopologyIT {
         .user("root")
         .password("")
         .build());
+
+    eventProducer = mock(EventProducer.class);
 
     Injectors.overrideWith(new TestModule());
     injector = Injectors.getInjector();
@@ -134,6 +157,8 @@ public class HL7MessageToEventTopologyIT {
     IngestMessage message = optionalMessage.get();
     assertEquals(message.getTimestamp(), originalMessage.getTimestamp());
     assertEquals(message.getPayload(), originalMessage.getPayload());
+
+    verify(eventProducer).send(any());
   }
 
   private void feedHL7Message(IngestMessage message) {

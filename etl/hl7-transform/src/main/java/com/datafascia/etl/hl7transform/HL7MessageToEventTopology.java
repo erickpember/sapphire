@@ -8,6 +8,7 @@ import backtype.storm.tuple.Fields;
 import ca.uhn.hl7v2.model.Message;
 import com.datafascia.common.storm.trident.BaseTridentTopology;
 import com.datafascia.common.storm.trident.StreamFactory;
+import com.datafascia.domain.event.Event;
 import com.datafascia.domain.model.IngestMessage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.configuration.HierarchicalConfiguration;
@@ -48,6 +49,7 @@ public class HL7MessageToEventTopology extends BaseTridentTopology {
 
   @Override
   protected Config configureTopology() {
+    stormConfig.registerSerialization(Event.class);
     stormConfig.registerSerialization(IngestMessage.class);
     stormConfig.registerSerialization(Message.class);
     return stormConfig;
@@ -57,9 +59,14 @@ public class HL7MessageToEventTopology extends BaseTridentTopology {
   protected StormTopology buildTopology() {
     TridentTopology topology = new TridentTopology();
 
-    Stream messageStream =
-        // Read serialized HL7 message from queue.
-        createHL7MessageStream(topology)
+    Stream messageStream = createMessageStream(topology);
+    transformMessageToEvent(messageStream);
+
+    return topology.build();
+  }
+
+  private Stream createMessageStream(TridentTopology topology) {
+    return createHL7MessageStream(topology)
         .parallelismHint(getParallelism(HL7_MESSAGE_SPOUT_ID))
 
         // Deserialize HL7 message.
@@ -87,22 +94,6 @@ public class HL7MessageToEventTopology extends BaseTridentTopology {
             ParseMessage.OUTPUT_FIELDS)
         .project(ParseMessage.OUTPUT_FIELDS)
         .parallelismHint(getParallelism(ParseMessage.ID));
-
-    messageStream
-        .name(HandleAdmitMessage.ID)
-        .each(
-            new Fields(F.MESSAGE),
-            wrap(new HandleAdmitMessage()))
-        .parallelismHint(getParallelism(HandleAdmitMessage.ID));
-
-    messageStream
-        .name(HandleObservationMessage.ID)
-        .each(
-            new Fields(F.MESSAGE),
-            wrap(new HandleObservationMessage()))
-        .parallelismHint(getParallelism(HandleObservationMessage.ID));
-
-    return topology.build();
   }
 
   private Stream createHL7MessageStream(TridentTopology topology) {
@@ -126,5 +117,23 @@ public class HL7MessageToEventTopology extends BaseTridentTopology {
     BrokerHosts brokerHosts = new ZkHosts(zooKeepers);
     TridentKafkaConfig spoutConfig = new TridentKafkaConfig(brokerHosts, topic);
     return new OpaqueTridentKafkaSpout(spoutConfig);
+  }
+
+  private void transformMessageToEvent(Stream messageStream) {
+    messageStream
+        // Transform admit message to event.
+        .name(TransformMessageToEvent.ID)
+        .each(
+            new Fields(F.MESSAGE),
+            wrap(new TransformMessageToEvent()),
+            TransformMessageToEvent.OUTPUT_FIELDS)
+        .parallelismHint(getParallelism(TransformMessageToEvent.ID))
+
+        // Publish event.
+        .name(PublishEvent.ID)
+        .each(
+            new Fields(F.EVENT),
+            wrap(new PublishEvent()))
+        .parallelismHint(getParallelism(PublishEvent.ID));
   }
 }

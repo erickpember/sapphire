@@ -14,13 +14,11 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-
 #
-# accumulo            This shell script takes care of stopping and starting
-#                     accumulo on a single server
-# chkconfig: - 60 20
-# description: Apache Accumulo: an implementation of Google's BigTable
-# probe: false
+# Starts Accumulo services
+#
+# chkconfig: 345 99 20
+# description: Accumulo
 
 . /etc/rc.d/init.d/functions
 

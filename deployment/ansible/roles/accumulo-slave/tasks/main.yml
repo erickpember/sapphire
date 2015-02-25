@@ -1,6 +1,0 @@
----
-- name: Start Accumulo services
-  service: 
-      name=accumulo
-      state=started
-      enabled=yes

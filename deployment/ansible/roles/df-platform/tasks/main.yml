@@ -1,9 +1,6 @@
 ---
 - name: Start Accumulo services
-  service:
-      name=accumulo
-      state=started
-      enabled=yes
+  command: sudo -u hdfs nohup {{ accumulo_home }}/bin/start-here.sh
   when: inventory_hostname == 'devbox'
 
 - name: Copy application package

@@ -3,6 +3,7 @@
 package com.datafascia.domain.event;
 
 import com.datafascia.common.avro.LocalDateAsStringEncoding;
+import com.datafascia.common.avro.LanguageCodeEncoding;
 import com.datafascia.models.Gender;
 import com.datafascia.models.MaritalStatus;
 import com.datafascia.models.Race;
@@ -26,16 +27,18 @@ public class PatientData implements EventData {
   private String middleName;
   private String lastName;
 
+  @AvroEncode(using = GenderEncoding.class)
   private Gender gender;
 
   @AvroEncode(using = LocalDateAsStringEncoding.class)
   private LocalDate birthDate;
 
-  @Nullable
+  @AvroEncode(using = MaritalStatusEncoding.class)
   private MaritalStatus maritalStatus;
 
+  @AvroEncode(using = RaceEncoding.class)
   private Race race;
 
-  @Nullable
+  @AvroEncode(using = LanguageCodeEncoding.class)
   private LanguageCode language;
 }

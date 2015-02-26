@@ -44,6 +44,11 @@
     </dependency>
 
     <dependency>
+      <groupId>com.neovisionaries</groupId>
+      <artifactId>nv-i18n</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>io.dropwizard.metrics</groupId>
       <artifactId>metrics-core</artifactId>
     </dependency>

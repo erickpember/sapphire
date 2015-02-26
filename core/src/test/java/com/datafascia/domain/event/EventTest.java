@@ -6,7 +6,9 @@ import com.datafascia.common.avro.Deserializer;
 import com.datafascia.common.avro.Serializer;
 import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
 import com.datafascia.models.Gender;
+import com.datafascia.models.MaritalStatus;
 import com.datafascia.models.Race;
+import com.neovisionaries.i18n.LanguageCode;
 import java.net.URI;
 import java.time.LocalDate;
 import org.testng.annotations.Test;
@@ -34,7 +36,9 @@ public class EventTest {
         .lastName("Coyote")
         .gender(Gender.MALE)
         .birthDate(LocalDate.now())
+        .maritalStatus(MaritalStatus.MARRIED)
         .race(Race.WHITE)
+        .language(LanguageCode.en)
         .build();
     Event originalEvent = Event.builder()
         .institutionId(URI.create("institution"))
@@ -51,5 +55,6 @@ public class EventTest {
     assertEquals(patientData.getFirstName(), originalPatientData.getFirstName());
     assertEquals(patientData.getGender(), originalPatientData.getGender());
     assertEquals(patientData.getBirthDate(), originalPatientData.getBirthDate());
+    assertEquals(patientData.getLanguage(), originalPatientData.getLanguage());
   }
 }

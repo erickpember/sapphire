@@ -19,6 +19,7 @@ import com.datafascia.common.storm.trident.StreamFactory;
 import com.datafascia.domain.model.IngestMessage;
 import com.datafascia.domain.persist.IngestMessageDao;
 import com.datafascia.domain.persist.Tables;
+import com.datafascia.kafka.SingleTopicProducer;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
 import java.net.URI;
@@ -49,6 +50,18 @@ import static org.testng.Assert.assertTrue;
 @Test(singleThreaded = true)
 public class HL7MessageToEventTopologyIT {
 
+  private static class TestEventProducer extends EventProducer {
+    public TestEventProducer(AvroSchemaRegistry schemaRegistry, Serializer serializer) {
+      super(schemaRegistry, serializer);
+      topic = EVENT_TOPIC;
+    }
+
+    @Override
+    protected SingleTopicProducer createProducer() {
+      return singleTopicProducer;
+    }
+  }
+
   private static class TestModule extends ConfigureModule {
     @Override
     protected void onConfigure() {
@@ -67,12 +80,14 @@ public class HL7MessageToEventTopologyIT {
     }
 
     @Provides
-    public EventProducer getEventProducer() {
-      return HL7MessageToEventTopologyIT.eventProducer;
+    public EventProducer getEventProducer(
+        AvroSchemaRegistry schemaRegistry, Serializer serializer) {
+
+      return new TestEventProducer(schemaRegistry, serializer);
     }
   }
 
-  private static final String TOPIC = "hl7Message";
+  private static final String HL7_MESSAGE_TOPIC = "hl7Message";
   private static final String HL7_MESSAGE_SPOUT_ID = "hl7MessageSpout";
   private static final String PAYLOAD =
       "MSH|^~\\&|APeX|UCSF|IE|UCSF|20141001120532|ADTPA|ADT^A01|48213|T|2.4\r" +
@@ -87,12 +102,13 @@ public class HL7MessageToEventTopologyIT {
       "|51112^CUCINA^RUSSELL^J^^^^^EPIC^^^^PROVID~025888116^CUCINA^RUSSELL^J||Hosp Med||||ACC||" +
       "|51112^CUCINA^RUSSELL^J^^^^^EPIC^^^^PROVID~025888116^CUCINA^RUSSELL^J|IP|5014212|AETNA||||" +
       "|||||||||||||||||AD|^^^5102||20141001120100\r";
+  private static final String EVENT_TOPIC = "event";
 
   private static ConnectorFactory connectorFactory;
   private static Injector injector;
   private static Connector connector;
   private static IngestMessageDao ingestMessageDao;
-  private static EventProducer eventProducer;
+  private static SingleTopicProducer singleTopicProducer;
 
   private HL7MessageToEventTopology topology;
   private FeederBatchSpout hl7MessageSpout;
@@ -107,12 +123,12 @@ public class HL7MessageToEventTopologyIT {
         .password("")
         .build());
 
-    eventProducer = mock(EventProducer.class);
-
     Injectors.overrideWith(new TestModule());
     injector = Injectors.getInjector();
 
     connector = injector.getInstance(Connector.class);
+
+    singleTopicProducer = mock(SingleTopicProducer.class);
   }
 
   @BeforeMethod
@@ -157,11 +173,11 @@ public class HL7MessageToEventTopologyIT {
     assertEquals(message.getTimestamp(), originalMessage.getTimestamp());
     assertEquals(message.getPayload(), originalMessage.getPayload());
 
-    verify(eventProducer).send(any());
+    verify(singleTopicProducer).send(any());
   }
 
   private void feedHL7Message(IngestMessage message) {
-    feedHL7Message(serializer.encodeReflect(TOPIC, message));
+    feedHL7Message(serializer.encodeReflect(HL7_MESSAGE_TOPIC, message));
   }
 
   private void feedHL7Message(final byte[] bytes) {

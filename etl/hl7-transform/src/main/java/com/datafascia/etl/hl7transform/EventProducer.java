@@ -22,15 +22,29 @@ public class EventProducer {
   private String kafkaBrokers;
 
   @Configure
-  private String topic;
+  protected String topic;
 
-  @Inject
   private AvroSchemaRegistry schemaRegistry;
-
-  @Inject
   private Serializer serializer;
-
   private SingleTopicProducer producer;
+
+  /**
+   * Constructor
+   *
+   * @param schemaRegistry
+   *     schema registry
+   * @param serializer
+   *     serializer
+   */
+  @Inject
+  public EventProducer(AvroSchemaRegistry schemaRegistry, Serializer serializer) {
+    this.schemaRegistry = schemaRegistry;
+    this.serializer = serializer;
+  }
+
+  protected SingleTopicProducer createProducer() {
+    return new SingleTopicProducer(kafkaBrokers, topic);
+  }
 
   /**
    * Initializes Kafka producer.
@@ -39,7 +53,7 @@ public class EventProducer {
     Schema schema = ReflectData.get().getSchema(Event.class);
     schemaRegistry.putSchema(topic, schema);
 
-    producer = new SingleTopicProducer(kafkaBrokers, topic);
+    producer = createProducer();
   }
 
   /**

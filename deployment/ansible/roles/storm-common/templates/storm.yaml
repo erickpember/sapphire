@@ -17,9 +17,8 @@ supervisor.childopts: "-Xmx256m {{ storm_java_opts }} -Xloggc:{{ storm_logs_dir 
 worker.childopts: "-Xmx1g -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=75 {{ storm_java_opts }} -Xloggc:{{ storm_logs_dir }}/gc-worker.log"
 
 supervisor.slots.ports:
-{% for port in storm_supervisor_slots_ports %}
-  - {{ port }}
-{% endfor %}
+  - 6700
+  - 6701
 
 storm.local.dir: {{ storm_local_dir }}
 

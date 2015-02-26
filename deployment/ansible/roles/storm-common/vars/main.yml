@@ -7,7 +7,4 @@ storm_home: "{{ company_prefix }}/storm"
 storm_local_dir: "{{ storm_home }}/local"
 storm_logs_dir: "{{ storm_home }}/logs"
 
-storm_supervisor_slots_ports:
-  - 6700
-
 storm_java_opts: "-Djava.net.preferIPv4Stack=true -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath={{ storm_logs_dir }} -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseGCLogFileRotation -XX:GCLogFileSize=1m"

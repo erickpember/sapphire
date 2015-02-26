@@ -3,6 +3,7 @@
 package com.datafascia.models;
 
 import com.datafascia.common.persist.Id;
+import com.datafascia.common.time.Interval;
 import com.neovisionaries.i18n.CountryCode;
 import com.neovisionaries.i18n.LanguageCode;
 import java.awt.Image;
@@ -190,20 +191,16 @@ public class TestModels {
     }
   };
 
-  public static Range range = new Range() {
-    {
-      setLow(new NumericQuantity(new BigDecimal(0), UCUM.LITER));
-      setHigh(new NumericQuantity(new BigDecimal(28935.78394d), UCUM.LITER));
-    }
-  };
-
   public static NumericQuantity numericQuantity = new NumericQuantity(new BigDecimal("3.1"), UCUM
       .METER);
+
+  public static Interval<NumericQuantity> numericInterval = new Interval<>(numericQuantity,
+      numericQuantity);
 
   public static ReferenceRange referenceRange = new ReferenceRange() {
     {
       setMeaning(codeable);
-      setAge(range);
+      setAge(numericInterval);
     }
   };
 

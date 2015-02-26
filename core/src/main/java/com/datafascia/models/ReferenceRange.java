@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.models;
 
+import com.datafascia.common.time.Interval;
 import com.datafascia.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -16,10 +17,10 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * Measurements and simple assertions made about a patient, device or other subject.
  */
-@Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode(callSuper = true)
+@Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "ReferenceRange") @ToString(callSuper = true)
-public class ReferenceRange extends Range {
+public class ReferenceRange {
   /** Code for the meaning of the reference range. */
   @JsonProperty("meaning")
   private CodeableConcept meaning;
@@ -29,5 +30,5 @@ public class ReferenceRange extends Range {
    * weeks at term) if the meaning says so.
    */
   @JsonProperty("age")
-  private Range age;
+  private Interval<NumericQuantity> age;
 }

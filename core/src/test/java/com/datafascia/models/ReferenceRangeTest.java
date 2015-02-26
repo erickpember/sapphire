@@ -17,7 +17,7 @@ public class ReferenceRangeTest extends ModelTestBase {
   public <T extends Object> void testReferenceRange() throws IOException, URISyntaxException {
     ReferenceRange decoded = (ReferenceRange) geneticEncodeDecodeTest(TestModels.referenceRange);
     assertEquals(decoded.getMeaning(), TestModels.codeable);
-    assertEquals(decoded.getAge(), TestModels.range);
+    assertEquals(decoded.getAge(), TestModels.numericInterval);
   }
 
   @Test

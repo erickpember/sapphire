@@ -10,6 +10,8 @@ import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.accumulo.core.client.BatchWriter;
+import org.apache.accumulo.core.client.BatchWriterConfig;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.client.TableNotFoundException;
@@ -39,6 +41,21 @@ public class AccumuloTemplate {
     this.authorizationsProvider = authorizationsProvider;
     this.connector = connector;
     this.metrics = metrics;
+  }
+
+  /**
+   * Creates a writer of the table.
+   *
+   * @param tableName
+   *     table name
+   * @return writer
+   */
+  public BatchWriter createBatchWriter(String tableName) {
+    try {
+      return connector.createBatchWriter(tableName, new BatchWriterConfig());
+    } catch (TableNotFoundException e) {
+      throw new IllegalStateException("Table " + tableName + " not found", e);
+    }
   }
 
   /**

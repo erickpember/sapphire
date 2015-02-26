@@ -36,6 +36,10 @@ public class Patient extends Person {
   @JsonProperty("@id")
   @JsonDeserialize(using = IdDeserializer.class) @JsonSerialize(using = IdSerializer.class)
   private Id<Patient> id;
+
+  private String patientId;
+  private String accountNumber;
+
   @JsonProperty("contacts")
   private List<Contact> contactDetails;
   @JsonProperty("creationDate") @JsonSerialize(using = InstantSerializer.class)

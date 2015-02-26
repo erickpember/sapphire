@@ -34,7 +34,7 @@ public class EventTest {
         .lastName("Coyote")
         .gender(Gender.MALE)
         .birthDate(LocalDate.now())
-        .race(Race.White)
+        .race(Race.WHITE)
         .build();
     Event originalEvent = Event.builder()
         .institutionId(URI.create("institution"))

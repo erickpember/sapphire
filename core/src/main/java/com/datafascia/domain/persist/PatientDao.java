@@ -194,7 +194,7 @@ public class PatientDao extends OpalDao {
     Patient patient = new Patient();
     patient.setId(Id.of(patientId));
     patient.setGender(Gender.UNKNOWN);
-    patient.setRace(Race.Unknown);
+    patient.setRace(Race.UNKNOWN);
     Name name = new Name();
 
     for (Entry<Key, Value> entry : scanner) {
@@ -220,7 +220,7 @@ public class PatientDao extends OpalDao {
             break;
           case dF_pidRace :
             Race race =
-                Enums.getIfPresent(Race.class, decodeString(value)).or(Race.Unknown);
+                Enums.getIfPresent(Race.class, decodeString(value)).or(Race.UNKNOWN);
             patient.setRace(race);
             break;
           case dF_pidPatientId :

@@ -110,7 +110,7 @@ public class TestModels {
       setLangs(Arrays.asList(LanguageCode.en, LanguageCode.ch));
       setManagingOrg("Test Corp.");
       setMaritalStatus(MaritalStatus.DomesticPartner);
-      setRace(Race.Black);
+      setRace(Race.BLACK);
     }
   };
 

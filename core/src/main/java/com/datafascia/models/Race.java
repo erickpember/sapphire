@@ -6,5 +6,5 @@ package com.datafascia.models;
  * Enumerates a list of human races.
  */
 public enum Race {
-  AmericanIndian, Asian, Black, Other, PacificIslander, Unknown, White
+  AMERICAN_INDIAN, ASIAN, BLACK, OTHER, PACIFIC_ISLANDER, UNKNOWN, WHITE
 }

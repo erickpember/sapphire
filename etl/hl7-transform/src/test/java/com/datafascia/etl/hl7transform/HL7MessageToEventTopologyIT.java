@@ -20,8 +20,10 @@ import com.datafascia.domain.model.IngestMessage;
 import com.datafascia.domain.persist.IngestMessageDao;
 import com.datafascia.domain.persist.Tables;
 import com.datafascia.kafka.SingleTopicProducer;
+import com.google.common.io.Resources;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
+import java.io.IOException;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -89,19 +91,6 @@ public class HL7MessageToEventTopologyIT {
 
   private static final String HL7_MESSAGE_TOPIC = "hl7Message";
   private static final String HL7_MESSAGE_SPOUT_ID = "hl7MessageSpout";
-  private static final String PAYLOAD =
-      "MSH|^~\\&|APeX|UCSF|IE|UCSF|20141001120532|ADTPA|ADT^A01|48213|T|2.4\r" +
-      "PID|1||97546762||NATUS-ADULT^ONE^A||19841001|F|NATUSADULT^ONE^A|U" +
-      "|123 MAIN^^SAN FRANCISCO^CA^94122^000^P||(415)999-9999^P^PH^^^415^9999999||ENG|S||41005438" +
-      "|888-88-8888|||U||||||||N\r" +
-      "ROL|1||General|14852^ROTH^DANIEL^ELI^^^^^EPIC^^^^PROVID|201410010000||||GENERAL|EXTERNAL" +
-      "|1 SHRADER ST #578^^SAN FRANCISCO^CA^94117" +
-      "|(415)876-5762^^PH^^^415^8765762~(415)876-4538^^FX^^^415^8764538\r" +
-      "PV1|1|I|A6A^A6597^28^5102^D^^^^^^OUTADT|R||" +
-      "|51112^CUCINA^RUSSELL^J^^^^^EPIC^^^^PROVID~025888116^CUCINA^RUSSELL^J" +
-      "|51112^CUCINA^RUSSELL^J^^^^^EPIC^^^^PROVID~025888116^CUCINA^RUSSELL^J||Hosp Med||||ACC||" +
-      "|51112^CUCINA^RUSSELL^J^^^^^EPIC^^^^PROVID~025888116^CUCINA^RUSSELL^J|IP|5014212|AETNA||||" +
-      "|||||||||||||||||AD|^^^5102||20141001120100\r";
   private static final String EVENT_TOPIC = "event";
 
   private static ConnectorFactory connectorFactory;
@@ -162,7 +151,7 @@ public class HL7MessageToEventTopologyIT {
         .institution(URI.create("urn:df-institution:institution"))
         .facility(URI.create("urn:df-facility:facility"))
         .payloadType(URI.create("urn:df-payloadtype:HL7v2"))
-        .payload(ByteBuffer.wrap(PAYLOAD.getBytes(StandardCharsets.UTF_8)))
+        .payload(getPayload())
         .build();
     feedHL7Message(originalMessage);
 
@@ -174,6 +163,13 @@ public class HL7MessageToEventTopologyIT {
     assertEquals(message.getPayload(), originalMessage.getPayload());
 
     verify(singleTopicProducer).send(any());
+  }
+
+  private ByteBuffer getPayload() throws IOException {
+    String payload = Resources.toString(
+        Resources.getResource("ADT_A01.hl7"), StandardCharsets.UTF_8);
+    payload = payload.replace('\n', '\r');
+    return ByteBuffer.wrap(payload.getBytes(StandardCharsets.UTF_8));
   }
 
   private void feedHL7Message(IngestMessage message) {

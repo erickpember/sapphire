@@ -48,11 +48,11 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
   private Gender toGender(String code) {
     switch (code) {
       case "F":
-        return Gender.Female;
+        return Gender.FEMALE;
       case "M":
-        return Gender.Male;
+        return Gender.MALE;
       default:
-        return Gender.Unknown;
+        return Gender.UNKNOWN;
     }
   }
 

@@ -19,7 +19,7 @@ public class CaregiverTest extends ModelTestBase {
     assertEquals(decoded.getAddress(), TestModels.address);
     assertEquals(decoded.getSpecialty(), Specialty.Allergy);
     assertEquals(decoded.getName(), TestModels.name);
-    assertEquals(decoded.getGender(), Gender.Undifferentiated);
+    assertEquals(decoded.getGender(), Gender.UNDIFFERENTIATED);
     assertEquals(decoded.getBirthDate(), TestModels.getDate());
     assertEquals(decoded.getPhoto(), TestModels.getPhoto());
     assertEquals(decoded.getOrganization(), "Test Corp.");

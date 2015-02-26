@@ -32,7 +32,7 @@ public class EventTest {
         .firstName("Wiley")
         .middleName("E")
         .lastName("Coyote")
-        .gender(Gender.Male)
+        .gender(Gender.MALE)
         .birthDate(LocalDate.now())
         .race(Race.White)
         .build();

@@ -75,7 +75,7 @@ public class TestModels {
       setAddress(address);
       setSpecialty(Specialty.Allergy);
       setName(name);
-      setGender(Gender.Undifferentiated);
+      setGender(Gender.UNDIFFERENTIATED);
       setBirthDate(getDate());
       setPhoto(TestModels.getPhoto());
       setOrganization("Test Corp.");
@@ -86,7 +86,7 @@ public class TestModels {
     {
       setAddress(address);
       setName(name);
-      setGender(Gender.Undifferentiated);
+      setGender(Gender.UNDIFFERENTIATED);
       setBirthDate(getDate());
       setPhoto(TestModels.getPhoto());
       setOrganization("Test Corp.");
@@ -258,7 +258,7 @@ public class TestModels {
     {
       setName(name);
       setAddress(address);
-      setGender(Gender.Male);
+      setGender(Gender.MALE);
       setBirthDate(getDate());
       setPhoto(TestModels.getPhoto());
       setOrganization("Some Ficticious Hospital");

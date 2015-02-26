@@ -18,7 +18,7 @@ public class PersonTest extends ModelTestBase {
     Person decoded = (Person) geneticEncodeDecodeTest(TestModels.person);
     assertEquals(decoded.getName(), TestModels.name);
     assertEquals(decoded.getAddress(), TestModels.address);
-    assertEquals(decoded.getGender(), Gender.Male);
+    assertEquals(decoded.getGender(), Gender.MALE);
     assertEquals(decoded.getBirthDate(), TestModels.getDate());
     assertEquals(decoded.getPhoto(), TestModels.getPhoto());
     assertEquals(decoded.getOrganization(), "Some Ficticious Hospital");

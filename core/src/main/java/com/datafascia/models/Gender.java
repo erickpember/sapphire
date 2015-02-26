@@ -6,5 +6,5 @@ package com.datafascia.models;
  * Enumerates a list of genders.
  */
 public enum Gender {
-  Male, Female, Undifferentiated, Unknown
+  MALE, FEMALE, UNDIFFERENTIATED, UNKNOWN
 }

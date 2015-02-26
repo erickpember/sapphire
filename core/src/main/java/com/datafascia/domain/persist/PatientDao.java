@@ -193,7 +193,7 @@ public class PatientDao extends OpalDao {
 
     Patient patient = new Patient();
     patient.setId(Id.of(patientId));
-    patient.setGender(Gender.Unknown);
+    patient.setGender(Gender.UNKNOWN);
     patient.setRace(Race.Unknown);
     Name name = new Name();
 
@@ -216,7 +216,7 @@ public class PatientDao extends OpalDao {
             break;
           case dF_pidSex :
             Gender gender =
-                Enums.getIfPresent(Gender.class, decodeString(value)).or(Gender.Unknown);
+                Enums.getIfPresent(Gender.class, decodeString(value)).or(Gender.UNKNOWN);
             patient.setGender(gender);
             break;
           case dF_pidRace :

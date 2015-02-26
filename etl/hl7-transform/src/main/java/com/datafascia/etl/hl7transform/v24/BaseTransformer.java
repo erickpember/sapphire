@@ -56,17 +56,17 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
   private MaritalStatus toMaritalStatus(String code) {
     switch (code) {
       case "A":
-        return MaritalStatus.LegallySeparated;
+        return MaritalStatus.LEGALLY_SEPARATED;
       case "D":
-        return MaritalStatus.Divorced;
+        return MaritalStatus.DIVORCED;
       case "M":
-        return MaritalStatus.Married;
+        return MaritalStatus.MARRIED;
       case "P":
-        return MaritalStatus.DomesticPartner;
+        return MaritalStatus.DOMESTIC_PARTNER;
       case "S":
-        return MaritalStatus.NeverMarried;
+        return MaritalStatus.NEVER_MARRIED;
       case "W":
-        return MaritalStatus.Widowed;
+        return MaritalStatus.WIDOWED;
       default:
         return null;
     }

@@ -6,14 +6,14 @@ package com.datafascia.models;
  * Enumerates the various marital statuses.
  */
 public enum MaritalStatus {
-  Annulled,
-  Divorced,
-  LegallySeparated,
-  Interlocutory,
-  Married,
-  Polygamous,
-  NeverMarried,
-  DomesticPartner,
-  Widowed,
-  Unmarried
+  ANNULLED,
+  DIVORCED,
+  LEGALLY_SEPARATED,
+  INTERLOCUTORY,
+  MARRIED,
+  POLYGAMOUS,
+  NEVER_MARRIED,
+  DOMESTIC_PARTNER,
+  WIDOWED,
+  UNMARRIED
 }

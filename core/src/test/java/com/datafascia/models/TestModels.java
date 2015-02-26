@@ -109,7 +109,7 @@ public class TestModels {
       setId(Id.of("1234"));
       setLangs(Arrays.asList(LanguageCode.en, LanguageCode.ch));
       setManagingOrg("Test Corp.");
-      setMaritalStatus(MaritalStatus.DomesticPartner);
+      setMaritalStatus(MaritalStatus.DOMESTIC_PARTNER);
       setRace(Race.BLACK);
     }
   };

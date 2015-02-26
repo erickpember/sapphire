@@ -36,7 +36,7 @@ public class PatientTest extends ModelTestBase {
     assertEquals(decoded.getId(), Id.of("1234"));
     assertEquals(decoded.getLangs(), Arrays.asList(LanguageCode.en, LanguageCode.ch));
     assertEquals(decoded.getManagingOrg(), "Test Corp.");
-    assertEquals(decoded.getMaritalStatus(), MaritalStatus.DomesticPartner);
+    assertEquals(decoded.getMaritalStatus(), MaritalStatus.DOMESTIC_PARTNER);
     assertEquals(decoded.getRace(), Race.BLACK);
   }
 

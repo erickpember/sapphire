@@ -46,14 +46,7 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
   }
 
   private Gender toGender(String code) {
-    switch (code) {
-      case "F":
-        return Gender.FEMALE;
-      case "M":
-        return Gender.MALE;
-      default:
-        return Gender.UNKNOWN;
-    }
+    return Gender.of(code).orElse(Gender.UNKNOWN);
   }
 
   private LocalDate toBirthDate(TSComponentOne birthDate) throws HL7Exception {

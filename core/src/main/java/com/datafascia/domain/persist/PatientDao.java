@@ -215,8 +215,7 @@ public class PatientDao extends OpalDao {
             name.setMiddle(decodeString(value));
             break;
           case dF_pidSex :
-            Gender gender =
-                Enums.getIfPresent(Gender.class, decodeString(value)).or(Gender.UNKNOWN);
+            Gender gender = Gender.of(decodeString(value)).orElse(Gender.UNKNOWN);
             patient.setGender(gender);
             break;
           case dF_pidRace :

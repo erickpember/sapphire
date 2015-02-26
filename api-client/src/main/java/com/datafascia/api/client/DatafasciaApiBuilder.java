@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.client;
 
+import com.datafascia.jackson.DFObjectMapper;
 import com.datafascia.string.StringUtils;
 import java.net.URI;
 import lombok.extern.slf4j.Slf4j;
@@ -23,7 +24,7 @@ public class DatafasciaApiBuilder {
    */
   public static DatafasciaApi endpoint(URI endpoint, String user, String password) {
     RestAdapter.Builder builder = new RestAdapter.Builder()
-        .setConverter(new JacksonConverter())
+        .setConverter(new JacksonConverter(DFObjectMapper.objectMapper()))
         .setEndpoint(endpoint.toString());
 
     if ((user != null) && (password != null)) {

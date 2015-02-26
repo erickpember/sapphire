@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.models;
 
+import com.datafascia.jackson.DFObjectMapper;
 import com.datafascia.urn.URNMap;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,7 +19,7 @@ import static org.testng.Assert.assertNotNull;
  * Base class for tests of models.
  */
 public class ModelTestBase {
-  public static ObjectMapper mapper = new ObjectMapper();
+  public static ObjectMapper mapper = DFObjectMapper.objectMapper();
 
   @BeforeSuite
   public void setup() {

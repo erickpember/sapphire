@@ -19,6 +19,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
+import tec.units.ri.util.UCUM;
 
 /**
  * A container for various test models.
@@ -205,6 +206,9 @@ public class TestModels {
       setHigh(quantity);
     }
   };
+
+  public static NumericQuantity numericQuantity = new NumericQuantity(new BigDecimal("3.1"), UCUM
+      .METER);
 
   public static ReferenceRange referenceRange = new ReferenceRange() {
     {

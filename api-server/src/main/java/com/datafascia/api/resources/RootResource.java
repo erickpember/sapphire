@@ -3,6 +3,7 @@
 package com.datafascia.api.resources;
 
 import com.codahale.metrics.annotation.Timed;
+import com.datafascia.jackson.DFObjectMapper;
 import com.datafascia.reflections.PackageUtils;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -70,7 +71,7 @@ public class RootResource {
   private JsonSchema modelSchema(String modelName) throws WebApplicationException {
     try {
       log.info("Fetching schema for " + modelName);
-      ObjectMapper mapper = new ObjectMapper();
+      ObjectMapper mapper = DFObjectMapper.objectMapper();
       SchemaFactoryWrapper visitor = new SchemaFactoryWrapper();
       Class<?> modelClass = Class.forName(modelName);
       mapper.acceptJsonFormatVisitor(modelClass, visitor);

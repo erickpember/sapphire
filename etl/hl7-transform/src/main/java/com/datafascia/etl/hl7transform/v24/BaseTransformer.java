@@ -54,22 +54,7 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
   }
 
   private MaritalStatus toMaritalStatus(String code) {
-    switch (code) {
-      case "A":
-        return MaritalStatus.LEGALLY_SEPARATED;
-      case "D":
-        return MaritalStatus.DIVORCED;
-      case "M":
-        return MaritalStatus.MARRIED;
-      case "P":
-        return MaritalStatus.DOMESTIC_PARTNER;
-      case "S":
-        return MaritalStatus.NEVER_MARRIED;
-      case "W":
-        return MaritalStatus.WIDOWED;
-      default:
-        return null;
-    }
+    return MaritalStatus.of(code).orElse(MaritalStatus.UNKNOWN);
   }
 
   private Race toRace(String code) {

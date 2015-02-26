@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.persist.opal;
 
-import com.datafascia.accumulo.QueryTemplate;
+import com.datafascia.accumulo.AccumuloTemplate;
 import com.datafascia.accumulo.RowMapper;
 import com.datafascia.accumulo.SingleValueRowMapper;
 import com.datafascia.common.persist.Id;
@@ -64,13 +64,14 @@ public class PatientDao extends OpalDao {
   private static final Text LAST_VISIT_ID = toColumnFamily(FieldType.STRING, "LastVisitOiid");
 
   /**
-   * Create data access with query template
+   * Constructor
    *
-   * @param queryTemplate the query template to use
+   * @param accumuloTemplate
+   *     data access operations template
    */
   @Inject
-  public PatientDao(QueryTemplate queryTemplate) {
-    super(queryTemplate);
+  public PatientDao(AccumuloTemplate accumuloTemplate) {
+    super(accumuloTemplate);
   }
 
   /**
@@ -138,7 +139,7 @@ public class PatientDao extends OpalDao {
     scanner.setRange(toRange(Kinds.PATIENT_OBJECT));
     scanner.fetchColumnFamily(PATIENT_PRESENT);
 
-    return queryTemplate.queryForList(scanner, new GetPatientIdsRowMapper(activeFlag));
+    return accumuloTemplate.queryForList(scanner, new GetPatientIdsRowMapper(activeFlag));
   }
 
   /**
@@ -174,7 +175,7 @@ public class PatientDao extends OpalDao {
     scanner.setRange(toRange(Kinds.PATIENT_OBJECT, patientId));
     scanner.fetchColumnFamily(LAST_VISIT_ID);
 
-    String lastVisitId = queryTemplate.queryForObject(scanner, new LastVisitIdRowMapper());
+    String lastVisitId = accumuloTemplate.queryForObject(scanner, new LastVisitIdRowMapper());
     return Optional.ofNullable(lastVisitId);
   }
 

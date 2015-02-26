@@ -5,8 +5,8 @@ package com.datafascia.domain.persist.opal;
 import com.datafascia.accumulo.AccumuloConfiguration;
 import com.datafascia.accumulo.AccumuloImport;
 import com.datafascia.accumulo.AccumuloModule;
+import com.datafascia.accumulo.AccumuloTemplate;
 import com.datafascia.accumulo.AuthorizationsProvider;
-import com.datafascia.accumulo.QueryTemplate;
 import com.datafascia.accumulo.SubjectAuthorizationsProvider;
 import com.datafascia.common.shiro.FakeRealm;
 import com.datafascia.common.shiro.RoleExposingRealm;
@@ -43,7 +43,7 @@ public abstract class DaoIT {
 
   private static final AccumuloConfiguration config = accumuloConfig();
   protected static Connector connect;
-  protected static QueryTemplate queryTemplate;
+  protected static AccumuloTemplate accumuloTemplate;
   private static ThreadState threadState;
 
   @BeforeSuite
@@ -63,7 +63,7 @@ public abstract class DaoIT {
         new AccumuloModule());
 
     connect = injector.getInstance(Connector.class);
-    queryTemplate = injector.getInstance(QueryTemplate.class);
+    accumuloTemplate = injector.getInstance(AccumuloTemplate.class);
 
     String resourceFile = Resources.getResource("version.json").getPath();
     String path = resourceFile.substring(0, resourceFile.lastIndexOf(File.separator));

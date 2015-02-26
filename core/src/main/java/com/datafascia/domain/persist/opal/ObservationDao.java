@@ -3,7 +3,7 @@
 package com.datafascia.domain.persist.opal;
 
 import com.codahale.metrics.Timer;
-import com.datafascia.accumulo.QueryTemplate;
+import com.datafascia.accumulo.AccumuloTemplate;
 import com.datafascia.models.CodeableConcept;
 import com.datafascia.models.Observation;
 import com.datafascia.models.ObservationValue;
@@ -26,13 +26,14 @@ import org.apache.accumulo.core.data.Value;
 public class ObservationDao extends OpalDao {
 
   /**
-   * Create data access with query template
+   * Constructor
    *
-   * @param queryTemplate the query template to use
+   * @param accumuloTemplate
+   *     data access operations template
    */
   @Inject
-  public ObservationDao(QueryTemplate queryTemplate) {
-    super(queryTemplate);
+  public ObservationDao(AccumuloTemplate accumuloTemplate) {
+    super(accumuloTemplate);
   }
 
   /**
@@ -43,7 +44,7 @@ public class ObservationDao extends OpalDao {
    * @return collection of observations, empty if none found
    */
   public List<Observation> findObservations(String updateId) {
-    Timer.Context timerContext = queryTemplate.getTimerContext(getClass(), "findObservations");
+    Timer.Context timerContext = accumuloTemplate.getTimerContext(getClass(), "findObservations");
     try {
       List<Observation> observations = new ArrayList<>();
       Instant issued = null;

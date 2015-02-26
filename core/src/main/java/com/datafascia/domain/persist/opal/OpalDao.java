@@ -3,7 +3,7 @@
 package com.datafascia.domain.persist.opal;
 
 import com.codahale.metrics.Timer;
-import com.datafascia.accumulo.QueryTemplate;
+import com.datafascia.accumulo.AccumuloTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -25,7 +25,7 @@ import org.apache.hadoop.io.Text;
  * Handles interacting with Accumulo instances that are formatted in the style of Opal.
  */
 @Slf4j
-public class OpalDao {
+public abstract class OpalDao {
   private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
 
   protected static final String ObjectStore = "ObjectStore";
@@ -38,15 +38,16 @@ public class OpalDao {
   protected static final String PatientObject = "PatientObject";
   protected static final String OPAL_DATA = "opal_dF_data";
 
-  protected QueryTemplate queryTemplate;
+  protected AccumuloTemplate accumuloTemplate;
 
   /**
-   * Create data access with query template
+   * Constructor
    *
-   * @param queryTemplate the query template to use
+   * @param accumuloTemplate
+   *     data access operations template
    */
-  public OpalDao(QueryTemplate queryTemplate) {
-    this.queryTemplate = queryTemplate;
+  protected OpalDao(AccumuloTemplate accumuloTemplate) {
+    this.accumuloTemplate = accumuloTemplate;
   }
 
   /**
@@ -56,7 +57,7 @@ public class OpalDao {
    * @throws RuntimeException if table not found.
    */
   protected Scanner getScanner() {
-    return queryTemplate.createScanner(OPAL_DATA);
+    return accumuloTemplate.createScanner(OPAL_DATA);
   }
 
   protected static String[] splitKey(String key) {
@@ -104,7 +105,7 @@ public class OpalDao {
   protected Optional<Value> getFieldValue(String namespace, String kind, String id,
       String requestedFieldName) {
 
-    Timer.Context timerContext = queryTemplate.getTimerContext(
+    Timer.Context timerContext = accumuloTemplate.getTimerContext(
         getClass(), "getFieldValue", kind, requestedFieldName);
     try {
       Scanner scanner = getScanner();

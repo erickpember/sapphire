@@ -27,7 +27,7 @@ public class PatientDaoIT extends DaoIT {
     DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss Z");
 
     log.info("Getting the patients");
-    PatientDao patientDao = new PatientDao(queryTemplate);
+    PatientDao patientDao = new PatientDao(accumuloTemplate);
     Iterator<Patient> patients = patientDao.patients(true);
 
     int count = 0;

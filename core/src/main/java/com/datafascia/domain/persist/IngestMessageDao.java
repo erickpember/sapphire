@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.persist;
 
-import com.datafascia.accumulo.QueryTemplate;
+import com.datafascia.accumulo.AccumuloTemplate;
 import com.datafascia.accumulo.RowMapper;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.model.IngestMessage;
@@ -45,25 +45,25 @@ public class IngestMessageDao {
   private static final MessageRowMapper MESSAGE_ROW_MAPPER = new MessageRowMapper();
 
   private BatchWriter writer;
-  private final QueryTemplate queryTemplate;
+  private final AccumuloTemplate accumuloTemplate;
 
   /**
    * Constructor
    *
    * @param connector
    *     connector
-   * @param queryTemplate
-   *     query template
+   * @param accumuloTemplate
+   *     data access operations template
    */
   @Inject
-  public IngestMessageDao(Connector connector, QueryTemplate queryTemplate) {
+  public IngestMessageDao(Connector connector, AccumuloTemplate accumuloTemplate) {
     try {
       writer = connector.createBatchWriter(Tables.INGEST_MESSAGE, new BatchWriterConfig());
     } catch (TableNotFoundException e) {
       throw new IllegalStateException("createBatchWriter", e);
     }
 
-    this.queryTemplate = queryTemplate;
+    this.accumuloTemplate = accumuloTemplate;
   }
 
   private static class MessageRowMapper implements RowMapper<IngestMessage> {
@@ -116,11 +116,11 @@ public class IngestMessageDao {
    * @return optional entity, not present if not found
    */
   public Optional<IngestMessage> read(Id<IngestMessage> messageId) {
-    Scanner scanner = queryTemplate.createScanner(Tables.INGEST_MESSAGE);
+    Scanner scanner = accumuloTemplate.createScanner(Tables.INGEST_MESSAGE);
     scanner.setRange(Range.exact(messageId.toString()));
     scanner.fetchColumnFamily(new Text(COLUMN_FAMILY));
 
-    return Optional.ofNullable(queryTemplate.queryForObject(scanner, MESSAGE_ROW_MAPPER));
+    return Optional.ofNullable(accumuloTemplate.queryForObject(scanner, MESSAGE_ROW_MAPPER));
   }
 
   /**

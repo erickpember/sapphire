@@ -19,9 +19,9 @@ public class FindObservationsCoordinatorIT extends DaoIT {
 
   @Test
   public void should_find_observations() throws Exception {
-    PatientDao patientDao = new PatientDao(queryTemplate);
+    PatientDao patientDao = new PatientDao(accumuloTemplate);
     FindObservationsCoordinator findObservationsCoordinator = new FindObservationsCoordinator(
-        patientDao, new EncounterDao(queryTemplate), new ObservationDao(queryTemplate));
+        patientDao, new EncounterDao(accumuloTemplate), new ObservationDao(accumuloTemplate));
 
     List<String> patientIds = patientDao.getPatientIds(true);
     for (String patientId : patientIds) {

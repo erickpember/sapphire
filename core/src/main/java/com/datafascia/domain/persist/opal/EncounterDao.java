@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.persist.opal;
 
-import com.datafascia.accumulo.QueryTemplate;
+import com.datafascia.accumulo.AccumuloTemplate;
 import com.datafascia.models.CodeableConcept;
 import com.datafascia.models.Encounter;
 import com.datafascia.models.Hospitalization;
@@ -36,13 +36,14 @@ public class EncounterDao extends OpalDao {
   private static final String ADMIN_DATE_FORMAT = "yyyyMMddHHmmssX";
 
   /**
-   * Create data access with query template
+   * Constructor
    *
-   * @param queryTemplate the query template to use
+   * @param accumuloTemplate
+   *     data access operations template
    */
   @Inject
-  public EncounterDao(QueryTemplate queryTemplate) {
-    super(queryTemplate);
+  public EncounterDao(AccumuloTemplate accumuloTemplate) {
+    super(accumuloTemplate);
   }
 
   /**

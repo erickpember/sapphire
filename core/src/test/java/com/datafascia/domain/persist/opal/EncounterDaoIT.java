@@ -24,7 +24,7 @@ public class EncounterDaoIT extends DaoIT {
   @Test
   public void encounters() throws Exception {
     log.info("Getting test encounters");
-    EncounterDao dao = new EncounterDao(queryTemplate);
+    EncounterDao dao = new EncounterDao(accumuloTemplate);
 
     DateTimeFormatter adminDateFormatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmssX");
     Encounter enco1 = dao.getEncounter("UCSF | SICU | a5096a63-09b2-4758-9eaf-6581e6541a06");

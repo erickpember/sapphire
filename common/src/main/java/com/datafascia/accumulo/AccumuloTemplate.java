@@ -18,7 +18,7 @@ import org.apache.accumulo.core.client.TableNotFoundException;
  * Accumulo data access template methods
  */
 @Singleton @Slf4j
-public class QueryTemplate {
+public class AccumuloTemplate {
 
   private final AuthorizationsProvider authorizationsProvider;
   private final Connector connector;
@@ -33,7 +33,7 @@ public class QueryTemplate {
    * @param metrics the metrics registry
    */
   @Inject
-  public QueryTemplate(
+  public AccumuloTemplate(
       AuthorizationsProvider authorizationsProvider, Connector connector, MetricRegistry metrics) {
 
     this.authorizationsProvider = authorizationsProvider;

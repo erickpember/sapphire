@@ -3,7 +3,6 @@
 package com.datafascia.etl.hl7transform.v24;
 
 import ca.uhn.hl7v2.HL7Exception;
-import ca.uhn.hl7v2.model.v24.datatype.ST;
 import ca.uhn.hl7v2.model.v24.datatype.TSComponentOne;
 import ca.uhn.hl7v2.model.v24.datatype.XPN;
 import ca.uhn.hl7v2.model.v24.segment.PID;
@@ -22,11 +21,17 @@ import java.time.LocalDate;
 public abstract class BaseTransformer implements MessageToEventTransformer {
 
   protected PatientData toPatientData(PID pid) throws HL7Exception {
+    XPN patientName = pid.getPatientName(0);
     return PatientData.builder()
         .patientId(
             pid.getPatientIdentifierList(0).getID().getValue())
         .accountNumber(pid.getPatientAccountNumber().getID().getValue())
-        .fullName(toFullName(pid.getPatientName(0)))
+        .firstName(
+            patientName.getGivenName().getValueOrEmpty())
+        .middleName(
+            patientName.getSecondAndFurtherGivenNamesOrInitialsThereof().getValueOrEmpty())
+        .lastName(
+            patientName.getFamilyName().getSurname().getValueOrEmpty())
         .address(
             pid.getPatientAddress(0).getStreetAddress().getStreetOrMailingAddress().getValue())
         .gender(
@@ -40,22 +45,6 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
         .language(
             toLanguage(pid.getPrimaryLanguage().getIdentifier().getValue()))
         .build();
-  }
-
-  private String toFullName(XPN patientName) throws HL7Exception {
-    StringBuilder fullName = new StringBuilder(patientName.getGivenName().getValueOrEmpty());
-    append(fullName, patientName.getSecondAndFurtherGivenNamesOrInitialsThereof());
-    append(fullName, patientName.getFamilyName().getSurname());
-    return fullName.toString();
-  }
-
-  private void append(StringBuilder output, ST st) throws HL7Exception {
-    if (!st.isEmpty()) {
-      if (output.length() > 0) {
-        output.append(' ');
-      }
-      output.append(st.getValue());
-    }
   }
 
   private Gender toGender(String code) {

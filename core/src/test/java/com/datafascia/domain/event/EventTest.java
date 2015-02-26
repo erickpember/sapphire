@@ -29,7 +29,9 @@ public class EventTest {
     PatientData originalPatientData = PatientData.builder()
         .patientId("patientId")
         .accountNumber("accountNumber")
-        .fullName("John Smith")
+        .firstName("Wiley")
+        .middleName("E")
+        .lastName("Coyote")
         .gender(Gender.Male)
         .birthDate(LocalDate.now())
         .race(Race.White)
@@ -46,7 +48,7 @@ public class EventTest {
     assertEquals(event.getType(), originalEvent.getType());
 
     PatientData patientData = (PatientData) event.getData();
-    assertEquals(patientData.getFullName(), originalPatientData.getFullName());
+    assertEquals(patientData.getFirstName(), originalPatientData.getFirstName());
     assertEquals(patientData.getGender(), originalPatientData.getGender());
     assertEquals(patientData.getBirthDate(), originalPatientData.getBirthDate());
   }

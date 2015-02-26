@@ -23,7 +23,9 @@ public class PatientData implements EventData {
 
   private String patientId;
   private String accountNumber;
-  private String fullName;
+  private String firstName;
+  private String middleName;
+  private String lastName;
 
   @Nullable
   private String address;

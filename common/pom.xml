@@ -30,6 +30,11 @@
     </dependency>
 
     <dependency>
+      <groupId>tec.units</groupId>
+      <artifactId>unit-ri</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
       <artifactId>jackson-dataformat-csv</artifactId>
     </dependency>

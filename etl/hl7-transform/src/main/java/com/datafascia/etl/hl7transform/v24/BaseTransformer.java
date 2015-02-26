@@ -73,22 +73,7 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
   }
 
   private Race toRace(String code) {
-    switch (code) {
-      case "1002-5":
-        return Race.AMERICAN_INDIAN;
-      case "2028-9":
-        return Race.ASIAN;
-      case "2076-8":
-        return Race.PACIFIC_ISLANDER;
-      case "2054-5":
-        return Race.BLACK;
-      case "2106-3":
-        return Race.WHITE;
-      case "2131-1":
-        return Race.OTHER;
-      default:
-        return Race.UNKNOWN;
-    }
+    return Race.of(code).orElse(Race.UNKNOWN);
   }
 
   private LanguageCode toLanguage(String code) {

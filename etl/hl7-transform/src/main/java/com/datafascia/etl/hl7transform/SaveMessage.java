@@ -3,7 +3,7 @@
 package com.datafascia.etl.hl7transform;
 
 import com.datafascia.domain.model.IngestMessage;
-import com.datafascia.domain.persist.IngestMessageDao;
+import com.datafascia.domain.persist.IngestMessageRepository;
 import javax.inject.Inject;
 import storm.trident.operation.BaseFilter;
 import storm.trident.tuple.TridentTuple;
@@ -17,12 +17,12 @@ public class SaveMessage extends BaseFilter {
   public static final String ID = SaveMessage.class.getSimpleName();
 
   @Inject
-  private transient IngestMessageDao ingestMessageDao;
+  private transient IngestMessageRepository ingestMessageRepository;
 
   @Override
   public boolean isKeep(TridentTuple tuple) {
     IngestMessage message = (IngestMessage) tuple.getValueByField(F.INGEST_MESSAGE);
-    ingestMessageDao.save(message);
+    ingestMessageRepository.save(message);
     return true;
   }
 }

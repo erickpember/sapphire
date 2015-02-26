@@ -17,7 +17,7 @@ import com.datafascia.common.configuration.guice.ConfigureModule;
 import com.datafascia.common.inject.Injectors;
 import com.datafascia.common.storm.trident.StreamFactory;
 import com.datafascia.domain.model.IngestMessage;
-import com.datafascia.domain.persist.IngestMessageDao;
+import com.datafascia.domain.persist.IngestMessageRepository;
 import com.datafascia.domain.persist.Tables;
 import com.datafascia.kafka.SingleTopicProducer;
 import com.google.common.io.Resources;
@@ -96,7 +96,7 @@ public class HL7MessageToEventTopologyIT {
   private static ConnectorFactory connectorFactory;
   private static Injector injector;
   private static Connector connector;
-  private static IngestMessageDao ingestMessageDao;
+  private static IngestMessageRepository ingestMessageRepository;
   private static SingleTopicProducer singleTopicProducer;
 
   private HL7MessageToEventTopology topology;
@@ -124,7 +124,7 @@ public class HL7MessageToEventTopologyIT {
   public void beforeMethod() throws Exception {
     connector.tableOperations().create(Tables.INGEST_MESSAGE);
 
-    ingestMessageDao = injector.getInstance(IngestMessageDao.class);
+    ingestMessageRepository = injector.getInstance(IngestMessageRepository.class);
 
     topology = new HL7MessageToEventTopology();
 
@@ -155,7 +155,7 @@ public class HL7MessageToEventTopologyIT {
         .build();
     feedHL7Message(originalMessage);
 
-    Optional<IngestMessage> optionalMessage = ingestMessageDao.read(originalMessage.getId());
+    Optional<IngestMessage> optionalMessage = ingestMessageRepository.read(originalMessage.getId());
     assertTrue(optionalMessage.isPresent());
 
     IngestMessage message = optionalMessage.get();

@@ -15,11 +15,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.BatchWriter;
-import org.apache.accumulo.core.client.BatchWriterConfig;
-import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.MutationsRejectedException;
 import org.apache.accumulo.core.client.Scanner;
-import org.apache.accumulo.core.client.TableNotFoundException;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Range;
@@ -29,9 +26,16 @@ import org.apache.hadoop.io.Text;
 
 /**
  * Ingest message archive data access.
+ * <p>
+ * The row ID for a message is composed of:
+ * <ol>
+ * <li>the timestamp with millisecond resolution in ISO 8601 format with timezone code {@code Z}
+ * <li>the {@code |} character
+ * <li>the hash of the message
+ * </ol>
  */
 @Singleton @Slf4j
-public class IngestMessageDao {
+public class IngestMessageRepository {
 
   private static final String COLUMN_FAMILY = IngestMessage.class.getSimpleName();
   private static final ColumnVisibility COLUMN_VISIBILITY = new ColumnVisibility("System");
@@ -44,26 +48,19 @@ public class IngestMessageDao {
   private static final String PAYLOAD = "payload";
   private static final MessageRowMapper MESSAGE_ROW_MAPPER = new MessageRowMapper();
 
-  private BatchWriter writer;
   private final AccumuloTemplate accumuloTemplate;
+  private final BatchWriter writer;
 
   /**
    * Constructor
    *
-   * @param connector
-   *     connector
    * @param accumuloTemplate
    *     data access operations template
    */
   @Inject
-  public IngestMessageDao(Connector connector, AccumuloTemplate accumuloTemplate) {
-    try {
-      writer = connector.createBatchWriter(Tables.INGEST_MESSAGE, new BatchWriterConfig());
-    } catch (TableNotFoundException e) {
-      throw new IllegalStateException("createBatchWriter", e);
-    }
-
+  public IngestMessageRepository(AccumuloTemplate accumuloTemplate) {
     this.accumuloTemplate = accumuloTemplate;
+    writer = accumuloTemplate.createBatchWriter(Tables.INGEST_MESSAGE);
   }
 
   private static class MessageRowMapper implements RowMapper<IngestMessage> {

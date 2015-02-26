@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import org.testng.annotations.Test;
+import tec.units.ri.util.UCUM;
 
 import static org.testng.Assert.assertEquals;
 
@@ -27,7 +28,7 @@ public class SampledDataTest extends ModelTestBase {
     assertEquals(decoded.getDimensions(), 9000l);
     assertEquals(decoded.getFactor(), new BigDecimal(5));
     assertEquals(decoded.getLowerLimit(), new BigDecimal(3.50));
-    assertEquals(decoded.getOrigin(), TestModels.quantity);
+    assertEquals(decoded.getOrigin(), new NumericQuantity(new BigDecimal(3.1), UCUM.BTU));
     assertEquals(decoded.getPeriod(), new BigDecimal(28));
     assertEquals(decoded.getUpperLimit(), new BigDecimal(9001));
   }

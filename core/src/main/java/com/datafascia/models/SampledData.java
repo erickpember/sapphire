@@ -28,7 +28,7 @@ public class SampledData {
    * units of the entire measurement series.
    */
   @JsonProperty("origin")
-  private Quantity origin;
+  private NumericQuantity origin;
 
   /** The length of time between sampling times, measured in milliseconds. */
   @JsonProperty("period")

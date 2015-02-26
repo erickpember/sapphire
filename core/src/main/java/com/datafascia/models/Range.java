@@ -22,9 +22,9 @@ import lombok.extern.slf4j.Slf4j;
 public class Range {
   // The low limit. The boundary is inclusive.
   @JsonProperty("low")
-  private Quantity low;
+  private NumericQuantity low;
 
   // The high limit. The boundary is inclusive.
   @JsonProperty("high")
-  private Quantity high;
+  private NumericQuantity high;
 }

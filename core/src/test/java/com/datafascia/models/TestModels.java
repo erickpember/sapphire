@@ -153,20 +153,10 @@ public class TestModels {
     }
   };
 
-  public static Quantity quantity = new Quantity() {
-    {
-      setValue(new BigDecimal(10));
-      setComparator(QuantityComparator.GreaterThan);
-      setUnits("seconds");
-      setSystem(getURI());
-      setCode(codeable);
-    }
-  };
-
   public static Ratio ratio = new Ratio() {
     {
-      setNumerator(quantity);
-      setDenominator(quantity);
+      setNumerator(new NumericQuantity(new BigDecimal(1), UCUM.CELSIUS));
+      setDenominator(new NumericQuantity(new BigDecimal(3), UCUM.CELSIUS));
     }
   };
 
@@ -182,7 +172,7 @@ public class TestModels {
       setDimensions(9000l);
       setFactor(new BigDecimal(5));
       setLowerLimit(new BigDecimal(3.50));
-      setOrigin(quantity);
+      setOrigin(new NumericQuantity(new BigDecimal(3.1), UCUM.BTU));
       setPeriod(new BigDecimal(28));
       setUpperLimit(new BigDecimal(9001));
     }
@@ -190,7 +180,7 @@ public class TestModels {
 
   public static ObservationValue value = new ObservationValue() {
     {
-      setQuantity(quantity);
+      setQuantity(numericQuantity);
       setCode(codeable);
       setAttachment(attachment);
       setRatio(ratio);
@@ -202,8 +192,8 @@ public class TestModels {
 
   public static Range range = new Range() {
     {
-      setLow(quantity);
-      setHigh(quantity);
+      setLow(new NumericQuantity(new BigDecimal(0), UCUM.LITER));
+      setHigh(new NumericQuantity(new BigDecimal(28935.78394d), UCUM.LITER));
     }
   };
 
@@ -219,7 +209,7 @@ public class TestModels {
 
   public static ObservationValue observationValue = new ObservationValue() {
     {
-      setQuantity(quantity);
+      setQuantity(numericQuantity);
       setCode(codeable);
       setAttachment(attachment);
       setRatio(ratio);

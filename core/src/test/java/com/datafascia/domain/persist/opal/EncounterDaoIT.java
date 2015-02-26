@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.persist.opal;
 
+import com.datafascia.jackson.UnitsSymbolMap;
 import com.datafascia.models.Encounter;
 import com.datafascia.models.Observation;
 import java.math.BigDecimal;
@@ -49,11 +50,11 @@ public class EncounterDaoIT extends DaoIT {
       if (ob.getName().getCode().equals(EncounterDao.WEIGHT)) {
         foundWeight = true;
         assertEquals(ob.getValues().getQuantity().getValue(), weight);
-        assertEquals(ob.getValues().getQuantity().getUnits(), "kg");
+        assertEquals(ob.getValues().getQuantity().getUnit(), UnitsSymbolMap.getUnit("kg"));
       } else if (ob.getName().getCode().equals(EncounterDao.HEIGHT)) {
         foundHeight = true;
         assertEquals(ob.getValues().getQuantity().getValue(), height);
-        assertEquals(ob.getValues().getQuantity().getUnits(), "in");
+        assertEquals(ob.getValues().getQuantity().getUnit(), UnitsSymbolMap.getUnit("in"));
       }
     }
 

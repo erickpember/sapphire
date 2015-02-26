@@ -3,13 +3,14 @@
 package com.datafascia.domain.persist.opal;
 
 import com.datafascia.accumulo.AccumuloTemplate;
+import com.datafascia.jackson.UnitsSymbolMap;
 import com.datafascia.models.CodeableConcept;
 import com.datafascia.models.Encounter;
 import com.datafascia.models.Hospitalization;
+import com.datafascia.models.NumericQuantity;
 import com.datafascia.models.Observation;
 import com.datafascia.models.ObservationValue;
 import com.datafascia.models.Period;
-import com.datafascia.models.Quantity;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -123,9 +124,9 @@ public class EncounterDao extends OpalDao {
       return Optional.empty();
     }
 
-    Quantity qWeight = new Quantity();
+    NumericQuantity qWeight = new NumericQuantity();
     qWeight.setValue(new BigDecimal(weightl[0]));
-    qWeight.setUnits(weightl[1]);
+    qWeight.setUnit(UnitsSymbolMap.getUnit(weightl[1]));
     ObservationValue ovWeight = new ObservationValue();
     ovWeight.setQuantity(qWeight);
     Observation oWeight = new Observation();
@@ -157,9 +158,9 @@ public class EncounterDao extends OpalDao {
       return Optional.empty();
     }
 
-    Quantity qHeight = new Quantity();
+    NumericQuantity qHeight = new NumericQuantity();
     qHeight.setValue(new BigDecimal(heightl[0]));
-    qHeight.setUnits(heightl[1]);
+    qHeight.setUnit(UnitsSymbolMap.getUnit(heightl[1]));
     ObservationValue ovHeight = new ObservationValue();
     ovHeight.setQuantity(qHeight);
     Observation oHeight = new Observation();

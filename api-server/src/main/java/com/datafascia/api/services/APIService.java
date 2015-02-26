@@ -13,9 +13,11 @@ import com.datafascia.api.health.AccumuloHealthCheck;
 import com.datafascia.common.shiro.FakeRealm;
 import com.datafascia.common.shiro.RealmInjectingEnvironmentLoaderListener;
 import com.datafascia.common.shiro.RoleExposingRealm;
+import com.datafascia.jackson.UnitsMapperModule;
 import com.datafascia.kafka.KafkaConfig;
 import com.datafascia.reflections.PackageUtils;
 import com.datafascia.urn.URNMap;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -66,6 +68,9 @@ public class APIService extends Application<APIConfiguration> {
     URNMap.idNSMapping(MODELS_PKG);
     Injector injector = createInjector(configuration, environment);
 
+    // Setup Jackson
+    setupJackson(environment.getObjectMapper());
+
     // Register Guice injector
     environment.servlets().addServletListeners(new GuiceServletContextListener() {
       @Override
@@ -104,6 +109,7 @@ public class APIService extends Application<APIConfiguration> {
         new AbstractModule() {
           @Override
           protected void configure() {
+            bind(ObjectMapper.class).toInstance(environment.getObjectMapper());
             bind(APIConfiguration.class).toInstance(config);
             bind(AccumuloConfiguration.class).toInstance(config.getAccumuloConfiguration());
             bind(AuthorizationsProvider.class).to(SubjectAuthorizationsProvider.class);
@@ -114,5 +120,14 @@ public class APIService extends Application<APIConfiguration> {
           }
         },
         new AccumuloModule());
+  }
+
+  /**
+   * Setup application specific Jackson filters, rules etc.
+   *
+   * @param mapper the Jackson object mapper used by application
+   */
+  private void setupJackson(ObjectMapper mapper) {
+    mapper.registerModule(new UnitsMapperModule());
   }
 }

@@ -22,9 +22,9 @@ import lombok.extern.slf4j.Slf4j;
 public class Ratio {
   // The value of the numerator.
   @JsonProperty("numerator")
-  private Quantity numerator;
+  private NumericQuantity numerator;
 
   // The value of the denominator.
   @JsonProperty("denominator")
-  private Quantity denominator;
+  private NumericQuantity denominator;
 }

@@ -46,7 +46,7 @@ public class EncounterIT extends ApiIT {
    * @param admitDate admit date+time for encounter
    */
   public void validateEncounter(Encounter enco, BigDecimal weight, String weightUnits,
-      BigDecimal height, String heightUnits, Instant admitDate) {
+                                BigDecimal height, String heightUnits, Instant admitDate) {
     boolean foundHeight = false;
     boolean foundWeight = false;
 
@@ -55,12 +55,12 @@ public class EncounterIT extends ApiIT {
         case "Weight":
           foundWeight = true;
           assertEquals(ob.getValues().getQuantity().getValue(), weight);
-          assertEquals(ob.getValues().getQuantity().getUnits(), "kg");
+          assertEquals(ob.getValues().getQuantity().getUnit().getSymbol(), "kg");
           break;
         case "Height":
           foundHeight = true;
           assertEquals(ob.getValues().getQuantity().getValue(), height);
-          assertEquals(ob.getValues().getQuantity().getUnits(), "in");
+          assertEquals(ob.getValues().getQuantity().getUnit().getSymbol(), "m");
           break;
       }
     }

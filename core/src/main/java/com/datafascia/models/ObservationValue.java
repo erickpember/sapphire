@@ -18,7 +18,7 @@ import lombok.ToString;
 @JsonTypeName(URNFactory.MODEL_PREFIX + "ObservationValue")
 public class ObservationValue {
   @JsonProperty("quantity")
-  private Quantity quantity;
+  private NumericQuantity quantity;
 
   @JsonProperty("code")
   private CodeableConcept code;

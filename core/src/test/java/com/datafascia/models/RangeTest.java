@@ -3,9 +3,11 @@
 package com.datafascia.models;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import org.testng.annotations.Test;
+import tec.units.ri.util.UCUM;
 
 import static org.testng.Assert.assertEquals;
 
@@ -16,8 +18,8 @@ public class RangeTest extends ModelTestBase {
   @Test
   public <T extends Object> void testRange() throws IOException, URISyntaxException {
     Range decoded = (Range) geneticEncodeDecodeTest(TestModels.range);
-    assertEquals(decoded.getLow(), TestModels.quantity);
-    assertEquals(decoded.getHigh(), TestModels.quantity);
+    assertEquals(decoded.getLow(), new NumericQuantity(new BigDecimal(0), UCUM.LITER));
+    assertEquals(decoded.getHigh(), new NumericQuantity(new BigDecimal(28935.78394d), UCUM.LITER));
   }
 
   @Test

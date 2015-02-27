@@ -25,7 +25,7 @@ public class ProcessEvent extends BaseFilter {
     Event event = (Event) tuple.getValueByField(F.EVENT);
 
     switch (event.getType()) {
-      case ADMIT_PATIENT:
+      case PATIENT_ADMIT:
         admitPatient.accept(event);
         break;
       default:

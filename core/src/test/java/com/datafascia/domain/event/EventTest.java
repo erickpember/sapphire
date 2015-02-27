@@ -43,7 +43,7 @@ public class EventTest {
     Event originalEvent = Event.builder()
         .institutionId(URI.create("institution"))
         .facilityId(URI.create("facility"))
-        .type(EventType.ADMIT_PATIENT)
+        .type(EventType.PATIENT_ADMIT)
         .data(originalPatientData)
         .build();
     byte[] bytes = serializer.encodeReflect(TOPIC, originalEvent);

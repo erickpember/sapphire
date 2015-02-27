@@ -139,7 +139,7 @@ public class ProcessEventTopologyIT {
     return Event.builder()
         .institutionId(URI.create("urn:df-institution:institution"))
         .facilityId(URI.create("urn:df-facility:facility"))
-        .type(EventType.ADMIT_PATIENT)
+        .type(EventType.PATIENT_ADMIT)
         .data(patientData)
         .build();
   }

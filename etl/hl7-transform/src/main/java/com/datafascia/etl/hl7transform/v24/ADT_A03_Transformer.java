@@ -29,7 +29,7 @@ public class ADT_A03_Transformer extends BaseTransformer {
       return Event.builder()
           .institutionId(institutionId)
           .facilityId(facilityId)
-          .type(EventType.DISCHARGE_PATIENT)
+          .type(EventType.PATIENT_DISCHARGE)
           .data(patientData)
           .build();
     } catch (HL7Exception e) {

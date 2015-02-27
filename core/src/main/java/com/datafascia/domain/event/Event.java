@@ -7,6 +7,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.avro.reflect.AvroEncode;
 
 /**
  * Event which changes state in the system.
@@ -16,6 +17,9 @@ public class Event {
 
   private URI institutionId;
   private URI facilityId;
+
+  @AvroEncode(using = EventTypeEncoding.class)
   private EventType type;
+
   private EventData data;
 }

@@ -30,10 +30,10 @@ import static java.nio.file.Paths.get;
 public class HL7ClientCommand implements Command {
 
   @Parameter(names = { "-h", "--host" }, description = "MLLP server host", required = true)
-  String mlppHost;
+  String mllpHost;
 
   @Parameter(names = { "-p", "--port" }, description = "MLLP server port", required = true)
-  private int port;
+  private int mllpPort;
 
   @Parameter(names = "--useTLS", description = "Use TLS on messages. Default is false.",
       required = false)
@@ -45,12 +45,12 @@ public class HL7ClientCommand implements Command {
 
   @Override
   public int execute() {
-    Connection conn = null;
+    HapiContext context = new DefaultHapiContext();
+    Connection connection;
     try {
-      HapiContext context = new DefaultHapiContext();
-      conn = context.newClient(mlppHost, port, useTLS);
+      connection = context.newClient(mllpHost, mllpPort, useTLS);
     } catch (HL7Exception e) {
-      throw new RuntimeException("Error connecting to MLLP server", e);
+      throw new IllegalStateException("Error connecting to MLLP server", e);
     }
 
     PipeParser pipeParser = new PipeParser();
@@ -58,13 +58,15 @@ public class HL7ClientCommand implements Command {
       try {
         log.info("Sending file {}", file);
         Message message = pipeParser.parse(content(file));
-        Message response = conn.getInitiator().sendAndReceive(message);
+        Message response = connection.getInitiator().sendAndReceive(message);
         log.info("Response was " + response.encode());
       } catch (LLPException | HL7Exception | IOException e) {
         log.error("Error sending file {} is {}", file, e);
       }
     }
-    conn.close();
+
+    connection.close();
+    context.getExecutorService().shutdown();
 
     return EXIT_STATUS_SUCCESS;
   }

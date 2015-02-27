@@ -2,8 +2,8 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.event;
 
-import com.datafascia.common.avro.LocalDateAsStringEncoding;
 import com.datafascia.common.avro.LanguageCodeEncoding;
+import com.datafascia.common.avro.LocalDateEncoding;
 import com.datafascia.models.Gender;
 import com.datafascia.models.MaritalStatus;
 import com.datafascia.models.Race;
@@ -30,7 +30,7 @@ public class PatientData implements EventData {
   @AvroEncode(using = GenderEncoding.class)
   private Gender gender;
 
-  @AvroEncode(using = LocalDateAsStringEncoding.class)
+  @AvroEncode(using = LocalDateEncoding.class)
   private LocalDate birthDate;
 
   @AvroEncode(using = MaritalStatusEncoding.class)

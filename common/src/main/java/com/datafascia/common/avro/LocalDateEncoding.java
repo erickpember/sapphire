@@ -13,14 +13,14 @@ import org.apache.avro.reflect.CustomEncoding;
 /**
  * Converts between LocalDate and String.
  */
-public class LocalDateAsStringEncoding extends CustomEncoding<LocalDate> {
+public class LocalDateEncoding extends CustomEncoding<LocalDate> {
 
   /**
    * Constructor
    */
-  public LocalDateAsStringEncoding() {
+  public LocalDateEncoding() {
     schema = Schema.create(Schema.Type.STRING);
-    schema.addProp("CustomEncoding", LocalDateAsStringEncoding.class.getSimpleName());
+    schema.addProp("CustomEncoding", LocalDateEncoding.class.getSimpleName());
   }
 
   @Override

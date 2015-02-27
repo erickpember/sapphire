@@ -13,7 +13,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.avro.reflect.AvroEncode;
-import org.apache.avro.reflect.Nullable;
 
 /**
  * Patient data included when admitting patient.
@@ -26,9 +25,6 @@ public class PatientData implements EventData {
   private String firstName;
   private String middleName;
   private String lastName;
-
-  @Nullable
-  private String address;
 
   private Gender gender;
 

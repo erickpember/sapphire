@@ -32,8 +32,6 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
             patientName.getSecondAndFurtherGivenNamesOrInitialsThereof().getValueOrEmpty())
         .lastName(
             patientName.getFamilyName().getSurname().getValueOrEmpty())
-        .address(
-            pid.getPatientAddress(0).getStreetAddress().getStreetOrMailingAddress().getValue())
         .gender(
             toGender(pid.getAdministrativeSex().getValue()))
         .birthDate(

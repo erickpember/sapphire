@@ -124,7 +124,7 @@ public class HL7MessageToEventTopology extends BaseTridentTopology {
         // Transform admit message to event.
         .name(TransformMessageToEvent.ID)
         .each(
-            new Fields(F.MESSAGE),
+            new Fields(F.INSTITUTION_ID, F.FACILITY_ID, F.MESSAGE),
             wrap(new TransformMessageToEvent()),
             TransformMessageToEvent.OUTPUT_FIELDS)
         .parallelismHint(getParallelism(TransformMessageToEvent.ID))

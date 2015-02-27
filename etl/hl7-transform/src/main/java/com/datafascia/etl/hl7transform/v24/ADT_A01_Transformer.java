@@ -8,6 +8,7 @@ import ca.uhn.hl7v2.model.v24.message.ADT_A01;
 import com.datafascia.domain.event.Event;
 import com.datafascia.domain.event.EventType;
 import com.datafascia.domain.event.PatientData;
+import java.net.URI;
 
 /**
  * Handles admit patient message.
@@ -20,17 +21,19 @@ public class ADT_A01_Transformer extends BaseTransformer {
   }
 
   @Override
-  public Event transform(Message input) {
+  public Event transform(URI institutionId, URI facilityId, Message input) {
     ADT_A01 message = (ADT_A01) input;
     try {
       PatientData patientData = toPatientData(message.getPID());
 
       return Event.builder()
+          .institutionId(institutionId)
+          .facilityId(facilityId)
           .type(EventType.ADMIT_PATIENT)
           .data(patientData)
           .build();
     } catch (HL7Exception e) {
-      throw new IllegalStateException("apply", e);
+      throw new IllegalStateException("transform", e);
     }
   }
 }

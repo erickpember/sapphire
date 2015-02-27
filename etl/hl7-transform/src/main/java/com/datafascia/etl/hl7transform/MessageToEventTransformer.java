@@ -4,6 +4,7 @@ package com.datafascia.etl.hl7transform;
 
 import ca.uhn.hl7v2.model.Message;
 import com.datafascia.domain.event.Event;
+import java.net.URI;
 
 /**
  * Transforms message to event.
@@ -20,9 +21,13 @@ public interface MessageToEventTransformer {
   /**
    * Transforms message to event.
    *
+   * @param institutionId
+   *     institution ID
+   * @param facilityId
+   *     facility ID
    * @param message
    *     to transform
    * @return event
    */
-  Event transform(Message message);
+  Event transform(URI institutionId, URI facilityId, Message message);
 }

@@ -24,7 +24,7 @@ public class ParseMessage extends BaseFunction {
 
   public static final String ID = ParseMessage.class.getSimpleName();
 
-  public static final Fields OUTPUT_FIELDS = new Fields(F.MESSAGE);
+  public static final Fields OUTPUT_FIELDS = new Fields(F.INSTITUTION_ID, F.FACILITY_ID, F.MESSAGE);
 
   @Inject
   private transient Parser parser;
@@ -42,6 +42,7 @@ public class ParseMessage extends BaseFunction {
       return;
     }
 
-    collector.emit(new Values(message));
+    collector.emit(
+        new Values(ingestMessage.getInstitution(), ingestMessage.getFacility(), message));
   }
 }

@@ -21,7 +21,8 @@ import org.apache.avro.reflect.Nullable;
 @AllArgsConstructor @Builder @Data @NoArgsConstructor
 public class PatientData implements EventData {
 
-  private String id;
+  private String patientId;
+  private String accountNumber;
   private String fullName;
 
   @Nullable

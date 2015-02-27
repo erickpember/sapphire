@@ -15,8 +15,6 @@ import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
 import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
 import com.datafascia.common.configuration.guice.ConfigureModule;
 import com.datafascia.common.inject.Injectors;
-import com.datafascia.common.shiro.FakeRealm;
-import com.datafascia.common.shiro.RoleExposingRealm;
 import com.datafascia.common.storm.trident.StreamFactory;
 import com.datafascia.domain.model.IngestMessage;
 import com.datafascia.domain.persist.IngestMessageDao;
@@ -56,7 +54,6 @@ public class HL7MessageToEventTopologyIT {
     protected void onConfigure() {
       bind(AuthorizationsProvider.class).to(FixedAuthorizationsProvider.class);
       bind(AvroSchemaRegistry.class).to(MemorySchemaRegistry.class).in(Singleton.class);
-      bind(RoleExposingRealm.class).to(FakeRealm.class);
     }
 
     @Provides
@@ -146,6 +143,8 @@ public class HL7MessageToEventTopologyIT {
   public void should_save_message() throws Exception {
     IngestMessage originalMessage = IngestMessage.builder()
         .timestamp(Instant.now())
+        .institution(URI.create("urn:df-institution:institution"))
+        .facility(URI.create("urn:df-facility:facility"))
         .payloadType(URI.create("urn:df-payloadtype:HL7v2"))
         .payload(ByteBuffer.wrap(PAYLOAD.getBytes(StandardCharsets.UTF_8)))
         .build();

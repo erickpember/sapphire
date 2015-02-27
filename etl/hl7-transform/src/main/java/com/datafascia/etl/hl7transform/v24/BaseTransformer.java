@@ -23,14 +23,22 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
 
   protected PatientData toPatientData(PID pid) throws HL7Exception {
     return PatientData.builder()
-        .id(pid.getPatientIdentifierList(0).getID().getValue())
+        .patientId(
+            pid.getPatientIdentifierList(0).getID().getValue())
+        .accountNumber(pid.getPatientAccountNumber().getID().getValue())
         .fullName(toFullName(pid.getPatientName(0)))
-        .address(pid.getPatientAddress(0).getStreetAddress().getStreetOrMailingAddress().getValue())
-        .gender(toGender(pid.getAdministrativeSex().getValue()))
-        .birthDate(toBirthDate(pid.getDateTimeOfBirth().getTimeOfAnEvent()))
-        .maritalStatus(toMaritalStatus(pid.getMaritalStatus().getIdentifier().getValue()))
-        .race(toRace(pid.getRace(0).getIdentifier().getValue()))
-        .language(toLanguage(pid.getPrimaryLanguage().getIdentifier().getValue()))
+        .address(
+            pid.getPatientAddress(0).getStreetAddress().getStreetOrMailingAddress().getValue())
+        .gender(
+            toGender(pid.getAdministrativeSex().getValue()))
+        .birthDate(
+            toBirthDate(pid.getDateTimeOfBirth().getTimeOfAnEvent()))
+        .maritalStatus(
+            toMaritalStatus(pid.getMaritalStatus().getIdentifier().getValue()))
+        .race(
+            toRace(pid.getRace(0).getIdentifier().getValue()))
+        .language(
+            toLanguage(pid.getPrimaryLanguage().getIdentifier().getValue()))
         .build();
   }
 

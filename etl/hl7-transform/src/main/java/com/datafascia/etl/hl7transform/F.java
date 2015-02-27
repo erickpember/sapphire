@@ -9,6 +9,8 @@ public abstract class F {
 
   public static final String BYTES = "bytes";
   public static final String INGEST_MESSAGE = "ingestMessage";
+  public static final String INSTITUTION_ID = "instituionId";
+  public static final String FACILITY_ID = "facilityId";
   public static final String MESSAGE = "message";
   public static final String EVENT = "event";
 

@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.event;
 
+import java.net.URI;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,6 +14,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor @Builder @Data @NoArgsConstructor
 public class Event {
 
+  private URI institutionId;
+  private URI facilityId;
   private EventType type;
   private EventData data;
 }

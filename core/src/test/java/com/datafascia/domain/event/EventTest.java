@@ -7,6 +7,7 @@ import com.datafascia.common.avro.Serializer;
 import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
 import com.datafascia.models.Gender;
 import com.datafascia.models.Race;
+import java.net.URI;
 import java.time.LocalDate;
 import org.testng.annotations.Test;
 
@@ -26,13 +27,16 @@ public class EventTest {
   @Test
   public void should_decode() {
     PatientData originalPatientData = PatientData.builder()
-        .id("12345")
+        .patientId("patientId")
+        .accountNumber("accountNumber")
         .fullName("John Smith")
         .gender(Gender.Male)
         .birthDate(LocalDate.now())
         .race(Race.White)
         .build();
     Event originalEvent = Event.builder()
+        .institutionId(URI.create("institution"))
+        .facilityId(URI.create("facility"))
         .type(EventType.ADMIT_PATIENT)
         .data(originalPatientData)
         .build();

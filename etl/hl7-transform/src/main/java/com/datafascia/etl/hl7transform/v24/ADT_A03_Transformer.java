@@ -8,6 +8,7 @@ import ca.uhn.hl7v2.model.v24.message.ADT_A03;
 import com.datafascia.domain.event.Event;
 import com.datafascia.domain.event.EventType;
 import com.datafascia.domain.event.PatientData;
+import java.net.URI;
 
 /**
  * Handles discharge patient message.
@@ -20,17 +21,19 @@ public class ADT_A03_Transformer extends BaseTransformer {
   }
 
   @Override
-  public Event transform(Message input) {
+  public Event transform(URI institutionId, URI facilityId, Message input) {
     ADT_A03 message = (ADT_A03) input;
     try {
       PatientData patientData = toPatientData(message.getPID());
 
       return Event.builder()
+          .institutionId(institutionId)
+          .facilityId(facilityId)
           .type(EventType.DISCHARGE_PATIENT)
           .data(patientData)
           .build();
     } catch (HL7Exception e) {
-      throw new IllegalStateException("apply", e);
+      throw new IllegalStateException("transform", e);
     }
   }
 }

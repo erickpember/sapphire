@@ -6,6 +6,7 @@ import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
 import ca.uhn.hl7v2.model.Message;
 import com.datafascia.domain.event.Event;
+import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ServiceLoader;
@@ -43,6 +44,8 @@ public class TransformMessageToEvent extends BaseFunction {
 
   @Override
   public void execute(TridentTuple tuple, TridentCollector collector) {
+    URI institutionId = (URI) tuple.getValueByField(F.INSTITUTION_ID);
+    URI facilityId = (URI) tuple.getValueByField(F.FACILITY_ID);
     Message message = (Message) tuple.getValueByField(F.MESSAGE);
 
     MessageToEventTransformer transformer = messageTypeToTransformerMap.get(message.getClass());
@@ -52,7 +55,7 @@ public class TransformMessageToEvent extends BaseFunction {
     }
 
     try {
-      Event event = transformer.transform(message);
+      Event event = transformer.transform(institutionId, facilityId, message);
       collector.emit(new Values(event));
     } catch (IllegalStateException e) {
       log.error("Cannot transform message type " + message.getClass(), e);

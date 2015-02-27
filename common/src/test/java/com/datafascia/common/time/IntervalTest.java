@@ -7,6 +7,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
@@ -24,9 +25,9 @@ public class IntervalTest {
   @Test
   public void encodeDecodeTest() throws Exception {
     ObjectMapper mapper = DFObjectMapper.objectMapper();
-    Interval<Date> interval = new Interval<>(new Date(), new Date());
+    Interval<Instant> interval = new Interval<>(Instant.now(), Instant.now());
     String jsonString = mapper.writeValueAsString(interval);
-    Object decoded = mapper.readValue(jsonString, new TypeReference<Interval<Date>>() { });
+    Object decoded = mapper.readValue(jsonString, new TypeReference<Interval<Instant>>() { });
     assertEquals(interval, decoded);
   }
 

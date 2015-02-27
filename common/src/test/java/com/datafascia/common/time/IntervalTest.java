@@ -2,12 +2,16 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.common.time;
 
+import com.datafascia.jackson.DFObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
+import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
@@ -16,6 +20,16 @@ import static org.testng.Assert.assertTrue;
  */
 @Slf4j
 public class IntervalTest {
+
+  @Test
+  public void encodeDecodeTest() throws Exception {
+    ObjectMapper mapper = DFObjectMapper.objectMapper();
+    Interval<Date> interval = new Interval<>(new Date(), new Date());
+    String jsonString = mapper.writeValueAsString(interval);
+    Object decoded = mapper.readValue(jsonString, new TypeReference<Interval<Date>>() { });
+    assertEquals(interval, decoded);
+  }
+
   @Test
   public void beforeDuringAfter() throws ParseException {
     SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");

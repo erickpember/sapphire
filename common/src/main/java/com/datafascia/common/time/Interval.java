@@ -2,8 +2,10 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.common.time;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 /**
  * Range of time in the open interval [startInclusive, endExclusive). That is, instants must be
@@ -11,10 +13,12 @@ import lombok.Data;
  *
  * @param <T> instant type
  */
-@AllArgsConstructor @Data
+@AllArgsConstructor @NoArgsConstructor @Data
 public class Interval<T extends Comparable<T>> {
-  private T startInclusive;
-  private T endExclusive;
+  @JsonProperty("start")
+  protected T startInclusive;
+  @JsonProperty("end")
+  protected T endExclusive;
 
   /**
    * Checks if this interval contains the item.
@@ -24,6 +28,9 @@ public class Interval<T extends Comparable<T>> {
    * @return {@code true} if the interval contains the item.
    */
   public boolean contains(T item) {
+    if (startInclusive == null || endExclusive == null) {
+      return false;
+    }
     return item.compareTo(startInclusive) >= 0 && item.compareTo(endExclusive) < 0;
   }
 }

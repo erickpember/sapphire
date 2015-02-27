@@ -13,14 +13,14 @@ import org.apache.avro.reflect.CustomEncoding;
  * Writes an Instant to a long and reads an Instant from a long.
  * The long stores the number of milliseconds since 1970-01-01T00:00:00Z.
  */
-public class InstantAsLongEncoding extends CustomEncoding<Instant> {
+public class InstantEncoding extends CustomEncoding<Instant> {
 
   /**
    * Constructor
    */
-  public InstantAsLongEncoding() {
+  public InstantEncoding() {
     schema = Schema.create(Schema.Type.LONG);
-    schema.addProp("CustomEncoding", InstantAsLongEncoding.class.getSimpleName());
+    schema.addProp("CustomEncoding", InstantEncoding.class.getSimpleName());
   }
 
   @Override

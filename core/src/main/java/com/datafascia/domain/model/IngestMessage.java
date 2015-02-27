@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.model;
 
-import com.datafascia.common.avro.InstantAsLongEncoding;
+import com.datafascia.common.avro.InstantEncoding;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.time.InstantFormatter;
 import com.google.common.hash.Hashing;
@@ -25,7 +25,7 @@ import org.apache.avro.reflect.Nullable;
 public class IngestMessage {
 
   /** when the system received the message */
-  @AvroEncode(using = InstantAsLongEncoding.class)
+  @AvroEncode(using = InstantEncoding.class)
   private Instant timestamp;
 
   /** Institution identifier */

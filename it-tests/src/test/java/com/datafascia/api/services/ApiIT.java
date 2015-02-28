@@ -132,7 +132,6 @@ public class ApiIT {
     return kafkaConfig;
   }
 
-
   /**
    * @return the API configuration to use as a file
    *
@@ -181,6 +180,8 @@ public class ApiIT {
     String path = resourceFile.substring(0, resourceFile.lastIndexOf(File.separator));
     AccumuloImport.importData(connect, OPAL_TABLE, path + "/accumulo_data", failDir.getPath());
     failDir.delete();
+
+    connect.tableOperations().create("Patient");
   }
 
   /**

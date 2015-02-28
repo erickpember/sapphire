@@ -14,6 +14,7 @@ import com.neovisionaries.i18n.LanguageCode;
 import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -196,5 +197,25 @@ public class PatientRepository extends BaseRepository {
     scanner.fetchColumnFamily(new Text(COLUMN_FAMILY));
 
     return Optional.ofNullable(accumuloTemplate.queryForObject(scanner, PATIENT_ROW_MAPPER));
+  }
+
+  /**
+   * Finds patients.
+   *
+   * @param optionalActive
+   *     if present, the active state to match
+   * @return found patients
+   */
+  public List<Patient> list(Optional<Boolean> optionalActive) {
+    Scanner scanner = accumuloTemplate.createScanner(Tables.PATIENT);
+    scanner.fetchColumnFamily(new Text(COLUMN_FAMILY));
+
+    if (optionalActive.isPresent()) {
+      boolean active = optionalActive.get();
+      return accumuloTemplate.queryForList(
+          scanner, PATIENT_ROW_MAPPER, patient -> patient.isActive() == active);
+    } else {
+      return accumuloTemplate.queryForList(scanner, PATIENT_ROW_MAPPER);
+    }
   }
 }

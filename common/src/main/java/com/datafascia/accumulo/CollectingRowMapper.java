@@ -5,6 +5,7 @@ package com.datafascia.accumulo;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 
@@ -17,15 +18,20 @@ import org.apache.accumulo.core.data.Value;
 public class CollectingRowMapper<E> implements RowMapper<Void> {
 
   private final RowMapper<E> rowMapper;
+  private final Predicate<E> predicate;
   private final List<E> rows = new ArrayList<>();
 
   /**
    * Construct from mapper
    *
-   * @param rowMapper the row mapper
+   * @param rowMapper
+   *     the row mapper
+   * @param predicate
+   *     include only entities satisfying the predicate
    */
-  public CollectingRowMapper(RowMapper<E> rowMapper) {
+  public CollectingRowMapper(RowMapper<E> rowMapper, Predicate<E> predicate) {
     this.rowMapper = rowMapper;
+    this.predicate = predicate;
   }
 
   /**
@@ -48,7 +54,7 @@ public class CollectingRowMapper<E> implements RowMapper<Void> {
   @Override
   public Void onEndRow() {
     E row = rowMapper.onEndRow();
-    if (row != null) {
+    if (row != null && predicate.test(row)) {
       rows.add(row);
     }
     return null;

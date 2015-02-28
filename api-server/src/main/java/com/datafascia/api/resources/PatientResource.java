@@ -3,9 +3,10 @@
 package com.datafascia.api.resources;
 
 import com.codahale.metrics.annotation.Timed;
-import com.datafascia.api.responses.IteratorResponse;
-import com.datafascia.domain.persist.opal.PatientDao;
+import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.models.Patient;
+import java.util.List;
+import java.util.Optional;
 import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -21,16 +22,16 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j @Path("/patient") @Produces(MediaType.APPLICATION_JSON)
 public class PatientResource {
 
-  private final PatientDao patientDao;
+  private final PatientRepository patientRepository;
 
   /**
    * Construct resource with the relevant data access object
    *
-   * @param patientDao the patient data access object (can be injected)
+   * @param patientRepository the patient data access object (can be injected)
    */
   @Inject
-  public PatientResource(PatientDao patientDao) {
-    this.patientDao = patientDao;
+  public PatientResource(PatientRepository patientRepository) {
+    this.patientRepository = patientRepository;
   }
 
   /**
@@ -39,8 +40,7 @@ public class PatientResource {
    * @return stream list of patients back
    */
   @GET @Timed
-  public IteratorResponse<Patient> patients(
-      @DefaultValue("true") @QueryParam("active") boolean active) {
-    return new IteratorResponse<Patient>(patientDao.patients(active));
+  public List<Patient> list(@DefaultValue("true") @QueryParam("active") boolean active) {
+    return patientRepository.list(Optional.of(active));
   }
 }

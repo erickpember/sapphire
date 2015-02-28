@@ -7,6 +7,7 @@ import com.codahale.metrics.Timer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Predicate;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -104,14 +105,16 @@ public class AccumuloTemplate {
    *     scanner to read from
    * @param rowMapper
    *     callback to receive entries
+   * @param predicate
+   *     include only entities satisfying the predicate
    * @param <E>
    *     entity type
    * @return entities
    */
-  public <E> List<E> queryForList(Scanner scanner, RowMapper<E> rowMapper) {
+  public <E> List<E> queryForList(Scanner scanner, RowMapper<E> rowMapper, Predicate<E> predicate) {
     Timer.Context timerContext = getTimerContext("queryForList", rowMapper);
     try {
-      CollectingRowMapper<E> collectingRowMapper = new CollectingRowMapper<>(rowMapper);
+      CollectingRowMapper<E> collectingRowMapper = new CollectingRowMapper<>(rowMapper, predicate);
       RowReader<Void> rowReader = new RowReader<>(collectingRowMapper);
       rowReader.consume(scanner);
       return collectingRowMapper.getRows();
@@ -119,6 +122,21 @@ public class AccumuloTemplate {
       timerContext.stop();
       scanner.close();
     }
+  }
+
+  /**
+   * Reads entries from rows into a list of objects. Also closes scanner.
+   *
+   * @param scanner
+   *     scanner to read from
+   * @param rowMapper
+   *     callback to receive entries
+   * @param <E>
+   *     entity type
+   * @return entities
+   */
+  public <E> List<E> queryForList(Scanner scanner, RowMapper<E> rowMapper) {
+    return queryForList(scanner, rowMapper, entity -> true);
   }
 
   private <E> Timer.Context getTimerContext(String methodName, RowMapper<E> rowMapper) {

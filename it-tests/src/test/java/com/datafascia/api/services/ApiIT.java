@@ -2,14 +2,14 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.services;
 
-import com.datafascia.accumulo.AccumuloConfiguration;
-import com.datafascia.accumulo.AccumuloImport;
-import com.datafascia.accumulo.AccumuloModule;
-import com.datafascia.accumulo.AuthorizationsProvider;
-import com.datafascia.accumulo.SubjectAuthorizationsProvider;
 import com.datafascia.api.client.DatafasciaApi;
 import com.datafascia.api.client.DatafasciaApiBuilder;
 import com.datafascia.api.configurations.APIConfiguration;
+import com.datafascia.common.accumulo.AccumuloConfiguration;
+import com.datafascia.common.accumulo.AccumuloImport;
+import com.datafascia.common.accumulo.AccumuloModule;
+import com.datafascia.common.accumulo.AuthorizationsProvider;
+import com.datafascia.common.accumulo.SubjectAuthorizationsProvider;
 import com.datafascia.common.shiro.FakeRealm;
 import com.datafascia.common.shiro.RoleExposingRealm;
 import com.datafascia.dropwizard.testing.DropwizardTestApp;

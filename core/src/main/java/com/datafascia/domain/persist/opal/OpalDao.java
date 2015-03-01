@@ -3,7 +3,7 @@
 package com.datafascia.domain.persist.opal;
 
 import com.codahale.metrics.Timer;
-import com.datafascia.accumulo.AccumuloTemplate;
+import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;

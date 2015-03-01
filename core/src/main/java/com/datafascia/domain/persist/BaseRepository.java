@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.persist;
 
-import com.datafascia.accumulo.AccumuloTemplate;
+import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.persist.Id;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;

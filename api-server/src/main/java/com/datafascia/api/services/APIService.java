@@ -3,13 +3,13 @@
 package com.datafascia.api.services;
 
 import com.codahale.metrics.MetricRegistry;
-import com.datafascia.accumulo.AccumuloConfiguration;
-import com.datafascia.accumulo.AccumuloModule;
-import com.datafascia.accumulo.AuthorizationsProvider;
-import com.datafascia.accumulo.SubjectAuthorizationsProvider;
 import com.datafascia.api.bundle.AtmosphereBundle;
 import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.api.health.AccumuloHealthCheck;
+import com.datafascia.common.accumulo.AccumuloConfiguration;
+import com.datafascia.common.accumulo.AccumuloModule;
+import com.datafascia.common.accumulo.AuthorizationsProvider;
+import com.datafascia.common.accumulo.SubjectAuthorizationsProvider;
 import com.datafascia.common.shiro.FakeRealm;
 import com.datafascia.common.shiro.RealmInjectingEnvironmentLoaderListener;
 import com.datafascia.common.shiro.RoleExposingRealm;

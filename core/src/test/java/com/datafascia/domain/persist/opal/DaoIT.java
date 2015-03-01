@@ -2,12 +2,12 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.persist.opal;
 
-import com.datafascia.accumulo.AccumuloConfiguration;
-import com.datafascia.accumulo.AccumuloImport;
-import com.datafascia.accumulo.AccumuloModule;
-import com.datafascia.accumulo.AccumuloTemplate;
-import com.datafascia.accumulo.AuthorizationsProvider;
-import com.datafascia.accumulo.SubjectAuthorizationsProvider;
+import com.datafascia.common.accumulo.AccumuloConfiguration;
+import com.datafascia.common.accumulo.AccumuloImport;
+import com.datafascia.common.accumulo.AccumuloModule;
+import com.datafascia.common.accumulo.AccumuloTemplate;
+import com.datafascia.common.accumulo.AuthorizationsProvider;
+import com.datafascia.common.accumulo.SubjectAuthorizationsProvider;
 import com.datafascia.common.shiro.FakeRealm;
 import com.datafascia.common.shiro.RoleExposingRealm;
 import com.google.common.io.Files;

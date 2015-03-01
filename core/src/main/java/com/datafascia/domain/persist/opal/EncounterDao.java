@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.persist.opal;
 
-import com.datafascia.accumulo.AccumuloTemplate;
+import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.jackson.UnitsSymbolMap;
 import com.datafascia.models.CodeableConcept;
 import com.datafascia.models.Encounter;

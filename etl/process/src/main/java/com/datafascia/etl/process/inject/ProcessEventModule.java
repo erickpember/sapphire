@@ -3,9 +3,9 @@
 package com.datafascia.etl.process.inject;
 
 import com.codahale.metrics.MetricRegistry;
-import com.datafascia.accumulo.AuthorizationsProvider;
-import com.datafascia.accumulo.ConnectorFactory;
-import com.datafascia.accumulo.FixedAuthorizationsProvider;
+import com.datafascia.common.accumulo.AuthorizationsProvider;
+import com.datafascia.common.accumulo.ConnectorFactory;
+import com.datafascia.common.accumulo.FixedAuthorizationsProvider;
 import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
 import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
 import com.datafascia.common.configuration.guice.ConfigureModule;

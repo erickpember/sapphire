@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.configurations;
 
-import com.datafascia.accumulo.AccumuloConfiguration;
+import com.datafascia.common.accumulo.AccumuloConfiguration;
 import com.datafascia.kafka.KafkaConfig;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;

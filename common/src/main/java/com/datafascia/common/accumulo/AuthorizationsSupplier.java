@@ -2,11 +2,11 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.common.accumulo;
 
-import javax.inject.Provider;
+import java.util.function.Supplier;
 import org.apache.accumulo.core.security.Authorizations;
 
 /**
- * Gets authorizations for performing Accumulo operations.
+ * Gets authorizations for reading entries from Accumulo.
  */
-public interface AuthorizationsProvider extends Provider<Authorizations> {
+public interface AuthorizationsSupplier extends Supplier<Authorizations> {
 }

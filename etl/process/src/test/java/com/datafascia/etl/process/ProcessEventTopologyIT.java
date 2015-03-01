@@ -7,9 +7,9 @@ import backtype.storm.Testing;
 import backtype.storm.testing.TestJob;
 import backtype.storm.tuple.Values;
 import com.datafascia.common.accumulo.AccumuloConfiguration;
-import com.datafascia.common.accumulo.AuthorizationsProvider;
+import com.datafascia.common.accumulo.AuthorizationsSupplier;
 import com.datafascia.common.accumulo.ConnectorFactory;
-import com.datafascia.common.accumulo.FixedAuthorizationsProvider;
+import com.datafascia.common.accumulo.FixedAuthorizationsSupplier;
 import com.datafascia.common.avro.Serializer;
 import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
 import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
@@ -56,7 +56,7 @@ public class ProcessEventTopologyIT {
   private static class TestModule extends ConfigureModule {
     @Override
     protected void onConfigure() {
-      bind(AuthorizationsProvider.class).to(FixedAuthorizationsProvider.class);
+      bind(AuthorizationsSupplier.class).to(FixedAuthorizationsSupplier.class);
       bind(AvroSchemaRegistry.class).to(MemorySchemaRegistry.class).in(Singleton.class);
     }
 

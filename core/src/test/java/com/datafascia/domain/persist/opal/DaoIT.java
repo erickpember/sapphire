@@ -6,8 +6,8 @@ import com.datafascia.common.accumulo.AccumuloConfiguration;
 import com.datafascia.common.accumulo.AccumuloImport;
 import com.datafascia.common.accumulo.AccumuloModule;
 import com.datafascia.common.accumulo.AccumuloTemplate;
-import com.datafascia.common.accumulo.AuthorizationsProvider;
-import com.datafascia.common.accumulo.SubjectAuthorizationsProvider;
+import com.datafascia.common.accumulo.AuthorizationsSupplier;
+import com.datafascia.common.accumulo.SubjectAuthorizationsSupplier;
 import com.datafascia.common.shiro.FakeRealm;
 import com.datafascia.common.shiro.RoleExposingRealm;
 import com.google.common.io.Files;
@@ -56,7 +56,7 @@ public abstract class DaoIT {
           @Override
           protected void configure() {
             bind(AccumuloConfiguration.class).toInstance(config);
-            bind(AuthorizationsProvider.class).to(SubjectAuthorizationsProvider.class);
+            bind(AuthorizationsSupplier.class).to(SubjectAuthorizationsSupplier.class);
             bind(RoleExposingRealm.class).to(FakeRealm.class);
           }
         },

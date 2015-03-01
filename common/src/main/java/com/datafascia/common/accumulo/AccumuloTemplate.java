@@ -23,7 +23,7 @@ import org.apache.accumulo.core.client.TableNotFoundException;
 @Singleton @Slf4j
 public class AccumuloTemplate {
 
-  private final AuthorizationsProvider authorizationsProvider;
+  private final AuthorizationsSupplier authorizationsSupplier;
   private final Connector connector;
   private final MetricRegistry metrics;
   private final Map<String, Timer> nameToTimerMap = new HashMap<>();
@@ -31,15 +31,15 @@ public class AccumuloTemplate {
   /**
    * Construct the query template.
    *
-   * @param authorizationsProvider authorizations provider
+   * @param authorizationsSupplier authorizations provider
    * @param connector the Accumulo connector
    * @param metrics the metrics registry
    */
   @Inject
   public AccumuloTemplate(
-      AuthorizationsProvider authorizationsProvider, Connector connector, MetricRegistry metrics) {
+      AuthorizationsSupplier authorizationsSupplier, Connector connector, MetricRegistry metrics) {
 
-    this.authorizationsProvider = authorizationsProvider;
+    this.authorizationsSupplier = authorizationsSupplier;
     this.connector = connector;
     this.metrics = metrics;
   }
@@ -70,7 +70,7 @@ public class AccumuloTemplate {
    */
   public Scanner createScanner(String tableName) {
     try {
-      return connector.createScanner(tableName, authorizationsProvider.get());
+      return connector.createScanner(tableName, authorizationsSupplier.get());
     } catch (TableNotFoundException e) {
       throw new IllegalStateException("Table " + tableName + " not found", e);
     }

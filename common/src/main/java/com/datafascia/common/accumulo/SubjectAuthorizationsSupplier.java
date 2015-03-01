@@ -8,9 +8,9 @@ import javax.inject.Inject;
 import org.apache.accumulo.core.security.Authorizations;
 
 /**
- * Provides Accumulo authorizations based on current Shiro subject.
+ * Supplies Accumulo authorizations based on current Shiro subject.
  */
-public class SubjectAuthorizationsProvider implements AuthorizationsProvider {
+public class SubjectAuthorizationsSupplier implements AuthorizationsSupplier {
 
   private final RoleExposingRealm realm;
 
@@ -21,7 +21,7 @@ public class SubjectAuthorizationsProvider implements AuthorizationsProvider {
    *     role exposing realm
    */
   @Inject
-  public SubjectAuthorizationsProvider(RoleExposingRealm realm) {
+  public SubjectAuthorizationsSupplier(RoleExposingRealm realm) {
     this.realm = realm;
   }
 

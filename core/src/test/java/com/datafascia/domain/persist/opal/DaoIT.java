@@ -7,6 +7,8 @@ import com.datafascia.common.accumulo.AccumuloImport;
 import com.datafascia.common.accumulo.AccumuloModule;
 import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
+import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
+import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.SubjectAuthorizationsSupplier;
 import com.datafascia.common.shiro.FakeRealm;
 import com.datafascia.common.shiro.RoleExposingRealm;
@@ -57,6 +59,7 @@ public abstract class DaoIT {
           protected void configure() {
             bind(AccumuloConfiguration.class).toInstance(config);
             bind(AuthorizationsSupplier.class).to(SubjectAuthorizationsSupplier.class);
+            bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
             bind(RoleExposingRealm.class).to(FakeRealm.class);
           }
         },

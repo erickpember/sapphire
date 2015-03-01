@@ -3,6 +3,8 @@
 package com.datafascia.domain.persist;
 
 import com.datafascia.common.accumulo.AccumuloTemplate;
+import com.datafascia.common.accumulo.MutationBuilder;
+import com.datafascia.common.accumulo.MutationSetter;
 import com.datafascia.common.accumulo.RowMapper;
 import com.datafascia.common.persist.Id;
 import com.datafascia.models.Gender;
@@ -19,14 +21,10 @@ import java.util.Map;
 import java.util.Optional;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.accumulo.core.client.BatchWriter;
-import org.apache.accumulo.core.client.MutationsRejectedException;
 import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.data.Key;
-import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
-import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.hadoop.io.Text;
 
 /**
@@ -47,7 +45,6 @@ import org.apache.hadoop.io.Text;
 public class PatientRepository extends BaseRepository {
 
   private static final String COLUMN_FAMILY = Patient.class.getSimpleName();
-  private static final ColumnVisibility COLUMN_VISIBILITY = new ColumnVisibility("System");
   private static final String PATIENT_ID = "patientId";
   private static final String ACCOUNT_NUMBER = "accountNumber";
   private static final String ACTIVE = "active";
@@ -62,8 +59,6 @@ public class PatientRepository extends BaseRepository {
   private static final String INSTITUTION_PATIENT_ID = "institutionPatientId";
   private static final PatientRowMapper PATIENT_ROW_MAPPER = new PatientRowMapper();
 
-  private BatchWriter writer;
-
   /**
    * Constructor
    *
@@ -73,37 +68,10 @@ public class PatientRepository extends BaseRepository {
   @Inject
   public PatientRepository(AccumuloTemplate accumuloTemplate) {
     super(accumuloTemplate);
-
-    writer = accumuloTemplate.createBatchWriter(Tables.PATIENT);
   }
 
   private static String toRowId(Id<Patient> patientId) {
     return toRowId(Patient.class, patientId);
-  }
-
-  private void putValue(Mutation mutation, String columnQualifier, Object value) {
-    if (value != null) {
-      mutation.put(COLUMN_FAMILY, columnQualifier, COLUMN_VISIBILITY, value.toString());
-    }
-  }
-
-  private Mutation toMutation(Patient patient) {
-    Mutation mutation = new Mutation(toRowId(patient.getId()));
-    putValue(mutation, PATIENT_ID, patient.getPatientId());
-    putValue(mutation, ACCOUNT_NUMBER, patient.getAccountNumber());
-    putValue(mutation, FIRST_NAME, patient.getName().getFirst());
-    putValue(mutation, MIDDLE_NAME, patient.getName().getMiddle());
-    putValue(mutation, LAST_NAME, patient.getName().getLast());
-    putValue(mutation, GENDER, patient.getGender().getCode());
-    putValue(mutation, BIRTH_DATE, encode(patient.getBirthDate()));
-    putValue(mutation, MARITAL_STATUS, patient.getMaritalStatus().getCode());
-    putValue(mutation, RACE, patient.getRace().getCode());
-    if (!patient.getLangs().isEmpty()) {
-      putValue(mutation, LANGUAGE, patient.getLangs().get(0).name());
-    }
-    putValue(mutation, ACTIVE, String.valueOf(patient.isActive()));
-    putValue(mutation, INSTITUTION_PATIENT_ID, patient.getInstitutionPatientId());
-    return mutation;
   }
 
   /**
@@ -113,13 +81,30 @@ public class PatientRepository extends BaseRepository {
    *     to save
    */
   public void save(Patient patient) {
-    patient.setId(Id.of(patient.getInstitutionPatientId().toString()));
-    try {
-      writer.addMutation(toMutation(patient));
-      writer.flush();
-    } catch (MutationsRejectedException e) {
-      throw new IllegalStateException("Cannot save patient ID " + patient.getId(), e);
-    }
+    accumuloTemplate.save(
+        Tables.PATIENT,
+        toRowId(patient.getId()),
+        new MutationSetter() {
+          @Override
+          public void putWriteOperations(MutationBuilder mutationBuilder) {
+            mutationBuilder
+                .columnFamily(COLUMN_FAMILY)
+                .put(PATIENT_ID, patient.getPatientId())
+                .put(ACCOUNT_NUMBER, patient.getAccountNumber())
+                .put(FIRST_NAME, patient.getName().getFirst())
+                .put(MIDDLE_NAME, patient.getName().getMiddle())
+                .put(LAST_NAME, patient.getName().getLast())
+                .put(GENDER, patient.getGender().getCode())
+                .put(BIRTH_DATE, encode(patient.getBirthDate()))
+                .put(MARITAL_STATUS, patient.getMaritalStatus().getCode())
+                .put(RACE, patient.getRace().getCode())
+                .put(ACTIVE, String.valueOf(patient.isActive()))
+                .put(INSTITUTION_PATIENT_ID, patient.getInstitutionPatientId());
+            if (!patient.getLangs().isEmpty()) {
+              mutationBuilder.put(LANGUAGE, patient.getLangs().get(0).name());
+            }
+          }
+        });
   }
 
   private static class PatientRowMapper implements RowMapper<Patient> {

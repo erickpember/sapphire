@@ -9,6 +9,8 @@ import com.datafascia.api.health.AccumuloHealthCheck;
 import com.datafascia.common.accumulo.AccumuloConfiguration;
 import com.datafascia.common.accumulo.AccumuloModule;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
+import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
+import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.SubjectAuthorizationsSupplier;
 import com.datafascia.common.shiro.FakeRealm;
 import com.datafascia.common.shiro.RealmInjectingEnvironmentLoaderListener;
@@ -113,6 +115,7 @@ public class APIService extends Application<APIConfiguration> {
             bind(APIConfiguration.class).toInstance(config);
             bind(AccumuloConfiguration.class).toInstance(config.getAccumuloConfiguration());
             bind(AuthorizationsSupplier.class).to(SubjectAuthorizationsSupplier.class);
+            bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
             bind(KafkaConfig.class).toInstance(config.getKafkaConfig());
             bind(MetricRegistry.class).toInstance(environment.metrics());
             bind(Realm.class).toInstance(realm);

@@ -8,8 +8,10 @@ import backtype.storm.testing.TestJob;
 import backtype.storm.tuple.Values;
 import com.datafascia.common.accumulo.AccumuloConfiguration;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
+import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.ConnectorFactory;
 import com.datafascia.common.accumulo.FixedAuthorizationsSupplier;
+import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
 import com.datafascia.common.avro.Serializer;
 import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
 import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
@@ -69,6 +71,7 @@ public class HL7MessageToEventTopologyIT {
     protected void onConfigure() {
       bind(AuthorizationsSupplier.class).to(FixedAuthorizationsSupplier.class);
       bind(AvroSchemaRegistry.class).to(MemorySchemaRegistry.class).in(Singleton.class);
+      bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
     }
 
     @Provides

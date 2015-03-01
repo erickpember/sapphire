@@ -7,8 +7,10 @@ import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.parser.Parser;
 import com.codahale.metrics.MetricRegistry;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
+import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.ConnectorFactory;
 import com.datafascia.common.accumulo.FixedAuthorizationsSupplier;
+import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
 import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
 import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
 import com.datafascia.common.configuration.guice.ConfigureModule;
@@ -25,17 +27,18 @@ public class HL7MessageToEventModule extends ConfigureModule {
   protected void onConfigure() {
     bind(AuthorizationsSupplier.class).to(FixedAuthorizationsSupplier.class);
     bind(AvroSchemaRegistry.class).to(MemorySchemaRegistry.class).in(Singleton.class);
+    bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
     bind(HapiContext.class).toInstance(new DefaultHapiContext());
     bind(MetricRegistry.class).in(Singleton.class);
   }
 
   @Provides @Singleton
-  public Connector getConnector(ConnectorFactory connectorFactory) {
+  public Connector connector(ConnectorFactory connectorFactory) {
     return connectorFactory.getConnector();
   }
 
   @Provides @Singleton
-  public Parser getParser(HapiContext context) {
+  public Parser parser(HapiContext context) {
     return context.getGenericParser();
   }
 }

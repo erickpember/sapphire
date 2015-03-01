@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.BatchWriter;
 import org.apache.accumulo.core.client.BatchWriterConfig;
 import org.apache.accumulo.core.client.Connector;
+import org.apache.accumulo.core.client.MutationsRejectedException;
 import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.client.TableNotFoundException;
 
@@ -23,39 +24,64 @@ import org.apache.accumulo.core.client.TableNotFoundException;
 @Singleton @Slf4j
 public class AccumuloTemplate {
 
-  private final AuthorizationsSupplier authorizationsSupplier;
   private final Connector connector;
+  private final ColumnVisibilityPolicy columnVisibilityPolicy;
+  private final AuthorizationsSupplier authorizationsSupplier;
   private final MetricRegistry metrics;
   private final Map<String, Timer> nameToTimerMap = new HashMap<>();
 
   /**
    * Construct the query template.
    *
-   * @param authorizationsSupplier authorizations provider
-   * @param connector the Accumulo connector
-   * @param metrics the metrics registry
+   * @param connector
+   *     the Accumulo connector
+   * @param columnVisibilityPolicy
+   *     supplies visibility expression to write when writing an entry
+   * @param authorizationsSupplier
+   *     supplies authorizations for reading entries
+   * @param metrics
+   *     the metrics registry
    */
   @Inject
   public AccumuloTemplate(
-      AuthorizationsSupplier authorizationsSupplier, Connector connector, MetricRegistry metrics) {
+      Connector connector,
+      ColumnVisibilityPolicy columnVisibilityPolicy,
+      AuthorizationsSupplier authorizationsSupplier,
+      MetricRegistry metrics) {
 
-    this.authorizationsSupplier = authorizationsSupplier;
     this.connector = connector;
+    this.columnVisibilityPolicy = columnVisibilityPolicy;
+    this.authorizationsSupplier = authorizationsSupplier;
     this.metrics = metrics;
   }
 
-  /**
-   * Creates a writer of the table.
-   *
-   * @param tableName
-   *     table name
-   * @return writer
-   */
-  public BatchWriter createBatchWriter(String tableName) {
+  private BatchWriter createBatchWriter(String tableName) {
     try {
       return connector.createBatchWriter(tableName, new BatchWriterConfig());
     } catch (TableNotFoundException e) {
       throw new IllegalStateException("Table " + tableName + " not found", e);
+    }
+  }
+
+  /**
+   * Writes entries to a row.
+   *
+   * @param tableName
+   *     table name
+   * @param rowId
+   *     row ID
+   * @param mutationSetter
+   *     puts write operations in a mutation
+   */
+  public void save(String tableName, String rowId, MutationSetter mutationSetter) {
+    BatchWriter writer = createBatchWriter(tableName);
+    MutationBuilder mutationBuilder = new MutationBuilder(tableName, rowId, columnVisibilityPolicy);
+    mutationSetter.putWriteOperations(mutationBuilder);
+    try {
+      writer.addMutation(mutationBuilder.build());
+      writer.close();
+    } catch (MutationsRejectedException e) {
+      throw new IllegalStateException("Cannot save row ID " + rowId, e);
     }
   }
 

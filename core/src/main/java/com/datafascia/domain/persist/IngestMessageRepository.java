@@ -14,14 +14,10 @@ import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.accumulo.core.client.BatchWriter;
-import org.apache.accumulo.core.client.MutationsRejectedException;
 import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.data.Key;
-import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
-import org.apache.accumulo.core.security.ColumnVisibility;
 import org.apache.hadoop.io.Text;
 
 /**
@@ -35,10 +31,9 @@ import org.apache.hadoop.io.Text;
  * </ol>
  */
 @Singleton @Slf4j
-public class IngestMessageRepository {
+public class IngestMessageRepository extends BaseRepository {
 
   private static final String COLUMN_FAMILY = IngestMessage.class.getSimpleName();
-  private static final ColumnVisibility COLUMN_VISIBILITY = new ColumnVisibility("System");
   private static final String TIMESTAMP = "timestamp";
   private static final String INSTITUTION = "institution";
   private static final String FACILITY = "facility";
@@ -48,9 +43,6 @@ public class IngestMessageRepository {
   private static final String PAYLOAD = "payload";
   private static final MessageRowMapper MESSAGE_ROW_MAPPER = new MessageRowMapper();
 
-  private final AccumuloTemplate accumuloTemplate;
-  private final BatchWriter writer;
-
   /**
    * Constructor
    *
@@ -59,8 +51,7 @@ public class IngestMessageRepository {
    */
   @Inject
   public IngestMessageRepository(AccumuloTemplate accumuloTemplate) {
-    this.accumuloTemplate = accumuloTemplate;
-    writer = accumuloTemplate.createBatchWriter(Tables.INGEST_MESSAGE);
+    super(accumuloTemplate);
   }
 
   private static class MessageRowMapper implements RowMapper<IngestMessage> {
@@ -127,28 +118,18 @@ public class IngestMessageRepository {
    *     to save
    */
   public void save(IngestMessage message) {
-    try {
-      writer.addMutation(toMutation(message));
-    } catch (MutationsRejectedException e) {
-      throw new IllegalStateException("save", e);
-    }
-  }
-
-  private Mutation toMutation(IngestMessage message) {
-    Mutation mutation = new Mutation(message.getId().toString());
-    putValue(mutation, TIMESTAMP, message.getTimestamp());
-    putValue(mutation, INSTITUTION, message.getInstitution());
-    putValue(mutation, FACILITY, message.getFacility());
-    putValue(mutation, DEPARTMENT, message.getDepartment());
-    putValue(mutation, SOURCE, message.getSource());
-    putValue(mutation, PAYLOAD_TYPE, message.getPayloadType());
-    mutation.put(COLUMN_FAMILY, PAYLOAD, COLUMN_VISIBILITY, new Value(message.getPayload()));
-    return mutation;
-  }
-
-  private void putValue(Mutation mutation, String columnQualifier, Object value) {
-    if (value != null) {
-      mutation.put(COLUMN_FAMILY, columnQualifier, COLUMN_VISIBILITY, value.toString());
-    }
+    accumuloTemplate.save(
+        Tables.INGEST_MESSAGE,
+        message.getId().toString(),
+        mutationBuilder ->
+            mutationBuilder
+                .columnFamily(COLUMN_FAMILY)
+                .put(TIMESTAMP, message.getTimestamp())
+                .put(INSTITUTION, message.getInstitution())
+                .put(FACILITY, message.getFacility())
+                .put(DEPARTMENT, message.getDepartment())
+                .put(SOURCE, message.getSource())
+                .put(PAYLOAD_TYPE, message.getPayloadType())
+                .put(PAYLOAD, new Value(message.getPayload())));
   }
 }

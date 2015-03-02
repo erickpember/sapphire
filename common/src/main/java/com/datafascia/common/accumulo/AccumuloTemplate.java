@@ -7,6 +7,7 @@ import com.codahale.metrics.Timer;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -111,13 +112,15 @@ public class AccumuloTemplate {
    *     callback to receive entries
    * @param <E>
    *     entity type
-   * @return entity
+   * @return optional entity, empty if none found
+   * @throws com.datafascia.common.persist.IncorrectResultSizeException
+   *     if more than one row found
    */
-  public <E> E queryForObject(Scanner scanner, RowMapper<E> rowMapper) {
+  public <E> Optional<E> queryForObject(Scanner scanner, RowMapper<E> rowMapper) {
     Timer.Context timerContext = getTimerContext("queryForObject", rowMapper);
     try {
       RowReader<E> rowReader = new RowReader<>(rowMapper);
-      return rowReader.consume(scanner);
+      return rowReader.queryForObject(scanner);
     } finally {
       timerContext.stop();
       scanner.close();
@@ -131,23 +134,42 @@ public class AccumuloTemplate {
    *     scanner to read from
    * @param rowMapper
    *     callback to receive entries
-   * @param predicate
+   * @param filter
+   *     include only entities satisfying the predicate
+   * @param allMatch
+   *     short circuit reading scanner by returning false
+   * @param <E>
+   *     entity type
+   * @return entities
+   */
+  public <E> List<E> queryForList(
+      Scanner scanner, RowMapper<E> rowMapper, Predicate<E> filter, Predicate<E> allMatch) {
+
+    Timer.Context timerContext = getTimerContext("queryForList", rowMapper);
+    try {
+      RowReader<E> rowReader = new RowReader<>(rowMapper, filter, allMatch);
+      return rowReader.queryForList(scanner);
+    } finally {
+      timerContext.stop();
+      scanner.close();
+    }
+  }
+
+  /**
+   * Reads entries from rows into a list of objects. Also closes scanner.
+   *
+   * @param scanner
+   *     scanner to read from
+   * @param rowMapper
+   *     callback to receive entries
+   * @param filter
    *     include only entities satisfying the predicate
    * @param <E>
    *     entity type
    * @return entities
    */
-  public <E> List<E> queryForList(Scanner scanner, RowMapper<E> rowMapper, Predicate<E> predicate) {
-    Timer.Context timerContext = getTimerContext("queryForList", rowMapper);
-    try {
-      CollectingRowMapper<E> collectingRowMapper = new CollectingRowMapper<>(rowMapper, predicate);
-      RowReader<Void> rowReader = new RowReader<>(collectingRowMapper);
-      rowReader.consume(scanner);
-      return collectingRowMapper.getRows();
-    } finally {
-      timerContext.stop();
-      scanner.close();
-    }
+  public <E> List<E> queryForList(Scanner scanner, RowMapper<E> rowMapper, Predicate<E> filter) {
+    return queryForList(scanner, rowMapper, filter, entity -> true);
   }
 
   /**

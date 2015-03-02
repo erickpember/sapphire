@@ -108,7 +108,7 @@ public class IngestMessageRepository extends BaseRepository {
     scanner.setRange(Range.exact(messageId.toString()));
     scanner.fetchColumnFamily(new Text(COLUMN_FAMILY));
 
-    return Optional.ofNullable(accumuloTemplate.queryForObject(scanner, MESSAGE_ROW_MAPPER));
+    return accumuloTemplate.queryForObject(scanner, MESSAGE_ROW_MAPPER);
   }
 
   /**

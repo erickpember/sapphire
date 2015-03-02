@@ -175,8 +175,7 @@ public class PatientDao extends OpalDao {
     scanner.setRange(toRange(Kinds.PATIENT_OBJECT, patientId));
     scanner.fetchColumnFamily(LAST_VISIT_ID);
 
-    String lastVisitId = accumuloTemplate.queryForObject(scanner, new LastVisitIdRowMapper());
-    return Optional.ofNullable(lastVisitId);
+    return accumuloTemplate.queryForObject(scanner, new LastVisitIdRowMapper());
   }
 
   /**

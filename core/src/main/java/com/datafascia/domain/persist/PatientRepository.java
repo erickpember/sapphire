@@ -181,7 +181,7 @@ public class PatientRepository extends BaseRepository {
     scanner.setRange(Range.exact(toRowId(patientId)));
     scanner.fetchColumnFamily(new Text(COLUMN_FAMILY));
 
-    return Optional.ofNullable(accumuloTemplate.queryForObject(scanner, PATIENT_ROW_MAPPER));
+    return accumuloTemplate.queryForObject(scanner, PATIENT_ROW_MAPPER);
   }
 
   /**

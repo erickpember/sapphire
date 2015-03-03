@@ -64,21 +64,15 @@ public class EmergeDemographicCSVGenerator {
 
     try (PrintWriter pw = new PrintWriter(new FileWriter(csvFile))) {
       DatafasciaApi api = DatafasciaApiBuilder.endpoint(apiEndpoint, user, password);
-      pw.write(Joiner.on(",").join(mapper.getHeaders()));
+      pw.println(Joiner.on(",").join(mapper.getHeaders()));
 
       int entry = 0;
-      String patientId = "";
       for (Patient pat : api.patients(true)) {
-        try {
-          String[] urnparts = pat.getId().toString().split(":");
-          patientId = urnparts[urnparts.length - 1];
-          Encounter encount = lastVisit(api, patientId);
+        // TODO: Read encounter from database to get patient height and weight.
+        Encounter encount = null;
 
-          pw.write("\n" + mapper.asCSV(getDemographic(pat, encount, entry)));
-          entry++;
-        } catch (MissingUrnException ex) {
-          log.error("Error processing patient {} is {}", patientId, ex);
-        }
+        pw.println(mapper.asCSV(getDemographic(pat, encount, entry)));
+        entry++;
       }
     }
   }
@@ -106,12 +100,7 @@ public class EmergeDemographicCSVGenerator {
    *
    * @return the Demographic object.
    */
-  private static Demographic getDemographic(Patient pat, Encounter encount, int entry)
-          throws MissingUrnException {
-    if (pat.getInstitutionPatientId() == null) {
-      throw new MissingUrnException("Institution patient ID missing " + pat.getId());
-    }
-
+  private static Demographic getDemographic(Patient pat, Encounter encount, int entry) {
     Demographic demo = new Demographic();
     demo.setHighestLevelActivity(UNKNOWN);
     demo.setIvcFilter(NO);
@@ -119,7 +108,6 @@ public class EmergeDemographicCSVGenerator {
     demo.setReadmission(NO);
     demo.setScreeningToolUsed(YES);
     demo.setEntry(Integer.toString(entry));
-    demo.setSubjectPatcom(Integer.toString(entry));
 
     addPatientData(demo, pat);
 
@@ -148,6 +136,7 @@ public class EmergeDemographicCSVGenerator {
     demo.setPatientDateOfBirth(df.format(pat.getBirthDate()));
     demo.setRace(pat.getRace().name());
     demo.setSubjectPatientId(getIdFromUrn(pat.getInstitutionPatientId()));
+    demo.setSubjectPatcom(pat.getAccountNumber());
     demo.setPatientName(pat.getName().format(NAME_FMT));
   }
 
@@ -214,14 +203,6 @@ public class EmergeDemographicCSVGenerator {
 
     String[] path = urn.toString().split(":");
     return path[path.length - 1];
-  }
-
-  @SuppressWarnings("serial")
-  private static class MissingUrnException extends Exception {
-
-    MissingUrnException(String message) {
-      super(message);
-    }
   }
 
   private EmergeDemographicCSVGenerator() {

@@ -90,6 +90,6 @@ public class PatientDaoIT extends DaoIT {
     assertEquals(patient.getName().getLast(), lastName);
     assertEquals(patient.getBirthDate(), birthDate);
     assertEquals(patient.getId().toString(), patId);
-    assertEquals(patient.getInstitutionPatientId().toString(), instId);
+    assertEquals(patient.getInstitutionPatientId(), instId);
   }
 }

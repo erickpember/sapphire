@@ -28,7 +28,6 @@ import com.datafascia.models.Gender;
 import com.datafascia.models.MaritalStatus;
 import com.datafascia.models.Patient;
 import com.datafascia.models.Race;
-import com.datafascia.urn.URNFactory;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.neovisionaries.i18n.LanguageCode;
@@ -128,7 +127,7 @@ public class ProcessEventTopologyIT {
 
   private Event createEvent() {
     PatientData patientData = PatientData.builder()
-        .patientId("patientId")
+        .institutionPatientId("institutionPatientId")
         .accountNumber("accountNumber")
         .firstName("Wiley")
         .middleName("E")
@@ -171,15 +170,11 @@ public class ProcessEventTopologyIT {
     feedEvent(event);
 
     PatientData patientData = (PatientData) event.getData();
-    URI primaryKey = URNFactory.institutionPatientId(
-        event.getInstitutionId().toString(),
-        event.getFacilityId().toString(),
-        patientData.getPatientId());
-    Id<Patient> id = Id.of(primaryKey.toString());
+    Id<Patient> id = Id.of(patientData.getInstitutionPatientId());
     Optional<Patient> optionalPatient = patientRepository.read(id);
     assertTrue(optionalPatient.isPresent());
 
     Patient patient = optionalPatient.get();
-    assertEquals(patient.getPatientId(), patientData.getPatientId());
+    assertEquals(patient.getInstitutionPatientId(), patientData.getInstitutionPatientId());
   }
 }

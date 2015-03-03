@@ -13,7 +13,6 @@ import com.datafascia.models.Name;
 import com.datafascia.models.Patient;
 import com.datafascia.models.Race;
 import com.neovisionaries.i18n.LanguageCode;
-import java.net.URI;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -45,9 +44,8 @@ import org.apache.hadoop.io.Text;
 public class PatientRepository extends BaseRepository {
 
   private static final String COLUMN_FAMILY = Patient.class.getSimpleName();
-  private static final String PATIENT_ID = "patientId";
+  private static final String INSTITUTION_PATIENT_ID = "institutionPatientId";
   private static final String ACCOUNT_NUMBER = "accountNumber";
-  private static final String ACTIVE = "active";
   private static final String FIRST_NAME = "firstName";
   private static final String MIDDLE_NAME = "middleName";
   private static final String LAST_NAME = "lastName";
@@ -56,7 +54,7 @@ public class PatientRepository extends BaseRepository {
   private static final String MARITAL_STATUS = "maritalStatus";
   private static final String RACE = "race";
   private static final String LANGUAGE = "language";
-  private static final String INSTITUTION_PATIENT_ID = "institutionPatientId";
+  private static final String ACTIVE = "active";
   private static final PatientRowMapper PATIENT_ROW_MAPPER = new PatientRowMapper();
 
   /**
@@ -89,7 +87,7 @@ public class PatientRepository extends BaseRepository {
           public void putWriteOperations(MutationBuilder mutationBuilder) {
             mutationBuilder
                 .columnFamily(COLUMN_FAMILY)
-                .put(PATIENT_ID, patient.getPatientId())
+                .put(INSTITUTION_PATIENT_ID, patient.getInstitutionPatientId())
                 .put(ACCOUNT_NUMBER, patient.getAccountNumber())
                 .put(FIRST_NAME, patient.getName().getFirst())
                 .put(MIDDLE_NAME, patient.getName().getMiddle())
@@ -98,8 +96,7 @@ public class PatientRepository extends BaseRepository {
                 .put(BIRTH_DATE, encode(patient.getBirthDate()))
                 .put(MARITAL_STATUS, patient.getMaritalStatus().getCode())
                 .put(RACE, patient.getRace().getCode())
-                .put(ACTIVE, String.valueOf(patient.isActive()))
-                .put(INSTITUTION_PATIENT_ID, patient.getInstitutionPatientId());
+                .put(ACTIVE, String.valueOf(patient.isActive()));
             if (!patient.getLangs().isEmpty()) {
               mutationBuilder.put(LANGUAGE, patient.getLangs().get(0).name());
             }
@@ -124,8 +121,9 @@ public class PatientRepository extends BaseRepository {
     public void onReadEntry(Map.Entry<Key, Value> entry) {
       String value = entry.getValue().toString();
       switch (entry.getKey().getColumnQualifier().toString()) {
-        case PATIENT_ID:
-          patient.setPatientId(value);
+        case INSTITUTION_PATIENT_ID:
+          patient.setId(Id.of(value));
+          patient.setInstitutionPatientId(value);
           break;
         case ACCOUNT_NUMBER:
           patient.setAccountNumber(value);
@@ -156,9 +154,6 @@ public class PatientRepository extends BaseRepository {
           break;
         case ACTIVE:
           patient.setActive(Boolean.parseBoolean(value));
-          break;
-        case INSTITUTION_PATIENT_ID:
-          patient.setInstitutionPatientId(URI.create(value));
           break;
       }
     }

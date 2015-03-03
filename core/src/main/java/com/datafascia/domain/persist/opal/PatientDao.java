@@ -10,7 +10,6 @@ import com.datafascia.models.Gender;
 import com.datafascia.models.Name;
 import com.datafascia.models.Patient;
 import com.datafascia.models.Race;
-import com.datafascia.urn.URNFactory;
 import com.google.common.base.Enums;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -223,9 +222,7 @@ public class PatientDao extends OpalDao {
             patient.setRace(race);
             break;
           case dF_pidPatientId :
-            String[] fields = visitId.get().split("\\|");
-            patient.setInstitutionPatientId(URNFactory.institutionPatientId(fields[0].trim(),
-                fields[1].trim(), decodeString(value)));
+            patient.setInstitutionPatientId(decodeString(value));
             break;
           case dF_pidDateTimeOfBirth :
             patient.setBirthDate(LocalDate.parse(decodeString(value),

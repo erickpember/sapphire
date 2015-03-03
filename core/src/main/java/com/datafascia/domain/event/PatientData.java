@@ -21,7 +21,7 @@ import org.apache.avro.reflect.AvroEncode;
 @AllArgsConstructor @Builder @Data @NoArgsConstructor
 public class PatientData implements EventData {
 
-  private String patientId;
+  private String institutionPatientId;
   private String accountNumber;
   private String firstName;
   private String middleName;

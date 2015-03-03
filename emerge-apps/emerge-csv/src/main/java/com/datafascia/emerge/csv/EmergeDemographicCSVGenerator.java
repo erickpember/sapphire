@@ -120,7 +120,7 @@ public class EmergeDemographicCSVGenerator {
     demo.setGender(pat.getGender().name());
     demo.setPatientDateOfBirth(df.format(pat.getBirthDate()));
     demo.setRace(pat.getRace().name());
-    demo.setSubjectPatientId(getIdFromUrn(pat.getInstitutionPatientId()));
+    demo.setSubjectPatientId(pat.getInstitutionPatientId());
     demo.setSubjectPatcom(pat.getAccountNumber());
     demo.setPatientName(pat.getName().format(NAME_FMT));
   }
@@ -172,22 +172,6 @@ public class EmergeDemographicCSVGenerator {
     }
 
     return Optional.empty();
-  }
-
-  /**
-   * Pull an ID out of a URN.
-   *
-   * @param urn The URN.
-   *
-   * @return The ID from the end.
-   */
-  private static String getIdFromUrn(URI urn) {
-    if (urn == null) {
-      return null;
-    }
-
-    String[] path = urn.toString().split(":");
-    return path[path.length - 1];
   }
 
   private EmergeDemographicCSVGenerator() {

@@ -4,7 +4,6 @@ package com.datafascia.urn;
 
 import com.google.common.base.Joiner;
 import java.io.UnsupportedEncodingException;
-import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,8 +20,6 @@ public class URNFactory {
   public static final String URN = "urn";
   /** URN separator */
   public static final String URN_SEP = ":";
-  /** Namespace for Institution patient identifier */
-  public static final String NS_INSTITUTION_PATIENT_ID = "df-institution-patientId-1";
   /** Namespace for dataFascia patient identifier */
   public static final String NS_PATIENT_ID = "df-patientId-1";
   /** Namespace for dataFascia patient encounter identifier */
@@ -38,28 +35,6 @@ public class URNFactory {
 
   /** Encoding */
   private static final String UTF8 = "UTF-8";
-
-  /**
-   * The URN of this type have the schema:
-   *
-   * urn:df-institution-patientId-1:[institution id]:[facility id]:[institution patient id]
-   *
-   * @param instId the institution identifier
-   * @param facilityId the facility identifier
-   * @param patientId the patient identifier
-   *
-   * @return URN of type df-institution-patientId-1
-   */
-  public static URI institutionPatientId(String instId, String facilityId, String patientId) {
-    if (instId == null || facilityId == null || patientId == null) {
-      throw new IllegalArgumentException("Institution patient identifiers cannot be null");
-    }
-    try {
-      return new URI(urn(NS_INSTITUTION_PATIENT_ID, instId, facilityId, patientId));
-    } catch (URISyntaxException e) {
-      throw new RuntimeException(e);
-    }
-  }
 
   /**
    * @param ns the URN namespaceifier

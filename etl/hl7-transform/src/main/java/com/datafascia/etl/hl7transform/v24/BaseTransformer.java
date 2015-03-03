@@ -23,7 +23,7 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
   protected PatientData toPatientData(PID pid) throws HL7Exception {
     XPN patientName = pid.getPatientName(0);
     return PatientData.builder()
-        .patientId(
+        .institutionPatientId(
             pid.getPatientIdentifierList(0).getID().getValue())
         .accountNumber(pid.getPatientAccountNumber().getID().getValue())
         .firstName(

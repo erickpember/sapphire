@@ -8,7 +8,6 @@ import com.datafascia.domain.event.PatientData;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.models.Name;
 import com.datafascia.models.Patient;
-import com.datafascia.urn.URNFactory;
 import java.util.Arrays;
 import java.util.function.Consumer;
 import javax.inject.Inject;
@@ -26,14 +25,8 @@ public class AdmitPatient implements Consumer<Event> {
     PatientData patientData = (PatientData) event.getData();
 
     Patient patient = new Patient();
-    patient.setInstitutionPatientId(
-        URNFactory.institutionPatientId(
-            event.getInstitutionId().toString(),
-            event.getFacilityId().toString(),
-            patientData.getPatientId()));
-    patient.setId(
-        Id.of(patient.getInstitutionPatientId().toString()));
-    patient.setPatientId(patientData.getPatientId());
+    patient.setId(Id.of(patientData.getInstitutionPatientId()));
+    patient.setInstitutionPatientId(patientData.getInstitutionPatientId());
     patient.setAccountNumber(patientData.getAccountNumber());
     patient.setName(new Name());
     patient.getName().setFirst(patientData.getFirstName());

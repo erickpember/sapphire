@@ -15,7 +15,6 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.neovisionaries.i18n.LanguageCode;
-import java.net.URI;
 import java.time.Instant;
 import java.util.List;
 import lombok.EqualsAndHashCode;
@@ -37,7 +36,9 @@ public class Patient extends Person {
   @JsonDeserialize(using = IdDeserializer.class) @JsonSerialize(using = IdSerializer.class)
   private Id<Patient> id;
 
-  private String patientId;
+  @JsonProperty("institutionPatientId")
+  private String institutionPatientId;
+
   private String accountNumber;
 
   @JsonProperty("contacts")
@@ -59,6 +60,4 @@ public class Patient extends Person {
   private String managingOrg;
   @JsonProperty("active")
   private boolean active;
-  @JsonProperty("institutionPatientId")
-  private URI institutionPatientId;
 }

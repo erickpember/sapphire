@@ -29,7 +29,7 @@ public class EventTest {
   @Test
   public void should_decode() {
     PatientData originalPatientData = PatientData.builder()
-        .patientId("patientId")
+        .institutionPatientId("institutionPatientId")
         .accountNumber("accountNumber")
         .firstName("Wiley")
         .middleName("E")

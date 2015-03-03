@@ -117,9 +117,9 @@ public class EmergeDemographicCSVGenerator {
    * @param pat
    */
   private static void addPatientData(Demographic demo, Patient pat) {
-    demo.setGender(pat.getGender().name());
+    demo.setGender(pat.getGender().getCode());
     demo.setPatientDateOfBirth(df.format(pat.getBirthDate()));
-    demo.setRace(pat.getRace().name());
+    demo.setRace(pat.getRace().getCode());
     demo.setSubjectPatientId(pat.getInstitutionPatientId());
     demo.setSubjectPatcom(pat.getAccountNumber());
     demo.setPatientName(pat.getName().format(NAME_FMT));

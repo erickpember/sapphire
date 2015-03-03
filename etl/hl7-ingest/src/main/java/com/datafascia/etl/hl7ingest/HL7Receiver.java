@@ -45,6 +45,7 @@ public class HL7Receiver implements ReceivingApplication {
   public Message processMessage(Message hl7, Map<String, Object> metadata)
       throws ReceivingApplicationException, HL7Exception {
 
+    log.debug("HL7 message received {}", hl7.printStructure());
     IngestMessage message = IngestMessage.builder()
         .timestamp(Instant.now())
         .institution(institution)
@@ -62,6 +63,7 @@ public class HL7Receiver implements ReceivingApplication {
 
       return hl7.generateACK();
     } catch (IOException e) {
+      log.error("Error processing HL7 message ", e);
       throw new HL7Exception(e);
     }
   }

@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j @NoArgsConstructor @EqualsAndHashCode
 public class Demographic {
 
+  private static final String DEFAULT_JHED_ID = "Topaz";
   private static final String DEFAULT_READMISSION = "No";
   private static final String DEFAULT_WEIGHT = "0";
   private static final String DEFAULT_HEIGHT = "0";
@@ -35,7 +36,7 @@ public class Demographic {
   @Getter @Setter @JsonProperty(value = "Data Collection Date", index = 4)
   private String dataCollectionDate;
   @Getter @Setter @JsonProperty(value = "JHED ID", index = 5)
-  private String jhedId;
+  private String jhedId = DEFAULT_JHED_ID;
   @Getter @Setter @JsonProperty(value = "Subject Patient ID", index = 6)
   private String subjectPatientId;
   @Getter @Setter @JsonProperty(value = "Subject Patcom", index = 7)

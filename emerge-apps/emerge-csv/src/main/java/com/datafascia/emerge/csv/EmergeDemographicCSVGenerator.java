@@ -17,6 +17,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
 import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -29,8 +31,11 @@ import retrofit.RetrofitError;
 @Slf4j
 public class EmergeDemographicCSVGenerator {
 
+  private static final ZoneId TIME_ZONE = ZoneId.of("America/Los_Angeles");
+  private static final DateTimeFormatter DATE_TIME_FORMATTER =
+      DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
   // Date format the CSV is expecting.
-  private static final DateTimeFormatter df = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+  private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
   // Name format
   private static final String NAME_FMT
           = "<[" + Name.FIRST + "," + Name.MIDDLE + "," + Name.LAST + "]; separator=\" \">";
@@ -101,6 +106,10 @@ public class EmergeDemographicCSVGenerator {
     Demographic demo = new Demographic();
     demo.setEntry(Integer.toString(entry));
 
+    LocalDateTime now = LocalDateTime.now(TIME_ZONE);
+    demo.setDateCreated(DATE_TIME_FORMATTER.format(now));
+    demo.setDataCollectionDate(DATE_FORMATTER.format(now));
+
     addPatientData(demo, pat);
 
     if (encount != null) {
@@ -118,7 +127,7 @@ public class EmergeDemographicCSVGenerator {
    */
   private static void addPatientData(Demographic demo, Patient pat) {
     demo.setGender(pat.getGender().getCode());
-    demo.setPatientDateOfBirth(df.format(pat.getBirthDate()));
+    demo.setPatientDateOfBirth(DATE_FORMATTER.format(pat.getBirthDate()));
     demo.setRace(pat.getRace().getCode());
     demo.setSubjectPatientId(pat.getInstitutionPatientId());
     demo.setSubjectPatcom(pat.getAccountNumber());
@@ -135,7 +144,7 @@ public class EmergeDemographicCSVGenerator {
     Hospitalization hosp = encount.getHospitalisation();
     if (hosp != null && hosp.getPeriod() != null && hosp.getPeriod().getStart() != null) {
       Instant admitDate = hosp.getPeriod().getStart();
-      demo.setSicuAdmissionDate(df.format(admitDate));
+      demo.setSicuAdmissionDate(DATE_FORMATTER.format(admitDate));
     }
 
     Optional<String> height = getObservationValue(encount, HEIGHT);

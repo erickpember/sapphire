@@ -37,9 +37,6 @@ public class EmergeDemographicCSVGenerator {
 
   private static final String HEIGHT = "Height";
   private static final String WEIGHT = "Weight";
-  private static final String YES = "Yes";
-  private static final String NO = "No";
-  private static final String UNKNOWN = "Unknown";
 
   private static CSVMapper<Demographic> mapper;
 
@@ -102,11 +99,6 @@ public class EmergeDemographicCSVGenerator {
    */
   private static Demographic getDemographic(Patient pat, Encounter encount, int entry) {
     Demographic demo = new Demographic();
-    demo.setHighestLevelActivity(UNKNOWN);
-    demo.setIvcFilter(NO);
-    demo.setPriorToHospitalStay(UNKNOWN);
-    demo.setReadmission(NO);
-    demo.setScreeningToolUsed(YES);
     demo.setEntry(Integer.toString(entry));
 
     addPatientData(demo, pat);
@@ -114,13 +106,6 @@ public class EmergeDemographicCSVGenerator {
     if (encount != null) {
       addEncounterData(demo, encount);
     }
-
-    // These are all unused, but still defined in the CSV.
-    demo.setIpAddress(null);
-    demo.setJhedId(null);
-    demo.setDataCollectionDate(null);
-    demo.setDateCreated(null);
-    demo.setDateUpdated(null);
 
     return demo;
   }

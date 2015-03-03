@@ -15,6 +15,15 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j @NoArgsConstructor @EqualsAndHashCode
 public class Demographic {
+
+  private static final String DEFAULT_READMISSION = "No";
+  private static final String DEFAULT_WEIGHT = "0";
+  private static final String DEFAULT_HEIGHT = "0";
+  private static final String DEFAULT_PRIOR_HOSPITAL_STAY = "Unknown";
+  private static final String DEFAULT_HIGHEST_LEVEL_ACTIVITY = "Unknown";
+  private static final String DEFAULT_SCREENING_TOOL_USED = "Yes";
+  private static final String DEFAULT_IVC_FILTER = "No";
+
   @Getter @Setter @JsonProperty(value = "Entry #", index = 0)
   private String entry;
   @Getter @Setter @JsonProperty(value = "Date Created", index = 1)
@@ -36,7 +45,7 @@ public class Demographic {
   @Getter @Setter @JsonProperty(value = "SICU Admission Date", index = 9)
   private String sicuAdmissionDate;
   @Getter @Setter @JsonProperty(value = "Readmission", index = 10)
-  private String readmission;
+  private String readmission = DEFAULT_READMISSION;
   @Getter @Setter @JsonProperty(value = "Patient Date of Birth", index = 11)
   private String patientDateOfBirth;
   @Getter @Setter @JsonProperty(value = "Gender", index = 12)
@@ -44,15 +53,15 @@ public class Demographic {
   @Getter @Setter @JsonProperty(value = "Race", index = 13)
   private String race;
   @Getter @Setter @JsonProperty(value = "Patient Admission Weight (kg)", index = 14)
-  private String patientAdmissionWeightKg;
+  private String patientAdmissionWeightKg = DEFAULT_WEIGHT;
   @Getter @Setter @JsonProperty(value = "Patient Admission Height (cm)", index = 15)
-  private String patientAdmissionHeightCm;
+  private String patientAdmissionHeightCm = DEFAULT_HEIGHT;
   @Getter @Setter @JsonProperty(value = "Prior to Hospital Stay", index = 16)
-  private String priorToHospitalStay;
+  private String priorToHospitalStay = DEFAULT_PRIOR_HOSPITAL_STAY;
   @Getter @Setter @JsonProperty(value = "Highest-level Activity", index = 17)
-  private String highestLevelActivity;
+  private String highestLevelActivity = DEFAULT_HIGHEST_LEVEL_ACTIVITY;
   @Getter @Setter @JsonProperty(value = "Screening Tool Used", index = 18)
-  private String screeningToolUsed;
+  private String screeningToolUsed = DEFAULT_SCREENING_TOOL_USED;
   @Getter @Setter @JsonProperty(value = "IVC Filter", index = 19)
-  private String ivcFilter;
+  private String ivcFilter = DEFAULT_IVC_FILTER;
 }

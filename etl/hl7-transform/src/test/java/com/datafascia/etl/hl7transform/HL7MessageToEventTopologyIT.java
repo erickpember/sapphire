@@ -55,7 +55,7 @@ import static org.testng.Assert.assertTrue;
 public class HL7MessageToEventTopologyIT {
 
   private static class TestEventProducer extends EventProducer {
-    public TestEventProducer(AvroSchemaRegistry schemaRegistry, Serializer serializer) {
+    TestEventProducer(AvroSchemaRegistry schemaRegistry, Serializer serializer) {
       super(schemaRegistry, serializer);
       topic = EVENT_TOPIC;
     }

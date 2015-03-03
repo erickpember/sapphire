@@ -24,8 +24,8 @@ public class EventProducer {
   @Configure
   protected String topic;
 
-  private AvroSchemaRegistry schemaRegistry;
-  private Serializer serializer;
+  private final AvroSchemaRegistry schemaRegistry;
+  private final Serializer serializer;
   private SingleTopicProducer producer;
 
   /**

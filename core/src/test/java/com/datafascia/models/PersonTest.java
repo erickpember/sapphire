@@ -21,7 +21,6 @@ public class PersonTest extends ModelTestBase {
     assertEquals(decoded.getGender(), Gender.MALE);
     assertEquals(decoded.getBirthDate(), TestModels.getDate());
     assertEquals(decoded.getPhoto(), TestModels.getPhoto());
-    assertEquals(decoded.getOrganization(), "Some Ficticious Hospital");
   }
 
   @Test
@@ -32,7 +31,6 @@ public class PersonTest extends ModelTestBase {
     jsonProperties.add("gender");
     jsonProperties.add("birthDate");
     jsonProperties.add("photo");
-    jsonProperties.add("organization");
     geneticJsonContainsFieldsTest(TestModels.person, jsonProperties);
   }
 }

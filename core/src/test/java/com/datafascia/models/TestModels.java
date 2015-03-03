@@ -91,7 +91,6 @@ public class TestModels {
       setGender(Gender.UNDIFFERENTIATED);
       setBirthDate(getDate());
       setPhoto(TestModels.getPhoto());
-      setOrganization("Test Corp.");
       setRelationship("Tester");
     }
   };
@@ -102,7 +101,6 @@ public class TestModels {
       setAddress(address);
       setBirthDate(getDate());
       setPhoto(TestModels.getPhoto());
-      setOrganization("Test Corp.");
       setName(name);
       setCareProvider(Arrays.asList(caregiver, caregiver));
       setContactDetails(Arrays.asList(contact, contact));
@@ -252,7 +250,6 @@ public class TestModels {
       setGender(Gender.MALE);
       setBirthDate(getDate());
       setPhoto(TestModels.getPhoto());
-      setOrganization("Some Ficticious Hospital");
     }
   };
 

@@ -25,7 +25,6 @@ public class PatientTest extends ModelTestBase {
     assertEquals(decoded.getAddress(), TestModels.address);
     assertEquals(decoded.getBirthDate(), TestModels.getDate());
     assertEquals(decoded.getPhoto(), TestModels.getPhoto());
-    assertEquals(decoded.getOrganization(), "Test Corp.");
     assertEquals(decoded.getName(), TestModels.name);
     assertEquals(decoded.getCareProvider(),
         Arrays.asList(TestModels.caregiver, TestModels.caregiver));

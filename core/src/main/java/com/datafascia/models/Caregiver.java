@@ -22,4 +22,6 @@ import lombok.extern.slf4j.Slf4j;
 public class Caregiver extends Person {
   @JsonProperty("specialty")
   private Specialty specialty;
+  @JsonProperty("organization")
+  private String organization;
 }

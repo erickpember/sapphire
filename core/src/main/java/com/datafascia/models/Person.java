@@ -37,6 +37,4 @@ public class Person {
   private LocalDate birthDate;
   @JsonProperty("photo")
   private Link<Image> photo;
-  @JsonProperty("organization")
-  private String organization;
 }

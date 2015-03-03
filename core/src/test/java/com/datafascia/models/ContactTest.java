@@ -21,7 +21,6 @@ public class ContactTest extends ModelTestBase {
     assertEquals(decoded.getGender(), Gender.UNDIFFERENTIATED);
     assertEquals(decoded.getBirthDate(), TestModels.getDate());
     assertEquals(decoded.getPhoto(), TestModels.getPhoto());
-    assertEquals(decoded.getOrganization(), "Test Corp.");
     assertEquals(decoded.getRelationship(), "Tester");
   }
 
@@ -34,7 +33,6 @@ public class ContactTest extends ModelTestBase {
     jsonProperties.add("gender");
     jsonProperties.add("birthDate");
     jsonProperties.add("photo");
-    jsonProperties.add("organization");
     geneticJsonContainsFieldsTest(TestModels.contact, jsonProperties);
   }
 }

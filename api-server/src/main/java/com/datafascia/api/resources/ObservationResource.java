@@ -3,6 +3,7 @@
 package com.datafascia.api.resources;
 
 import com.codahale.metrics.annotation.Timed;
+import com.datafascia.common.api.ApiParams;
 import com.datafascia.common.time.Interval;
 import com.datafascia.domain.persist.opal.FindObservationsCoordinator;
 import com.datafascia.models.Observation;
@@ -54,9 +55,9 @@ public class ObservationResource {
    */
   @GET @Timed
   public Collection<Observation> findObservations(
-      @QueryParam("patientId") String patientId,
-      @QueryParam("startCaptureTime") String startCaptureTimeString,
-      @QueryParam("endCaptureTime") String endCaptureTimeString) {
+      @QueryParam(ApiParams.PATIENT_ID) String patientId,
+      @QueryParam(ApiParams.START_TIME) String startCaptureTimeString,
+      @QueryParam(ApiParams.END_TIME) String endCaptureTimeString) {
 
     if (Strings.isNullOrEmpty(patientId)) {
       throw new WebApplicationException(

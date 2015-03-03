@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.client;
 
+import com.datafascia.common.api.ApiParams;
 import com.datafascia.models.Encounter;
 import com.datafascia.models.Observation;
 import com.datafascia.models.Patient;
@@ -22,7 +23,7 @@ public interface DatafasciaApi {
    * @return list of all patients.
    */
   @GET("/patient")
-  List<Patient> patients(@Query("active") boolean active);
+  List<Patient> patients(@Query(ApiParams.ACTIVE) boolean active);
 
   /**
    * @param encounterId the unique identifier for the encounter
@@ -46,7 +47,7 @@ public interface DatafasciaApi {
    * @return version information for the package on the server.
    */
   @GET("/version")
-  Version version(@Query("package") String packageName);
+  Version version(@Query(ApiParams.PACKAGE) String packageName);
 
   /**
    * @return A list of schemas provided by the API.
@@ -63,15 +64,15 @@ public interface DatafasciaApi {
   JsonSchema schema(@Path("modelName") String modelName);
 
   /**
-   * @param patientId ID of the patient to load observations for.
-   * @param startCaptureTimeString The starting ISO_DATE_TIME bound for the query. (inclusive)
-   * @param endCaptureTimeString The ending ISO_DATE_TIME bound for the query. (exclusive)
+   * @param patientId Id of the patient to load observations for.
+   * @param startTime starting ISO_DATE_TIME bound for the query. (inclusive)
+   * @param endTime ending ISO_DATE_TIME bound for the query. (exclusive)
    *
    * @return A list of observations
    */
   @GET("/observation")
   List<Observation> findObservations(
-      @Query("patientId") String patientId,
-      @Query("startCaptureTime") String startCaptureTimeString,
-      @Query("endCaptureTime") String endCaptureTimeString);
+      @Query(ApiParams.PATIENT_ID) String patientId,
+      @Query(ApiParams.START_TIME) String startTime,
+      @Query(ApiParams.END_TIME) String endTime);
 }

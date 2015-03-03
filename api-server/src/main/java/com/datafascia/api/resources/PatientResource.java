@@ -3,6 +3,7 @@
 package com.datafascia.api.resources;
 
 import com.codahale.metrics.annotation.Timed;
+import com.datafascia.common.api.ApiParams;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.models.Patient;
 import java.util.List;
@@ -40,7 +41,7 @@ public class PatientResource {
    * @return stream list of patients back
    */
   @GET @Timed
-  public List<Patient> list(@DefaultValue("true") @QueryParam("active") boolean active) {
+  public List<Patient> list(@DefaultValue("true") @QueryParam(ApiParams.ACTIVE) boolean active) {
     return patientRepository.list(Optional.of(active));
   }
 }

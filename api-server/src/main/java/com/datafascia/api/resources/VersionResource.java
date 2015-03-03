@@ -3,6 +3,7 @@
 package com.datafascia.api.resources;
 
 import com.codahale.metrics.annotation.Timed;
+import com.datafascia.common.api.ApiParams;
 import com.datafascia.models.Version;
 import com.google.common.base.Optional;
 import java.util.concurrent.atomic.AtomicLong;
@@ -37,7 +38,7 @@ public class VersionResource {
    * @return version information associated with package
    */
   @GET @Timed
-  public Version version(@QueryParam("package") Optional<String> packageName) {
+  public Version version(@QueryParam(ApiParams.PACKAGE) Optional<String> packageName) {
     return new Version(counter.incrementAndGet(), packageName.or(DEFAULT_PACKAGE));
   }
 }

@@ -13,7 +13,7 @@
 
   <parent>
     <groupId>com.datafascia</groupId>
-    <artifactId>sapphire</artifactId>
+    <artifactId>df-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 

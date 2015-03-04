@@ -26,15 +26,24 @@ import lombok.extern.slf4j.Slf4j;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "Person")
 public class Person {
+  /** A name associated with the individual.*/
   @JsonProperty("name")
   private Name name;
+
+  /** Addresses for the individual.*/
   @JsonProperty("address")
   private Address address;
+
+  /** The gender that the patient is considered to have for administration purposes.*/
   @JsonProperty("gender")
   private Gender gender;
+
+  /** The date of birth for the individual.*/
   @JsonProperty("birthDate") @JsonSerialize(using = LocalDateSerializer.class)
   @JsonDeserialize(using = LocalDateDeserializer.class)
   private LocalDate birthDate;
+
+  /** Image of the person.*/
   @JsonProperty("photo")
   private Link<Image> photo;
 }

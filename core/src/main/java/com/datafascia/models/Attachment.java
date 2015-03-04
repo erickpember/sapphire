@@ -22,26 +22,26 @@ import lombok.extern.slf4j.Slf4j;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "Attachment")
 public class Attachment {
-  /*
+  /**
    * Identifies the type of the data in the attachment and allows a method to be chosen to interpret
    * or render the data. Includes mime type parameters such as charset where appropriate.
    */
   @JsonProperty("code")
   private String contentType;
 
-  // The human language of the content.
+  /** The human language of the content.*/
   @JsonProperty("language")
   private LanguageCode language;
 
-  // The actual data of the attachment.
+  /** The actual data of the attachment.*/
   @JsonProperty("data")
   private byte[] data;
 
-  // An alternative location where the data can be accessed.
+  /** An alternative location where the data can be accessed.*/
   @JsonProperty("url")
   private URI url;
 
-  // A label or set of text to display in place of the data.
+  /** A label or set of text to display in place of the data.*/
   @JsonProperty("title")
   private String title;
 }

@@ -32,32 +32,52 @@ import lombok.extern.slf4j.Slf4j;
 @JsonTypeName(URNFactory.MODEL_PREFIX + "Patient") @IdNamespace(URNFactory.NS_PATIENT_ID)
 @ToString(callSuper = true)
 public class Patient extends Person {
+  /** Identifier for the patient.*/
   @JsonProperty("@id")
   @JsonDeserialize(using = IdDeserializer.class) @JsonSerialize(using = IdSerializer.class)
   private Id<Patient> id;
 
+  /** Identifier used by a given institution's internal database.*/
   @JsonProperty("institutionPatientId")
   private String institutionPatientId;
 
+  /** Account number from HL7 field PID-18.*/
   private String accountNumber;
 
+ /** A list of contacts associated with the patient.*/
   @JsonProperty("contacts")
   private List<Contact> contactDetails;
+
+  /** Date and time the patient was entered into the system.*/
   @JsonProperty("creationDate") @JsonSerialize(using = InstantSerializer.class)
   @JsonDeserialize(using = InstantDeserializer.class)
   private Instant creationDate;
+
+  /** Indicates if the individual is deceased or not.*/
   @JsonProperty("deceased")
   private boolean deceased;
+
+  /** The patient's most recent marital (civil) status.*/
   @JsonProperty("maritalStatus")
   private MaritalStatus maritalStatus;
+
+  /** The patient's race.*/
   @JsonProperty("race")
   private Race race;
+
+  /** Languages which may be used to communicate with the patient about his or her health.*/
   @JsonProperty("languages")
   private List<LanguageCode> langs;
+
+  /** Patient's nominated care provider.*/
   @JsonProperty("careProvider")
   private List<Caregiver> careProvider;
+
+  /** Organization that is the custodian of the patient record.*/
   @JsonProperty("managingOrganization")
   private String managingOrg;
+
+  /** Whether this patient record is in active use.*/
   @JsonProperty("active")
   private boolean active;
 }

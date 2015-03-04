@@ -20,12 +20,19 @@ import lombok.extern.slf4j.Slf4j;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "Version")
 public class Version {
+  /** Identifier for the version.*/
   @Getter @Setter
   private long id;
+
+  /** String name for the version.*/
   @Getter @Setter
   private String revision;
+
+  /** Vendor for the implementation.*/
   @Getter @Setter
   private String vendor;
+
+  /** Title for the implementation.*/
   @Getter @Setter
   private String title;
 

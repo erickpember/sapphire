@@ -21,11 +21,11 @@ import lombok.extern.slf4j.Slf4j;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "Participant")
 public class Participant {
-  // Role of participant in encounter.
+  /** Role of participant in encounter.*/
   @JsonProperty("role")
   private CodeableConcept role;
 
-  // Persons involved in the encounter other than the patient.
+  /** Persons involved in the encounter other than the patient.*/
   @JsonProperty("individual")
   private URI individual;
 }

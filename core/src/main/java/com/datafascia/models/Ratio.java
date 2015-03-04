@@ -20,11 +20,11 @@ import lombok.extern.slf4j.Slf4j;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "Ratio")
 public class Ratio {
-  // The value of the numerator.
+  /** The value of the numerator.*/
   @JsonProperty("numerator")
   private NumericQuantity numerator;
 
-  // The value of the denominator.
+  /** The value of the denominator.*/
   @JsonProperty("denominator")
   private NumericQuantity denominator;
 }

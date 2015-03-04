@@ -21,16 +21,27 @@ import lombok.extern.slf4j.Slf4j;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "Address")
 public class Address {
+  /** Name of the street.*/
   @JsonProperty("street")
   private String street;
+
+  /** Name of the city.*/
   @JsonProperty("city")
   private String city;
+
+  /** State or Province.*/
   @JsonProperty("stateProvince")
   private String stateProvince;
+
+  /** Postal code for the province.*/
   @JsonProperty("postalCode")
   private String postalCode;
+
+  /** Apartment or unit number.*/
   @JsonProperty("unit")
   private String unit;
+
+  /** Name of the country.*/
   @JsonProperty("country")
   private CountryCode country;
 }

@@ -17,24 +17,31 @@ import lombok.ToString;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "ObservationValue")
 public class ObservationValue {
+  /** Specific UCUM measurement.*/
   @JsonProperty("quantity")
   private NumericQuantity quantity;
 
+  /** Code identifying what is being observed.*/
   @JsonProperty("code")
   private CodeableConcept code;
 
+  /** Data associated with the observation.*/
   @JsonProperty("attachment")
   private Attachment attachment;
 
+  /** Ratio of values associated with the observation.*/
   @JsonProperty("ratio")
   private Ratio ratio;
 
+  /** Range of time associated with the observation.*/
   @JsonProperty("period")
   private Period period;
 
+  /** Data sampled from a device.*/
   @JsonProperty("sampleData")
   private SampledData sampledData;
 
+  /** A raw string value.*/
   @JsonProperty("text")
   private String text;
 }

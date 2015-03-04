@@ -25,9 +25,12 @@ import lombok.extern.slf4j.Slf4j;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "Period")
 public class Period {
+  /** Beginning of the period.*/
   @JsonProperty("start") @JsonSerialize(using = InstantSerializer.class)
   @JsonDeserialize(using = InstantDeserializer.class)
   private Instant start;
+
+  /** End of the period.*/
   @JsonProperty("stop") @JsonSerialize(using = InstantSerializer.class)
   @JsonDeserialize(using = InstantDeserializer.class)
   private Instant stop;

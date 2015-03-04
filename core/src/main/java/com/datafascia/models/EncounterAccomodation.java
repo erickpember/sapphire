@@ -21,11 +21,11 @@ import lombok.extern.slf4j.Slf4j;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "EncounterAccomodation")
 public class EncounterAccomodation {
-  // The bed that is assigned to the patient.
+  /** The bed that is assigned to the patient.*/
   @JsonProperty("bed")
   private URI bed;
 
-  // Period during which the patient was assigned the bed.
+  /** Period during which the patient was assigned the bed.*/
   @JsonProperty("period")
   private Period period;
 }

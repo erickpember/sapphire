@@ -20,6 +20,7 @@ import lombok.extern.slf4j.Slf4j;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "Contact") @ToString(callSuper = true)
 public class Contact extends Person {
+  /** Relationship of the contact to the person.*/
   @JsonProperty("relationship")
   private String relationship;
 }

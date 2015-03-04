@@ -22,11 +22,11 @@ import lombok.extern.slf4j.Slf4j;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "ObservationRelation")
 public class ObservationRelated {
-  // A code specifying the kind of relationship that exists with the target observation.
+  /** A code specifying the kind of relationship that exists with the target observation.*/
   @JsonProperty("type")
   private List<ObservationRelationshipType> type;
 
-  // A reference to the observation that is related to this observation.
+  /** A reference to the observation that is related to this observation.*/
   @JsonProperty("target")
   private URI target;
 }

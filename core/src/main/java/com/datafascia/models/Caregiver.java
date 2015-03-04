@@ -20,8 +20,11 @@ import lombok.extern.slf4j.Slf4j;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "Caregiver") @ToString(callSuper = true)
 public class Caregiver extends Person {
+  /** Speciality of the caregiver.*/
   @JsonProperty("specialty")
   private Specialty specialty;
+
+  /** Organization to which the caregiver belongs.*/
   @JsonProperty("organization")
   private String organization;
 }

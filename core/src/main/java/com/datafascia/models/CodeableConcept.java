@@ -19,12 +19,11 @@ import lombok.ToString;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "CodeableConcept")
 public class CodeableConcept {
-
-  // Coding Code defined by a terminology system.
+  /** Coding Code defined by a terminology system.*/
   @JsonProperty("code")
   private String code;
 
-  // Plain text representation of the concept.
+  /** Plain text representation of the concept.*/
   @JsonProperty("text")
   private String text;
 }

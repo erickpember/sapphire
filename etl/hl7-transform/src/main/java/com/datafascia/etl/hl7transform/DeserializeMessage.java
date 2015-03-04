@@ -63,6 +63,9 @@ public class DeserializeMessage extends BaseFunction {
     byte[] bytes = tuple.getBinaryByField(F.BYTES);
 
     IngestMessage message = deserializer.decodeReflect(topic, bytes, IngestMessage.class);
+
+    log.debug("Transform deserialized message:{}", message);
+
     collector.emit(new Values(message));
   }
 }

@@ -5,12 +5,14 @@ package com.datafascia.etl.hl7transform;
 import com.datafascia.domain.model.IngestMessage;
 import com.datafascia.domain.persist.IngestMessageRepository;
 import javax.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 import storm.trident.operation.BaseFilter;
 import storm.trident.tuple.TridentTuple;
 
 /**
  * Saves message to archive.
  */
+@Slf4j
 public class SaveMessage extends BaseFilter {
   private static final long serialVersionUID = 1L;
 
@@ -23,6 +25,8 @@ public class SaveMessage extends BaseFilter {
   public boolean isKeep(TridentTuple tuple) {
     IngestMessage message = (IngestMessage) tuple.getValueByField(F.INGEST_MESSAGE);
     ingestMessageRepository.save(message);
+
+    log.debug("Transform saved message to Archive.");
     return true;
   }
 }

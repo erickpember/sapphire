@@ -5,6 +5,7 @@ package com.datafascia.etl.hl7transform;
 import com.datafascia.domain.event.Event;
 import java.util.Map;
 import javax.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 import storm.trident.operation.BaseFilter;
 import storm.trident.operation.TridentOperationContext;
 import storm.trident.tuple.TridentTuple;
@@ -12,6 +13,7 @@ import storm.trident.tuple.TridentTuple;
 /**
  * Sends event to Kafka.
  */
+@Slf4j
 public class PublishEvent extends BaseFilter {
   private static final long serialVersionUID = 1L;
 
@@ -31,6 +33,8 @@ public class PublishEvent extends BaseFilter {
   public boolean isKeep(TridentTuple tuple) {
     Event event = (Event) tuple.getValueByField(F.EVENT);
     producer.send(event);
+
+    log.debug("Transform sent Event to Kafka.");
     return true;
   }
 }

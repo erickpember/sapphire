@@ -57,6 +57,10 @@ public class TransformMessageToEvent extends BaseFunction {
     try {
       Event event = transformer.transform(institutionId, facilityId, message);
       collector.emit(new Values(event));
+      log.debug("Transform transformed Message to Event. institutionId:{}, facilityId:{},"
+          + " type:{}, data:{}", event.getInstitutionId(), event.getFacilityId(), event.getType(),
+          event.getData());
+
     } catch (IllegalStateException e) {
       log.error("Cannot transform message type " + message.getClass(), e);
     }

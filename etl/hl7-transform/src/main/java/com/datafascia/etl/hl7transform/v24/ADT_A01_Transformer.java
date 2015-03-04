@@ -9,10 +9,12 @@ import com.datafascia.domain.event.Event;
 import com.datafascia.domain.event.EventType;
 import com.datafascia.domain.event.PatientData;
 import java.net.URI;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Handles admit patient message.
  */
+@Slf4j
 public class ADT_A01_Transformer extends BaseTransformer {
 
   @Override
@@ -33,6 +35,7 @@ public class ADT_A01_Transformer extends BaseTransformer {
           .data(patientData)
           .build();
     } catch (HL7Exception e) {
+      log.debug("HL7 transformer failed to transform input:{}", input);
       throw new IllegalStateException("transform", e);
     }
   }

@@ -32,15 +32,17 @@ public class ParseMessage extends BaseFunction {
   @Override
   public void execute(TridentTuple tuple, TridentCollector collector) {
     IngestMessage ingestMessage = (IngestMessage) tuple.getValueByField(F.INGEST_MESSAGE);
-
     Message message;
+    String hl7 = null;
     try {
-      String hl7 = new String(ingestMessage.getPayload().array(), StandardCharsets.UTF_8);
+      hl7 = new String(ingestMessage.getPayload().array(), StandardCharsets.UTF_8);
       message = parser.parse(hl7);
     } catch (HL7Exception e) {
       log.error("Error parsing HL7", e);
+      log.debug("This HL7 message could not be parsed: {}", hl7);
       return;
     }
+    log.debug("Transform parsed HL7 to message:{}", message);
 
     collector.emit(
         new Values(ingestMessage.getInstitution(), ingestMessage.getFacility(), message));

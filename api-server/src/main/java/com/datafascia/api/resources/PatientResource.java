@@ -5,8 +5,11 @@ package com.datafascia.api.resources;
 import com.codahale.metrics.annotation.Timed;
 import com.datafascia.common.api.ApiParams;
 import com.datafascia.domain.persist.PatientRepository;
+import com.datafascia.models.PagedCollection;
 import com.datafascia.models.Patient;
+import com.google.common.collect.ImmutableMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import javax.inject.Inject;
 import javax.ws.rs.DefaultValue;
@@ -14,7 +17,9 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -36,12 +41,37 @@ public class PatientResource {
   }
 
   /**
+   *
+   * @param start the starting identifier of the patient
    * @param active the type of patient to return
+   * @param count the maximum number of patients to return
    *
    * @return stream list of patients back
    */
   @GET @Timed
-  public List<Patient> list(@DefaultValue("true") @QueryParam(ApiParams.ACTIVE) boolean active) {
-    return patientRepository.list(Optional.of(active));
+  public PagedCollection<Patient> list(
+      @QueryParam(ApiParams.START) String start,
+      @QueryParam(ApiParams.ACTIVE) Boolean active,
+      @DefaultValue("100") @QueryParam(ApiParams.COUNT) int count) {
+
+    if (count < 0) {
+      throw new WebApplicationException("Invalid count parameter", Response.Status.BAD_REQUEST);
+    }
+    Optional<String> optStart = start == null ? Optional.empty() : Optional.of(start);
+    Optional<Boolean> optActive = active == null ? Optional.empty() : Optional.of(active);
+
+    List<Patient> patients = patientRepository.list(optStart, optActive, count + 1);
+    PagedCollection<Patient> response = new PagedCollection<>();
+    if (patients.size() > count) {
+      Map<String, String> params = ImmutableMap.of(
+          ApiParams.ACTIVE, Boolean.toString(active),
+          ApiParams.COUNT, Integer.toString(count),
+          ApiParams.START, PatientRepository.toRowId(patients.get(count).getId()));
+      response.setNext(params);
+      patients.remove(count);
+    }
+    response.setCollection(patients);
+
+    return response;
   }
 }

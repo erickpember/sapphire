@@ -4,6 +4,7 @@ package com.datafascia.emerge.csv;
 
 import com.datafascia.api.client.DatafasciaApi;
 import com.datafascia.api.client.DatafasciaApiBuilder;
+import com.datafascia.common.api.ApiParams;
 import com.datafascia.csv.CSVMapper;
 import com.datafascia.emerge.models.Demographic;
 import com.datafascia.models.Encounter;
@@ -11,8 +12,10 @@ import com.datafascia.models.Gender;
 import com.datafascia.models.Hospitalization;
 import com.datafascia.models.Name;
 import com.datafascia.models.Observation;
+import com.datafascia.models.PagedCollection;
 import com.datafascia.models.Patient;
 import com.google.common.base.Joiner;
+import com.google.common.collect.ImmutableMap;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -22,6 +25,7 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import retrofit.RetrofitError;
@@ -70,13 +74,19 @@ public class EmergeDemographicCSVGenerator {
       pw.println(Joiner.on(",").join(mapper.getHeaders()));
 
       int entry = 0;
-      for (Patient pat : api.patients(true)) {
-        String[] urnParts = pat.getId().toString().split(":");
-        String patientId = urnParts[urnParts.length - 1];
-        Encounter encount = lastVisit(api, patientId);
+      Map<String, String> params = ImmutableMap.of(
+          ApiParams.ACTIVE, "true", ApiParams.COUNT, "100");
+      while (params != null) {
+        PagedCollection<Patient> page = api.patients(params);
+        for (Patient pat : page.getCollection()) {
+          String[] urnParts = pat.getId().toString().split(":");
+          String patientId = urnParts[urnParts.length - 1];
+          Encounter encount = lastVisit(api, patientId);
 
-        pw.println(mapper.asCSV(getDemographic(pat, encount, entry)));
-        entry++;
+          pw.println(mapper.asCSV(getDemographic(pat, encount, entry)));
+          entry++;
+        }
+        params = page.getNext();
       }
     }
   }

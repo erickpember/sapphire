@@ -5,7 +5,6 @@ package com.datafascia.api.services;
 import com.datafascia.models.Patient;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
@@ -23,8 +22,7 @@ public class PatientIT extends ApiIT {
    */
   @Test
   public void testPatient() throws Exception {
-    List<Patient> patients = api.patients(true);
-    for (Patient pat : patients) {
+    for (Patient pat : api.patients(null, true, 1000).getCollection()) {
       String id = pat.getId().toString();
       switch (id) {
         case "urn:df-patientId-1:96087004":

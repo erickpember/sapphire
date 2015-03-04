@@ -11,7 +11,6 @@ import com.datafascia.models.Race;
 import com.neovisionaries.i18n.LanguageCode;
 import java.time.LocalDate;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import org.testng.annotations.BeforeClass;
@@ -32,10 +31,10 @@ public class PatientRepositoryTest extends BaseRepositoryTest {
 
   @Test(dependsOnGroups = "patients")
   public void patients() {
-    List<Patient> patients = patientRepo.list(Optional.of(false));
-    assertEquals(1, patients.size());
-    patients.addAll(patientRepo.list(Optional.of(true)));
-    assertEquals(3, patients.size());
+    assertEquals(patientRepo.list(Optional.empty(), Optional.of(false), 1).size(), 1);
+    assertEquals(patientRepo.list(Optional.empty(), Optional.of(true), 5).size(), 2);
+    assertEquals(patientRepo.list(Optional.empty(), Optional.empty(), 5).size(), 3);
+    assertEquals(patientRepo.list(Optional.of("96087039"), Optional.empty(), 5).size(), 2);
   }
 
   @Test
@@ -44,11 +43,11 @@ public class PatientRepositoryTest extends BaseRepositoryTest {
     assertEquals(Optional.empty(), patNonExistent);
   }
 
-  @Test(groups = "patients")
+  @Test(groups = "patients") @SuppressWarnings("serial")
   private void getActiveWithLanguages() {
     testPatientSet(new Patient() {
       {
-        setId(Id.of("urn:df-patientId-1:96087004"));
+        setId(Id.of("96087004"));
         setInstitutionPatientId("UCSF-12345");
         setAccountNumber("12345");
         setName(new Name() {
@@ -78,7 +77,7 @@ public class PatientRepositoryTest extends BaseRepositoryTest {
   private void getActiveWithoutLanguages() {
     testPatientSet(new Patient() {
       {
-        setId(Id.of("urn:df-patientId-1:96087039"));
+        setId(Id.of("96087039"));
         setInstitutionPatientId("UCSF-67890");
         setAccountNumber("67890");
         setName(new Name() {
@@ -102,7 +101,7 @@ public class PatientRepositoryTest extends BaseRepositoryTest {
   private void getInactive() {
     testPatientSet(new Patient() {
       {
-        setId(Id.of("urn:df-patientId-1:96087047"));
+        setId(Id.of("96087047"));
         setInstitutionPatientId("UCSF-13579");
         setAccountNumber("13579");
         setName(new Name() {

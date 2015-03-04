@@ -5,25 +5,41 @@ package com.datafascia.api.client;
 import com.datafascia.common.api.ApiParams;
 import com.datafascia.models.Encounter;
 import com.datafascia.models.Observation;
+import com.datafascia.models.PagedCollection;
 import com.datafascia.models.Patient;
 import com.datafascia.models.Version;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import java.util.List;
+import java.util.Map;
 import retrofit.http.GET;
 import retrofit.http.Path;
 import retrofit.http.Query;
+import retrofit.http.QueryMap;
 
 /**
  * Base interface for interacting with the dataFascia API.
  */
 public interface DatafasciaApi {
   /**
+   * @param start the starting patient id
    * @param active boolean indicating type of patient to return
+   * @param count maximum number of patients to return in page
    *
    * @return list of all patients.
    */
   @GET("/patient")
-  List<Patient> patients(@Query(ApiParams.ACTIVE) boolean active);
+  PagedCollection<Patient> patients(
+      @Query(ApiParams.START) String start,
+      @Query(ApiParams.ACTIVE) boolean active,
+      @Query(ApiParams.COUNT) int count);
+
+  /**
+   * @param params the query parameters as a map
+   *
+   * @return list of patients
+   */
+  @GET("/patient")
+  PagedCollection<Patient> patients(@QueryMap Map<String, String> params);
 
   /**
    * @param encounterId the unique identifier for the encounter

@@ -3,6 +3,7 @@
 package com.datafascia.domain.persist;
 
 import com.datafascia.common.accumulo.AccumuloTemplate;
+import com.datafascia.common.accumulo.Limit;
 import com.datafascia.common.accumulo.MutationBuilder;
 import com.datafascia.common.accumulo.MutationSetter;
 import com.datafascia.common.accumulo.RowMapper;
@@ -64,7 +65,13 @@ public class PatientRepository extends BaseRepository {
     super(accumuloTemplate);
   }
 
-  private static String toRowId(Id<Patient> patientId) {
+  /**
+   *
+   * @param patientId the patient identifier
+   *
+   * @return string representation of Patient id
+   */
+  public static String toRowId(Id<Patient> patientId) {
     return toRowId(Patient.class, patientId);
   }
 
@@ -184,20 +191,27 @@ public class PatientRepository extends BaseRepository {
   /**
    * Finds patients.
    *
-   * @param optionalActive
+   * @param optStart
+   *     if present, start the scan from this patient
+   * @param optActive
    *     if present, the active state to match
+   * @param count maximum number of items to return in list
+   *
    * @return found patients
    */
-  public List<Patient> list(Optional<Boolean> optionalActive) {
+  public List<Patient> list(Optional<String> optStart, Optional<Boolean> optActive, int count) {
     Scanner scanner = accumuloTemplate.createScanner(Tables.PATIENT);
+    if (optStart.isPresent()) {
+      scanner.setRange(new Range(new Text(toRowId(Id.of(optStart.get()))), null));
+    }
     scanner.fetchColumnFamily(new Text(COLUMN_FAMILY));
 
-    if (optionalActive.isPresent()) {
-      boolean active = optionalActive.get();
+    Limit<Patient> maxLim = new Limit<>(count);
+    if (optActive.isPresent()) {
       return accumuloTemplate.queryForList(
-          scanner, PATIENT_ROW_MAPPER, patient -> patient.isActive() == active);
+          scanner, PATIENT_ROW_MAPPER, patient -> patient.isActive() == optActive.get(), maxLim);
     } else {
-      return accumuloTemplate.queryForList(scanner, PATIENT_ROW_MAPPER);
+      return accumuloTemplate.queryForList(scanner, PATIENT_ROW_MAPPER, patient -> true, maxLim);
     }
   }
 }

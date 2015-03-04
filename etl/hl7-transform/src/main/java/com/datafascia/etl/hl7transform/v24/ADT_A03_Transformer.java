@@ -36,7 +36,7 @@ public class ADT_A03_Transformer extends BaseTransformer {
           .build();
     } catch (HL7Exception e) {
       log.debug("HL7 transformer failed to transform input:{}", input);
-      throw new IllegalStateException("transform", e);
+      throw new IllegalStateException("Transform failed to build PatientData from HL7 message.", e);
     }
   }
 }

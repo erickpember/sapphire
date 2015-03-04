@@ -4,6 +4,7 @@ package com.datafascia.domain.persist;
 
 import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.persist.Id;
+import com.datafascia.jackson.DFObjectMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -20,7 +21,7 @@ public abstract class BaseRepository {
 
   private static final char COMPONENT_SEPARATOR = '=';
   private static final char KEY_SEPARATOR = '&';
-  private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+  private static final ObjectMapper OBJECT_MAPPER = DFObjectMapper.objectMapper();
 
   protected AccumuloTemplate accumuloTemplate;
 

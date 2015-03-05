@@ -54,6 +54,7 @@ public class PatientRepository extends BaseRepository {
   private static final String MARITAL_STATUS = "maritalStatus";
   private static final String RACE = "race";
   private static final String LANGUAGE = "language";
+  private static final String LAST_ENCOUNTER_ID = "lastEncounterId";
   private static final String ACTIVE = "active";
   private static final PatientRowMapper PATIENT_ROW_MAPPER = new PatientRowMapper();
 
@@ -96,6 +97,7 @@ public class PatientRepository extends BaseRepository {
                 .put(BIRTH_DATE, encode(patient.getBirthDate()))
                 .put(MARITAL_STATUS, patient.getMaritalStatus().getCode())
                 .put(RACE, patient.getRace().getCode())
+                .put(LAST_ENCOUNTER_ID, patient.getLastEncounterId())
                 .put(ACTIVE, String.valueOf(patient.isActive()));
             if (!patient.getLangs().isEmpty()) {
               mutationBuilder.put(LANGUAGE, patient.getLangs().get(0).name());
@@ -151,6 +153,9 @@ public class PatientRepository extends BaseRepository {
           break;
         case LANGUAGE:
           patient.setLangs(Arrays.asList(LanguageCode.getByCode(value)));
+          break;
+        case LAST_ENCOUNTER_ID:
+          patient.setLastEncounterId(Id.of(value));
           break;
         case ACTIVE:
           patient.setActive(Boolean.parseBoolean(value));

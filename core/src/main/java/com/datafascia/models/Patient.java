@@ -9,6 +9,7 @@ import com.datafascia.jackson.InstantDeserializer;
 import com.datafascia.jackson.InstantSerializer;
 import com.datafascia.urn.URNFactory;
 import com.datafascia.urn.annotations.IdNamespace;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -76,6 +77,10 @@ public class Patient extends Person {
   /** Organization that is the custodian of the patient record.*/
   @JsonProperty("managingOrganization")
   private String managingOrg;
+
+  /** last encounter for the patient */
+  @JsonIgnore
+  private Id<Encounter> lastEncounterId;
 
   /** Whether this patient record is in active use.*/
   @JsonProperty("active")

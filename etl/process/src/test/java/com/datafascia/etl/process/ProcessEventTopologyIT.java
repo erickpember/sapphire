@@ -24,8 +24,10 @@ import com.datafascia.domain.event.EncounterData;
 import com.datafascia.domain.event.Event;
 import com.datafascia.domain.event.EventType;
 import com.datafascia.domain.event.PatientData;
+import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.domain.persist.Tables;
+import com.datafascia.models.Encounter;
 import com.datafascia.models.Gender;
 import com.datafascia.models.MaritalStatus;
 import com.datafascia.models.Patient;
@@ -83,6 +85,7 @@ public class ProcessEventTopologyIT {
   private static Injector injector;
   private static Connector connector;
   private static PatientRepository patientRepository;
+  private static EncounterRepository encounterRepository;
 
   private ProcessEventTopology topology;
   private FeederBatchSpout eventSpout;
@@ -108,6 +111,7 @@ public class ProcessEventTopologyIT {
     connector.tableOperations().create(Tables.PATIENT);
 
     patientRepository = injector.getInstance(PatientRepository.class);
+    encounterRepository = injector.getInstance(EncounterRepository.class);
 
     topology = new ProcessEventTopology();
 
@@ -175,17 +179,27 @@ public class ProcessEventTopologyIT {
   }
 
   @Test
-  public void should_save_patient() throws Exception {
+  public void should_save_patient_and_encounter() throws Exception {
     Event event = createEvent();
     feedEvent(event);
 
     AdmitData admitData = (AdmitData) event.getData();
+
     PatientData patientData = admitData.getPatient();
-    Id<Patient> id = Id.of(patientData.getInstitutionPatientId());
-    Optional<Patient> optionalPatient = patientRepository.read(id);
+    Id<Patient> patientId = Id.of(patientData.getInstitutionPatientId());
+    Optional<Patient> optionalPatient = patientRepository.read(patientId);
     assertTrue(optionalPatient.isPresent());
 
     Patient patient = optionalPatient.get();
     assertEquals(patient.getInstitutionPatientId(), patientData.getInstitutionPatientId());
+
+    EncounterData encounterData = admitData.getEncounter();
+    Id<Encounter> encounterId = patient.getLastEncounterId();
+    Optional<Encounter> optionalEncounter = encounterRepository.read(patientId, encounterId);
+    assertTrue(optionalEncounter.isPresent());
+
+    Encounter encounter = optionalEncounter.get();
+    assertEquals(
+        encounter.getHospitalisation().getPeriod().getStart(), encounterData.getAdmitTime());
   }
 }

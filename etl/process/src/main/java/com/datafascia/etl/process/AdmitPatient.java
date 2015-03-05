@@ -4,12 +4,18 @@ package com.datafascia.etl.process;
 
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.event.AdmitData;
+import com.datafascia.domain.event.EncounterData;
 import com.datafascia.domain.event.Event;
 import com.datafascia.domain.event.PatientData;
+import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.PatientRepository;
+import com.datafascia.models.Encounter;
+import com.datafascia.models.Hospitalization;
 import com.datafascia.models.Name;
 import com.datafascia.models.Patient;
+import com.datafascia.models.Period;
 import java.util.Arrays;
+import java.util.UUID;
 import java.util.function.Consumer;
 import javax.inject.Inject;
 
@@ -21,11 +27,23 @@ public class AdmitPatient implements Consumer<Event> {
   @Inject
   private transient PatientRepository patientRepository;
 
-  @Override
-  public void accept(Event event) {
-    AdmitData admitData = (AdmitData) event.getData();
-    PatientData patientData = admitData.getPatient();
+  @Inject
+  private transient EncounterRepository encounterRepository;
 
+  private static Encounter createEncounter(EncounterData fromEncounter) {
+    Period period = new Period();
+    period.setStart(fromEncounter.getAdmitTime());
+
+    Hospitalization hospitalization = new Hospitalization();
+    hospitalization.setPeriod(period);
+
+    Encounter encounter = new Encounter();
+    encounter.setId(Id.of(UUID.randomUUID().toString()));
+    encounter.setHospitalisation(hospitalization);
+    return encounter;
+  }
+
+  private Patient createPatient(PatientData patientData, Encounter encounter) {
     Patient patient = new Patient();
     patient.setId(Id.of(patientData.getInstitutionPatientId()));
     patient.setInstitutionPatientId(patientData.getInstitutionPatientId());
@@ -39,8 +57,18 @@ public class AdmitPatient implements Consumer<Event> {
     patient.setMaritalStatus(patientData.getMaritalStatus());
     patient.setRace(patientData.getRace());
     patient.setLangs(Arrays.asList(patientData.getLanguage()));
+    patient.setLastEncounterId(encounter.getId());
     patient.setActive(true);
+    return patient;
+  }
+
+  @Override
+  public void accept(Event event) {
+    AdmitData admitData = (AdmitData) event.getData();
+    Encounter encounter = createEncounter(admitData.getEncounter());
+    Patient patient = createPatient(admitData.getPatient(), encounter);
 
     patientRepository.save(patient);
+    encounterRepository.save(patient, encounter);
   }
 }

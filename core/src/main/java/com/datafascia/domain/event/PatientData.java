@@ -19,7 +19,7 @@ import org.apache.avro.reflect.AvroEncode;
  * Patient data included when admitting patient.
  */
 @AllArgsConstructor @Builder @Data @NoArgsConstructor
-public class PatientData implements EventData {
+public class PatientData {
 
   private String institutionPatientId;
   private String accountNumber;

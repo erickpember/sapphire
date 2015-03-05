@@ -7,6 +7,6 @@ import org.apache.avro.reflect.Union;
 /**
  * Marker interface for data included with event.
  */
-@Union({ PatientData.class })
+@Union({ AdmitData.class })
 public interface EventData {
 }

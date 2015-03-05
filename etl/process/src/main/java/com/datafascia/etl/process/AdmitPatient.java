@@ -3,6 +3,7 @@
 package com.datafascia.etl.process;
 
 import com.datafascia.common.persist.Id;
+import com.datafascia.domain.event.AdmitData;
 import com.datafascia.domain.event.Event;
 import com.datafascia.domain.event.PatientData;
 import com.datafascia.domain.persist.PatientRepository;
@@ -22,7 +23,8 @@ public class AdmitPatient implements Consumer<Event> {
 
   @Override
   public void accept(Event event) {
-    PatientData patientData = (PatientData) event.getData();
+    AdmitData admitData = (AdmitData) event.getData();
+    PatientData patientData = admitData.getPatient();
 
     Patient patient = new Patient();
     patient.setId(Id.of(patientData.getInstitutionPatientId()));

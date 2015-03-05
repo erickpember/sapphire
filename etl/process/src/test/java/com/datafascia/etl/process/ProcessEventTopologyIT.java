@@ -19,6 +19,8 @@ import com.datafascia.common.configuration.guice.ConfigureModule;
 import com.datafascia.common.inject.Injectors;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.storm.trident.StreamFactory;
+import com.datafascia.domain.event.AdmitData;
+import com.datafascia.domain.event.EncounterData;
 import com.datafascia.domain.event.Event;
 import com.datafascia.domain.event.EventType;
 import com.datafascia.domain.event.PatientData;
@@ -32,6 +34,7 @@ import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.neovisionaries.i18n.LanguageCode;
 import java.net.URI;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Optional;
@@ -138,11 +141,18 @@ public class ProcessEventTopologyIT {
         .race(Race.WHITE)
         .language(LanguageCode.en)
         .build();
+    EncounterData encounterData = EncounterData.builder()
+        .admitTime(Instant.now())
+        .build();
+    AdmitData admitData = AdmitData.builder()
+        .patient(patientData)
+        .encounter(encounterData)
+        .build();
     return Event.builder()
         .institutionId(URI.create("urn:df-institution:institution"))
         .facilityId(URI.create("urn:df-facility:facility"))
         .type(EventType.PATIENT_ADMIT)
-        .data(patientData)
+        .data(admitData)
         .build();
   }
 
@@ -169,7 +179,8 @@ public class ProcessEventTopologyIT {
     Event event = createEvent();
     feedEvent(event);
 
-    PatientData patientData = (PatientData) event.getData();
+    AdmitData admitData = (AdmitData) event.getData();
+    PatientData patientData = admitData.getPatient();
     Id<Patient> id = Id.of(patientData.getInstitutionPatientId());
     Optional<Patient> optionalPatient = patientRepository.read(id);
     assertTrue(optionalPatient.isPresent());

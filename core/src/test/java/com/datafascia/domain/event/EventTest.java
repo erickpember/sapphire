@@ -10,6 +10,7 @@ import com.datafascia.models.MaritalStatus;
 import com.datafascia.models.Race;
 import com.neovisionaries.i18n.LanguageCode;
 import java.net.URI;
+import java.time.Instant;
 import java.time.LocalDate;
 import org.testng.annotations.Test;
 
@@ -40,21 +41,33 @@ public class EventTest {
         .race(Race.WHITE)
         .language(LanguageCode.en)
         .build();
+    EncounterData originalEncounterData = EncounterData.builder()
+        .admitTime(Instant.now())
+        .build();
+    AdmitData originalAdmitData = AdmitData.builder()
+        .patient(originalPatientData)
+        .encounter(originalEncounterData)
+        .build();
     Event originalEvent = Event.builder()
         .institutionId(URI.create("institution"))
         .facilityId(URI.create("facility"))
         .type(EventType.PATIENT_ADMIT)
-        .data(originalPatientData)
+        .data(originalAdmitData)
         .build();
     byte[] bytes = serializer.encodeReflect(TOPIC, originalEvent);
 
     Event event = deserializer.decodeReflect(TOPIC, bytes, Event.class);
     assertEquals(event.getType(), originalEvent.getType());
 
-    PatientData patientData = (PatientData) event.getData();
+    AdmitData admitData = (AdmitData) event.getData();
+
+    PatientData patientData = admitData.getPatient();
     assertEquals(patientData.getFirstName(), originalPatientData.getFirstName());
     assertEquals(patientData.getGender(), originalPatientData.getGender());
     assertEquals(patientData.getBirthDate(), originalPatientData.getBirthDate());
     assertEquals(patientData.getLanguage(), originalPatientData.getLanguage());
+
+    EncounterData encounterData = admitData.getEncounter();
+    assertEquals(encounterData.getAdmitTime(), originalEncounterData.getAdmitTime());
   }
 }

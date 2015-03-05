@@ -8,15 +8,6 @@
       state=mounted
   when: mnt_dev in ansible_devices
 
-- name: Set iptables INPUT default policy to ACCEPT
-  command: /sbin/iptables -P INPUT ACCEPT
-
-- name: Clear all iptables rules so everything is allowed
-  command: /sbin/iptables -F
-
-- name: Save iptables rules
-  command: /sbin/service iptables save
-
 - name: Increase maximum open files for all users
   lineinfile:
       dest=/etc/security/limits.conf
@@ -36,13 +27,8 @@
   stat: path=/etc/yum.repos.d/epel.repo
   register: epel_repo
 
-- name: Download EPEL YUM repository package
-  command: wget --quiet -O {{ company_prefix }}/epel-release-6-8.noarch.rpm http://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm
-      creates={{ company_prefix }}/epel-release-6-8.noarch.rpm
-  when: epel_repo.stat.exists == False
-
 - name: Add EPEL YUM repository
-  shell: rpm --install {{ company_prefix }}/epel-release-6-8.noarch.rpm || true
+  command: rpm --install http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
   when: epel_repo.stat.exists == False
 
 - name: Install python-pip

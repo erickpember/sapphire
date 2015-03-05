@@ -35,10 +35,7 @@ public class EncounterIT extends ApiIT {
         new BigDecimal("72.576"), "kg", new BigDecimal("62.99"), "in",
         LocalDateTime.parse("2014-11-24T11:39:07Z", dateFormat).toInstant(ZoneOffset.UTC));
 
-    // Test getting the last encounter for a patient.
-    validateEncounter(api.lastvisit("97540012"),
-        new BigDecimal("4.99"), "kg", new BigDecimal("23"), "in",
-        LocalDateTime.parse("2014-08-04T10:51:00Z", dateFormat).toInstant(ZoneOffset.UTC));
+    // TODO: Test getting the last encounter for a patient.
   }
 
   /**
@@ -69,5 +66,4 @@ public class EncounterIT extends ApiIT {
     assertTrue(foundHeight);
     assertEquals(admitDate, enco.getHospitalisation().getPeriod().getStart());
   }
-
 }

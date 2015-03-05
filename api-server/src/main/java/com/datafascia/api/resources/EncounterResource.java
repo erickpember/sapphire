@@ -3,9 +3,12 @@
 package com.datafascia.api.resources;
 
 import com.codahale.metrics.annotation.Timed;
+import com.datafascia.common.persist.Id;
+import com.datafascia.domain.persist.EncounterRepository;
+import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.domain.persist.opal.EncounterDao;
-import com.datafascia.domain.persist.opal.PatientDao;
 import com.datafascia.models.Encounter;
+import com.datafascia.models.Patient;
 import java.util.Optional;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -23,18 +26,28 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j @Path("/encounter") @Produces(MediaType.APPLICATION_JSON)
 public class EncounterResource {
 
-  private final PatientDao patientDao;
+  private final PatientRepository patientRepository;
+  private final EncounterRepository encounterRepository;
   private final EncounterDao encounterDao;
 
   /**
    * Construct resource with associated data access objects
    *
-   * @param patientDao the patient data access object
-   * @param encounterDao the encounter data access object
+   * @param patientRepository
+   *     patient repository
+   * @param encounterRepository
+   *     encounter repository
+   * @param encounterDao
+   *     encounter data access object
    */
   @Inject
-  public EncounterResource(PatientDao patientDao, EncounterDao encounterDao) {
-    this.patientDao = patientDao;
+  public EncounterResource(
+      PatientRepository patientRepository,
+      EncounterRepository encounterRepository,
+      EncounterDao encounterDao) {
+
+    this.patientRepository = patientRepository;
+    this.encounterRepository = encounterRepository;
     this.encounterDao = encounterDao;
   }
 
@@ -49,17 +62,27 @@ public class EncounterResource {
   }
 
   /**
-   * @param id the patient identifier
+   * Gets last encounter for a patient.
    *
-   * @return stream list of patients back
+   * @param aPatientId
+   *     patient ID
+   * @return entity
    */
-  @GET @Timed @Path("last/{patientid}")
-  public Encounter getlast(@PathParam("patientid") String id) {
-    Optional<String> lastVisit = patientDao.getLastVisitId(id);
-    if (!lastVisit.isPresent()) {
-      throw new WebApplicationException(Response.Status.NOT_FOUND);
+  @GET @Timed @Path("last/{patientId}")
+  public Encounter getLast(@PathParam("patientId") String aPatientId) {
+    Id<Patient> patientId = Id.of(aPatientId);
+    Optional<Patient> optionalPatient = patientRepository.read(patientId);
+    if (!optionalPatient.isPresent()) {
+      throw new WebApplicationException("Patient not found", Response.Status.NOT_FOUND);
     }
 
-    return encounterDao.getEncounter(lastVisit.get());
+    Patient patient = optionalPatient.get();
+    Optional<Encounter> optionalEncounter =
+        encounterRepository.read(patientId, patient.getLastEncounterId());
+    if (!optionalPatient.isPresent()) {
+      throw new WebApplicationException("Last encounter not found", Response.Status.NOT_FOUND);
+    }
+
+    return optionalEncounter.get();
   }
 }

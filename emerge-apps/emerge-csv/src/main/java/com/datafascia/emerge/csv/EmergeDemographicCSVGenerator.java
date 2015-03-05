@@ -16,9 +16,9 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URI;
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
@@ -70,8 +70,9 @@ public class EmergeDemographicCSVGenerator {
 
       int entry = 0;
       for (Patient pat : api.patients(true)) {
-        // TODO: Read encounter from database to get patient height and weight.
-        Encounter encount = null;
+        String[] urnParts = pat.getId().toString().split(":");
+        String patientId = urnParts[urnParts.length - 1];
+        Encounter encount = lastVisit(api, patientId);
 
         pw.println(mapper.asCSV(getDemographic(pat, encount, entry)));
         entry++;
@@ -143,8 +144,8 @@ public class EmergeDemographicCSVGenerator {
   private static void addEncounterData(Demographic demo, Encounter encount) {
     Hospitalization hosp = encount.getHospitalisation();
     if (hosp != null && hosp.getPeriod() != null && hosp.getPeriod().getStart() != null) {
-      Instant admitDate = hosp.getPeriod().getStart();
-      demo.setSicuAdmissionDate(DATE_FORMATTER.format(admitDate));
+      ZonedDateTime admitTime = ZonedDateTime.ofInstant(hosp.getPeriod().getStart(), TIME_ZONE);
+      demo.setSicuAdmissionDate(DATE_TIME_FORMATTER.format(admitTime));
     }
 
     Optional<String> height = getObservationValue(encount, HEIGHT);

@@ -1,0 +1,20 @@
+---
+- name: Stop firewall
+  service:
+      name=firewalld
+      state=stopped
+      enabled=no
+
+- name: Add virt7-testing YUM repository
+  copy:
+    src: virt7-testing.repo
+    dest: /etc/yum.repos.d/virt7-testing.repo
+
+- name: Install Docker
+  yum: name=docker-{{ docker_version }}
+
+- name: Start Docker service
+  service:
+      name=docker
+      state=started
+      enabled=yes

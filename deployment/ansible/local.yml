@@ -4,13 +4,4 @@
   vars_files:
     - environment/{{ environment_name }}/vars.yml
   roles:
-    - zookeeper-server
-    - storm-nimbus
-    - storm-supervisor
-    - hadoop-hdfs-namenode
-    - hadoop-hdfs-datanode
-    - hostname
-    - accumulo-master-primary
-    - accumulo-slave
-    - kafka
-    - df-platform
+    - docker-image-creator

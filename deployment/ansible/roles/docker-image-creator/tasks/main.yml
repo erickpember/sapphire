@@ -1,0 +1,23 @@
+---
+- name: Install Ansible
+  yum: name=ansible
+
+- name: Create {{ docker_image_creator_home }} directory
+  file:
+    path: "{{ docker_image_creator_home }}"
+    state: directory
+    mode: 0755
+
+- name: Package Ansible scripts
+  local_action: command tar czf /tmp/ansible.tar.gz ansible
+      chdir={{ playbook_dir }}/..
+  sudo: no
+
+- name: Copy Ansible scripts
+  copy:
+    src: /tmp/ansible.tar.gz
+    dest: "{{ company_package_dir }}/ansible.tar.gz"
+
+- name: Extract Ansible scripts
+  command: tar --no-same-owner -xzf {{ company_package_dir }}/ansible.tar.gz
+      chdir={{ docker_image_creator_home }}

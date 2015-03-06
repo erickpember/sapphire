@@ -1,0 +1,2 @@
+---
+docker_image_creator_home: "{{ company_install_prefix }}/docker-image-creator"

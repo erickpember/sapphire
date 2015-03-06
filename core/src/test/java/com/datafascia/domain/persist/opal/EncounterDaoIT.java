@@ -42,7 +42,7 @@ public class EncounterDaoIT extends DaoIT {
   }
 
   public void assertValues(Encounter enco, BigDecimal weight, BigDecimal height, Instant date) {
-    assertEquals(date, enco.getHospitalisation().getPeriod().getStart());
+    assertEquals(date, enco.getHospitalisation().getPeriod().getStartInclusive());
 
     boolean foundHeight = false;
     boolean foundWeight = false;

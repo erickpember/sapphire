@@ -2,11 +2,13 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.models;
 
+import com.datafascia.common.time.Interval;
 import com.datafascia.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.net.URI;
+import java.time.Instant;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,5 +29,5 @@ public class EncounterAccomodation {
 
   /** Period during which the patient was assigned the bed.*/
   @JsonProperty("period")
-  private Period period;
+  private Interval<Instant> period;
 }

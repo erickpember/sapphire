@@ -3,9 +3,9 @@
 package com.datafascia.models;
 
 import com.datafascia.common.persist.Id;
+import com.datafascia.common.time.Interval;
 import com.datafascia.jackson.IdDeserializer;
 import com.datafascia.jackson.IdSerializer;
-import com.datafascia.urn.URNFactory;
 import com.datafascia.urn.URNFactory;
 import com.datafascia.urn.annotations.IdNamespace;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -14,6 +14,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.net.URI;
+import java.time.Instant;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -45,7 +46,7 @@ public class Hospitalization {
 
   /** Period during which the patient was admitted. */
   @JsonProperty("period")
-  private Period period;
+  private Interval<Instant> period;
 
   /** Where the patient stays during this encounter. */
   @JsonProperty("accomodation")

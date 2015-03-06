@@ -2,13 +2,16 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.models;
 
+import com.datafascia.common.time.Interval;
 import com.datafascia.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.time.Instant;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+
 
 /**
  * Holds a given value for an observation.
@@ -35,7 +38,7 @@ public class ObservationValue {
 
   /** Range of time associated with the observation.*/
   @JsonProperty("period")
-  private Period period;
+  private Interval<Instant> period;
 
   /** Data sampled from a device.*/
   @JsonProperty("sampleData")

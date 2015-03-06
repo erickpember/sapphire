@@ -3,6 +3,7 @@
 package com.datafascia.etl.process;
 
 import com.datafascia.common.persist.Id;
+import com.datafascia.common.time.Interval;
 import com.datafascia.domain.event.AdmitData;
 import com.datafascia.domain.event.EncounterData;
 import com.datafascia.domain.event.Event;
@@ -13,7 +14,7 @@ import com.datafascia.models.Encounter;
 import com.datafascia.models.Hospitalization;
 import com.datafascia.models.Name;
 import com.datafascia.models.Patient;
-import com.datafascia.models.Period;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.UUID;
 import java.util.function.Consumer;
@@ -31,8 +32,8 @@ public class AdmitPatient implements Consumer<Event> {
   private transient EncounterRepository encounterRepository;
 
   private static Encounter createEncounter(EncounterData fromEncounter) {
-    Period period = new Period();
-    period.setStart(fromEncounter.getAdmitTime());
+    Interval<Instant> period = new Interval<>();
+    period.setStartInclusive(fromEncounter.getAdmitTime());
 
     Hospitalization hospitalization = new Hospitalization();
     hospitalization.setPeriod(period);

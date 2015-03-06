@@ -143,8 +143,9 @@ public class EmergeDemographicCSVGenerator {
    */
   private static void addEncounterData(Demographic demo, Encounter encount) {
     Hospitalization hosp = encount.getHospitalisation();
-    if (hosp != null && hosp.getPeriod() != null && hosp.getPeriod().getStart() != null) {
-      ZonedDateTime admitTime = ZonedDateTime.ofInstant(hosp.getPeriod().getStart(), TIME_ZONE);
+    if (hosp != null && hosp.getPeriod() != null && hosp.getPeriod().getStartInclusive() != null) {
+      ZonedDateTime admitTime = ZonedDateTime.ofInstant(hosp.getPeriod().getStartInclusive(),
+          TIME_ZONE);
       demo.setSicuAdmissionDate(DATE_TIME_FORMATTER.format(admitTime));
     }
 

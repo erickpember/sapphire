@@ -3,6 +3,7 @@
 package com.datafascia.domain.persist.opal;
 
 import com.datafascia.common.accumulo.AccumuloTemplate;
+import com.datafascia.common.time.Interval;
 import com.datafascia.jackson.UnitsSymbolMap;
 import com.datafascia.models.CodeableConcept;
 import com.datafascia.models.Encounter;
@@ -10,7 +11,6 @@ import com.datafascia.models.Hospitalization;
 import com.datafascia.models.NumericQuantity;
 import com.datafascia.models.Observation;
 import com.datafascia.models.ObservationValue;
-import com.datafascia.models.Period;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -58,8 +58,8 @@ public class EncounterDao extends OpalDao {
 
     Optional<Instant> odate = getAdmissionDate(id);
     if (odate.isPresent()) {
-      Period period = new Period();
-      period.setStart(odate.get());
+      Interval<Instant> period = new Interval<>();
+      period.setStartInclusive(odate.get());
 
       Hospitalization hospit = new Hospitalization();
       hospit.setPeriod(period);

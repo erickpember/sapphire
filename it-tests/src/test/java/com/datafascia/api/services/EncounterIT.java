@@ -64,6 +64,6 @@ public class EncounterIT extends ApiIT {
 
     assertTrue(foundWeight);
     assertTrue(foundHeight);
-    assertEquals(admitDate, enco.getHospitalisation().getPeriod().getStart());
+    assertEquals(admitDate, enco.getHospitalisation().getPeriod().getStartInclusive());
   }
 }

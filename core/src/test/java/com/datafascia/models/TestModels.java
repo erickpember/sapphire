@@ -114,10 +114,10 @@ public class TestModels {
     }
   };
 
-  public static Period period = new Period() {
+  public static Interval<Instant> period = new Interval<Instant>() {
     {
-      setStart(getDateTime());
-      setStop(getDateTime());
+      setStartInclusive(getDateTime());
+      setEndExclusive(getDateTime());
     }
   };
 

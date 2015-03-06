@@ -3,6 +3,7 @@
 package com.datafascia.models;
 
 import com.datafascia.common.persist.Id;
+import com.datafascia.common.time.Interval;
 import com.datafascia.jackson.IdDeserializer;
 import com.datafascia.jackson.IdSerializer;
 import com.datafascia.jackson.InstantDeserializer;
@@ -62,7 +63,7 @@ public class Observation {
    * source of the date/time is not known, only the date/time itself.
    */
   @JsonProperty("applies")
-  private Period applies;
+  private Interval<Instant> applies;
 
   /** Date/Time this was made available. */
   @JsonProperty("issued") @JsonSerialize(using = InstantSerializer.class)

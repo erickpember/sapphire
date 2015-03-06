@@ -200,6 +200,7 @@ public class ProcessEventTopologyIT {
 
     Encounter encounter = optionalEncounter.get();
     assertEquals(
-        encounter.getHospitalisation().getPeriod().getStart(), encounterData.getAdmitTime());
+        encounter.getHospitalisation().getPeriod().getStartInclusive(),
+        encounterData.getAdmitTime());
   }
 }

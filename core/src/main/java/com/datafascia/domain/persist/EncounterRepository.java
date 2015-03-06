@@ -7,10 +7,10 @@ import com.datafascia.common.accumulo.MutationBuilder;
 import com.datafascia.common.accumulo.MutationSetter;
 import com.datafascia.common.accumulo.RowMapper;
 import com.datafascia.common.persist.Id;
+import com.datafascia.common.time.Interval;
 import com.datafascia.models.Encounter;
 import com.datafascia.models.Hospitalization;
 import com.datafascia.models.Patient;
-import com.datafascia.models.Period;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
@@ -69,7 +69,7 @@ public class EncounterRepository extends BaseRepository {
           public void putWriteOperations(MutationBuilder mutationBuilder) {
             mutationBuilder
                 .columnFamily(COLUMN_FAMILY)
-                .put(ADMIT_TIME, encounter.getHospitalisation().getPeriod().getStart());
+                .put(ADMIT_TIME, encounter.getHospitalisation().getPeriod().getStartInclusive());
           }
         });
   }
@@ -80,7 +80,7 @@ public class EncounterRepository extends BaseRepository {
     @Override
     public void onBeginRow(Key key) {
       Hospitalization hospitalization = new Hospitalization();
-      hospitalization.setPeriod(new Period());
+      hospitalization.setPeriod(new Interval<>());
 
       encounter = new Encounter();
       encounter.setHospitalisation(hospitalization);
@@ -91,7 +91,7 @@ public class EncounterRepository extends BaseRepository {
       String value = entry.getValue().toString();
       switch (entry.getKey().getColumnQualifier().toString()) {
         case ADMIT_TIME:
-          encounter.getHospitalisation().getPeriod().setStart(Instant.parse(value));
+          encounter.getHospitalisation().getPeriod().setStartInclusive(Instant.parse(value));
           break;
       }
     }

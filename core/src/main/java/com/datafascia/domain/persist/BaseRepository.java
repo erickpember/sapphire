@@ -7,10 +7,14 @@ import com.datafascia.common.persist.Id;
 import com.datafascia.jackson.DFObjectMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
 
 /**
@@ -34,8 +38,43 @@ public abstract class BaseRepository {
     this.accumuloTemplate = accumuloTemplate;
   }
 
+  private static String escape(String input) {
+    try {
+      return URLEncoder.encode(input, StandardCharsets.UTF_8.name());
+    } catch (UnsupportedEncodingException e) {
+      throw new AssertionError("Java must implement UTF-8");
+    }
+  }
+
   protected static String toRowId(Class<?> entityClass, Id<?> entityId) {
-    return entityClass.getSimpleName() + COMPONENT_SEPARATOR + entityId.toString() + KEY_SEPARATOR;
+    return entityClass.getSimpleName() + COMPONENT_SEPARATOR +
+        escape(entityId.toString()) + KEY_SEPARATOR;
+  }
+
+  private static String unescape(String input) {
+    try {
+      return URLDecoder.decode(input, StandardCharsets.UTF_8.name());
+    } catch (UnsupportedEncodingException e) {
+      throw new AssertionError("Java must implement UTF-8");
+    }
+  }
+
+  protected static String extractEntityId(Key key) {
+    String rowId = key.getRow().toString();
+
+    int endIndex = rowId.lastIndexOf(KEY_SEPARATOR);
+    if (endIndex < 0) {
+      throw new IllegalStateException(
+          String.format("Row ID [%s] does not contain %c", rowId, KEY_SEPARATOR));
+    }
+
+    int beginIndex = rowId.lastIndexOf(COMPONENT_SEPARATOR, endIndex - 1);
+    if (beginIndex < 0) {
+      throw new IllegalStateException(
+          String.format("Row ID [%s] does not contain %c", rowId, COMPONENT_SEPARATOR));
+    }
+
+    return unescape(rowId.substring(beginIndex + 1, endIndex));
   }
 
   /**

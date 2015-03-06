@@ -31,14 +31,9 @@ import org.apache.hadoop.io.Text;
  * <p>
  * The row ID for a patient entity has the format:
  * <pre>
- * Patient={primary key}&
+ * Patient={patientId}&
  * </pre>
- * where the primary key has the format:
- * <pre>
- * urn:df-institution-patientId-1:{institution ID}:{facility ID}:{patient ID}
- * </pre>
- * The institution ID, facility ID and patient ID are URL encoded to escape
- * delimilter characters appearing in them.
+ * The patient ID is URL encoded to escape delimiter characters appearing in it.
  */
 @Slf4j
 public class PatientRepository extends BaseRepository {
@@ -112,6 +107,7 @@ public class PatientRepository extends BaseRepository {
     @Override
     public void onBeginRow(Key key) {
       patient = new Patient();
+      patient.setId(Id.of(extractEntityId(key)));
       patient.setName(new Name());
       patient.setGender(Gender.UNKNOWN);
       patient.setMaritalStatus(MaritalStatus.UNKNOWN);
@@ -124,7 +120,6 @@ public class PatientRepository extends BaseRepository {
       String value = entry.getValue().toString();
       switch (entry.getKey().getColumnQualifier().toString()) {
         case INSTITUTION_PATIENT_ID:
-          patient.setId(Id.of(value));
           patient.setInstitutionPatientId(value);
           break;
         case ACCOUNT_NUMBER:

@@ -13,11 +13,11 @@ import com.datafascia.models.Name;
 import com.datafascia.models.Patient;
 import com.datafascia.models.Race;
 import com.neovisionaries.i18n.LanguageCode;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.Scanner;
@@ -48,7 +48,7 @@ public class PatientRepository extends BaseRepository {
   private static final String BIRTH_DATE = "birthDate";
   private static final String MARITAL_STATUS = "maritalStatus";
   private static final String RACE = "race";
-  private static final String LANGUAGE = "language";
+  private static final String LANGUAGES = "languages";
   private static final String LAST_ENCOUNTER_ID = "lastEncounterId";
   private static final String ACTIVE = "active";
   private static final PatientRowMapper PATIENT_ROW_MAPPER = new PatientRowMapper();
@@ -92,11 +92,11 @@ public class PatientRepository extends BaseRepository {
                 .put(BIRTH_DATE, encode(patient.getBirthDate()))
                 .put(MARITAL_STATUS, patient.getMaritalStatus().getCode())
                 .put(RACE, patient.getRace().getCode())
+                .put(LANGUAGES, encode(patient.getLangs().stream()
+                    .map(LanguageCode::name)
+                    .collect(Collectors.toList())))
                 .put(LAST_ENCOUNTER_ID, patient.getLastEncounterId())
                 .put(ACTIVE, String.valueOf(patient.isActive()));
-            if (!patient.getLangs().isEmpty()) {
-              mutationBuilder.put(LANGUAGE, patient.getLangs().get(0).name());
-            }
           }
         });
   }
@@ -146,8 +146,10 @@ public class PatientRepository extends BaseRepository {
         case RACE:
           patient.setRace(Race.of(value).orElse(Race.UNKNOWN));
           break;
-        case LANGUAGE:
-          patient.setLangs(Arrays.asList(LanguageCode.getByCode(value)));
+        case LANGUAGES:
+          patient.setLangs(decodeStringList(value).stream()
+              .map(LanguageCode::getByCode)
+              .collect(Collectors.toList()));
           break;
         case LAST_ENCOUNTER_ID:
           patient.setLastEncounterId(Id.of(value));

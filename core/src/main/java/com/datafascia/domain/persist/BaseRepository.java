@@ -5,6 +5,8 @@ package com.datafascia.domain.persist;
 import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.persist.Id;
 import com.datafascia.jackson.DFObjectMapper;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -13,9 +15,9 @@ import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.data.Key;
-import org.apache.accumulo.core.data.Value;
 
 /**
  * Implements common data access methods.
@@ -26,6 +28,8 @@ public abstract class BaseRepository {
   private static final char COMPONENT_SEPARATOR = '=';
   private static final char KEY_SEPARATOR = '&';
   private static final ObjectMapper OBJECT_MAPPER = DFObjectMapper.objectMapper();
+  private static final TypeReference<List<String>> STRING_LIST_TYPE_REFERENCE =
+      new TypeReference<List<String>>() { };
 
   protected AccumuloTemplate accumuloTemplate;
 
@@ -99,20 +103,31 @@ public abstract class BaseRepository {
     return LocalDate.parse(value, DateTimeFormatter.BASIC_ISO_DATE);
   }
 
-  private static String decodeJson(Value value) {
-    return new String(value.get(), StandardCharsets.UTF_8);
+  /**
+   * Converts String list to database representation.
+   *
+   * @param value
+   *     to convert
+   * @return converted value
+   */
+  protected static String encode(List<String> value) {
+    try {
+      return OBJECT_MAPPER.writeValueAsString(value);
+    } catch (JsonProcessingException e) {
+      throw new IllegalStateException(String.format("Cannot convert %s to JSON", value), e);
+    }
   }
 
   /**
-   * Converts value from database representation to String array.
+   * Converts value from database representation to String list.
    *
    * @param json
    *     to convert
    * @return converted value
    */
-  protected static String[] decodeStringArray(String json) {
+  protected static List<String> decodeStringList(String json) {
     try {
-      return OBJECT_MAPPER.readValue(json, String[].class);
+      return OBJECT_MAPPER.readValue(json, STRING_LIST_TYPE_REFERENCE);
     } catch (IOException e) {
       throw new IllegalStateException(String.format("Cannot convert JSON [%s]", json), e);
     }

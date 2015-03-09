@@ -7,6 +7,7 @@ import com.datafascia.api.client.DatafasciaApiBuilder;
 import com.datafascia.csv.CSVMapper;
 import com.datafascia.emerge.models.Demographic;
 import com.datafascia.models.Encounter;
+import com.datafascia.models.Gender;
 import com.datafascia.models.Hospitalization;
 import com.datafascia.models.Name;
 import com.datafascia.models.Observation;
@@ -127,7 +128,7 @@ public class EmergeDemographicCSVGenerator {
    * @param pat
    */
   private static void addPatientData(Demographic demo, Patient pat) {
-    demo.setGender(pat.getGender().getCode());
+    demo.setGender(pat.getGender().equals(Gender.FEMALE) ? "Female" : "Male");
     demo.setPatientDateOfBirth(DATE_FORMATTER.format(pat.getBirthDate()));
     demo.setRace(pat.getRace().getCode());
     demo.setSubjectPatientId(pat.getInstitutionPatientId());
@@ -146,7 +147,7 @@ public class EmergeDemographicCSVGenerator {
     if (hosp != null && hosp.getPeriod() != null && hosp.getPeriod().getStartInclusive() != null) {
       ZonedDateTime admitTime = ZonedDateTime.ofInstant(hosp.getPeriod().getStartInclusive(),
           TIME_ZONE);
-      demo.setSicuAdmissionDate(DATE_TIME_FORMATTER.format(admitTime));
+      demo.setSicuAdmissionDate(DATE_FORMATTER.format(admitTime));
     }
 
     Optional<String> height = getObservationValue(encount, HEIGHT);

@@ -139,8 +139,7 @@ public class ScenariosIT {
    * @param The patient ID
    */
   private void validateStep(String mrn) {
-    List<Patient> patients = api.patients(true);
-    for (Patient pat : patients) {
+    for (Patient pat : api.patients(null, true, 1).getCollection()) {
       if (pat.getId().toString().equals(mrn)) {
         validatePatient(pat, "NATUS-ADULT", "ONE", "A",
             LocalDateTime.parse("1984-10-01T05:00:00Z", dateFormat).toLocalDate(), mrn, mrn);

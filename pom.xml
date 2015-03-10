@@ -65,7 +65,7 @@
     <module>api-client</module>
     <module>api-server</module>
     <module>build-tools</module>
-    <module>common</module>
+    <module>common/core</module>
     <module>core</module>
     <module>dropwizard-testing</module>
     <module>emerge-apps</module>

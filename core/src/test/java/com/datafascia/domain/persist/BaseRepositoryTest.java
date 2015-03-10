@@ -8,10 +8,8 @@ import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
 import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.ConnectorFactory;
+import com.datafascia.common.accumulo.FixedAuthorizationsSupplier;
 import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
-import com.datafascia.common.accumulo.SubjectAuthorizationsSupplier;
-import com.datafascia.common.shiro.FakeRealm;
-import com.datafascia.common.shiro.RoleExposingRealm;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -21,16 +19,6 @@ import org.apache.accumulo.core.client.AccumuloSecurityException;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.TableExistsException;
 import org.apache.accumulo.core.client.admin.TableOperations;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.config.IniSecurityManagerFactory;
-import org.apache.shiro.mgt.RealmSecurityManager;
-import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.apache.shiro.subject.Subject;
-import org.apache.shiro.subject.support.SubjectThreadState;
-import org.apache.shiro.util.Factory;
-import org.apache.shiro.util.ThreadState;
-import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 
 /**
@@ -39,7 +27,6 @@ import org.testng.annotations.BeforeSuite;
 public class BaseRepositoryTest {
   private static final String USER = "root";
   private static final String PASSWORD = "secret";
-  private static ThreadState threadState;
   protected AccumuloTemplate accumuloTemplate;
 
   @BeforeSuite
@@ -47,7 +34,6 @@ public class BaseRepositoryTest {
       AccumuloException {
     Injector injector = setupMock();
     setupPatientsTable(injector);
-    setupMockSecurity();
     accumuloTemplate = injector.getInstance(AccumuloTemplate.class);
   }
 
@@ -56,9 +42,8 @@ public class BaseRepositoryTest {
         new AbstractModule() {
           @Override
           protected void configure() {
-            bind(AuthorizationsSupplier.class).to(SubjectAuthorizationsSupplier.class);
+            bind(AuthorizationsSupplier.class).to(FixedAuthorizationsSupplier.class);
             bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
-            bind(RoleExposingRealm.class).to(FakeRealm.class);
           }
 
           @Provides
@@ -81,23 +66,5 @@ public class BaseRepositoryTest {
     Connector connector = injector.getInstance(Connector.class);
     TableOperations tableOps = connector.tableOperations();
     tableOps.create("Patient");
-  }
-
-  private void setupMockSecurity() {
-    Factory<SecurityManager> factory = new IniSecurityManagerFactory("classpath:shiro.ini");
-    RealmSecurityManager securityManager = (RealmSecurityManager) factory.getInstance();
-    securityManager.setRealm(new FakeRealm());
-    SecurityUtils.setSecurityManager(securityManager);
-
-    Subject subject = new Subject.Builder()
-        .principals(new SimplePrincipalCollection("root", FakeRealm.class.getSimpleName()))
-        .buildSubject();
-    threadState = new SubjectThreadState(subject);
-    threadState.bind();
-  }
-
-  @AfterSuite
-  public void afterTest() throws Exception {
-    threadState.clear();
   }
 }

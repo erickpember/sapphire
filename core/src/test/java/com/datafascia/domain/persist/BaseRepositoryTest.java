@@ -3,7 +3,6 @@
 package com.datafascia.domain.persist;
 
 import com.datafascia.common.accumulo.AccumuloConfiguration;
-import com.datafascia.common.accumulo.AccumuloModule;
 import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
 import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
@@ -11,59 +10,58 @@ import com.datafascia.common.accumulo.ConnectorFactory;
 import com.datafascia.common.accumulo.FixedAuthorizationsSupplier;
 import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
 import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import com.google.inject.Provides;
-import org.apache.accumulo.core.client.AccumuloException;
-import org.apache.accumulo.core.client.AccumuloSecurityException;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import org.apache.accumulo.core.client.Connector;
-import org.apache.accumulo.core.client.TableExistsException;
 import org.apache.accumulo.core.client.admin.TableOperations;
-import org.testng.annotations.BeforeSuite;
+import org.testng.annotations.BeforeClass;
+import org.testng.annotations.Guice;
 
 /**
- * Base for mock accumulo repository tests.
+ * Base for mock Accumulo repository tests.
  */
+@Guice(modules = BaseRepositoryTest.Module.class)
 public class BaseRepositoryTest {
-  private static final String USER = "root";
-  private static final String PASSWORD = "secret";
+
+  /**
+   * Provides test dependencies
+   */
+  public static class Module extends AbstractModule {
+    @Override
+    protected void configure() {
+      bind(AuthorizationsSupplier.class).to(FixedAuthorizationsSupplier.class);
+      bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
+    }
+
+    @Provides @Singleton
+    public Connector connector(ConnectorFactory factory) {
+      return factory.getConnector();
+    }
+
+    @Provides @Singleton
+    public ConnectorFactory connectorFactory() {
+      return new ConnectorFactory(AccumuloConfiguration.builder()
+          .instance(ConnectorFactory.MOCK_INSTANCE)
+          .zooKeepers("localhost")
+          .user("root")
+          .password("secret")
+          .build());
+    }
+  }
+
+  @Inject
+  private Connector connector;
+
+  @Inject
   protected AccumuloTemplate accumuloTemplate;
 
-  @BeforeSuite
-  public void beforeClass() throws TableExistsException, AccumuloSecurityException,
-      AccumuloException {
-    Injector injector = setupMock();
-    setupPatientsTable(injector);
-    accumuloTemplate = injector.getInstance(AccumuloTemplate.class);
+  @BeforeClass
+  public void beforeClass() throws Exception {
+    setupPatientTable();
   }
 
-  private Injector setupMock() {
-    Injector injector = Guice.createInjector(
-        new AbstractModule() {
-          @Override
-          protected void configure() {
-            bind(AuthorizationsSupplier.class).to(FixedAuthorizationsSupplier.class);
-            bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
-          }
-
-          @Provides
-          public AccumuloConfiguration getAccumuloConfiguration() {
-            return AccumuloConfiguration.builder()
-                .instance(ConnectorFactory.MOCK_INSTANCE)
-                .zooKeepers("zookeeper1.datafascia.com")
-                .user(USER)
-                .password(PASSWORD)
-                .build();
-          }
-        },
-        new AccumuloModule());
-
-    return injector;
-  }
-
-  private void setupPatientsTable(Injector injector) throws TableExistsException,
-      AccumuloSecurityException, AccumuloException {
-    Connector connector = injector.getInstance(Connector.class);
+  private void setupPatientTable() throws Exception {
     TableOperations tableOps = connector.tableOperations();
     tableOps.create("Patient");
   }

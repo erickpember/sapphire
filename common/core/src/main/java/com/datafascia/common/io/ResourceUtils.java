@@ -1,6 +1,6 @@
 // Copyright (C) 2014-2015 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.resources;
+package com.datafascia.common.io;
 
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;

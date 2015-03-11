@@ -4,8 +4,8 @@ package com.datafascia.scenarios;
 
 import com.datafascia.api.client.DatafasciaApi;
 import com.datafascia.api.client.DatafasciaApiBuilder;
+import com.datafascia.common.io.ResourceUtils;
 import com.datafascia.models.Patient;
-import com.datafascia.resources.ResourceUtils;
 import com.datafascia.shell.Main;
 import com.google.common.io.Resources;
 import java.io.BufferedReader;

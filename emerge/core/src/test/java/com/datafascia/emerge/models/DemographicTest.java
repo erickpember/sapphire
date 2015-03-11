@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.models;
 
-import com.datafascia.csv.CSVMapper;
+import com.datafascia.common.jackson.CSVMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import java.io.IOException;
 import lombok.extern.slf4j.Slf4j;

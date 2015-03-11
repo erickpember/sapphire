@@ -5,7 +5,7 @@ package com.datafascia.emerge.csv;
 import com.datafascia.api.client.DatafasciaApi;
 import com.datafascia.api.client.DatafasciaApiBuilder;
 import com.datafascia.common.api.ApiParams;
-import com.datafascia.csv.CSVMapper;
+import com.datafascia.common.jackson.CSVMapper;
 import com.datafascia.emerge.models.Demographic;
 import com.datafascia.models.Encounter;
 import com.datafascia.models.Gender;

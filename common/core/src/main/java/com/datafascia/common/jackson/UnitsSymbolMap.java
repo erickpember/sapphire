@@ -3,7 +3,6 @@
 
 package com.datafascia.common.jackson;
 
-import com.datafascia.exceptions.UnsupportedUnitException;
 import java.util.HashMap;
 import java.util.Map;
 import javax.measure.Unit;

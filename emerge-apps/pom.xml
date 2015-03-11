@@ -26,6 +26,5 @@
 
   <modules>
     <module>emerge-csv</module>
-    <module>emerge-models</module>
   </modules>
 </project>

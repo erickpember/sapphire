@@ -13,12 +13,12 @@
 
   <parent>
     <groupId>com.datafascia</groupId>
-    <artifactId>emerge-apps</artifactId>
+    <artifactId>df-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../..</relativePath>
   </parent>
 
-  <artifactId>emerge-models</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <artifactId>df-emerge-core</artifactId>
   <packaging>jar</packaging>
 
   <name>${project.artifactId}</name>

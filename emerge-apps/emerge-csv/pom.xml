@@ -42,7 +42,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>emerge-models</artifactId>
+      <artifactId>df-emerge-core</artifactId>
       <version>${project.version}</version>
     </dependency>
 

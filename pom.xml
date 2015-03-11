@@ -67,6 +67,7 @@
     <module>common/core</module>
     <module>common/test</module>
     <module>domain/core</module>
+    <module>emerge/core</module>
     <module>emerge-apps</module>
     <module>etl/hl7-ingest</module>
     <module>etl/hl7-transform</module>

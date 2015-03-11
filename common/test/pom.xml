@@ -15,10 +15,10 @@
     <groupId>com.datafascia</groupId>
     <artifactId>df-parent</artifactId>
     <version>0.0.1-SNAPSHOT</version>
+    <relativePath>../..</relativePath>
   </parent>
 
-  <artifactId>dropwizard-testing</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <artifactId>df-common-test</artifactId>
   <packaging>jar</packaging>
 
   <name>${project.artifactId}</name>

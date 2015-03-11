@@ -28,7 +28,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>core</artifactId>
+      <artifactId>df-domain-core</artifactId>
       <version>${project.version}</version>
     </dependency>
 

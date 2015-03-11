@@ -66,7 +66,7 @@
     <module>build-tools</module>
     <module>common/core</module>
     <module>common/test</module>
-    <module>core</module>
+    <module>domain/core</module>
     <module>emerge-apps</module>
     <module>etl/hl7-ingest</module>
     <module>etl/hl7-transform</module>

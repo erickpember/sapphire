@@ -1,7 +1,8 @@
 // Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.string;
+package com.datafascia.common.string;
 
+import com.datafascia.common.string.StringUtils;
 import java.io.UnsupportedEncodingException;
 import java.util.Base64;
 import org.testng.annotations.Test;

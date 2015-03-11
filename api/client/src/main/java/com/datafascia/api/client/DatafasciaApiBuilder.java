@@ -3,7 +3,7 @@
 package com.datafascia.api.client;
 
 import com.datafascia.common.jackson.DFObjectMapper;
-import com.datafascia.string.StringUtils;
+import com.datafascia.common.string.StringUtils;
 import java.net.URI;
 import lombok.extern.slf4j.Slf4j;
 import retrofit.RequestInterceptor;

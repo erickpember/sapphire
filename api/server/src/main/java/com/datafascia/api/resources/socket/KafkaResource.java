@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.resources.socket;
 
-import com.datafascia.kafka.KafkaConfig;
+import com.datafascia.common.kafka.KafkaConfig;
 import com.google.common.base.Strings;
 import java.util.Arrays;
 import java.util.Collections;
@@ -25,7 +25,7 @@ import org.atmosphere.cpr.AtmosphereResource;
 import org.atmosphere.cpr.AtmosphereResourceEvent;
 import org.atmosphere.interceptor.AtmosphereResourceLifecycleInterceptor;
 
-import static com.datafascia.kafka.KafkaConfig.TIMEOUT;
+import static com.datafascia.common.kafka.KafkaConfig.TIMEOUT;
 import static javax.servlet.http.HttpServletResponse.SC_REQUEST_TIMEOUT;
 import static org.apache.commons.httpclient.HttpStatus.SC_CONTINUE;
 

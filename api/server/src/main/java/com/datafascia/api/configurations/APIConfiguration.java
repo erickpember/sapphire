@@ -3,7 +3,7 @@
 package com.datafascia.api.configurations;
 
 import com.datafascia.common.accumulo.AccumuloConfiguration;
-import com.datafascia.kafka.KafkaConfig;
+import com.datafascia.common.kafka.KafkaConfig;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.dropwizard.Configuration;
 import javax.validation.constraints.NotNull;

@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.resources.socket;
 
-import com.datafascia.kafka.KafkaConfig;
+import com.datafascia.common.kafka.KafkaConfig;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.atmosphere.config.service.Disconnect;

@@ -15,6 +15,7 @@ import com.datafascia.common.accumulo.SubjectAuthorizationsSupplier;
 import com.datafascia.common.kafka.KafkaConfig;
 import com.datafascia.common.shiro.FakeRealm;
 import com.datafascia.common.shiro.RoleExposingRealm;
+import com.datafascia.domain.model.Version;
 import com.datafascia.dropwizard.testing.DropwizardTestApp;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -50,7 +51,7 @@ import org.testng.annotations.BeforeSuite;
  */
 @Slf4j
 public class ApiIT {
-  protected static final String MODELS_PKG = "com.datafascia.models";
+  protected static final String MODELS_PKG = Version.class.getPackage().getName();
   protected static final String OPAL_TABLE = "opal_dF_data";
   protected static final DateTimeFormatter dateFormat
       = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");

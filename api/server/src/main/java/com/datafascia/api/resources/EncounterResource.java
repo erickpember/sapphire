@@ -4,11 +4,11 @@ package com.datafascia.api.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.datafascia.common.persist.Id;
+import com.datafascia.domain.model.Encounter;
+import com.datafascia.domain.model.Patient;
 import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.domain.persist.opal.EncounterDao;
-import com.datafascia.models.Encounter;
-import com.datafascia.models.Patient;
 import java.util.Optional;
 import javax.inject.Inject;
 import javax.ws.rs.GET;

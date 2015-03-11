@@ -2,8 +2,8 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.services;
 
-import com.datafascia.models.Encounter;
-import com.datafascia.models.Observation;
+import com.datafascia.domain.model.Encounter;
+import com.datafascia.domain.model.Observation;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;

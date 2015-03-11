@@ -8,6 +8,7 @@ import com.beust.jcommander.Parameters;
 import com.datafascia.common.command.Command;
 import com.datafascia.common.command.CommandLoader;
 import com.datafascia.common.urn.URNMap;
+import com.datafascia.domain.model.Version;
 import java.util.HashMap;
 
 /**
@@ -15,7 +16,7 @@ import java.util.HashMap;
  */
 public class Main {
   /** Package name for models */
-  private static final String MODELS_PKG = "com.datafascia.models";
+  private static final String MODELS_PKG = Version.class.getPackage().getName();
 
   private static final String PROGRAM_NAME = "dfp";
 

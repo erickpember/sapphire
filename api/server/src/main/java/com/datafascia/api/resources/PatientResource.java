@@ -4,9 +4,9 @@ package com.datafascia.api.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.datafascia.common.api.ApiParams;
+import com.datafascia.domain.model.PagedCollection;
+import com.datafascia.domain.model.Patient;
 import com.datafascia.domain.persist.PatientRepository;
-import com.datafascia.models.PagedCollection;
-import com.datafascia.models.Patient;
 import com.google.common.collect.ImmutableMap;
 import java.util.List;
 import java.util.Map;

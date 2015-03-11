@@ -3,11 +3,11 @@
 package com.datafascia.api.client;
 
 import com.datafascia.common.api.ApiParams;
-import com.datafascia.models.Encounter;
-import com.datafascia.models.Observation;
-import com.datafascia.models.PagedCollection;
-import com.datafascia.models.Patient;
-import com.datafascia.models.Version;
+import com.datafascia.domain.model.Encounter;
+import com.datafascia.domain.model.Observation;
+import com.datafascia.domain.model.PagedCollection;
+import com.datafascia.domain.model.Patient;
+import com.datafascia.domain.model.Version;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import java.util.List;
 import java.util.Map;

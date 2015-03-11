@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.persist.opal;
 
-import com.datafascia.models.Patient;
+import com.datafascia.domain.model.Patient;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

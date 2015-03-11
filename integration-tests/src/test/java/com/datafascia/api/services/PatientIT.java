@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.services;
 
-import com.datafascia.models.Patient;
+import com.datafascia.domain.model.Patient;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import lombok.extern.slf4j.Slf4j;

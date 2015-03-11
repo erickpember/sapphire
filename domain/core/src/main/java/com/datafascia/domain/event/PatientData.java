@@ -4,9 +4,9 @@ package com.datafascia.domain.event;
 
 import com.datafascia.common.avro.LanguageCodeEncoding;
 import com.datafascia.common.avro.LocalDateEncoding;
-import com.datafascia.models.Gender;
-import com.datafascia.models.MaritalStatus;
-import com.datafascia.models.Race;
+import com.datafascia.domain.model.Gender;
+import com.datafascia.domain.model.MaritalStatus;
+import com.datafascia.domain.model.Race;
 import com.neovisionaries.i18n.LanguageCode;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;

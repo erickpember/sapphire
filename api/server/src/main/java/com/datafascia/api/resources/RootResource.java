@@ -5,6 +5,7 @@ package com.datafascia.api.resources;
 import com.codahale.metrics.annotation.Timed;
 import com.datafascia.common.jackson.DFObjectMapper;
 import com.datafascia.common.reflect.PackageUtils;
+import com.datafascia.domain.model.Version;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
@@ -26,7 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 @Produces(MediaType.APPLICATION_JSON) @Slf4j @Path("/")
 public class RootResource {
   /** Package name for models */
-  public static final String MODELS_PKG = "com.datafascia.models";
+  private static final String MODELS_PKG = Version.class.getPackage().getName();
 
   /**
    * @return the JSON schema for the model

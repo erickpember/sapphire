@@ -3,11 +3,11 @@
 package com.datafascia.domain.persist;
 
 import com.datafascia.common.persist.Id;
-import com.datafascia.models.Gender;
-import com.datafascia.models.MaritalStatus;
-import com.datafascia.models.Name;
-import com.datafascia.models.Patient;
-import com.datafascia.models.Race;
+import com.datafascia.domain.model.Gender;
+import com.datafascia.domain.model.MaritalStatus;
+import com.datafascia.domain.model.Name;
+import com.datafascia.domain.model.Patient;
+import com.datafascia.domain.model.Race;
 import com.neovisionaries.i18n.LanguageCode;
 import java.time.LocalDate;
 import java.util.ArrayList;

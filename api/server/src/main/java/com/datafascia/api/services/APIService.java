@@ -19,6 +19,7 @@ import com.datafascia.common.shiro.FakeRealm;
 import com.datafascia.common.shiro.RealmInjectingEnvironmentLoaderListener;
 import com.datafascia.common.shiro.RoleExposingRealm;
 import com.datafascia.common.urn.URNMap;
+import com.datafascia.domain.model.Version;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
@@ -42,7 +43,7 @@ public class APIService extends Application<APIConfiguration> {
   /** Package name for resources */
   public static final String RESOURCES_PKG = "com.datafascia.api.resources";
   /** Package name for models */
-  public static final String MODELS_PKG = "com.datafascia.models";
+  private static final String MODELS_PKG = Version.class.getPackage().getName();
 
   /**
    * The main entry point for the application

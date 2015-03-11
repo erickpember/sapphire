@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.services;
 
-import com.datafascia.models.Version;
+import com.datafascia.domain.model.Version;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 

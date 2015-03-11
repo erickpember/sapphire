@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.event;
 
-import com.datafascia.models.Gender;
+import com.datafascia.domain.model.Gender;
 import java.io.IOException;
 import org.apache.avro.Schema;
 import org.apache.avro.io.Decoder;

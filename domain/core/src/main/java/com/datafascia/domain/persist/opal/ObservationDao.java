@@ -4,9 +4,9 @@ package com.datafascia.domain.persist.opal;
 
 import com.codahale.metrics.Timer;
 import com.datafascia.common.accumulo.AccumuloTemplate;
-import com.datafascia.models.CodeableConcept;
-import com.datafascia.models.Observation;
-import com.datafascia.models.ObservationValue;
+import com.datafascia.domain.model.CodeableConcept;
+import com.datafascia.domain.model.Observation;
+import com.datafascia.domain.model.ObservationValue;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;

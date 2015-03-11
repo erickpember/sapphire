@@ -3,7 +3,7 @@
 package com.datafascia.domain.persist.opal;
 
 import com.datafascia.common.time.Interval;
-import com.datafascia.models.Observation;
+import com.datafascia.domain.model.Observation;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collection;

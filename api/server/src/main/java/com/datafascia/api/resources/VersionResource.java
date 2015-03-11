@@ -4,7 +4,7 @@ package com.datafascia.api.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.datafascia.common.api.ApiParams;
-import com.datafascia.models.Version;
+import com.datafascia.domain.model.Version;
 import com.google.common.base.Optional;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.ws.rs.GET;

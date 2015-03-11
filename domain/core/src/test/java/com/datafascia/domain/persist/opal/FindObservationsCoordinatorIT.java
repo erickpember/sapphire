@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.persist.opal;
 
-import com.datafascia.models.Observation;
+import com.datafascia.domain.model.Observation;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;

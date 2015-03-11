@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.common.jackson;
 
-import com.datafascia.urn.URNMap;
+import com.datafascia.common.urn.URNMap;
 import org.testng.annotations.BeforeSuite;
 
 /**

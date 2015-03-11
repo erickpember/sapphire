@@ -3,7 +3,7 @@
 package com.datafascia.models;
 
 import com.datafascia.common.jackson.DFObjectMapper;
-import com.datafascia.urn.URNMap;
+import com.datafascia.common.urn.URNMap;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;

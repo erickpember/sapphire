@@ -3,8 +3,8 @@
 package com.datafascia.common.jackson;
 
 import com.datafascia.common.persist.Id;
-import com.datafascia.urn.URNFactory;
-import com.datafascia.urn.URNMap;
+import com.datafascia.common.urn.URNFactory;
+import com.datafascia.common.urn.URNMap;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.DeserializationContext;

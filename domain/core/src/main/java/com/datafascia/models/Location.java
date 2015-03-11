@@ -3,7 +3,7 @@
 package com.datafascia.models;
 
 import com.datafascia.common.time.Interval;
-import com.datafascia.urn.URNFactory;
+import com.datafascia.common.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;

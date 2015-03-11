@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.models;
 
-import com.datafascia.urn.URNFactory;
+import com.datafascia.common.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;

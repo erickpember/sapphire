@@ -1,9 +1,9 @@
 // Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.urn;
+package com.datafascia.common.urn;
 
 import com.datafascia.common.reflect.PackageUtils;
-import com.datafascia.urn.annotations.IdNamespace;
+import com.datafascia.common.urn.annotations.IdNamespace;
 import java.util.HashMap;
 import java.util.Map;
 import lombok.extern.slf4j.Slf4j;

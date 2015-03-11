@@ -7,7 +7,7 @@ import com.beust.jcommander.ParameterException;
 import com.beust.jcommander.Parameters;
 import com.datafascia.common.command.Command;
 import com.datafascia.common.command.CommandLoader;
-import com.datafascia.urn.URNMap;
+import com.datafascia.common.urn.URNMap;
 import java.util.HashMap;
 
 /**

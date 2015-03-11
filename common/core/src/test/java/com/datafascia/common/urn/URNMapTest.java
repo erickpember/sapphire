@@ -1,8 +1,8 @@
 // Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.urn;
+package com.datafascia.common.urn;
 
-import com.datafascia.urn.annotations.IdNamespace;
+import com.datafascia.common.urn.annotations.IdNamespace;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.BeforeSuite;
 import org.testng.annotations.Test;
@@ -17,7 +17,7 @@ public class URNMapTest {
   @BeforeSuite
   public void setup() {
     // Load the mappings by scanning the package
-    URNMap.idNSMapping("com.datafascia.urn");
+    URNMap.idNSMapping(getClass().getPackage().getName());
   }
 
   @Test

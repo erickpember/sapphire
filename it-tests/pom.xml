@@ -32,7 +32,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>api-server</artifactId>
+      <artifactId>df-api-server</artifactId>
       <version>${project.version}</version>
       <exclusions>
         <exclusion>

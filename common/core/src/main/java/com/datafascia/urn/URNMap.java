@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.urn;
 
-import com.datafascia.reflections.PackageUtils;
+import com.datafascia.common.reflect.PackageUtils;
 import com.datafascia.urn.annotations.IdNamespace;
 import java.util.HashMap;
 import java.util.Map;

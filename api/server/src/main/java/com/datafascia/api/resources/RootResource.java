@@ -4,7 +4,7 @@ package com.datafascia.api.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.datafascia.common.jackson.DFObjectMapper;
-import com.datafascia.reflections.PackageUtils;
+import com.datafascia.common.reflect.PackageUtils;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;

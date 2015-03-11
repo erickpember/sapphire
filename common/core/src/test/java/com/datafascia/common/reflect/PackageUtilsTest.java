@@ -1,6 +1,6 @@
 // Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.reflections;
+package com.datafascia.common.reflect;
 
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;

@@ -61,7 +61,7 @@
   </properties>
 
   <modules>
-    <module>api-client</module>
+    <module>api/client</module>
     <module>api/server</module>
     <module>build-tools</module>
     <module>common/core</module>

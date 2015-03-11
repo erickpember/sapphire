@@ -27,7 +27,7 @@
   <dependencies>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>api-client</artifactId>
+      <artifactId>df-api-client</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>

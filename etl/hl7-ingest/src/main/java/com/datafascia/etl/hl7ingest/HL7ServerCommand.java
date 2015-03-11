@@ -9,7 +9,7 @@ import ca.uhn.hl7v2.protocol.ReceivingApplication;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.datafascia.common.command.Command;
-import com.datafascia.jcommander.converters.URIConverter;
+import com.datafascia.common.jcommander.URIConverter;
 import java.net.URI;
 import java.util.Properties;
 import kafka.javaapi.producer.Producer;

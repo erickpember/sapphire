@@ -5,7 +5,7 @@ package com.datafascia.emerge.csv;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.datafascia.common.command.Command;
-import com.datafascia.jcommander.converters.URIConverter;
+import com.datafascia.common.jcommander.URIConverter;
 import java.io.IOException;
 import java.net.URI;
 import lombok.extern.slf4j.Slf4j;

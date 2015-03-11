@@ -3,8 +3,8 @@
 package com.datafascia.domain.persist;
 
 import com.datafascia.common.accumulo.AccumuloTemplate;
+import com.datafascia.common.jackson.DFObjectMapper;
 import com.datafascia.common.persist.Id;
-import com.datafascia.jackson.DFObjectMapper;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;

@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.common.time;
 
-import com.datafascia.jackson.DFObjectMapper;
+import com.datafascia.common.jackson.DFObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.text.ParseException;

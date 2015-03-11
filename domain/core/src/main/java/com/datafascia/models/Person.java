@@ -2,8 +2,8 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.models;
 
-import com.datafascia.jackson.LocalDateDeserializer;
-import com.datafascia.jackson.LocalDateSerializer;
+import com.datafascia.common.jackson.LocalDateDeserializer;
+import com.datafascia.common.jackson.LocalDateSerializer;
 import com.datafascia.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;

@@ -1,6 +1,6 @@
 // Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.jackson;
+package com.datafascia.common.jackson;
 
 import com.datafascia.urn.URNMap;
 import org.testng.annotations.BeforeSuite;
@@ -12,6 +12,6 @@ public class JacksonBaseTest {
   @BeforeSuite
   public void setup() {
     // Load the mappings by scanning the package
-    URNMap.idNSMapping("com.datafascia.jackson");
+    URNMap.idNSMapping(getClass().getPackage().getName());
   }
 }

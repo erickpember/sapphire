@@ -2,11 +2,11 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.models;
 
+import com.datafascia.common.jackson.IdDeserializer;
+import com.datafascia.common.jackson.IdSerializer;
+import com.datafascia.common.jackson.InstantDeserializer;
+import com.datafascia.common.jackson.InstantSerializer;
 import com.datafascia.common.persist.Id;
-import com.datafascia.jackson.IdDeserializer;
-import com.datafascia.jackson.IdSerializer;
-import com.datafascia.jackson.InstantDeserializer;
-import com.datafascia.jackson.InstantSerializer;
 import com.datafascia.urn.URNFactory;
 import com.datafascia.urn.annotations.IdNamespace;
 import com.fasterxml.jackson.annotation.JsonIgnore;

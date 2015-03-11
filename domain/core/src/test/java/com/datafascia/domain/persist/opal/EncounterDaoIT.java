@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.persist.opal;
 
-import com.datafascia.jackson.UnitsSymbolMap;
+import com.datafascia.common.jackson.UnitsSymbolMap;
 import com.datafascia.models.Encounter;
 import com.datafascia.models.Observation;
 import java.math.BigDecimal;

@@ -1,6 +1,6 @@
 // Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.jackson;
+package com.datafascia.common.jackson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import javax.measure.Unit;
@@ -10,7 +10,7 @@ import tec.units.ri.util.UCUM;
 import static org.testng.Assert.assertEquals;
 
 /**
- * {@link UnitDeserializer} test
+ * {@link com.datafascia.common.jackson.UnitDeserializer} test
  */
 public class UnitDeserializerTest extends LocalDateBaseTest {
   @Test

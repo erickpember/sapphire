@@ -3,8 +3,8 @@
 package com.datafascia.domain.persist.opal;
 
 import com.datafascia.common.accumulo.AccumuloTemplate;
+import com.datafascia.common.jackson.UnitsSymbolMap;
 import com.datafascia.common.time.Interval;
-import com.datafascia.jackson.UnitsSymbolMap;
 import com.datafascia.models.CodeableConcept;
 import com.datafascia.models.Encounter;
 import com.datafascia.models.Hospitalization;

@@ -1,6 +1,6 @@
 // Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.jackson;
+package com.datafascia.common.jackson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.LocalDate;
@@ -10,7 +10,7 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 
 /**
- * {@link IdDeserializer} test
+ * {@link com.datafascia.common.jackson.IdDeserializer} test
  */
 public class LocalDateDeserializerTest extends LocalDateBaseTest {
   @Test

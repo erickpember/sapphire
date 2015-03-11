@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.client;
 
-import com.datafascia.jackson.DFObjectMapper;
+import com.datafascia.common.jackson.DFObjectMapper;
 import com.datafascia.string.StringUtils;
 import java.net.URI;
 import lombok.extern.slf4j.Slf4j;

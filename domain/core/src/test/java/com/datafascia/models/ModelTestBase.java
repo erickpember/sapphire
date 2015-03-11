@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.models;
 
-import com.datafascia.jackson.DFObjectMapper;
+import com.datafascia.common.jackson.DFObjectMapper;
 import com.datafascia.urn.URNMap;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;

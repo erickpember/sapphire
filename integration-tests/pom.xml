@@ -17,11 +17,10 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
 
-  <artifactId>df-it-tests</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <artifactId>df-integration-tests</artifactId>
   <packaging>jar</packaging>
 
-  <name>Integration Tests</name>
+  <name>${project.artifactId}</name>
   <description>dataFascia Integration Tests</description>
 
   <dependencies>

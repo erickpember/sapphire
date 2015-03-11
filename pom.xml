@@ -72,8 +72,8 @@
     <module>etl/hl7-ingest</module>
     <module>etl/hl7-transform</module>
     <module>etl/process</module>
+    <module>integration-tests</module>
     <module>shell</module>
-    <module>it-tests</module>
   </modules>
 
   <dependencyManagement>

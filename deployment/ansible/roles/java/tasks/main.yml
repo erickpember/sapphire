@@ -1,19 +1,19 @@
 ---
 - name: Download Java
   uri:
-      url=http://download.oracle.com/otn-pub/java/jdk/{{ java_package_version }}-{{ java_package_build }}/{{ java_package }}
-      HEADER_Cookie=oraclelicense=accept-securebackup-cookie
-      dest={{ company_prefix }}/{{ java_package }}
-      creates={{ company_prefix }}/{{ java_package }}
+    url: http://download.oracle.com/otn-pub/java/jdk/{{ java_package_version }}-{{ java_package_build }}/{{ java_package }}
+    HEADER_Cookie: oraclelicense=accept-securebackup-cookie
+    dest: "{{ company_package_dir }}/{{ java_package }}"
+    creates: "{{ company_package_dir }}/{{ java_package }}"
 
 - name: Install Java
-  command: rpm --install {{ company_prefix }}/{{ java_package }}
+  command: rpm --install {{ company_package_dir }}/{{ java_package }}
       creates=/usr/java/jre{{ java_version }}
 
 - name: Install Unlimited Strength Jurisdiction Policy Files
   copy:
-      src={{ item }}
-      dest=/usr/java/jre{{ java_version }}/lib/security/{{ item }}
+    src: "{{ item }}"
+    dest: /usr/java/jre{{ java_version }}/lib/security/{{ item }}
   with_items:
     - local_policy.jar
     - US_export_policy.jar

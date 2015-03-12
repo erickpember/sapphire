@@ -3,5 +3,11 @@
 # Software not installed by RPM will be installed under this directory.
 company_prefix: /datafascia
 
+# downloaded packages directory
+company_package_dir: "{{ company_prefix }}/package"
+
+# Ansible scripts directory inside Docker image
+company_ansible_dir: "{{ company_prefix }}/ansible"
+
 # mount point of EC2 ephemeral store
 ephemeral_dir: /media/ephemeral0

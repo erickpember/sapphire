@@ -1,0 +1,3 @@
+---
+zookeeper_conf_dir: "{{ zookeeper_home }}/conf"
+zookeeper_data_dir: "{{ company_data_prefix }}/zookeeper"

@@ -1,4 +1,5 @@
 ---
-zookeeper_version: 3.4.5+*
-zookeeper_data_dir: "{{ company_data_prefix }}/zookeeper"
-zookeeper_home: /usr/lib/zookeeper
+zookeeper_version: 3.4.6
+zookeeper_package: zookeeper-{{ zookeeper_version }}.tar.gz
+zookeeper_install_dir: "{{ company_install_prefix }}/zookeeper-{{ zookeeper_version }}"
+zookeeper_home: "{{ company_install_prefix }}/zookeeper"

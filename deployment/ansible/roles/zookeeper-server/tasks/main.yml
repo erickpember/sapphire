@@ -1,25 +1,30 @@
 ---
-- name: Install zookeeper-server
-  yum: name=zookeeper-server-{{ zookeeper_version }}
-
-- name: Copy zookeeper configuration file
+- name: Copy run script
   template:
-      src=zoo.cfg
-      dest=/etc/zookeeper/conf/zoo.cfg
+    src: run.sh
+    dest: "{{ zookeeper_home }}/run.sh"
+    mode: 0755
+  tags:
+    - image
 
-- name: Create zookeeper data directory
+- name: Create data directory
   file:
-      path={{ zookeeper_data_dir }}
-      state=directory
-      owner=zookeeper
-      group=zookeeper
+    path: "{{ zookeeper_data_dir }}"
+    state: directory
+    mode: 0755
+  tags:
+    - run
 
-- name: Initialize zookeeper server
-  command: /sbin/service zookeeper-server init --myid={{ zoo_id }}
+- name: Copy configuration file
+  template:
+    src: zoo.cfg
+    dest: "{{ zookeeper_conf_dir }}/zoo.cfg"
+  tags:
+    - run
+
+- name: Initialize server
+  command: >
+      {{ zookeeper_home }}/bin/zkServer.sh init --myid={{ ansible_env.ZOOKEEPER_SERVER_ID }}
       creates={{ zookeeper_data_dir }}/myid
-
-- name: Start zookeeper-server
-  service:
-      name=zookeeper-server
-      state=started
-      enabled=yes
+  tags:
+    - run

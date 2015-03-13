@@ -2,5 +2,24 @@
 # This role installs the ZooKeeper software but does not start the server.
 # The accumulo role depends on this role for the ZooKeeper library.
 
-- name: Install zookeeper
-  yum: name=zookeeper-{{ zookeeper_version }}
+- name: Download package
+  get_url:
+    url: http://mirrors.ibiblio.org/apache/zookeeper/zookeeper-{{ zookeeper_version }}/{{ zookeeper_package }}
+    dest: "{{ company_package_dir }}/{{ zookeeper_package }}"
+  tags:
+    - image
+
+- name: Extract package
+  command: tar --no-same-owner -xzf {{ company_package_dir }}/{{ zookeeper_package }}
+      chdir={{ company_install_prefix }}
+      creates={{ zookeeper_install_dir }}
+  tags:
+    - image
+
+- name: Create symbolic link {{ zookeeper_home }} to install directory
+  file:
+    src: "{{ zookeeper_install_dir }}"
+    path: "{{ zookeeper_home }}"
+    state: link
+  tags:
+    - image

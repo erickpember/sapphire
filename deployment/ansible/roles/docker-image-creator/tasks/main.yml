@@ -35,3 +35,17 @@
       {{ company_package_dir }} &&
       touch {{ docker_image_creator_home }}/centos7-ansible-java.created
       creates={{ docker_image_creator_home }}/centos7-ansible-java.created
+
+- name: Copy ZooKeeper Dockerfile
+  template:
+    src: "{{ playbook_dir }}/roles/zookeeper-server/templates/zookeeper-Dockerfile"
+    dest: "{{ company_package_dir }}/zookeeper-Dockerfile"
+
+- name: Create ZooKeeper Docker image
+  shell: >
+      docker build
+      --file={{ company_package_dir }}/zookeeper-Dockerfile
+      --tag=datafascia/zookeeper
+      {{ company_package_dir }} &&
+      touch {{ docker_image_creator_home }}/zookeeper.created
+      creates={{ docker_image_creator_home }}/zookeeper.created

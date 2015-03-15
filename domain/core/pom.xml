@@ -37,6 +37,11 @@
     </dependency>
 
     <dependency>
+      <groupId>com.google.guava</groupId>
+      <artifactId>guava</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>com.neovisionaries</groupId>
       <artifactId>nv-i18n</artifactId>
     </dependency>

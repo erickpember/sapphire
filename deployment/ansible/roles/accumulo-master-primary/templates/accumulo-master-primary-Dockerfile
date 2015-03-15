@@ -1,0 +1,52 @@
+# Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
+# For license information, please contact http://datafascia.com/contact
+
+# Example run command:
+#
+#     docker run \
+#         --detach \
+#         --dns=172.17.42.1 \
+#         --env=ACCUMULO_MASTER_PRIMARY_HOST=master1.accumulo.local.datafascia.com \
+#         --env=ACCUMULO_MASTER_STANDBY_HOST=master2.accumulo.local.datafascia.com \
+#         --env=ACCUMULO_SLAVE_HOSTS=slave1.accumulo.local.datafascia.com \
+#         --env=ZOOKEEPER_SERVERS=zookeeper1.local.datafascia.com \
+#         --hostname=master1.accumulo.local.datafascia.com \
+#         --publish=4560:4560 \
+#         --publish=8020:8020 \
+#         --publish=9999:9999 \
+#         --publish=50070:50070 \
+#         --publish=50095:50095 \
+#         --volume=/var/dF:/var/dF \
+#         datafascia/accumulo-master-primary
+
+FROM datafascia/centos7-ansible-java:latest
+MAINTAINER devops@datafascia.com
+
+# ADD instruction also extracts recognized archive formats.
+ADD ansible.tar.gz {{ company_install_prefix }}
+
+WORKDIR {{ company_ansible_dir }}
+RUN ansible-playbook \
+        --extra-vars="environment_name=local" \
+        --inventory-file=environment/local/hosts \
+        --tags=image \
+        accumulo-master-primary.yml && \
+    rm -rf {{ company_package_dir }} && \
+    yum clean all
+
+# Accumulo monitor
+EXPOSE 4560
+
+# HDFS namenode
+EXPOSE 8020
+
+# Accumulo master
+EXPOSE 9999
+
+# HDFS namenode user interface
+EXPOSE 50070
+
+# Accumulo user interface
+EXPOSE 50095
+
+CMD ["{{ company_install_prefix }}/accumulo/run.sh"]

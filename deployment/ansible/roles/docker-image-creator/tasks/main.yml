@@ -49,3 +49,17 @@
       {{ company_package_dir }} &&
       touch {{ docker_image_creator_home }}/zookeeper.created
       creates={{ docker_image_creator_home }}/zookeeper.created
+
+- name: Copy Accumulo master primary Dockerfile
+  template:
+    src: "{{ playbook_dir }}/roles/accumulo-master-primary/templates/accumulo-master-primary-Dockerfile"
+    dest: "{{ company_package_dir }}/accumulo-master-primary-Dockerfile"
+
+- name: Create Accumulo master primary Docker image
+  shell: >
+      docker build
+      --file={{ company_package_dir }}/accumulo-master-primary-Dockerfile
+      --tag=datafascia/accumulo-master-primary
+      {{ company_package_dir }} &&
+      touch {{ docker_image_creator_home }}/accumulo-master-primary.created
+      creates={{ docker_image_creator_home }}/accumulo-master-primary.created

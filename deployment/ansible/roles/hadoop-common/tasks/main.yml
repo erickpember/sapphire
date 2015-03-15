@@ -1,6 +1,8 @@
 ---
 - name: Install Hadoop
   yum: name=hadoop-{{ hadoop_version }}
+  tags:
+    - image
 
 - name: Create {{ company_data_prefix }}/hadoop directory
   file:
@@ -9,6 +11,8 @@
     mode: 0775
     owner: root
     group: hadoop
+  tags:
+    - run
 
 - name: Copy configuration files
   template:
@@ -22,3 +26,5 @@
     - masters
     - slaves
     - yarn-site.xml
+  tags:
+    - run

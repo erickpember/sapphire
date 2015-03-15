@@ -30,7 +30,7 @@
 
   <property>
     <name>instance.zookeeper.host</name>
-    <value>{{ groups['zookeeper'] | join(',') }}</value>
+    <value>{{ ansible_env.ZOOKEEPER_SERVERS }}</value>
     <description>comma separated list of zookeeper servers</description>
   </property>
 

@@ -1,1 +1,1 @@
-{{ yarn_resourcemanager_host }}
+{{ ansible_env.ACCUMULO_MASTER_PRIMARY_HOST }}

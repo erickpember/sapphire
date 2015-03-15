@@ -1,1 +1,1 @@
-{{ groups['accumulo-master-standby'][0] }}
+{{ ansible_env.ACCUMULO_MASTER_STANDBY_HOST }}

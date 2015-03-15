@@ -21,6 +21,16 @@
   </property>
 
   <property>
+    <name>dfs.namenode.datanode.registration.ip-hostname-check</name>
+    <value>false</value>
+  </property>
+
+  <property>
+    <name>dfs.namenode.safemode.min.datanodes</name>
+    <value>1</value>
+  </property>
+
+  <property>
     <name>fs.checkpoint.dir</name>
     <value>{{ hdfs_fs_checkpoint_dir | join(',') }}</value>
   </property>

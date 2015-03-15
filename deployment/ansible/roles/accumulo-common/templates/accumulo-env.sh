@@ -40,7 +40,7 @@ fi
 # hadoop-2.0:
 test -z "$HADOOP_CONF_DIR"       && export HADOOP_CONF_DIR={{ hadoop_conf_dir }}
 
-test -z "$JAVA_HOME"             && export JAVA_HOME={{ java_home }}
+test -z "$JAVA_HOME"             && export JAVA_HOME=/usr/java/default
 test -z "$ZOOKEEPER_HOME"        && export ZOOKEEPER_HOME={{ zookeeper_home }}
 test -z "$ACCUMULO_LOG_DIR"      && export ACCUMULO_LOG_DIR={{ accumulo_log_dir }}
 if [ -f ${ACCUMULO_CONF_DIR}/accumulo.policy ]

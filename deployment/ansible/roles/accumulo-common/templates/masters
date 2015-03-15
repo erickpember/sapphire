@@ -1,3 +1,2 @@
-{% for host in groups['accumulo-master'] %}
-{{ host }}
-{% endfor %}
+{{ ansible_env.ACCUMULO_MASTER_PRIMARY_HOST }}
+{{ ansible_env.ACCUMULO_MASTER_STANDBY_HOST }}

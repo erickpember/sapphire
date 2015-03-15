@@ -21,3 +21,17 @@
 - name: Extract Ansible scripts
   command: tar --no-same-owner -xzf {{ company_package_dir }}/ansible.tar.gz
       chdir={{ docker_image_creator_home }}
+
+- name: Copy centos7-ansible-java Dockerfile
+  template:
+    src: centos7-ansible-java-Dockerfile
+    dest: "{{ company_package_dir }}/centos7-ansible-java-Dockerfile"
+
+- name: Create centos7-ansible-java base Docker image
+  shell: >
+      docker build
+      --file={{ company_package_dir }}/centos7-ansible-java-Dockerfile
+      --tag=datafascia/centos7-ansible-java
+      {{ company_package_dir }} &&
+      touch {{ docker_image_creator_home }}/centos7-ansible-java.created
+      creates={{ docker_image_creator_home }}/centos7-ansible-java.created

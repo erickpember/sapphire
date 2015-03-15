@@ -1,0 +1,18 @@
+# Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
+# For license information, please contact http://datafascia.com/contact
+
+FROM ansible/centos7-ansible:stable
+MAINTAINER devops@datafascia.com
+
+RUN yum install -y tar
+
+# ADD instruction also extracts recognized archive formats.
+ADD ansible.tar.gz {{ company_install_prefix }}
+
+WORKDIR {{ company_ansible_dir }}
+RUN ansible-playbook \
+        --extra-vars="environment_name=local" \
+        --inventory-file=environment/local/hosts \
+        --tags=image \
+        java.yml && \
+    rm -rf {{ company_ansible_dir }} {{ company_package_dir }}

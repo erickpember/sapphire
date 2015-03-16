@@ -3,8 +3,9 @@ storm_version: 0.9.3
 
 storm_package: apache-storm-{{ storm_version }}.tar.gz
 
-storm_home: "{{ company_prefix }}/storm"
-storm_local_dir: "{{ storm_home }}/local"
-storm_logs_dir: "{{ storm_home }}/logs"
+storm_home: "{{ company_install_prefix }}/storm"
+storm_data_prefix: "{{ company_data_prefix }}/storm"
+storm_local_dir: "{{ storm_data_prefix }}/local"
+storm_logs_dir: "{{ storm_data_prefix }}/logs"
 
 storm_java_opts: "-Djava.net.preferIPv4Stack=true -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath={{ storm_logs_dir }} -XX:+PrintGCDetails -XX:+PrintGCDateStamps -XX:+UseGCLogFileRotation -XX:GCLogFileSize=1m"

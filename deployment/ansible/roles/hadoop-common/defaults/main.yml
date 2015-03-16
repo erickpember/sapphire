@@ -1,5 +1,5 @@
 ---
 # variables for hdfs-site.xml
 hdfs_dfs_data_dir:
-  - "{{ company_prefix }}/hadoop/datanode"
+  - "{{ company_data_prefix }}/hadoop/datanode"
   - "{{ mnt_dir }}/hadoop/datanode"

@@ -2,9 +2,17 @@
 - name: Install Hadoop
   yum: name=hadoop-{{ hadoop_version }}
 
+- name: Create {{ company_data_prefix }}/hadoop directory
+  file:
+    path: "{{ company_data_prefix }}/hadoop"
+    state: directory
+    mode: 0775
+    owner: root
+    group: hadoop
+
 - name: Copy configuration files
   template:
-      src=roles/hadoop-common/templates/{{ item }}
+      src={{ item }}
       dest={{ hadoop_conf_dir }}/{{ item }}
       mode=664
   with_items:
@@ -14,14 +22,3 @@
     - masters
     - slaves
     - yarn-site.xml
-
-- name: Create work directories
-  file:
-      path={{ item }}
-      state=directory
-      owner=root
-      group=hadoop
-      mode=775
-  with_items:
-    - "{{ company_prefix }}/hadoop"
-    - "{{ hadoop_log_dir }}"

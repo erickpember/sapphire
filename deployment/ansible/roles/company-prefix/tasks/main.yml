@@ -9,16 +9,16 @@
   stat: path={{ ephemeral_dir }}
   register: ephemeral_stat
 
-- name: Create {{ company_prefix }} directory
+- name: Create {{ company_data_prefix }} directory
   file:
-    path: "{{ company_prefix }}"
+    path: "{{ company_data_prefix }}"
     state: directory
     mode: 0755
   when: ephemeral_stat.stat.exists == False
 
-- name: Create symbolic link {{ company_prefix }} to {{ ephemeral_dir }}
+- name: Create symbolic link {{ company_data_prefix }} to {{ ephemeral_dir }}
   file:
     src: "{{ ephemeral_dir }}"
-    path: "{{ company_prefix }}"
+    path: "{{ company_data_prefix }}"
     state: link
   when: ephemeral_stat.stat.exists == True

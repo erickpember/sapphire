@@ -2,10 +2,10 @@
 - name: Download Logstash package
   get_url:
       url=https://download.elasticsearch.org/logstash/logstash/packages/centos/{{ logstash_package }}
-      dest={{ company_prefix }}/{{ logstash_package }}
+      dest={{ company_package_dir }}/{{ logstash_package }}
 
 - name: Install Logstash
-  command: rpm --install {{ company_prefix }}/{{ logstash_package }}
+  command: rpm --install {{ company_package_dir }}/{{ logstash_package }}
       creates=/etc/logstash
 
 - name: Start Logstash

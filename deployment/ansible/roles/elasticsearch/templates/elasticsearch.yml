@@ -14,7 +14,7 @@ discovery.zen.ping.unicast.hosts:
 
 # Cluster name identifies your cluster for auto-discovery. If you're running
 # multiple clusters on the same network, make sure you're using unique names.
-cluster.name: refinery1
+cluster.name: search1
 
 gateway.expected_nodes: {{ groups['elasticsearch'] | length }}
 gateway.recover_after_nodes: {{ elasticsearch_minimum_master_nodes }}
@@ -27,10 +27,10 @@ node.name: {{ inventory_hostname }}
 path.data: {{ elasticsearch_data_dir | join(',') }}
 
 # Path to log files
-path.logs: {{ elasticsearch_home }}/logs
+path.logs: {{ elasticsearch_data_prefix }}/logs
 
 # Path to where plugins are installed
 path.plugins: {{ elasticsearch_home }}/plugins
 
 # Path to temporary files
-path.work: {{ elasticsearch_home }}/work
+path.work: {{ elasticsearch_data_prefix }}/work

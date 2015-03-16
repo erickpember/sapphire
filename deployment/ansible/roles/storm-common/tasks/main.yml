@@ -2,16 +2,16 @@
 - name: Download Storm archive
   get_url:
       url=http://mirrors.ibiblio.org/apache/storm/apache-storm-{{ storm_version }}/{{ storm_package }}
-      dest={{ company_prefix }}/{{ storm_package }}
+      dest={{ company_package_dir }}/{{ storm_package }}
 
 - name: Extract Storm archive
-  command: tar xzf {{ company_prefix }}/{{ storm_package }}
-      chdir={{ company_prefix }}
-      creates={{ company_prefix }}/apache-storm-{{ storm_version }}
+  command: tar xzf {{ company_package_dir }}/{{ storm_package }}
+      chdir={{ company_install_prefix }}
+      creates={{ company_install_prefix }}/apache-storm-{{ storm_version }}
 
 - name: Create symbolic link to Storm install
   file:
-      src={{ company_prefix }}/apache-storm-{{ storm_version }}
+      src={{ company_install_prefix }}/apache-storm-{{ storm_version }}
       path={{ storm_home }}
       state=link
 

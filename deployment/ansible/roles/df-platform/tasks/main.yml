@@ -5,8 +5,8 @@
 
 - name: Copy application package
   copy:
-      src={{ inventory_dir }}/../../../../shell/target/{{ df_platform_package }}
-      dest={{ company_prefix }}/{{ df_platform_package }}
+      src={{ playbook_dir }}/../../shell/target/{{ df_platform_package }}
+      dest={{ company_package_dir }}/{{ df_platform_package }}
 
 - name: Remove previous application install
   command: rm -rf {{ df_platform_install_dir }}.previous
@@ -17,8 +17,8 @@
   ignore_errors: True
 
 - name: Extract application package
-  command: tar xzf {{ company_prefix }}/{{ df_platform_package }}
-      chdir={{ company_prefix }}
+  command: tar xzf {{ company_package_dir }}/{{ df_platform_package }}
+      chdir={{ company_install_prefix }}
 
 - name: Create symbolic link to application install
   file:

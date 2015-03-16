@@ -1,13 +1,16 @@
 ---
 # We allow RPM to install software to directories chosen by the packages.
 # Software not installed by RPM will be installed under this directory.
-company_prefix: /datafascia
+company_install_prefix: /opt/dF
 
 # downloaded packages directory
-company_package_dir: "{{ company_prefix }}/package"
+company_package_dir: "{{ company_install_prefix }}/package"
 
 # Ansible scripts directory inside Docker image
-company_ansible_dir: "{{ company_prefix }}/ansible"
+company_ansible_dir: "{{ company_install_prefix }}/ansible"
+
+# parent directory for storing data
+company_data_prefix: /var/dF
 
 # mount point of EC2 ephemeral store
 ephemeral_dir: /media/ephemeral0

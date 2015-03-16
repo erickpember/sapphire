@@ -9,15 +9,12 @@ hdfs_fs_defaultfs_port: 8020
 
 # variables for hdfs-site.xml
 hdfs_dfs_name_dir:
-  - "{{ company_prefix }}/hadoop/namenode"
+  - "{{ company_data_prefix }}/hadoop/namenode"
 hdfs_fs_checkpoint_dir:
-  - "{{ company_prefix }}/hadoop/checkpoint"
-
-# variables for log4j.properties
-hadoop_log_dir: "{{ company_prefix }}/hadoop/logs"
+  - "{{ company_data_prefix }}/hadoop/checkpoint"
 
 # variables for yarn-site.xml
 yarn_nodemanager_local_dir:
-  - "{{ company_prefix }}/hadoop/nodemanager/local"
+  - "{{ company_data_prefix }}/hadoop/nodemanager/local"
 yarn_nodemanager_log_dir:
-  - "{{ company_prefix }}/hadoop/nodemanager/log"
+  - "{{ company_data_prefix }}/hadoop/nodemanager/log"

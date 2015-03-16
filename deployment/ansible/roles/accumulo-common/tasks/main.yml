@@ -2,11 +2,11 @@
 - name: Download Accumulo package
   get_url:
       url=http://mirrors.ibiblio.org/apache/accumulo/{{ accumulo_version }}/{{ accumulo_package }}
-      dest={{ company_prefix }}/{{ accumulo_package }}
+      dest={{ company_package_dir }}/{{ accumulo_package }}
 
 - name: Extract Accumulo
-  command: tar xzf {{ company_prefix }}/{{ accumulo_package }}
-      chdir={{ company_prefix }}
+  command: tar xzf {{ company_package_dir }}/{{ accumulo_package }}
+      chdir={{ company_install_prefix }}
       creates={{ accumulo_install_dir }}
 
 - name: Create symbolic link {{ accumulo_home }} to install directory

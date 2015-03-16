@@ -11,10 +11,10 @@
 - name: Download Kibana package
   get_url:
       url=https://download.elasticsearch.org/kibana/kibana/{{ kibana_package }}
-      dest={{ company_prefix }}/{{ kibana_package }}
+      dest={{ company_package_dir }}/{{ kibana_package }}
 
 - name: Extract Kibana
-  command: tar xzf {{ company_prefix }}/{{ kibana_package }}
+  command: tar xzf {{ company_package_dir }}/{{ kibana_package }}
       chdir={{ nginx_document_root_dir }}
       creates={{ kibana_install_dir }}
 

@@ -1,0 +1,48 @@
+# Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
+# For license information, please contact http://datafascia.com/contact
+
+# Example run command:
+#
+#     docker run \
+#         --detach \
+#         --dns=172.17.42.1 \
+#         --env=ACCUMULO_MASTER_PRIMARY_HOST=master1.accumulo.local.datafascia.com \
+#         --env=ACCUMULO_MASTER_STANDBY_HOST=master2.accumulo.local.datafascia.com \
+#         --env=ACCUMULO_SLAVE_HOSTS=slave1.accumulo.local.datafascia.com \
+#         --env=ZOOKEEPER_SERVERS=zookeeper1.local.datafascia.com \
+#         --hostname=slave1.accumulo.local.datafascia.com \
+#         --publish=9997:9997 \
+#         --publish=50010:50010 \
+#         --publish=50020:50020 \
+#         --publish=50075:50075 \
+#         --volume=/var/dF:/var/dF \
+#         datafascia/accumulo-slave
+
+FROM datafascia/centos7-ansible-java:latest
+MAINTAINER devops@datafascia.com
+
+# ADD instruction also extracts recognized archive formats.
+ADD ansible.tar.gz {{ company_install_prefix }}
+
+WORKDIR {{ company_ansible_dir }}
+RUN ansible-playbook \
+        --extra-vars="environment_name=local" \
+        --inventory-file=environment/local/hosts \
+        --tags=image \
+        accumulo-slave.yml && \
+    rm -rf {{ company_package_dir }} && \
+    yum clean all
+
+# Accumulo tablet
+EXPOSE 9997
+
+# HDFS datanode data transfer
+EXPOSE 50010
+
+# HDFS datanode metadata operations
+EXPOSE 50020
+
+# HDFS datanode user interface
+EXPOSE 50075
+
+CMD ["{{ company_install_prefix }}/accumulo/run.sh"]

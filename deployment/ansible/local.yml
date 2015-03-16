@@ -5,3 +5,4 @@
     - environment/{{ environment_name }}/vars.yml
   roles:
     - docker-image-creator
+    - docker-runner

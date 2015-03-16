@@ -1,20 +1,22 @@
-[accumulo-master]
-devbox
+default ansible_ssh_host=192.168.222.222 ansible_ssh_port=22
+
+[accumulo-master-primary]
+master1.accumulo.local.datafascia.com
 
 [accumulo-master-standby]
-devbox
+master2.accumulo.local.datafascia.com
 
 [accumulo-slave]
-devbox
-
-[default]
-devbox ansible_ssh_host=192.168.222.222 ansible_ssh_port=22
+slave1.accumulo.local.datafascia.com
 
 [kafka]
-devbox kafka_broker_id=0
+kafka1.local.datafascia.com kafka_broker_id=0
 
-[log-database]
-devbox
+[storm-nimbus]
+nimbus.storm.local.datafascia.com
+
+[storm-supervisor]
+supervisor1.storm.local.datafascia.com
 
 [zookeeper]
-devbox zoo_id=1
+zookeeper1.local.datafascia.com zookeeper_server_id=1

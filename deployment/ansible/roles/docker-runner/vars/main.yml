@@ -1,0 +1,6 @@
+---
+docker_run_command: "{{ company_install_prefix }}/docker-run.sh"
+
+docker_run_options: --dns=172.17.42.1
+
+dnsmasq_conf_dir: /etc/dnsmasq.d

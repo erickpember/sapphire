@@ -1,0 +1,33 @@
+---
+- name: Install dnsmasq
+  yum: name=dnsmasq
+
+- name: Create {{ company_data_prefix }} directory
+  file:
+    path: "{{ company_data_prefix }}"
+    state: directory
+    mode: 0755
+
+- name: Copy Docker run script
+  template:
+    src: docker-run.sh
+    dest: "{{ docker_run_command }}"
+    mode: 0755
+
+- name: List Docker containers
+  shell: docker ps | awk '{ print $2 }'
+  register: list_containers
+
+- name: Run ZooKeeper
+  command: >
+      {{ docker_run_command }}
+          {{ groups['zookeeper'][0] }}
+          --detach
+          --env=ZOOKEEPER_SERVERS={{ groups['zookeeper'] | join(',') }}
+          --env=ZOOKEEPER_SERVER_ID={{ hostvars[groups['zookeeper'][0]]['zookeeper_server_id'] }}
+          --publish=2181:2181
+          --publish=2888:2888
+          --publish=3888:3888
+          --volume={{ company_data_prefix }}:{{ company_data_prefix }}
+          datafascia/zookeeper
+  when: "'datafascia/zookeeper:latest' not in list_containers.stdout_lines"

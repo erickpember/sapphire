@@ -12,5 +12,6 @@ Vagrant.configure('2') do |config|
     ansible.extra_vars = { environment_name: 'local' }
     ansible.inventory_path = 'ansible/environment/local/hosts'
     ansible.playbook = 'ansible/local.yml'
+    ansible.skip_tags = ['image', 'run']
   end
 end

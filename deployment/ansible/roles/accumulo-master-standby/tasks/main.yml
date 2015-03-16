@@ -1,0 +1,8 @@
+---
+- name: Copy run script
+  template:
+    src: run.sh
+    dest: "{{ accumulo_home }}/run.sh"
+    mode: 0755
+  tags:
+    - image

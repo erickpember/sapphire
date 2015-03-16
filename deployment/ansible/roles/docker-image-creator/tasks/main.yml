@@ -63,3 +63,17 @@
       {{ company_package_dir }} &&
       touch {{ docker_image_creator_home }}/accumulo-master-primary.created
       creates={{ docker_image_creator_home }}/accumulo-master-primary.created
+
+- name: Copy Accumulo master standby Dockerfile
+  template:
+    src: "{{ playbook_dir }}/roles/accumulo-master-standby/templates/accumulo-master-standby-Dockerfile"
+    dest: "{{ company_package_dir }}/accumulo-master-standby-Dockerfile"
+
+- name: Create Accumulo master standby Docker image
+  shell: >
+      docker build
+      --file={{ company_package_dir }}/accumulo-master-standby-Dockerfile
+      --tag=datafascia/accumulo-master-standby
+      {{ company_package_dir }} &&
+      touch {{ docker_image_creator_home }}/accumulo-master-standby.created
+      creates={{ docker_image_creator_home }}/accumulo-master-standby.created

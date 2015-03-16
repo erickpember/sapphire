@@ -1,0 +1,48 @@
+# Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
+# For license information, please contact http://datafascia.com/contact
+
+# Example run command:
+#
+#     docker run \
+#         --detach \
+#         --dns=172.17.42.1 \
+#         --env=ACCUMULO_MASTER_PRIMARY_HOST=master1.accumulo.local.datafascia.com \
+#         --env=ACCUMULO_MASTER_STANDBY_HOST=master2.accumulo.local.datafascia.com \
+#         --env=ACCUMULO_SLAVE_HOSTS=slave1.accumulo.local.datafascia.com \
+#         --env=ZOOKEEPER_SERVERS=zookeeper1.local.datafascia.com \
+#         --hostname=master2.accumulo.local.datafascia.com \
+#         --publish=9999:9999 \
+#         --publish=12234:12234 \
+#         --publish=50090:50090 \
+#         --publish=50091:50091 \
+#         --volume=/var/dF:/var/dF \
+#         datafascia/accumulo-master-standby
+
+FROM datafascia/centos7-ansible-java:latest
+MAINTAINER devops@datafascia.com
+
+# ADD instruction also extracts recognized archive formats.
+ADD ansible.tar.gz {{ company_install_prefix }}
+
+WORKDIR {{ company_ansible_dir }}
+RUN ansible-playbook \
+        --extra-vars="environment_name=local" \
+        --inventory-file=environment/local/hosts \
+        --tags=image \
+        accumulo-master-standby.yml && \
+    rm -rf {{ company_package_dir }} && \
+    yum clean all
+
+# Accumulo master
+EXPOSE 9999
+
+# Accumulo tracer
+EXPOSE 12234
+
+# HDFS secondary namenode
+EXPOSE 50090
+
+# Accumulo garbage collector
+EXPOSE 50091
+
+CMD ["{{ company_install_prefix }}/accumulo/run.sh"]

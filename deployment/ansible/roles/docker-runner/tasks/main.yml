@@ -157,3 +157,14 @@
           --volume={{ company_data_prefix }}:{{ company_data_prefix }}
           datafascia/storm-nimbus
   when: "'datafascia/storm-nimbus:latest' not in list_containers.stdout_lines"
+
+- name: Run Storm supervisor
+  command: >
+      {{ docker_run_command }}
+          {{ groups['storm-supervisor'][0] }}
+          --detach
+          --env=STORM_NIMBUS_HOST={{ groups['storm-nimbus'][0] }}
+          --env=ZOOKEEPER_SERVERS={{ groups['zookeeper'] | join(',') }}
+          --volume={{ company_data_prefix }}:{{ company_data_prefix }}
+          datafascia/storm-supervisor
+  when: "'datafascia/storm-supervisor:latest' not in list_containers.stdout_lines"

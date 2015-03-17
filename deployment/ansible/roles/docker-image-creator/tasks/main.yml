@@ -91,3 +91,17 @@
       {{ company_package_dir }} &&
       touch {{ docker_image_creator_home }}/accumulo-slave.created
       creates={{ docker_image_creator_home }}/accumulo-slave.created
+
+- name: Copy Kafka Dockerfile
+  template:
+    src: "{{ playbook_dir }}/roles/kafka/templates/kafka-Dockerfile"
+    dest: "{{ company_package_dir }}/kafka-Dockerfile"
+
+- name: Create Kafka Docker image
+  shell: >
+      docker build
+      --file={{ company_package_dir }}/kafka-Dockerfile
+      --tag=datafascia/kafka
+      {{ company_package_dir }} &&
+      touch {{ docker_image_creator_home }}/kafka.created
+      creates={{ docker_image_creator_home }}/kafka.created

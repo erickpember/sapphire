@@ -3,41 +3,47 @@
   get_url:
       url=http://mirrors.ibiblio.org/apache/kafka/{{ kafka_version }}/{{ kafka_package }}
       dest={{ company_package_dir }}/{{ kafka_package }}
+  tags:
+    - image
 
 - name: Extract Kafka
-  command: tar xzf {{ company_package_dir }}/{{ kafka_package }}
+  command: tar --no-same-owner -xzf {{ company_package_dir }}/{{ kafka_package }}
       chdir={{ company_install_prefix }}
       creates={{ kafka_install_dir }}
+  tags:
+    - image
 
 - name: Create symbolic link {{ kafka_home }} to install directory
   file:
       src={{ kafka_install_dir }}
       path={{ kafka_home }}
       state=link
+  tags:
+    - image
 
-- name: Create directories
+- name: Copy run script
+  template:
+    src: run.sh
+    dest: "{{ kafka_home }}/run.sh"
+    mode: 0755
+  tags:
+    - image
+
+- name: Create data directories
   file:
       path={{ item }}
       state=directory
       mode=755
   with_items:
     - "{{ kafka_data_dir }}"
-    - "{{ kafka_logs_dir }}"
+    - "{{ kafka_log_dir }}"
+  tags:
+    - run
 
-- name: Copy configuration files
+- name: Copy configuration file
   template:
-      src={{ item }}
-      dest={{ kafka_home }}/config/{{ item }}
+      src=server.properties
+      dest={{ kafka_home }}/config/server.properties
       mode=755
-  with_items:
-    - log4j.properties
-    - server.properties
-
-- name: Copy Upstart configuration file
-  template:
-      src=kafka.conf
-      dest=/etc/init/kafka.conf
-
-- name: Start Kafka
-  command: /sbin/initctl start kafka
-  ignore_errors: True
+  tags:
+    - run

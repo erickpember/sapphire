@@ -31,3 +31,103 @@
           --volume={{ company_data_prefix }}:{{ company_data_prefix }}
           datafascia/zookeeper
   when: "'datafascia/zookeeper:latest' not in list_containers.stdout_lines"
+
+- name: Set vm.swappiness to Accumulo recommended value
+  sysctl:
+    name: vm.swappiness
+    value: 0
+
+- name: Run Accumulo master primary container
+  command: >
+      {{ docker_run_command }}
+          {{ groups['accumulo-master-primary'][0] }}
+          --detach
+          --env=ACCUMULO_MASTER_PRIMARY_HOST={{ groups['accumulo-master-primary'][0] }}
+          --env=ACCUMULO_MASTER_STANDBY_HOST={{ groups['accumulo-master-standby'][0] }}
+          --env=ACCUMULO_SLAVE_HOSTS={{ groups['accumulo-slave'] | join(',') }}
+          --env=ZOOKEEPER_SERVERS={{ groups['zookeeper'] | join(',') }}
+          --hostname={{ groups['accumulo-master-primary'][0] }}
+          --publish=4560:4560
+          --publish=8020:8020
+          --publish=9999:9999
+          --publish=50070:50070
+          --publish=50095:50095
+          --volume={{ company_data_prefix }}:{{ company_data_prefix }}
+          datafascia/accumulo-master-primary
+  when: "'datafascia/accumulo-master-primary:latest' not in list_containers.stdout_lines"
+
+- name: Run Accumulo master standby container
+  command: >
+      {{ docker_run_command }}
+          {{ groups['accumulo-master-standby'][0] }}
+          --detach
+          --env=ACCUMULO_MASTER_PRIMARY_HOST={{ groups['accumulo-master-primary'][0] }}
+          --env=ACCUMULO_MASTER_STANDBY_HOST={{ groups['accumulo-master-standby'][0] }}
+          --env=ACCUMULO_SLAVE_HOSTS={{ groups['accumulo-slave'] | join(',') }}
+          --env=ZOOKEEPER_SERVERS={{ groups['zookeeper'] | join(',') }}
+          --hostname={{ groups['accumulo-master-standby'][0] }}
+          --publish=12234:12234
+          --publish=50090:50090
+          --publish=50091:50091
+          --volume={{ company_data_prefix }}:{{ company_data_prefix }}
+          datafascia/accumulo-master-standby
+  when: "'datafascia/accumulo-master-standby:latest' not in list_containers.stdout_lines"
+
+- name: Run Accumulo slave container
+  command: >
+      {{ docker_run_command }}
+          {{ groups['accumulo-slave'][0] }}
+          --detach
+          --env=ACCUMULO_MASTER_PRIMARY_HOST={{ groups['accumulo-master-primary'][0] }}
+          --env=ACCUMULO_MASTER_STANDBY_HOST={{ groups['accumulo-master-standby'][0] }}
+          --env=ACCUMULO_SLAVE_HOSTS={{ groups['accumulo-slave'] | join(',') }}
+          --env=ZOOKEEPER_SERVERS={{ groups['zookeeper'] | join(',') }}
+          --hostname={{ groups['accumulo-slave'][0] }}
+          --publish=9997:9997
+          --publish=50010:50010
+          --publish=50020:50020
+          --publish=50075:50075
+          --volume={{ company_data_prefix }}:{{ company_data_prefix }}
+          datafascia/accumulo-slave
+  when: "'datafascia/accumulo-slave:latest' not in list_containers.stdout_lines"
+
+- name: Wait for HDFS namenode to start
+  command: >
+      docker exec {{ groups['accumulo-master-primary'][0] }}
+      ansible localhost
+      --connection=local
+      --module-name=wait_for
+      --args="host={{ groups['accumulo-master-primary'][0] }} port=8020 timeout=30"
+  when: "'datafascia/accumulo-master-primary:latest' not in list_containers.stdout_lines"
+
+- name: Wait for HDFS to become available
+  command: >
+      docker exec {{ groups['accumulo-master-primary'][0] }}
+      su hdfs -c "hdfs dfsadmin -safemode wait"
+  when: "'datafascia/accumulo-master-primary:latest' not in list_containers.stdout_lines"
+
+- name: Initialize Accumulo instance
+  shell: >
+      docker exec {{ groups['accumulo-master-primary'][0] }}
+      su hdfs -c "{{ accumulo_home }}/bin/accumulo init --clear-instance-name --instance-name {{ accumulo_instance }} --password {{ accumulo_password }}" &&
+      touch {{ accumulo_data_prefix }}/instance.initialized
+      creates={{ accumulo_data_prefix }}/instance.initialized
+  when: "'datafascia/accumulo-master-primary:latest' not in list_containers.stdout_lines"
+
+- name: Start Accumulo master primary
+  command: >
+      docker exec {{ groups['accumulo-master-primary'][0] }}
+      su hdfs -c "{{ accumulo_home }}/bin/start-here.sh"
+  when: "'datafascia/accumulo-master-primary:latest' not in list_containers.stdout_lines"
+
+- name: Start Accumulo master standby
+  command: >
+      docker exec {{ groups['accumulo-master-standby'][0] }}
+      su hdfs -c "{{ accumulo_home }}/bin/start-here.sh"
+  when: "'datafascia/accumulo-master-standby:latest' not in list_containers.stdout_lines"
+
+- name: Start Accumulo slave
+  command: >
+      docker exec {{ groups['accumulo-slave'][0] }}
+      su hdfs -c "{{ accumulo_home }}/bin/start-here.sh"
+  when: "'datafascia/accumulo-slave:latest' not in list_containers.stdout_lines"

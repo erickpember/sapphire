@@ -131,3 +131,16 @@
       docker exec {{ groups['accumulo-slave'][0] }}
       su hdfs -c "{{ accumulo_home }}/bin/start-here.sh"
   when: "'datafascia/accumulo-slave:latest' not in list_containers.stdout_lines"
+
+- name: Run Kafka
+  command: >
+      {{ docker_run_command }}
+          {{ groups['kafka'][0] }}
+          --detach
+          --env=KAFKA_ADVERTISED_HOST={{ groups['kafka'][0] }}
+          --env=KAFKA_BROKER_ID={{ hostvars[groups['kafka'][0]]['kafka_broker_id'] }}
+          --env=ZOOKEEPER_SERVERS={{ groups['zookeeper'] | join(',') }}
+          --publish=9092:9092
+          --volume={{ company_data_prefix }}:{{ company_data_prefix }}
+          datafascia/kafka
+  when: "'datafascia/kafka:latest' not in list_containers.stdout_lines"

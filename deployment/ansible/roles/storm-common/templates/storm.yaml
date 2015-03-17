@@ -1,28 +1,23 @@
 ---
-java.library.path: "/usr/lib64:/usr/lib"
+storm.local.dir: {{ storm_local_dir }}
+
+storm.log.dir: {{ storm_log_dir }}
 
 storm.zookeeper.servers:
-{% for host in groups['zookeeper'] %}
+{% for host in ansible_env.ZOOKEEPER_SERVERS.split(',') %}
   - {{ host }}
 {% endfor %}
 
-storm.zookeeper.root: "/storm{{ storm_cluster_id }}"
+nimbus.host: {{ ansible_env.STORM_NIMBUS_HOST }}
 
-nimbus.host: {{ storm_nimbus_host }}
-nimbus.childopts: "-Xmx1g {{ storm_java_opts }} -Xloggc:{{ storm_logs_dir }}/gc-nimbus.log"
+nimbus.childopts: "-Xmx1g {{ storm_java_opts }} -Xloggc:{{ storm_log_dir }}/gc-nimbus.log"
 
-ui.childopts: "-Xmx768m {{ storm_java_opts }} -Xloggc:{{ storm_logs_dir }}/gc-ui.log"
+ui.childopts: "-Xmx768m {{ storm_java_opts }} -Xloggc:{{ storm_log_dir }}/gc-ui.log"
 
-supervisor.childopts: "-Xmx256m {{ storm_java_opts }} -Xloggc:{{ storm_logs_dir }}/gc-supervisor.log"
-worker.childopts: "-Xmx1g -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=75 {{ storm_java_opts }} -Xloggc:{{ storm_logs_dir }}/gc-worker.log"
+supervisor.childopts: "-Xmx256m {{ storm_java_opts }} -Xloggc:{{ storm_log_dir }}/gc-supervisor.log"
+
+worker.childopts: "-Xmx1g -XX:+UseParNewGC -XX:+UseConcMarkSweepGC -XX:CMSInitiatingOccupancyFraction=75 {{ storm_java_opts }} -Xloggc:{{ storm_log_dir }}/gc-worker.log"
 
 supervisor.slots.ports:
   - 6700
   - 6701
-
-storm.local.dir: {{ storm_local_dir }}
-
-drpc.servers:
-{% for server in storm_drpc_servers %}
-  - {{ server }}
-{% endfor %}

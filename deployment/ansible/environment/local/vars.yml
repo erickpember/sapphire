@@ -11,8 +11,6 @@ hdfs_namenode_host: localhost
 
 log_host: localhost
 
-storm_cluster_id: 1
-
 storm_drpc_servers:
   - localhost
 

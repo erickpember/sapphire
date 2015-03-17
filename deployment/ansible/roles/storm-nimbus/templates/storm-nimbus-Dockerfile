@@ -1,0 +1,37 @@
+# Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
+# For license information, please contact http://datafascia.com/contact
+
+# Example run command:
+#
+#     docker run \
+#         --detach \
+#         --dns=172.17.42.1 \
+#         --env=STORM_NIMBUS_HOST=nimbus.storm.local.datafascia.com \
+#         --env=ZOOKEEPER_SERVERS=zookeeper1.local.datafascia.com \
+#         --publish=6627:6627 \
+#         --publish=8080:8080 \
+#         --volume=/var/dF:/var/dF \
+#         datafascia/storm-nimbus
+
+FROM datafascia/centos7-ansible-java:latest
+MAINTAINER devops@datafascia.com
+
+# ADD instruction also extracts recognized archive formats.
+ADD ansible.tar.gz {{ company_install_prefix }}
+
+WORKDIR {{ company_ansible_dir }}
+RUN ansible-playbook \
+        --extra-vars="environment_name=local" \
+        --inventory-file=environment/local/hosts \
+        --tags=image \
+        storm-nimbus.yml && \
+    rm -rf {{ company_package_dir }} && \
+    yum clean all
+
+# Storm nimbus Thrift
+EXPOSE 6627
+
+# Storm user interface
+EXPOSE 8080
+
+CMD ["{{ company_install_prefix }}/storm/run.sh"]

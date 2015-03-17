@@ -3,29 +3,23 @@
   get_url:
       url=http://mirrors.ibiblio.org/apache/storm/apache-storm-{{ storm_version }}/{{ storm_package }}
       dest={{ company_package_dir }}/{{ storm_package }}
+  tags:
+    - image
 
 - name: Extract Storm archive
-  command: tar xzf {{ company_package_dir }}/{{ storm_package }}
+  command: tar --no-same-owner -xzf {{ company_package_dir }}/{{ storm_package }}
       chdir={{ company_install_prefix }}
       creates={{ company_install_prefix }}/apache-storm-{{ storm_version }}
+  tags:
+    - image
 
 - name: Create symbolic link to Storm install
   file:
       src={{ company_install_prefix }}/apache-storm-{{ storm_version }}
       path={{ storm_home }}
       state=link
-
-- name: Create local working directory
-  file:
-      path={{ storm_local_dir }}
-      state=directory
-      mode=755
-
-- name: Copy Storm configuration file
-  template:
-      src=storm.yaml
-      dest={{ storm_home }}/conf/storm.yaml
-      mode=644
+  tags:
+    - image
 
 - name: Download Jackson JAR files
   get_artifact:
@@ -39,6 +33,8 @@
     - jackson-annotations
     - jackson-core
     - jackson-databind
+  tags:
+    - image
 
 - name: Download logback-gelf JAR file
   get_artifact:
@@ -48,9 +44,32 @@
       version={{ logback_gelf_version }}
       packaging=jar
       dest={{ storm_home }}/lib/logback-gelf-{{ logback_gelf_version }}.jar
+  tags:
+    - image
 
 - name: Copy logback configuration file
   template:
       src=cluster.xml
       dest={{ storm_home }}/logback/cluster.xml
       mode=644
+  tags:
+    - image
+
+- name: Create data directories
+  file:
+      path={{ item }}
+      state=directory
+      mode=755
+  with_items:
+    - "{{ storm_local_dir }}"
+    - "{{ storm_log_dir }}"
+  tags:
+    - run
+
+- name: Copy Storm configuration file
+  template:
+      src=storm.yaml
+      dest={{ storm_home }}/conf/storm.yaml
+      mode=644
+  tags:
+    - run

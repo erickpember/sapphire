@@ -1,18 +1,8 @@
 ---
-- name: Copy storm-nimbus Upstart configuration file
+- name: Copy run script
   template:
-      src=storm-nimbus.conf
-      dest=/etc/init/storm-nimbus.conf
-
-- name: Start storm-nimbus
-  command: /sbin/initctl start storm-nimbus
-  ignore_errors: True
-
-- name: Copy storm-ui Upstart configuration file
-  template:
-      src=storm-ui.conf
-      dest=/etc/init/storm-ui.conf
-
-- name: Start storm-ui
-  command: /sbin/initctl start storm-ui
-  ignore_errors: True
+    src: run.sh
+    dest: "{{ storm_home }}/run.sh"
+    mode: 0755
+  tags:
+    - image

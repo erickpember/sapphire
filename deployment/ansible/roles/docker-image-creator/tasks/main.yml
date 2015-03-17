@@ -119,3 +119,17 @@
       {{ company_package_dir }} &&
       touch {{ docker_image_creator_home }}/storm-nimbus.created
       creates={{ docker_image_creator_home }}/storm-nimbus.created
+
+- name: Copy Storm supervisor Dockerfile
+  template:
+    src: "{{ playbook_dir }}/roles/storm-supervisor/templates/storm-supervisor-Dockerfile"
+    dest: "{{ company_package_dir }}/storm-supervisor-Dockerfile"
+
+- name: Create Storm supervisor Docker image
+  shell: >
+      docker build
+      --file={{ company_package_dir }}/storm-supervisor-Dockerfile
+      --tag=datafascia/storm-supervisor
+      {{ company_package_dir }} &&
+      touch {{ docker_image_creator_home }}/storm-supervisor.created
+      creates={{ docker_image_creator_home }}/storm-supervisor.created

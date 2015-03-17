@@ -1,0 +1,29 @@
+# Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
+# For license information, please contact http://datafascia.com/contact
+
+# Example run command:
+#
+#     docker run \
+#         --detach \
+#         --dns=172.17.42.1 \
+#         --env=STORM_NIMBUS_HOST=nimbus.storm.local.datafascia.com \
+#         --env=ZOOKEEPER_SERVERS=zookeeper1.local.datafascia.com \
+#         --volume=/var/dF:/var/dF \
+#         datafascia/storm-supervisor
+
+FROM datafascia/centos7-ansible-java:latest
+MAINTAINER devops@datafascia.com
+
+# ADD instruction also extracts recognized archive formats.
+ADD ansible.tar.gz {{ company_install_prefix }}
+
+WORKDIR {{ company_ansible_dir }}
+RUN ansible-playbook \
+        --extra-vars="environment_name=local" \
+        --inventory-file=environment/local/hosts \
+        --tags=image \
+        storm-supervisor.yml && \
+    rm -rf {{ company_package_dir }} && \
+    yum clean all
+
+CMD ["{{ company_install_prefix }}/storm/run.sh"]

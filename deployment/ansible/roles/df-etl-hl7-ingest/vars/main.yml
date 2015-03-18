@@ -1,0 +1,4 @@
+---
+df_platform_package: df-shell-{{ df_platform_version }}-bin.tar.gz
+df_platform_install_dir: "{{ company_install_prefix }}/df-shell-{{ df_platform_version }}"
+df_platform_home: "{{ company_install_prefix }}/df-platform"

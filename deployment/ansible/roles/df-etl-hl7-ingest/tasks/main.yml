@@ -1,0 +1,22 @@
+---
+- name: Extract application package
+  command: tar --no-same-owner -xzf {{ company_package_dir }}/{{ df_platform_package }}
+      chdir={{ company_install_prefix }}
+  tags:
+    - image
+
+- name: Create symbolic link to application install
+  file:
+    path: "{{ df_platform_home }}"
+    src: "{{ df_platform_install_dir }}"
+    state: link
+  tags:
+    - image
+
+- name: Copy run script
+  template:
+    src: run.sh
+    dest: "{{ df_platform_home }}/run.sh"
+    mode: 0755
+  tags:
+    - image

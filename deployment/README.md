@@ -14,12 +14,18 @@ machine.
 
 ## Installation
 
+* Edit the default IP (192.168.222.222) address for the virtual machine if there is a clash with
+  the host IP address. This will need to be changed in two places:
+
+    ansible/environment/local/hosts
+    Vagrantfile
+
 * Run the command `vagrant up` from the directory where this README.md file is
   located. This should finish after many minutes.
 
 * On the host machine, add this line to the `/etc/hosts` file:
 
-    192.168.222.222 devbox
+    <192.168.222.222 or your own IP address> devbox
 
   This enables applications running on the host machine to connect to Accumulo
   by using that name.

@@ -7,14 +7,14 @@ ProcessEventTopology:
 
 accumulo:
   instance: operational
-  zooKeepers: devbox
+  zooKeepers: zookeeper1.local.datafascia.com
   user: root
   password: secret
 
 eventQueue:
-  kafkaBrokers: "devbox:9092"
+  kafkaBrokers: "kafka1.local.datafascia.com:9092"
   topic: event
 
 hl7MessageQueue:
-  kafkaBrokers: "devbox:9092"
+  kafkaBrokers: "kafka1.local.datafascia.com:9092"
   topic: hl7Message

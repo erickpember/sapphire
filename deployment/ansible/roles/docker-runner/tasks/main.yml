@@ -179,3 +179,15 @@
           --volume={{ company_data_prefix }}:{{ company_data_prefix }}
           datafascia/df-etl-hl7-ingest
   when: "'datafascia/df-etl-hl7-ingest:latest' not in list_containers.stdout_lines"
+
+- name: Run df-api-server
+  command: >
+      {{ docker_run_command }}
+          api1.local.datafascia.com
+          --detach
+          --env=ZOOKEEPER_SERVERS={{ groups['zookeeper'] | join(',') }}
+          --publish=8081:8081
+          --publish=9090:9090
+          --volume={{ company_data_prefix }}:{{ company_data_prefix }}
+          datafascia/df-api-server
+  when: "'datafascia/df-api-server:latest' not in list_containers.stdout_lines"

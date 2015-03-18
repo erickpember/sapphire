@@ -152,3 +152,22 @@
       {{ company_package_dir }} &&
       touch {{ docker_image_creator_home }}/df-etl-hl7-ingest.created
       creates={{ docker_image_creator_home }}/df-etl-hl7-ingest.created
+
+- name: Copy df-api-server package
+  copy:
+    src: "{{ playbook_dir }}/../../api/server/target/df-api-server-{{ df_platform_version }}.jar"
+    dest: "{{ company_package_dir }}/df-api-server-{{ df_platform_version }}.jar"
+
+- name: Copy df-api-server Dockerfile
+  template:
+    src: "{{ playbook_dir }}/roles/df-api-server/templates/df-api-server-Dockerfile"
+    dest: "{{ company_package_dir }}/df-api-server-Dockerfile"
+
+- name: Create df-api-server Docker image
+  shell: >
+      docker build
+      --file={{ company_package_dir }}/df-api-server-Dockerfile
+      --tag=datafascia/df-api-server
+      {{ company_package_dir }} &&
+      touch {{ docker_image_creator_home }}/df-api-server.created
+      creates={{ docker_image_creator_home }}/df-api-server.created

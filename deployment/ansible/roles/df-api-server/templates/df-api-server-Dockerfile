@@ -1,0 +1,34 @@
+# Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
+# For license information, please contact http://datafascia.com/contact
+
+# Example run command:
+#
+#     docker run \
+#         --detach \
+#         --dns=172.17.42.1 \
+#         --env=ZOOKEEPER_SERVERS=zookeeper1.local.datafascia.com:9092 \
+#         --publish=8081:8081 \
+#         --publish=9090:9090 \
+#         --volume=/var/dF:/var/dF \
+#         datafascia/df-api-server
+
+FROM datafascia/centos7-ansible-java:latest
+MAINTAINER devops@datafascia.com
+
+COPY df-api-server-{{ df_platform_version }}.jar {{ company_install_prefix }}/df-api-server/df-api-server-{{ df_platform_version }}.jar
+
+# ADD instruction also extracts recognized archive formats.
+ADD ansible.tar.gz {{ company_install_prefix }}
+
+WORKDIR {{ company_ansible_dir }}
+RUN ansible-playbook \
+        --extra-vars="environment_name=local" \
+        --inventory-file=environment/local/hosts \
+        --tags=image \
+        df-api-server.yml && \
+    rm -rf {{ company_package_dir }} && \
+    yum clean all
+
+EXPOSE 8081 9090
+
+CMD ["{{ company_install_prefix }}/df-api-server/run.sh"]

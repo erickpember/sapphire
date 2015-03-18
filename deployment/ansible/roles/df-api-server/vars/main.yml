@@ -1,0 +1,2 @@
+---
+df_api_server_home: "{{ company_install_prefix }}/df-api-server"

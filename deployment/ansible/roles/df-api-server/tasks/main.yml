@@ -1,0 +1,15 @@
+---
+- name: Copy run script
+  template:
+    src: run.sh
+    dest: "{{ df_api_server_home }}/run.sh"
+    mode: 0755
+  tags:
+    - image
+
+- name: Copy configuration file
+  template:
+    src: configuration.yml
+    dest: "{{ df_api_server_home }}/configuration.yml"
+  tags:
+    - run

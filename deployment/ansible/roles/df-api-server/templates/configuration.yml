@@ -1,0 +1,24 @@
+# Copyright (C) 2014-2015 dataFascia Corporation - All Rights Reserved)
+# For license information, please contact http://datafascia.com/contact
+
+accumulo:
+  instance: operational
+  zooKeepers: {{ ansible_env.ZOOKEEPER_SERVERS }}
+  user: root
+  password: secret
+
+kafkaConfig:
+  zookeeperConnect: {{ ansible_env.ZOOKEEPER_SERVERS }}
+  groupId: group
+  autoOffsetReset: smallest
+  consumerTimeoutMs: -1
+
+logging:
+  level: INFO
+  loggers:
+    com.datafascia: DEBUG
+
+server:
+  applicationConnectors:
+  - type: http
+    port: 9090

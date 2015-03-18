@@ -4,3 +4,7 @@ df_platform_package: df-shell-{{ df_platform_version }}-bin.tar.gz
 df_platform_install_dir: "{{ company_install_prefix }}/df-shell-{{ df_platform_version }}"
 df_platform_home: "{{ company_install_prefix }}/df-platform"
 df_platform_conf_dir: "{{ df_platform_home }}/conf"
+df_platform_data_dir: "{{ company_data_prefix }}/df-platform"
+
+df_etl_hl7_transform_jar: df-etl-hl7-transform-{{ df_platform_version }}.jar 
+df_etl_process_jar: df-etl-process-{{ df_platform_version }}.jar 

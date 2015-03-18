@@ -22,34 +22,78 @@
       src={{ df_platform_install_dir }}
       state=link
 
-- name: Copy configuration files
+- name: Create {{ df_platform_data_dir }} directory
+  file:
+    path: "{{ df_platform_data_dir }}"
+    state: directory
+    mode: 0755
+
+- name: Copy scripts
   copy:
       src={{ item }}
-      dest={{ df_platform_conf_dir }}/{{ item }}
+      dest={{ df_platform_data_dir }}/{{ item }}
   with_items:
     - create-accumulo-tables
 
 - name: List Accumulo tables
-  shell: >
-      {{ accumulo_home }}/bin/accumulo shell --user root --password {{ accumulo_password }} --execute-command tables
+  command: >
+      docker exec {{ groups['accumulo-master-primary'][0] }}
+      {{ accumulo_home }}/bin/accumulo shell --user root --password {{ accumulo_password }}
+      --execute-command tables
   register: list_tables
 
 - name: Create Accumulo tables
-  shell: >
-      {{ accumulo_home }}/bin/accumulo shell --user root --password {{ accumulo_password }} --execute-command "execfile {{ df_platform_conf_dir }}/create-accumulo-tables"
+  command: >
+      docker exec {{ groups['accumulo-master-primary'][0] }}
+      {{ accumulo_home }}/bin/accumulo shell --user root --password {{ accumulo_password }}
+      --execute-command "execfile {{ df_platform_data_dir }}/create-accumulo-tables"
   when: "'Patient' not in list_tables.stdout_lines"
 
 - name: List Kafka topics
   command: >
-      {{ kafka_home }}/bin/kafka-topics.sh --zookeeper {{ groups['zookeeper'][0] }} --list
+      docker exec {{ groups['kafka'][0] }}
+      {{ kafka_home }}/bin/kafka-topics.sh --zookeeper {{ groups['zookeeper'][0] }}
+      --list
   register: list_topics
 
 - name: Create Kafka topic
   command: >
-      {{ kafka_home }}/bin/kafka-topics.sh --zookeeper {{ groups['zookeeper'][0] }} --create --partitions 1 --replication-factor 1 --topic hl7Message
+      docker exec {{ groups['kafka'][0] }}
+      {{ kafka_home }}/bin/kafka-topics.sh --zookeeper {{ groups['zookeeper'][0] }}
+      --create --partitions 1 --replication-factor 1 --topic hl7Message
   when: "'hl7Message' not in list_topics.stdout_lines"
 
 - name: Create Kafka topic
   command: >
-      {{ kafka_home }}/bin/kafka-topics.sh --zookeeper {{ groups['zookeeper'][0] }} --create --partitions 1 --replication-factor 1 --topic event
+      docker exec {{ groups['kafka'][0] }}
+      {{ kafka_home }}/bin/kafka-topics.sh --zookeeper {{ groups['zookeeper'][0] }}
+      --create --partitions 1 --replication-factor 1 --topic event
   when: "'event' not in list_topics.stdout_lines"
+
+- name: Copy {{ df_etl_hl7_transform_jar }} file
+  copy:
+      src={{ playbook_dir }}/../../etl/hl7-transform/target/{{ df_etl_hl7_transform_jar }}
+      dest={{ storm_data_prefix }}/{{ df_etl_hl7_transform_jar }}
+
+- name: Submit {{ df_etl_hl7_transform_jar }}
+  command: >
+      docker exec {{ groups['storm-nimbus'][0] }}
+      {{ storm_home }}/bin/storm jar
+      {{ storm_data_prefix }}/{{ df_etl_hl7_transform_jar }}
+      com.datafascia.etl.hl7transform.HL7MessageToEventTopology
+      df-etl-hl7-transform
+  ignore_errors: True
+
+- name: Copy {{ df_etl_process_jar }} file
+  copy:
+      src={{ playbook_dir }}/../../etl/process/target/{{ df_etl_process_jar }}
+      dest={{ storm_data_prefix }}/{{ df_etl_process_jar }}
+
+- name: Submit {{ df_etl_process_jar }}
+  command: >
+      docker exec {{ groups['storm-nimbus'][0] }}
+      {{ storm_home }}/bin/storm jar
+      {{ storm_data_prefix }}/{{ df_etl_process_jar }}
+      com.datafascia.etl.process.ProcessEventTopology
+      df-etl-process
+  ignore_errors: True

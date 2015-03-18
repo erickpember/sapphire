@@ -1,0 +1,5 @@
+---
+dependencies:
+  - role: accumulo-common
+  - role: kafka
+  - role: storm-common

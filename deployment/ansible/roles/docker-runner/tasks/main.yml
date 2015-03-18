@@ -168,3 +168,14 @@
           --volume={{ company_data_prefix }}:{{ company_data_prefix }}
           datafascia/storm-supervisor
   when: "'datafascia/storm-supervisor:latest' not in list_containers.stdout_lines"
+
+- name: Run df-etl-hl7-ingest MLLP server
+  command: >
+      {{ docker_run_command }}
+          ingest1.local.datafascia.com
+          --detach
+          --env=KAFKA_BROKERS={{ groups['kafka'][0] }}:9092
+          --publish=9520:9520
+          --volume={{ company_data_prefix }}:{{ company_data_prefix }}
+          datafascia/df-etl-hl7-ingest
+  when: "'datafascia/df-etl-hl7-ingest:latest' not in list_containers.stdout_lines"

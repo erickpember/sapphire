@@ -1,0 +1,2 @@
+com.datafascia.common.jackson.PersistModule
+com.datafascia.common.jackson.UnitsMapperModule

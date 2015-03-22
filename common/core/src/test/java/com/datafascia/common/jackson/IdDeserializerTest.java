@@ -9,17 +9,19 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 
 /**
- * {@link com.datafascia.common.jackson.IdDeserializer} test
+ * {@link IdDeserializer} test
  */
 public class IdDeserializerTest extends IdBaseTest {
+
   @Test
   public void should_deserialize_id() throws Exception {
-    ObjectMapper objectMapper = new ObjectMapper();
-    Observation observ = new Observation();
-    observ.setId(Id.of("1"));
-    String json = objectMapper.writeValueAsString(observ);
+    ObjectMapper objectMapper = DFObjectMapper.objectMapper();
 
-    Observation observ1 = objectMapper.readValue(json, Observation.class);
-    assertEquals(observ1, observ);
+    Observation originalObservation = new Observation();
+    originalObservation.setId(Id.of("urn:test-IdBaseTest:1"));
+    String json = objectMapper.writeValueAsString(originalObservation);
+
+    Observation observation = objectMapper.readValue(json, Observation.class);
+    assertEquals(observation, originalObservation);
   }
 }

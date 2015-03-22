@@ -2,8 +2,6 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.model;
 
-import com.datafascia.common.jackson.IdDeserializer;
-import com.datafascia.common.jackson.IdSerializer;
 import com.datafascia.common.jackson.InstantDeserializer;
 import com.datafascia.common.jackson.InstantSerializer;
 import com.datafascia.common.persist.Id;
@@ -35,7 +33,6 @@ import lombok.extern.slf4j.Slf4j;
 public class Patient extends Person {
   /** Identifier for the patient.*/
   @JsonProperty("@id")
-  @JsonDeserialize(using = IdDeserializer.class) @JsonSerialize(using = IdSerializer.class)
   private Id<Patient> id;
 
   /** Identifier used by a given institution's internal database.*/

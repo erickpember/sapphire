@@ -12,13 +12,17 @@ import static org.testng.Assert.assertEquals;
  * {@link IdSerializer} test
  */
 public class IdSerializerTest extends IdBaseTest {
+
+  private static final String ID = "urn:test-IdBaseTest:1";
+
   @Test
   public void should_serialize_id() throws Exception {
-    ObjectMapper objectMapper = new ObjectMapper();
+    ObjectMapper objectMapper = DFObjectMapper.objectMapper();
+
     Observation observ = new Observation();
-    observ.setId(Id.of("1"));
+    observ.setId(Id.of(ID));
 
     String json = objectMapper.writeValueAsString(observ);
-    assertEquals(json, "{\"@id\":\"urn:test-IdBaseTest:1\"}");
+    assertEquals(json, "{\"@id\":\"" + ID + "\"}");
   }
 }

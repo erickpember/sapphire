@@ -12,7 +12,6 @@ import com.datafascia.common.accumulo.AuthorizationsSupplier;
 import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.SubjectAuthorizationsSupplier;
-import com.datafascia.common.jackson.UnitsMapperModule;
 import com.datafascia.common.kafka.KafkaConfig;
 import com.datafascia.common.reflect.PackageUtils;
 import com.datafascia.common.shiro.FakeRealm;
@@ -132,6 +131,6 @@ public class APIService extends Application<APIConfiguration> {
    * @param mapper the Jackson object mapper used by application
    */
   private void setupJackson(ObjectMapper mapper) {
-    mapper.registerModule(new UnitsMapperModule());
+    mapper.findAndRegisterModules();
   }
 }

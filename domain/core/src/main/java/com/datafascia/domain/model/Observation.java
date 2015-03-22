@@ -2,8 +2,6 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.model;
 
-import com.datafascia.common.jackson.IdDeserializer;
-import com.datafascia.common.jackson.IdSerializer;
 import com.datafascia.common.jackson.InstantDeserializer;
 import com.datafascia.common.jackson.InstantSerializer;
 import com.datafascia.common.persist.Id;
@@ -31,7 +29,6 @@ import lombok.ToString;
 public class Observation {
   /** Unique identifier for observation */
   @JsonProperty("@id")
-  @JsonDeserialize(using = IdDeserializer.class) @JsonSerialize(using = IdSerializer.class)
   private Id<Observation> id;
 
   /** Describes what was observed. Sometimes this is called the observation "code". */

@@ -15,9 +15,6 @@ public class DFObjectMapper {
    * @return dF instance of Jackson ObjectMapper with all modules loaded
    */
   public static ObjectMapper objectMapper() {
-    ObjectMapper mapper = new ObjectMapper();
-    mapper.registerModule(new UnitsMapperModule());
-
-    return mapper;
+    return new ObjectMapper().findAndRegisterModules();
   }
 }

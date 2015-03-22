@@ -3,60 +3,29 @@
 package com.datafascia.common.jackson;
 
 import com.datafascia.common.persist.Id;
-import com.datafascia.common.urn.URNFactory;
-import com.datafascia.common.urn.URNMap;
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.BeanProperty;
 import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
-import com.fasterxml.jackson.databind.JsonMappingException;
-import com.fasterxml.jackson.databind.deser.ContextualDeserializer;
+import com.fasterxml.jackson.databind.deser.std.StdDeserializer;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Jackson serializer for Id
- *
- * NOTE: the SuppressWarnings is necessary because we do not have the underlying type for the Id.
+ * Jackson deserializer for {@link Id}.
+ * <p>
+ * NOTE: The SuppressWarnings is necessary because we do not have the type parameter for the Id.
  */
 @Slf4j @SuppressWarnings("rawtypes")
-public class IdDeserializer extends JsonDeserializer<Id> implements ContextualDeserializer {
-  Class<?> declaringClass;
+public class IdDeserializer extends StdDeserializer<Id> {
 
   /**
-   * null constructor
+   * Constructor
    */
   public IdDeserializer() {
-    declaringClass = IdDeserializer.class;
-  }
-
-  /**
-   * Create deserializer for class
-   *
-   * @param clazz the class
-   */
-  public IdDeserializer(Class<?> clazz) {
-    declaringClass = clazz;
+    super(Id.class);
   }
 
   @Override
-  public JsonDeserializer<?> createContextual(
-      DeserializationContext ctxt, BeanProperty property) throws JsonMappingException {
-    return new IdDeserializer(property.getMember().getDeclaringClass());
-  }
-
-  @Override
-  public Id deserialize(JsonParser jp, DeserializationContext ctxt)
-      throws IOException, JsonMappingException {
-    String text = jp.getText();
-    try {
-      String ns = URNFactory.namespace(text);
-      if (URNMap.getClassFromIdNamespace(ns).equals(declaringClass)) {
-        return Id.of(URNFactory.path(text));
-      }
-    } catch (URISyntaxException e) {
-    }
-    throw new JsonMappingException("Illegal URN or namespace mapping for " + text);
+  public Id deserialize(JsonParser jsonParser, DeserializationContext ctxt) throws IOException {
+    return Id.of(jsonParser.getText());
   }
 }

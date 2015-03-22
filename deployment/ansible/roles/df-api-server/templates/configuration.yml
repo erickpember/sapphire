@@ -17,6 +17,7 @@ logging:
   level: INFO
   loggers:
     com.datafascia: DEBUG
+    io.dropwizard.jersey.jackson: DEBUG
 
 server:
   applicationConnectors:

@@ -157,6 +157,7 @@
   copy:
     src: "{{ playbook_dir }}/../../api/server/target/df-api-server-{{ df_platform_version }}.jar"
     dest: "{{ company_package_dir }}/df-api-server-{{ df_platform_version }}.jar"
+  register: copy_df_api_server
 
 - name: Copy df-api-server Dockerfile
   template:
@@ -164,10 +165,9 @@
     dest: "{{ company_package_dir }}/df-api-server-Dockerfile"
 
 - name: Create df-api-server Docker image
-  shell: >
+  command: >
       docker build
-      --file={{ company_package_dir }}/df-api-server-Dockerfile
-      --tag=datafascia/df-api-server
-      {{ company_package_dir }} &&
-      touch {{ docker_image_creator_home }}/df-api-server.created
-      creates={{ docker_image_creator_home }}/df-api-server.created
+          --file={{ company_package_dir }}/df-api-server-Dockerfile
+          --tag=datafascia/df-api-server
+          {{ company_package_dir }}
+  when: copy_df_api_server.changed

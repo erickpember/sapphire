@@ -112,25 +112,21 @@
       su hdfs -c "{{ accumulo_home }}/bin/accumulo init --clear-instance-name --instance-name {{ accumulo_instance }} --password {{ accumulo_password }}" &&
       touch {{ accumulo_data_prefix }}/instance.initialized
       creates={{ accumulo_data_prefix }}/instance.initialized
-  when: "'datafascia/accumulo-master-primary:latest' not in list_containers.stdout_lines"
 
 - name: Start Accumulo master primary
   command: >
       docker exec {{ groups['accumulo-master-primary'][0] }}
       su hdfs -c "{{ accumulo_home }}/bin/start-here.sh"
-  when: "'datafascia/accumulo-master-primary:latest' not in list_containers.stdout_lines"
 
 - name: Start Accumulo master standby
   command: >
       docker exec {{ groups['accumulo-master-standby'][0] }}
       su hdfs -c "{{ accumulo_home }}/bin/start-here.sh"
-  when: "'datafascia/accumulo-master-standby:latest' not in list_containers.stdout_lines"
 
 - name: Start Accumulo slave
   command: >
       docker exec {{ groups['accumulo-slave'][0] }}
       su hdfs -c "{{ accumulo_home }}/bin/start-here.sh"
-  when: "'datafascia/accumulo-slave:latest' not in list_containers.stdout_lines"
 
 - name: Run Kafka
   command: >
@@ -180,6 +176,11 @@
           datafascia/df-etl-hl7-ingest
   when: "'datafascia/df-etl-hl7-ingest:latest' not in list_containers.stdout_lines"
 
+- name: Stop df-api-server
+  shell: docker stop api1.local.datafascia.com && docker rm api1.local.datafascia.com
+  ignore_errors: True
+  when: copy_df_api_server.changed
+
 - name: Run df-api-server
   command: >
       {{ docker_run_command }}
@@ -190,4 +191,4 @@
           --publish=9090:9090
           --volume={{ company_data_prefix }}:{{ company_data_prefix }}
           datafascia/df-api-server
-  when: "'datafascia/df-api-server:latest' not in list_containers.stdout_lines"
+  when: copy_df_api_server.changed

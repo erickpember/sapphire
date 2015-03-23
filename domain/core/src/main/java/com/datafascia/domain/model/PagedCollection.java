@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 public class PagedCollection<T> {
   /** The collection of the model type */
   @JsonProperty("items")
+  @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
   Collection<T> collection;
 
   /** Parameters to fetch next page. This can be considered a relative link */

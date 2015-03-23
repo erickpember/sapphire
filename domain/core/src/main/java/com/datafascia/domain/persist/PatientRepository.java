@@ -8,6 +8,7 @@ import com.datafascia.common.accumulo.MutationBuilder;
 import com.datafascia.common.accumulo.MutationSetter;
 import com.datafascia.common.accumulo.RowMapper;
 import com.datafascia.common.persist.Id;
+import com.datafascia.common.urn.URNFactory;
 import com.datafascia.domain.model.Gender;
 import com.datafascia.domain.model.MaritalStatus;
 import com.datafascia.domain.model.Name;
@@ -66,13 +67,24 @@ public class PatientRepository extends BaseRepository {
   }
 
   /**
+   * Converts patient ID to row ID.
    *
    * @param patientId the patient identifier
-   *
-   * @return string representation of Patient id
+   * @return row ID
    */
-  public static String toRowId(Id<Patient> patientId) {
+  private static String toRowId(Id<Patient> patientId) {
     return toRowId(Patient.class, patientId);
+  }
+
+  /**
+   * Generates primary key from institution patient ID.
+   *
+   * @param patient
+   *     patient to read property from
+   * @return primary key
+   */
+  public static Id<Patient> getPatientId(Patient patient) {
+    return Id.of(URNFactory.urn(URNFactory.NS_PATIENT_ID, patient.getInstitutionPatientId()));
   }
 
   /**
@@ -82,6 +94,8 @@ public class PatientRepository extends BaseRepository {
    *     to save
    */
   public void save(Patient patient) {
+    patient.setId(getPatientId(patient));
+
     accumuloTemplate.save(
         Tables.PATIENT,
         toRowId(patient.getId()),

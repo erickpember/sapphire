@@ -12,7 +12,6 @@ import com.neovisionaries.i18n.LanguageCode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Optional;
-
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
@@ -22,7 +21,11 @@ import static org.testng.Assert.assertEquals;
  * Test for Patient Repository
  */
 public class PatientRepositoryTest extends BaseRepositoryTest {
+
   private PatientRepository patientRepo;
+  private Patient patient1;
+  private Patient patient2;
+  private Patient patient3;
 
   @BeforeClass
   public void setupTemplate() {
@@ -30,11 +33,24 @@ public class PatientRepositoryTest extends BaseRepositoryTest {
   }
 
   @Test(dependsOnGroups = "patients")
-  public void patients() {
+  public void should_list_inactive_patients() {
     assertEquals(patientRepo.list(Optional.empty(), Optional.of(false), 1).size(), 1);
+  }
+
+  @Test(dependsOnGroups = "patients")
+  public void should_list_active_patients() {
     assertEquals(patientRepo.list(Optional.empty(), Optional.of(true), 5).size(), 2);
+  }
+
+  @Test(dependsOnGroups = "patients")
+  public void should_list_all_patients() {
     assertEquals(patientRepo.list(Optional.empty(), Optional.empty(), 5).size(), 3);
-    assertEquals(patientRepo.list(Optional.of("96087039"), Optional.empty(), 5).size(), 2);
+  }
+
+  @Test(dependsOnGroups = "patients")
+  public void should_list_patients_starting_from_specified_patient() {
+    Id<Patient> startPatientId = PatientRepository.getPatientId(patient2);
+    assertEquals(patientRepo.list(Optional.of(startPatientId), Optional.empty(), 5).size(), 2);
   }
 
   @Test
@@ -45,9 +61,8 @@ public class PatientRepositoryTest extends BaseRepositoryTest {
 
   @Test(groups = "patients") @SuppressWarnings("serial")
   private void getActiveWithLanguages() {
-    testPatientSet(new Patient() {
+    patient1 = new Patient() {
       {
-        setId(Id.of("96087004"));
         setInstitutionPatientId("UCSF-12345");
         setAccountNumber("12345");
         setName(new Name() {
@@ -70,14 +85,14 @@ public class PatientRepositoryTest extends BaseRepositoryTest {
         setRace(Race.ASIAN);
         setActive(true);
       }
-    });
+    };
+    testPatientSet(patient1);
   }
 
   @Test(groups = "patients")
   private void getActiveWithoutLanguages() {
-    testPatientSet(new Patient() {
+    patient3 = new Patient() {
       {
-        setId(Id.of("96087039"));
         setInstitutionPatientId("UCSF-67890");
         setAccountNumber("67890");
         setName(new Name() {
@@ -94,14 +109,14 @@ public class PatientRepositoryTest extends BaseRepositoryTest {
         setRace(Race.PACIFIC_ISLANDER);
         setActive(true);
       }
-    });
+    };
+    testPatientSet(patient3);
   }
 
   @Test(groups = "patients")
   private void getInactive() {
-    testPatientSet(new Patient() {
+    patient2 = new Patient() {
       {
-        setId(Id.of("96087047"));
         setInstitutionPatientId("UCSF-13579");
         setAccountNumber("13579");
         setName(new Name() {
@@ -118,15 +133,16 @@ public class PatientRepositoryTest extends BaseRepositoryTest {
         setRace(Race.BLACK);
         setActive(false);
       }
-    });
+    };
+    testPatientSet(patient2);
   }
 
-  private void testPatientSet(Patient pat) {
-    patientRepo.save(pat);
+  private void testPatientSet(Patient originalPatient) {
+    patientRepo.save(originalPatient);
 
     // Not checking if the optional has data, as we *want* it to fail if it's empty.
-    Patient patfetched = patientRepo.read(pat.getId()).get();
+    Patient fetchedPatient = patientRepo.read(originalPatient.getId()).get();
 
-    assertEquals(pat, patfetched);
+    assertEquals(fetchedPatient, originalPatient);
   }
 }

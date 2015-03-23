@@ -184,13 +184,13 @@ public class ProcessEventTopologyIT {
     feedEvent(event);
 
     AdmitData admitData = (AdmitData) event.getData();
-
     PatientData patientData = admitData.getPatient();
-    Id<Patient> patientId = Id.of(patientData.getInstitutionPatientId());
-    Optional<Patient> optionalPatient = patientRepository.read(patientId);
-    assertTrue(optionalPatient.isPresent());
 
-    Patient patient = optionalPatient.get();
+    Patient dummyPatient = new Patient();
+    dummyPatient.setInstitutionPatientId(patientData.getInstitutionPatientId());
+    Id<Patient> patientId = PatientRepository.getPatientId(dummyPatient);
+
+    Patient patient = patientRepository.read(patientId).get();
     assertEquals(patient.getInstitutionPatientId(), patientData.getInstitutionPatientId());
 
     EncounterData encounterData = admitData.getEncounter();

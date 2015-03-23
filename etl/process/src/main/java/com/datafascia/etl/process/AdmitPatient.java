@@ -46,7 +46,6 @@ public class AdmitPatient implements Consumer<Event> {
 
   private Patient createPatient(PatientData patientData, Encounter encounter) {
     Patient patient = new Patient();
-    patient.setId(Id.of(patientData.getInstitutionPatientId()));
     patient.setInstitutionPatientId(patientData.getInstitutionPatientId());
     patient.setAccountNumber(patientData.getAccountNumber());
     patient.setName(new Name());

@@ -205,18 +205,20 @@ public class PatientRepository extends BaseRepository {
   /**
    * Finds patients.
    *
-   * @param optStart
-   *     if present, start the scan from this patient
+   * @param optStartPatientId
+   *     if present, start the scan from this patient ID
    * @param optActive
    *     if present, the active state to match
    * @param count maximum number of items to return in list
    *
    * @return found patients
    */
-  public List<Patient> list(Optional<String> optStart, Optional<Boolean> optActive, int count) {
+  public List<Patient> list(
+      Optional<Id<Patient>> optStartPatientId, Optional<Boolean> optActive, int count) {
+
     Scanner scanner = accumuloTemplate.createScanner(Tables.PATIENT);
-    if (optStart.isPresent()) {
-      scanner.setRange(new Range(new Text(toRowId(Id.of(optStart.get()))), null));
+    if (optStartPatientId.isPresent()) {
+      scanner.setRange(new Range(new Text(toRowId(optStartPatientId.get())), null));
     }
     scanner.fetchColumnFamily(new Text(COLUMN_FAMILY));
 

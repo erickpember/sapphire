@@ -4,6 +4,7 @@ package com.datafascia.api.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.datafascia.common.api.ApiParams;
+import com.datafascia.common.persist.Id;
 import com.datafascia.domain.model.PagedCollection;
 import com.datafascia.domain.model.Patient;
 import com.datafascia.domain.persist.PatientRepository;
@@ -57,8 +58,8 @@ public class PatientResource {
     if (count < 0) {
       throw new WebApplicationException("Invalid count parameter", Response.Status.BAD_REQUEST);
     }
-    Optional<String> optStart = start == null ? Optional.empty() : Optional.of(start);
-    Optional<Boolean> optActive = active == null ? Optional.empty() : Optional.of(active);
+    Optional<Id<Patient>> optStart = (start == null) ? Optional.empty() : Optional.of(Id.of(start));
+    Optional<Boolean> optActive = Optional.ofNullable(active);
 
     List<Patient> patients = patientRepository.list(optStart, optActive, count + 1);
     PagedCollection<Patient> response = new PagedCollection<>();
@@ -66,7 +67,7 @@ public class PatientResource {
       Map<String, String> params = ImmutableMap.of(
           ApiParams.ACTIVE, Boolean.toString(active),
           ApiParams.COUNT, Integer.toString(count),
-          ApiParams.START, PatientRepository.toRowId(patients.get(count).getId()));
+          ApiParams.START, patients.get(count).getId().toString());
       response.setNext(params);
       patients.remove(count);
     }

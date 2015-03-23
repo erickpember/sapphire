@@ -6,6 +6,7 @@ import com.datafascia.api.client.DatafasciaApi;
 import com.datafascia.api.client.DatafasciaApiBuilder;
 import com.datafascia.common.api.ApiParams;
 import com.datafascia.common.jackson.CSVMapper;
+import com.datafascia.common.persist.Id;
 import com.datafascia.domain.model.Encounter;
 import com.datafascia.domain.model.Gender;
 import com.datafascia.domain.model.Hospitalization;
@@ -79,9 +80,7 @@ public class EmergeDemographicCSVGenerator {
       while (params != null) {
         PagedCollection<Patient> page = api.patients(params);
         for (Patient pat : page.getCollection()) {
-          String[] urnParts = pat.getId().toString().split(":");
-          String patientId = urnParts[urnParts.length - 1];
-          Encounter encount = lastVisit(api, patientId);
+          Encounter encount = lastVisit(api, pat.getId());
 
           pw.println(mapper.asCSV(getDemographic(pat, encount, entry)));
           entry++;
@@ -97,9 +96,9 @@ public class EmergeDemographicCSVGenerator {
    * @param api the API end-point
    * @param patientId the patientId
    */
-  private static Encounter lastVisit(DatafasciaApi api, String patientId) {
+  private static Encounter lastVisit(DatafasciaApi api, Id<Patient> patientId) {
     try {
-      return api.lastvisit(patientId);
+      return api.lastvisit(patientId.toString());
     } catch (RetrofitError rf) {
       log.error("No last encounter found for patient {}", patientId);
       return null;

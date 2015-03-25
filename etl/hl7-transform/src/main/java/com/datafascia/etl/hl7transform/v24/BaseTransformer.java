@@ -14,6 +14,7 @@ import com.datafascia.domain.model.Gender;
 import com.datafascia.domain.model.MaritalStatus;
 import com.datafascia.domain.model.Race;
 import com.datafascia.etl.hl7transform.MessageToEventTransformer;
+import com.datafascia.etl.hl7transform.RaceMap;
 import com.neovisionaries.i18n.LanguageAlpha3Code;
 import com.neovisionaries.i18n.LanguageCode;
 import java.time.Instant;
@@ -80,7 +81,10 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
   }
 
   private Race toRace(String code) {
-    return Race.of(code).orElse(Race.UNKNOWN);
+    if (!RaceMap.raceMap.containsKey(code.toLowerCase())) {
+      return Race.UNKNOWN;
+    }
+    return RaceMap.raceMap.get(code.toLowerCase());
   }
 
   private LanguageCode toLanguage(String code) {

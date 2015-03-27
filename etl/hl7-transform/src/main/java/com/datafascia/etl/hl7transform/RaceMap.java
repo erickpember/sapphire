@@ -10,12 +10,12 @@ import com.google.common.collect.ImmutableMap;
  */
 public class RaceMap {
   public static final ImmutableMap<String,Race> raceMap = ImmutableMap.<String, Race>builder()
-      .put("w", Race.WHITE)
       .put("b", Race.BLACK)
-      .put("a", Race.ASIAN)
-      .put("n", Race.AMERICAN_INDIAN)
-      .put("p", Race.PACIFIC_ISLANDER)
+      .put("i", Race.AMERICAN_INDIAN)
+      .put("n", Race.ASIAN)
       .put("o", Race.OTHER)
+      .put("p", Race.PACIFIC_ISLANDER)
       .put("u", Race.UNKNOWN)
+      .put("w", Race.WHITE)
       .build();
 }

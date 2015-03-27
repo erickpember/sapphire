@@ -1,0 +1,4 @@
+Scenario1-Step1.hl7|urn:df-patientId-1:97546762|97546762|3|true
+Scenario1-Step2.hl7|urn:df-patientId-1:97546762|97546762|3|true
+Scenario1-Step3.hl7|urn:df-patientId-1:97546762|97546762|3|true
+Scenario1-Step4.hl7|urn:df-patientId-1:97546762|97546762|3|false

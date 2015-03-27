@@ -5,6 +5,8 @@ package com.datafascia.scenarios;
 import com.datafascia.api.client.DatafasciaApi;
 import com.datafascia.api.client.DatafasciaApiBuilder;
 import com.datafascia.common.io.ResourceUtils;
+import com.datafascia.domain.model.Encounter;
+import com.datafascia.domain.model.Hospitalization;
 import com.datafascia.domain.model.Patient;
 import com.datafascia.shell.Main;
 import com.google.common.io.Resources;
@@ -14,14 +16,12 @@ import java.io.StringReader;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.BeforeTest;
-import org.testng.annotations.DataProvider;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -32,6 +32,10 @@ import static org.testng.Assert.fail;
  */
 @Slf4j
 public class ScenariosIT {
+  private static final ZoneId TIME_ZONE = ZoneId.of("America/Los_Angeles");
+  private static final DateTimeFormatter DATE_FORMATTER
+      = DateTimeFormatter.ISO_LOCAL_DATE;
+
   private static final DateTimeFormatter dateFormat
       = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
@@ -62,56 +66,118 @@ public class ScenariosIT {
   }
 
   /**
-   * Read the list of scenarios from resources.
-   *
-   * @returns An iterator for an Object[]
-   */
-  @DataProvider(name = "scenariosList")
-  public Iterator<Object[]> getScenarios() throws Exception {
-    List<Object[]> result = new ArrayList<Object[]>();
-
-    String line = null;
-    try (BufferedReader reader = new BufferedReader(
-        new StringReader(ResourceUtils.resource("scenariosList.txt")))) {
-      while ((line = reader.readLine()) != null) {
-        result.add(new Object[] {line});
-      }
-    } catch (IOException e) {
-      log.error("IO Exception: {}", e);
-    }
-
-    return result.iterator();
-  }
-
-  /**
-   * Fetch admitted patients and validate them.
-   *
-   * @param The scenario to run
+   * Execute scenario #1.
    *
    * @throws Exception
    */
-  @Test(dataProvider = "scenariosList")
-  public void testScenarios(String scenario) throws Exception {
-    log.info("executing testScenario: {}", scenario);
-    processScenario(scenario);
+  @Test
+  public void testScenario1() throws Exception {
+    log.info("executing Scenario1.txt");
+    processScenario("Scenario1.txt", "NATUS-ADULT", "ONE", "A", "FEMALE", "UNKNOWN",
+        LocalDateTime.parse("1984-10-01T05:00:00Z", dateFormat).toLocalDate(),
+        LocalDateTime.parse("2014-10-01T19:01:00Z", dateFormat).toLocalDate());
   }
 
   /**
-   * Process the scenario file.
-   *
-   * @param The scenario file
+   * Execute scenario #2.
    *
    * @throws Exception
    */
-  private void processScenario(String scenarioFile) throws Exception {
+  @Test
+  public void testScenario2() throws Exception {
+    log.info("executing Scenario2.txt");
+    processScenario("Scenario2.txt", "TEST", "INPBM", "", "MALE", "WHITE",
+        LocalDateTime.parse("1970-05-01T05:00:00Z", dateFormat).toLocalDate(),
+        LocalDateTime.parse("2014-12-23T18:08:00Z", dateFormat).toLocalDate());
+  }
+
+  /**
+   * Execute scenario #3.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testScenario3() throws Exception {
+    log.info("executing Scenario3.txt");
+    processScenario("Scenario3.txt", "TEST", "OUTPTBM", "", "FEMALE", "WHITE",
+        LocalDateTime.parse("1980-05-01T05:00:00Z", dateFormat).toLocalDate(),
+        LocalDateTime.parse("2014-12-23T18:13:00Z", dateFormat).toLocalDate());
+  }
+
+  /**
+   * Execute scenario #4.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testScenario4() throws Exception {
+    log.info("executing Scenario4.txt");
+    processScenario("Scenario4.txt", "TEST", "CHILDBM", "", "MALE", "WHITE",
+        LocalDateTime.parse("2000-05-01T05:00:00Z", dateFormat).toLocalDate(),
+        LocalDateTime.parse("2014-12-23T19:55:00Z", dateFormat).toLocalDate());
+  }
+
+  /**
+   * Execute scenario #5.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testScenario5() throws Exception {
+    log.info("executing Scenario5.txt");
+    processScenario("Scenario5.txt", "MB-HIM", "FOUR", "A", "MALE", "AMERICAN_INDIAN",
+        LocalDateTime.parse("2009-02-19T05:00:00Z", dateFormat).toLocalDate(),
+        LocalDateTime.parse("2015-02-19T21:24:00Z", dateFormat).toLocalDate());
+  }
+
+  /**
+   * Execute scenario #40.
+   *
+   * @throws Exception
+   */
+  @Test
+  public void testScenario40() throws Exception {
+    log.info("executing Scenario40.txt");
+    processScenario("Scenario40.txt", "TRN-TWO", "GIRL", "", "FEMALE", "ASIAN",
+        LocalDateTime.parse("2015-01-02T05:00:00Z", dateFormat).toLocalDate(),
+        LocalDateTime.parse("2015-01-02T21:42:00Z", dateFormat).toLocalDate());
+  }
+
+  /**
+   * Process the scenario file.  Each scenario file contains one or more steps.  Each step
+   * is a pipe, '|', delimited string with the following schema:
+   *
+   * HL7 Message File|Patient ID|Institution Patient Id|Ingest Delay|Active Status
+   *
+   * HL7 Message File     - the HL7 base file name from the resources directory
+   * Patient ID           - the internal patient identifier
+   * Intition Pattient Id - the institution patient identifier
+   * Ingest Delay         - the number of seconds to pause after ingesting the HL7 file
+   * Active Status        - whether or not the patient is active
+   *
+   * @param scenarioFile scenario file
+   * @param lastName patient last name
+   * @param firstName patient first name
+   * @param middleName patient middle name
+   * @param gender patient gender
+   * @param race patient race
+   * @param birthDate patient date of birth
+   * @param admitDate patient admittance date
+   *
+   * @throws Exception
+   */
+  private void processScenario(String scenarioFile, String lastName, String firstName,
+      String middleName, String gender, String race, LocalDate birthDate, LocalDate admitDate)
+      throws Exception {
     String line = null;
     try (BufferedReader reader = new BufferedReader(
         new StringReader(ResourceUtils.resource("scenarios/" + scenarioFile)))) {
       while ((line = reader.readLine()) != null) {
         log.info("executing step: {}", line);
         String[] stepComps = line.split("\\|");
-        ingestHL7Message(stepComps[0], Integer.parseInt(stepComps[2]));
-        validateStep(stepComps[1]);
+        ingestHL7Message(stepComps[0], Integer.parseInt(stepComps[3]));
+        validateStep(lastName, firstName, middleName, gender, race,
+            birthDate, admitDate, stepComps[1], stepComps[2], stepComps[4]);
       }
     } catch (IOException e) {
       log.error("IO Exception: {}", e);
@@ -134,19 +200,33 @@ public class ScenariosIT {
   }
 
   /**
-   * Fetch patients and validate them.
+   * Fetch the requested patient and validate patient data, active status and admit time.
    *
    * @param The patient ID
+   * @param lastName patient last name
+   * @param firstName patient first name
+   * @param middleName patient middle name
+   * @param gender patient gender
+   * @param race patient race
+   * @param birthDate patient date of birth
+   * @param admitDate patient admittance date
+   * @param patientId internal unique patient identifier
+   * @param institutionPatientId the institution patient identifier
+   * @param status patient status flag
    */
-  private void validateStep(String mrn) {
-    for (Patient pat : api.patients(null, true, 1).getCollection()) {
-      if (pat.getId().toString().equals(mrn)) {
-        validatePatient(pat, "NATUS-ADULT", "ONE", "A",
-            LocalDateTime.parse("1984-10-01T05:00:00Z", dateFormat).toLocalDate(), mrn, mrn);
+  private void validateStep(String lastName, String firstName, String middleName,
+      String gender, String race, LocalDate birthDate, LocalDate admitDate,
+      String patientId, String institutionPatientId, String active) {
+    log.info("looking for {} and active {}", patientId, Boolean.parseBoolean(active));
+    for (Patient pat : api.patients(patientId, Boolean.parseBoolean(active), 1).getCollection()) {
+      if (pat.getId().toString().equals(patientId)) {
+        validatePatient(pat, lastName, firstName, middleName, gender, race, birthDate,
+            patientId, institutionPatientId);
+        validateEncounter(pat, admitDate);
         return;
       }
     }
-    fail("Patient " + mrn + " not found");
+    fail("Patient " + patientId + " not found");
   }
 
   /**
@@ -156,17 +236,40 @@ public class ScenariosIT {
    * @param lastName last name
    * @param firstName first name
    * @param middleName middle name
+   * @param gender patient gender
+   * @param race patient race
    * @param birthDate date of birth
-   * @param patId patient dF identifier
-   * @param instId patient institution identifier
+   * @param patientId patient dF identifier
+   * @param institutionPatientId patient institution identifier
    */
   private void validatePatient(Patient patient, String lastName, String firstName,
-      String middleName, LocalDate birthDate, String patId, String instId) {
+      String middleName, String gender, String race,
+      LocalDate birthDate, String patientId, String institutionPatientId) {
     assertEquals(patient.getName().getFirst(), firstName);
     assertEquals(patient.getName().getMiddle(), middleName);
     assertEquals(patient.getName().getLast(), lastName);
     assertEquals(patient.getBirthDate(), birthDate);
-    assertEquals(patient.getId().toString(), patId);
-    assertEquals(patient.getInstitutionPatientId(), instId);
+    assertEquals(patient.getRace().toString(), race);
+    assertEquals(patient.getGender().toString(), gender);
+    assertEquals(patient.getId().toString(), patientId);
+    assertEquals(patient.getInstitutionPatientId(), institutionPatientId);
+  }
+
+  /**
+   * Validates a patient encouter against various expected values.
+   *
+   * @param patient object
+   */
+  private void validateEncounter(Patient patient, LocalDate expectedTime) {
+    // Get the last encounter for the patient
+    Encounter encounter = api.lastvisit(patient.getId().toString());
+    Hospitalization hosp = encounter.getHospitalisation();
+    if (hosp != null && hosp.getPeriod() != null && hosp.getPeriod().getStartInclusive() != null) {
+      ZonedDateTime admitTime = ZonedDateTime.ofInstant(hosp.getPeriod().getStartInclusive(),
+          TIME_ZONE);
+      assertEquals(DATE_FORMATTER.format(admitTime), expectedTime.toString());
+    } else {
+      fail("Invalid Admission Date for " + patient.getId().toString());
+    }
   }
 }

@@ -74,6 +74,18 @@
   copy:
       src={{ playbook_dir }}/../../etl/hl7-transform/target/{{ df_etl_hl7_transform_jar }}
       dest={{ storm_data_prefix }}/{{ df_etl_hl7_transform_jar }}
+  register: copy_df_etl_hl7_transform
+
+- name: Kill existing df-etl-hl7-transform topology
+  command: >
+      docker exec {{ groups['storm-nimbus'][0] }}
+      {{ storm_home }}/bin/storm kill df-etl-hl7-transform -w 1
+  ignore_errors: True
+  when: copy_df_etl_hl7_transform.changed
+
+- name: Pause to allow time for df-etl-hl7-transform topology to be killed
+  pause: seconds=2
+  when: copy_df_etl_hl7_transform.changed
 
 - name: Submit {{ df_etl_hl7_transform_jar }}
   command: >
@@ -82,12 +94,24 @@
       {{ storm_data_prefix }}/{{ df_etl_hl7_transform_jar }}
       com.datafascia.etl.hl7transform.HL7MessageToEventTopology
       df-etl-hl7-transform
-  ignore_errors: True
+  when: copy_df_etl_hl7_transform.changed
 
 - name: Copy {{ df_etl_process_jar }} file
   copy:
       src={{ playbook_dir }}/../../etl/process/target/{{ df_etl_process_jar }}
       dest={{ storm_data_prefix }}/{{ df_etl_process_jar }}
+  register: copy_df_etl_process
+
+- name: Kill existing df-etl-process topology
+  command: >
+      docker exec {{ groups['storm-nimbus'][0] }}
+      {{ storm_home }}/bin/storm kill df-etl-process -w 1
+  ignore_errors: True
+  when: copy_df_etl_process.changed
+
+- name: Pause to allow time for df-etl-process topology to be killed
+  pause: seconds=2
+  when: copy_df_etl_process.changed
 
 - name: Submit {{ df_etl_process_jar }}
   command: >
@@ -96,4 +120,4 @@
       {{ storm_data_prefix }}/{{ df_etl_process_jar }}
       com.datafascia.etl.process.ProcessEventTopology
       df-etl-process
-  ignore_errors: True
+  when: copy_df_etl_process.changed

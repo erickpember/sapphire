@@ -1,10 +1,30 @@
-# dataFascia Platform in Virtual Machine
+# dataFascia Platform Deployment
 
-This Vagrant script installs the dataFascia Platform software in a virtual
-machine.
+These scripts deploy the dataFascia Platform software.
 
 
-## Requirements
+## Linux
+
+Deploy to the local Linux machine.
+
+
+### Requirements
+
+* [Ansible](http://docs.ansible.com/intro_installation.html)
+
+
+### Installation
+
+* Run the command `./local-deploy.sh` from the directory where this README.md file is
+  located. This should finish after many minutes.
+
+
+## Mac OS X
+
+Deploy to a virtual machine hosted by Mac OS X.
+
+
+### Requirements
 
 * [VirtualBox](https://www.virtualbox.org/wiki/Downloads)
 * [Vagrant](http://www.vagrantup.com/downloads.html)
@@ -12,13 +32,7 @@ machine.
 * The host machine probably needs at least 8 GB of RAM.
 
 
-## Installation
-
-* Edit the default IP (192.168.222.222) address for the virtual machine if there is a clash with
-  the host IP address. This will need to be changed in two places:
-
-    ansible/environment/local/hosts
-    Vagrantfile
+### Installation
 
 * Run the command `vagrant up` from the directory where this README.md file is
   located. This should finish after many minutes.
@@ -36,37 +50,32 @@ machine.
 
 ### Accumulo
 
-`/datafascia/accumulo/bin`
+`/opt/dF/accumulo/bin`
 :   executables
 
-`/datafascia/accumulo/logs`
+`/var/dF/accumulo/logs`
 :   log files
-
-When you start or resume the virtual machine, you must start Accumulo with the
-command:
-
-    sudo service accumulo start
 
 
 ### Kafka
 
-`/datafascia/kafka/bin`
+`/opt/dF/kafka/bin`
 :   executables
 
-`/datafascia/kafka/logs`
+`/var/dF/kafka/logs`
 :   log files
 
 
 ### Storm
 
-`/datafascia/storm/bin`
+`/opt/dF/storm/bin`
 :   executables
 
-`/datafascia/storm/logs`
+`/var/dF/storm/logs`
 :   log files
 
 
 ### dataFascia Platform shell
 
-`/datafascia/df-platform/bin`
+`/opt/dF/df-platform/bin`
 :   executables

@@ -7,7 +7,11 @@ package com.datafascia.domain.event;
  */
 public enum ObservationType {
   A01,
+  A02,
   A03,
+  A06,
+  A08,
+  A13,
   ORU,
   OTHER
 }

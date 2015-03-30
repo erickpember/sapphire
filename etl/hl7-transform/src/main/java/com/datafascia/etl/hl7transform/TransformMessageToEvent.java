@@ -8,6 +8,7 @@ import ca.uhn.hl7v2.model.Message;
 import com.datafascia.domain.event.Event;
 import java.net.URI;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import lombok.extern.slf4j.Slf4j;
@@ -55,12 +56,13 @@ public class TransformMessageToEvent extends BaseFunction {
     }
 
     try {
-      Event event = transformer.transform(institutionId, facilityId, message);
-      collector.emit(new Values(event));
-      log.debug("Transform transformed Message to Event. institutionId:{}, facilityId:{},"
-          + " type:{}, data:{}", event.getInstitutionId(), event.getFacilityId(), event.getType(),
-          event.getData());
-
+      List<Event> events = transformer.transform(institutionId, facilityId, message);
+      for (Event event : events) {
+        collector.emit(new Values(event));
+        log.debug("Transform transformed Message to Event. institutionId:{}, facilityId:{},"
+            + " type:{}, data:{}", event.getInstitutionId(), event.getFacilityId(), event.getType(),
+            event.getData());
+      }
     } catch (IllegalStateException e) {
       log.error("Cannot transform message type " + message.getClass(), e);
     }

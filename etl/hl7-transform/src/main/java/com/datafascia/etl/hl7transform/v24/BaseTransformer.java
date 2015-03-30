@@ -3,6 +3,8 @@
 package com.datafascia.etl.hl7transform.v24;
 
 import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.Segment;
+import ca.uhn.hl7v2.model.Varies;
 import ca.uhn.hl7v2.model.v24.datatype.CE;
 import ca.uhn.hl7v2.model.v24.datatype.FT;
 import ca.uhn.hl7v2.model.v24.datatype.TSComponentOne;
@@ -23,6 +25,7 @@ import com.datafascia.etl.hl7transform.MessageToEventTransformer;
 import com.datafascia.etl.hl7transform.RaceMap;
 import com.neovisionaries.i18n.LanguageAlpha3Code;
 import com.neovisionaries.i18n.LanguageCode;
+
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -33,9 +36,10 @@ import java.util.List;
 /**
  * Implements common methods for transformers.
  */
-public abstract class BaseTransformer implements MessageToEventTransformer {
+public abstract class BaseTransformer extends MessageToEventTransformer {
 
   private static final ZoneId TIME_ZONE = ZoneId.of("America/Los_Angeles");
+  public static final String V24 = "2.4";
 
   protected AdmitData toAdmitData(PID pid, PV1 pv1) throws HL7Exception {
     return AdmitData.builder()
@@ -44,16 +48,27 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
         .build();
   }
 
+  @Override
+  protected ObservationData segmentsToObservationData(String version, Segment obx,
+      List<Segment> segmentNotes, ObservationType observationType) throws HL7Exception {
+    ArrayList<NTE> ntes = new ArrayList<>();
+    for (Segment seg : segmentNotes) {
+      ntes.add((NTE) seg);
+    }
+
+    return toObservationData(version, (OBX) obx, ntes, observationType);
+  }
+
   /**
    * Takes an OBX and it's associated NTEs and converts it into an Avro-friendly POJO.
    * @param obx The OBX segment.
-   * @param ntes The NTE segment.
+   * @param ntes The NTE segments.
    * @param observationType The type of message it came from.
    * @return Avro-friendly Pojo.
    * @throws HL7Exception
    */
-  protected ObservationData toObservationData(OBX obx, List<NTE> ntes,
-                                              ObservationType observationType) throws HL7Exception {
+  protected ObservationData toObservationData(String version, OBX obx, List<NTE> ntes,
+      ObservationType observationType) throws HL7Exception {
     List<String> observationMethod = new ArrayList<>();
     for (CE ce : obx.getObservationMethod()) {
       observationMethod.add(ce.getText().encode());
@@ -68,7 +83,7 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
       }
     }
 
-    List<String> abnormalFlags = null;
+    List<String> abnormalFlags = new ArrayList<>();
     if (!obx.getAbnormalFlags().isEmpty()) {
       abnormalFlags.add(obx.getAbnormalFlags().encode());
     }
@@ -77,10 +92,14 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
     if (obx.getProbability().length > 0) {
       probability = obx.getProbability()[0].encode();
     }
-    String observationValue = null;
+
+    List<String> observationValue = new ArrayList<>();
     if (obx.getObservationValue().length > 0) {
-      observationValue = obx.getObservationValue()[0].encode();
+      for (Varies varies : obx.getObservationValue()) {
+        observationValue.add(varies.encode());
+      }
     }
+
     return ObservationData.builder()
         .observationMethod(observationMethod)
         .abnormalFlags(abnormalFlags)
@@ -98,9 +117,10 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
         .valueType(obx.getValueType().getValueOrEmpty())
         .subId(obx.getObservationSubId().getValueOrEmpty())
         .value(observationValue)
-        .id(obx.getSetIDOBX().encode())
+        .id(obx.getObservationIdentifier().encode())
         .referenceRange(obx.getReferencesRange().encode())
-        .observationType(observationType).build();
+        .observationType(observationType)
+        .hl7Version(version).build();
   }
 
   private PatientData toPatientData(PID pid) throws HL7Exception {

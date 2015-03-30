@@ -30,7 +30,9 @@ import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import javax.inject.Singleton;
 import org.apache.accumulo.core.client.Connector;
@@ -95,6 +97,17 @@ public class HL7MessageToEventTopologyIT {
   private static final String HL7_MESSAGE_TOPIC = "hl7Message";
   private static final String HL7_MESSAGE_SPOUT_ID = "hl7MessageSpout";
   private static final String EVENT_TOPIC = "event";
+  private static final ArrayList<String> OBX_TEST_FILENAMES = new ArrayList<String>() {
+    {
+      add("ADT_A01_OBXtest.hl7");
+      add("ADT_A02_OBXtest.hl7");
+      add("ADT_A03_OBXtest.hl7");
+      add("ADT_A06_OBXtest.hl7");
+      add("ADT_A08_OBXtest.hl7");
+      add("ADT_A13_OBXtest.hl7");
+      add("ORU_R01_OBXtest.hl7");
+    }
+  };
 
   private static ConnectorFactory connectorFactory;
   private static Injector injector;
@@ -158,7 +171,8 @@ public class HL7MessageToEventTopologyIT {
         .build();
     feedHL7Message(originalMessage);
 
-    Optional<IngestMessage> optionalMessage = ingestMessageRepository.read(originalMessage.getId());
+    Optional<IngestMessage> optionalMessage
+        = ingestMessageRepository.read(originalMessage.getId());
     assertTrue(optionalMessage.isPresent());
 
     IngestMessage message = optionalMessage.get();
@@ -168,11 +182,44 @@ public class HL7MessageToEventTopologyIT {
     verify(singleTopicProducer).send(any());
   }
 
+  @Test
+  public void should_save_obx_messages() throws Exception {
+    for (ByteBuffer payload : getObxPayloads()) {
+      IngestMessage originalMessage = IngestMessage.builder()
+          .timestamp(Instant.now())
+          .institution(URI.create("urn:df-institution:institution"))
+          .facility(URI.create("urn:df-facility:facility"))
+          .payloadType(URI.create("urn:df-payloadtype:HL7v2"))
+          .payload(payload)
+          .build();
+      feedHL7Message(originalMessage);
+
+      Optional<IngestMessage> optionalMessage
+          = ingestMessageRepository.read(originalMessage.getId());
+      assertTrue(optionalMessage.isPresent());
+
+      IngestMessage message = optionalMessage.get();
+      assertEquals(message.getTimestamp(), originalMessage.getTimestamp());
+      assertEquals(message.getPayload(), originalMessage.getPayload());
+    }
+  }
+
   private ByteBuffer getPayload() throws IOException {
     String payload = Resources.toString(
         Resources.getResource("ADT_A01.hl7"), StandardCharsets.UTF_8);
     payload = payload.replace('\n', '\r');
     return ByteBuffer.wrap(payload.getBytes(StandardCharsets.UTF_8));
+  }
+
+  private List<ByteBuffer> getObxPayloads() throws IOException {
+    List<ByteBuffer> payloads = new ArrayList<>();
+    for (String filename : OBX_TEST_FILENAMES) {
+      String payload = Resources.toString(
+          Resources.getResource(filename), StandardCharsets.UTF_8);
+      payload = payload.replace('\n', '\r');
+      payloads.add(ByteBuffer.wrap(payload.getBytes(StandardCharsets.UTF_8)));
+    }
+    return payloads;
   }
 
   private void feedHL7Message(IngestMessage message) {

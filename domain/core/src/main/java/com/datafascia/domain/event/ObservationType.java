@@ -2,11 +2,12 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.event;
 
-import org.apache.avro.reflect.Union;
-
 /**
- * Marker interface for data included with event.
+ * An enumeration of message types that produce OBX segments.
  */
-@Union({ AdmitData.class, ObservationListData.class })
-public interface EventData {
+public enum ObservationType {
+  A01,
+  A03,
+  ORU,
+  OTHER
 }

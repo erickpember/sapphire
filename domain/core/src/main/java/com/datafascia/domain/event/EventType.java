@@ -12,7 +12,8 @@ import java.util.Optional;
 public enum EventType implements Code<String> {
   UNKNOWN("UNKNOWN"),
   PATIENT_ADMIT("PATIENT_ADMIT"),
-  PATIENT_DISCHARGE("PATIENT_DISCHARGE");
+  PATIENT_DISCHARGE("PATIENT_DISCHARGE"),
+  OBSERVATION("OBSERVATION");
 
   private String code;
 

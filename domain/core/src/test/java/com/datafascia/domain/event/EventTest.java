@@ -12,6 +12,8 @@ import com.neovisionaries.i18n.LanguageCode;
 import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.util.Arrays;
+
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -26,6 +28,60 @@ public class EventTest {
   private MemorySchemaRegistry schemaRegistry = new MemorySchemaRegistry();
   private Serializer serializer = new Serializer(schemaRegistry);
   private Deserializer deserializer = new Deserializer(schemaRegistry);
+
+  @Test
+  public void observationDataTestAllFields() {
+    ObservationData originalObservationData = ObservationData.builder()
+        .abnormalFlags(Arrays.asList("flag1", "flag2"))
+        .comments(Arrays.asList("comment1", "comment2"))
+        .effectiveDateOfLastNormalObservation("effectiveDateOfLastNormalObservation")
+        .id("id")
+        .hl7Version("version")
+        .natureOfAbnormalTest("natureOfAbnormalTest")
+        .observationDateAndTime("observationDateAndTime")
+        .observationMethod(Arrays.asList("method1", "method2"))
+        .observationType(ObservationType.A01)
+        .probability("probability")
+        .producersId("producersId")
+        .referenceRange("referenceRange")
+        .responsibleObserver("responsibleObserver")
+        .resultStatus("resultStatus")
+        .subId("subId")
+        .userDefinedAccessChecks("userDefinedAccessChecks")
+        .value(Arrays.asList("value"))
+        .valueType("valueType").build();
+
+    byte[] bytes = serializer.encodeReflect(TOPIC, originalObservationData);
+    ObservationData observationData = deserializer.decodeReflect(TOPIC, bytes,
+        ObservationData.class);
+    assertEquals(originalObservationData,observationData);
+  }
+
+  @Test
+  public void observationDataTestNoOptionalFields() {
+    ObservationData originalObservationData = ObservationData.builder()
+        .id("id")
+        .hl7Version("version")
+        .observationType(ObservationType.A01)
+        .resultStatus("resultStatus")
+        .value(Arrays.asList("value"))
+        .valueType("valueType").build();
+
+    byte[] bytes = serializer.encodeReflect(TOPIC, originalObservationData);
+    ObservationData observationData = deserializer.decodeReflect(TOPIC, bytes,
+        ObservationData.class);
+    assertEquals(originalObservationData,observationData);
+  }
+
+  @Test(expectedExceptions = NullPointerException.class)
+  public void observationDataTestShouldFail() {
+    ObservationData originalObservationData = ObservationData.builder().build();
+
+    byte[] bytes = serializer.encodeReflect(TOPIC, originalObservationData);
+    ObservationData observationData = deserializer.decodeReflect(TOPIC, bytes,
+        ObservationData.class);
+    assertEquals(originalObservationData,observationData);
+  }
 
   @Test
   public void should_decode() {
@@ -47,6 +103,9 @@ public class EventTest {
     AdmitData originalAdmitData = AdmitData.builder()
         .patient(originalPatientData)
         .encounter(originalEncounterData)
+        .build();
+    ObservationListData originalObservationData = ObservationListData.builder()
+        .observations(null)
         .build();
     Event originalEvent = Event.builder()
         .institutionId(URI.create("institution"))

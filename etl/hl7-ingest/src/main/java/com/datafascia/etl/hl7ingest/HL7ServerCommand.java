@@ -3,14 +3,17 @@
 package com.datafascia.etl.hl7ingest;
 
 import ca.uhn.hl7v2.DefaultHapiContext;
+import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.app.HL7Service;
 import ca.uhn.hl7v2.protocol.ReceivingApplication;
+import ca.uhn.hl7v2.protocol.ReceivingApplicationExceptionHandler;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.Parameters;
 import com.datafascia.common.command.Command;
 import com.datafascia.common.jcommander.URIConverter;
 import java.net.URI;
+import java.util.Map;
 import java.util.Properties;
 import kafka.javaapi.producer.Producer;
 import kafka.producer.ProducerConfig;
@@ -69,6 +72,7 @@ public class HL7ServerCommand implements Command {
     ReceivingApplication handler = new HL7Receiver(kafkaProducer(), queueName,
         institution, facility, department, source, payloadType);
     server.registerApplication(handler);
+    server.setExceptionHandler(new MllpExceptionHandler());
     server.start();
 
     return EXIT_STATUS_SUCCESS;
@@ -83,5 +87,18 @@ public class HL7ServerCommand implements Command {
     properties.put("request.required.acks", "1");
 
     return new Producer<>(new ProducerConfig(properties));
+  }
+
+  /**
+   * An exception handler for validation of incoming messages.
+   */
+  public static class MllpExceptionHandler implements ReceivingApplicationExceptionHandler {
+    @Override
+    public String processException(String incomingMessage, Map<String, Object> incomingMetadata,
+        String outoingMessage, Exception e) throws HL7Exception {
+      log.error("Error processing incoming message. Header is as follows: \n" + incomingMessage
+          .split("\r")[0], e);
+      return outoingMessage;
+    }
   }
 }

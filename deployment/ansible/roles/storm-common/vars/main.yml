@@ -1,5 +1,5 @@
 ---
-storm_version: 0.9.3
+storm_version: 0.9.4
 
 storm_package: apache-storm-{{ storm_version }}.tar.gz
 

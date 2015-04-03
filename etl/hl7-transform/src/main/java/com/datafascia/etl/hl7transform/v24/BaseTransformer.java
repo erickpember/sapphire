@@ -13,9 +13,11 @@ import ca.uhn.hl7v2.model.v24.segment.NTE;
 import ca.uhn.hl7v2.model.v24.segment.OBX;
 import ca.uhn.hl7v2.model.v24.segment.PID;
 import ca.uhn.hl7v2.model.v24.segment.PV1;
+import ca.uhn.hl7v2.util.Terser;
 import com.datafascia.domain.event.AdmitData;
 import com.datafascia.domain.event.EncounterData;
 import com.datafascia.domain.event.ObservationData;
+import com.datafascia.domain.event.ObservationListData;
 import com.datafascia.domain.event.ObservationType;
 import com.datafascia.domain.event.PatientData;
 import com.datafascia.domain.model.Gender;
@@ -23,9 +25,9 @@ import com.datafascia.domain.model.MaritalStatus;
 import com.datafascia.domain.model.Race;
 import com.datafascia.etl.hl7transform.MessageToEventTransformer;
 import com.datafascia.etl.hl7transform.RaceMap;
+import com.google.common.base.Strings;
 import com.neovisionaries.i18n.LanguageAlpha3Code;
 import com.neovisionaries.i18n.LanguageCode;
-
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
@@ -36,9 +38,11 @@ import java.util.List;
 /**
  * Implements common methods for transformers.
  */
-public abstract class BaseTransformer extends MessageToEventTransformer {
+public abstract class BaseTransformer implements MessageToEventTransformer {
 
   private static final ZoneId TIME_ZONE = ZoneId.of("America/Los_Angeles");
+
+  protected static final String SUBSCRIPT_PLACEHOLDER = "REPLACEME";
 
   protected AdmitData toAdmitData(PID pid, PV1 pv1) throws HL7Exception {
     return AdmitData.builder()
@@ -47,8 +51,17 @@ public abstract class BaseTransformer extends MessageToEventTransformer {
         .build();
   }
 
-  @Override
-  protected ObservationData segmentsToObservationData(Segment obx,
+  /**
+   * Converts segments to appropriate versions of NTE and OBX in order to call
+   * and wrap toObservationData.
+   *
+   * @param obx Segment to convert to OBX
+   * @param segmentNotes Segment to convert to List<NTE>
+   * @param observationType Type of message from which the aforementioned segments were extracted.
+   * @return observation data
+   * @throws HL7Exception Parsing error encountered in toObservationData.
+   */
+  private ObservationData segmentsToObservationData(Segment obx,
       List<Segment> segmentNotes, ObservationType observationType) throws HL7Exception {
     ArrayList<NTE> ntes = new ArrayList<>();
     for (Segment seg : segmentNotes) {
@@ -119,6 +132,69 @@ public abstract class BaseTransformer extends MessageToEventTransformer {
         .id(obx.getObservationIdentifier().encode())
         .referenceRange(obx.getReferencesRange().encode())
         .observationType(observationType)
+        .build();
+  }
+
+  /**
+   * Groups of multiple OBX and NTE segments are arranged in Hapi Terser paths this way:
+   * OBX, OBX(1), OBX(2)
+   * This method produces the number sequence "", "(1)","(2)"..."(n)"
+   *
+   * @param subscript String representing what comes after OBX or NTE, such as (1).
+   * @return the next subscript in order.
+   */
+  private String incrementSubscript(String subscript) {
+    if (subscript.isEmpty()) {
+      return "(1)";
+    } else {
+      // Pull the number out of the parens, increment it and put parens back on.
+      return "(" + Integer.toString(Integer.parseInt(subscript.replaceAll("[^\\d.]", "")) + 1)
+          + ")";
+    }
+  }
+
+  /**
+   * General purpose utility to parse OBX and NTE segments out of HL7 messages.
+   *
+   * @param obxRootPath Terser path to find OBX, varies between message types.
+   * @param nteRootPath Terser path to find NTE, varies between message types.
+   * @param terser Like XPath for HL7, extracts segments from parsed HL7 using a path.
+   * @param observationType The subtype of the wrapping message, such as AO1.
+   * @return EventData subclass containing a list of Observations stored in our internal format.
+   * @throws ca.uhn.hl7v2.HL7Exception Failure to parse HL7 with terser.
+   */
+  protected ObservationListData extractObx(String obxRootPath, String nteRootPath, Terser terser,
+      ObservationType observationType)
+      throws HL7Exception {
+    String obxSubscript = "";
+    String currentObxPath = obxRootPath.replace(SUBSCRIPT_PLACEHOLDER, obxSubscript);
+    List<ObservationData> observations = new ArrayList<>();
+
+    // iterate through obx segments: OBX, OBX(1), OBX(2)... OBX(n)
+    while (!Strings.isNullOrEmpty(terser.get(currentObxPath + "-1"))) {
+      Segment obx = terser.getSegment(currentObxPath);
+
+      // iterate through NTE segments
+      List<Segment> notes = new ArrayList<>();
+      String nteSubscript = "";
+      String currentNtePath = nteRootPath.replace(SUBSCRIPT_PLACEHOLDER, obxSubscript);
+
+      while (!Strings.isNullOrEmpty(currentNtePath) &&
+          !Strings.isNullOrEmpty(terser.get(currentNtePath + "-1"))) {
+
+        notes.add(terser.getSegment(currentNtePath));
+
+        nteSubscript = incrementSubscript(nteSubscript);
+        currentNtePath = nteRootPath.replace(SUBSCRIPT_PLACEHOLDER, obxSubscript)
+            + nteSubscript;
+      }
+      observations.add(segmentsToObservationData(obx, notes, observationType));
+
+      obxSubscript = incrementSubscript(obxSubscript);
+      currentObxPath = obxRootPath.replace(SUBSCRIPT_PLACEHOLDER, obxSubscript);
+    }
+    return ObservationListData.builder()
+        .observations(observations)
         .build();
   }
 

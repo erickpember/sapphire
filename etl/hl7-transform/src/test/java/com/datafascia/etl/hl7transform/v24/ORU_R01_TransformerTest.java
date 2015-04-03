@@ -1,12 +1,13 @@
 // Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.etl.hl7transform.v23;
+package com.datafascia.etl.hl7transform.v24;
 
 import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.model.Message;
-import ca.uhn.hl7v2.model.v23.message.ORU_R01;
+import ca.uhn.hl7v2.model.v24.message.ORU_R01;
+import ca.uhn.hl7v2.parser.CanonicalModelClassFactory;
 import ca.uhn.hl7v2.parser.Parser;
 import com.datafascia.domain.event.Event;
 import com.datafascia.domain.event.EventType;
@@ -19,6 +20,7 @@ import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -27,15 +29,22 @@ import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 /**
- * This tests parsing of OBX from a hl7 file to Events.
- *
+ * Tests parsing of OBX segments from an ORU message to events.
  */
 @Slf4j
 public class ORU_R01_TransformerTest {
 
   private static final String HL7_OBX_FILE = "ORU_R01_OBXtest.hl7";
-  private static final HapiContext context = new DefaultHapiContext();
-  private static final Parser parser = context.getGenericParser();
+
+  private static Parser parser;
+
+  @BeforeClass
+  public static void beforeClass() {
+    HapiContext context = new DefaultHapiContext();
+    context.setModelClassFactory(new CanonicalModelClassFactory("2.4"));
+
+    parser = context.getPipeParser();
+  }
 
   /**
    * Test of getApplicableMessageType method, of class ORU_R01_Transformer.
@@ -98,7 +107,7 @@ public class ORU_R01_TransformerTest {
 
         obxCompleted = true;
       } else {
-        fail("Unknown even type found:" + event.getType());
+        fail("Unknown event type found: " + event.getType());
       }
     }
     assertTrue(obxCompleted, "OBX segment was not successfully processed");

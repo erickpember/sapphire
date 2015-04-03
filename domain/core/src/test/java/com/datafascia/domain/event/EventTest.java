@@ -36,7 +36,6 @@ public class EventTest {
         .comments(Arrays.asList("comment1", "comment2"))
         .effectiveDateOfLastNormalObservation("effectiveDateOfLastNormalObservation")
         .id("id")
-        .hl7Version("version")
         .natureOfAbnormalTest("natureOfAbnormalTest")
         .observationDateAndTime("observationDateAndTime")
         .observationMethod(Arrays.asList("method1", "method2"))
@@ -61,7 +60,6 @@ public class EventTest {
   public void observationDataTestNoOptionalFields() {
     ObservationData originalObservationData = ObservationData.builder()
         .id("id")
-        .hl7Version("version")
         .observationType(ObservationType.A01)
         .resultStatus("resultStatus")
         .value(Arrays.asList("value"))

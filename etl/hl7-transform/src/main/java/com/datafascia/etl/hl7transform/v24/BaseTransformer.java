@@ -39,7 +39,6 @@ import java.util.List;
 public abstract class BaseTransformer extends MessageToEventTransformer {
 
   private static final ZoneId TIME_ZONE = ZoneId.of("America/Los_Angeles");
-  public static final String V24 = "2.4";
 
   protected AdmitData toAdmitData(PID pid, PV1 pv1) throws HL7Exception {
     return AdmitData.builder()
@@ -49,14 +48,14 @@ public abstract class BaseTransformer extends MessageToEventTransformer {
   }
 
   @Override
-  protected ObservationData segmentsToObservationData(String version, Segment obx,
+  protected ObservationData segmentsToObservationData(Segment obx,
       List<Segment> segmentNotes, ObservationType observationType) throws HL7Exception {
     ArrayList<NTE> ntes = new ArrayList<>();
     for (Segment seg : segmentNotes) {
       ntes.add((NTE) seg);
     }
 
-    return toObservationData(version, (OBX) obx, ntes, observationType);
+    return toObservationData((OBX) obx, ntes, observationType);
   }
 
   /**
@@ -67,7 +66,7 @@ public abstract class BaseTransformer extends MessageToEventTransformer {
    * @return Avro-friendly Pojo.
    * @throws HL7Exception
    */
-  protected ObservationData toObservationData(String version, OBX obx, List<NTE> ntes,
+  protected ObservationData toObservationData(OBX obx, List<NTE> ntes,
       ObservationType observationType) throws HL7Exception {
     List<String> observationMethod = new ArrayList<>();
     for (CE ce : obx.getObservationMethod()) {
@@ -120,7 +119,7 @@ public abstract class BaseTransformer extends MessageToEventTransformer {
         .id(obx.getObservationIdentifier().encode())
         .referenceRange(obx.getReferencesRange().encode())
         .observationType(observationType)
-        .hl7Version(version).build();
+        .build();
   }
 
   private PatientData toPatientData(PID pid) throws HL7Exception {

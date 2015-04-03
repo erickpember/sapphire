@@ -42,7 +42,7 @@ public class ADT_A01_Transformer extends BaseTransformer {
       if (!Strings.isNullOrEmpty(terser.get(OBX_ROOT_PATH.replace(SUBSCRIPT_PLACEHOLDER, "")
           + "-1"))) {
         ObservationListData observationList = extractObx(OBX_ROOT_PATH, "", terser,
-            ObservationType.A01, V24);
+            ObservationType.A01);
 
         outputEvents.add(Event.builder()
             .institutionId(institutionId)

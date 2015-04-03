@@ -6,15 +6,17 @@ import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.model.Message;
-import ca.uhn.hl7v2.model.v23.segment.NTE;
 import ca.uhn.hl7v2.model.v24.message.ADT_A01;
 import ca.uhn.hl7v2.model.v24.message.ADT_A03;
+import ca.uhn.hl7v2.model.v24.segment.NTE;
 import ca.uhn.hl7v2.model.v24.segment.OBX;
+import ca.uhn.hl7v2.parser.CanonicalModelClassFactory;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.util.Terser;
 import com.datafascia.domain.event.Event;
 import com.datafascia.domain.event.ObservationData;
 import com.datafascia.domain.event.ObservationType;
+import com.datafascia.etl.hl7transform.v24.BaseTransformer;
 import java.io.File;
 import java.io.IOException;
 import java.net.URI;
@@ -23,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static java.nio.file.Files.readAllBytes;
@@ -34,14 +37,18 @@ import static org.testng.Assert.assertEquals;
  */
 @Slf4j
 public class ObxTransformTest {
-  private static final HapiContext context = new DefaultHapiContext();
-  private static final Parser p = context.getGenericParser();
-  private static final String segmentRoot = "/RESPONSE/ORDER_OBSERVATION/OBSERVATION";
-  private static final TestObxV24Transformer transformer24 = new TestObxV24Transformer();
-  private static final TestObxV23Transformer transformer23 = new TestObxV23Transformer();
-  private static final String V24 = "2.4";
-  private static final String V23 = "2.3";
+  private static Parser parser;
+  private static final String segmentRoot = "/PATIENT_RESULT/ORDER_OBSERVATION/OBSERVATION";
+  private static final TestObxTransformer transformer = new TestObxTransformer();
   private static String currentFile;
+
+  @BeforeClass
+  public static void beforeClass() {
+    HapiContext context = new DefaultHapiContext();
+    context.setModelClassFactory(new CanonicalModelClassFactory("2.4"));
+
+    parser = context.getPipeParser();
+  }
 
   @Test
   public void testObx() throws IOException, HL7Exception {
@@ -58,7 +65,7 @@ public class ObxTransformTest {
 
   private static void parseFile(String filename) throws IOException, HL7Exception {
     currentFile = filename;
-    Message hapiMsg = p.parse(content(filename));
+    Message hapiMsg = parser.parse(content(filename));
     Terser terser = new Terser(hapiMsg);
     String hl7type = terser.get("/MSH-9-1");
     String hl7subtype = terser.get("/MSH-9-2");
@@ -67,29 +74,25 @@ public class ObxTransformTest {
 
   private static void handleRoutes(String hl7type, String hl7subtype, Message hapiMsg, Terser
       terser) throws HL7Exception {
-    /*
-     * The test data we have now has all ADT messages in version 2.4 format and all ORU messages in
-     * version 2.3 format.
-     */
-    if (hl7type.equals("ADT") && hapiMsg.getVersion().equals(V24)) {
+
+    if (hl7type.equals("ADT")) {
       if (hl7subtype.equals("A01")) {
-        handleV24A01((ADT_A01) hapiMsg);
+        handleADT_A01((ADT_A01) hapiMsg);
       } else if (hl7subtype.equals("A03")) {
-        handleV24A03((ADT_A03) hapiMsg);
+        handleADT_A03((ADT_A03) hapiMsg);
       }
-    } else if (hl7type.equals("ORU") && hl7subtype.equals("R01")
-        && hapiMsg.getVersion().equals(V23)) {
-      handleV23R01(terser);
+    } else if (hl7type.equals("ORU") && hl7subtype.equals("R01")) {
+      handleORU_R01(terser);
     } else {
       log.info("Unhandled message. Type:" + hl7type + " Subtype:" + hl7subtype + " Version: "
           + hapiMsg.getVersion());
     }
   }
 
-  private static void handleV24A01(ADT_A01 a01) throws HL7Exception {
+  private static void handleADT_A01(ADT_A01 a01) throws HL7Exception {
     for (int i = 0; i < a01.getOBXAll().size(); i++) {
       OBX obx = a01.getOBXAll().get(i);
-      ObservationData obdata = transformer24.testObxData(obx, ObservationType.A01);
+      ObservationData obdata = transformer.testObxData(obx, null, ObservationType.A01);
 
       // Test the values of a known A01 message.
       if (currentFile.endsWith("1420235232060.dat.hl7")) {
@@ -117,10 +120,10 @@ public class ObxTransformTest {
 
   }
 
-  private static void handleV24A03(ADT_A03 a03) throws HL7Exception {
+  private static void handleADT_A03(ADT_A03 a03) throws HL7Exception {
     for (int i = 0; i < a03.getOBXAll().size(); i++) {
       OBX obx = a03.getOBXAll().get(i);
-      ObservationData obdata = transformer24.testObxData(obx, ObservationType.A03);
+      ObservationData obdata = transformer.testObxData(obx, null, ObservationType.A03);
 
       // Test the values of a known A03 message.
       if (currentFile.endsWith("1424369138736.dat.hl7")) {
@@ -141,14 +144,13 @@ public class ObxTransformTest {
     }
   }
 
-  private static void handleV23R01(Terser terser) throws HL7Exception {
+  private static void handleORU_R01(Terser terser) throws HL7Exception {
     for (int i = 0; i < 10000; i++) {
       String insert = i == 0 ? "" : "(" + Integer.toString(i) + ")";
       String obxSegmentPath = segmentRoot + insert + "/OBX";
       log.info("Getting segment: " + obxSegmentPath);
 
-      ca.uhn.hl7v2.model.v23.segment.OBX obx = (ca.uhn.hl7v2.model.v23.segment.OBX) terser
-          .getSegment(obxSegmentPath);
+      OBX obx = (OBX) terser.getSegment(obxSegmentPath);
 
       // If null, it encodes to an empty OBX segment.
       if (obx.encode().equals("OBX")) {
@@ -171,7 +173,7 @@ public class ObxTransformTest {
         ntes.add(nte);
       }
 
-      ObservationData obdata = transformer23.testObxData(obx, ntes, ObservationType.ORU);
+      ObservationData obdata = transformer.testObxData(obx, ntes, ObservationType.ORU);
 
       // Test some known ORU contents.
       if (currentFile.endsWith("1423254262610.dat.hl7")) {
@@ -210,30 +212,11 @@ public class ObxTransformTest {
     }
   }
 
-  private static class TestObxV24Transformer
-      extends com.datafascia.etl.hl7transform.v24.BaseTransformer {
+  private static class TestObxTransformer extends BaseTransformer {
 
-    public ObservationData testObxData(OBX obx, ObservationType type) throws HL7Exception {
-      return this.toObservationData(V24, obx, null, type);
-    }
-
-    @Override
-    public Class<? extends Message> getApplicableMessageType() {
-      return null;
-    }
-
-    @Override
-    public ArrayList<Event> transform(URI institutionId, URI facilityId, Message message) {
-      return null;
-    }
-  }
-
-  private static class TestObxV23Transformer
-      extends com.datafascia.etl.hl7transform.v23.BaseTransformer {
-
-    public ObservationData testObxData(ca.uhn.hl7v2.model.v23.segment.OBX obx, List<NTE> ntes,
+    public ObservationData testObxData(OBX obx, List<NTE> ntes,
           ObservationType type) throws HL7Exception {
-      return this.toObservationData(V23, obx, ntes, type);
+      return this.toObservationData(obx, ntes, type);
     }
 
     @Override

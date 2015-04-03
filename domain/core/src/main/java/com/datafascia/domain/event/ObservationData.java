@@ -21,11 +21,6 @@ public class ObservationData {
   private ObservationType observationType;
 
   /**
-   * The version of HL7 this came from.
-   */
-  private String hl7Version;
-
-  /**
    * Matching NTE segments
    */
   @Nullable

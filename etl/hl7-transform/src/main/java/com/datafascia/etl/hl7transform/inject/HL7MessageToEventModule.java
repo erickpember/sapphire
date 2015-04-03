@@ -4,6 +4,7 @@ package com.datafascia.etl.hl7transform.inject;
 
 import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HapiContext;
+import ca.uhn.hl7v2.parser.CanonicalModelClassFactory;
 import ca.uhn.hl7v2.parser.Parser;
 import com.codahale.metrics.MetricRegistry;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
@@ -28,7 +29,6 @@ public class HL7MessageToEventModule extends ConfigureModule {
     bind(AuthorizationsSupplier.class).to(FixedAuthorizationsSupplier.class);
     bind(AvroSchemaRegistry.class).to(MemorySchemaRegistry.class).in(Singleton.class);
     bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
-    bind(HapiContext.class).toInstance(new DefaultHapiContext());
     bind(MetricRegistry.class).in(Singleton.class);
   }
 
@@ -38,7 +38,23 @@ public class HL7MessageToEventModule extends ConfigureModule {
   }
 
   @Provides @Singleton
+  public HapiContext hapiContext() {
+    HapiContext context = new DefaultHapiContext();
+
+    /* HL7 v2 is a backwards compatible standard for the most part. It is
+     * possible to use a HAPI message structure to parse a message of the same
+     * type from an earlier version of the standard. Force a specific HL7
+     * version to use. Choose the highest HL7 version we need to support, and
+     * the model classes will be compatible with messages from previous
+     * versions.
+     */
+    context.setModelClassFactory(new CanonicalModelClassFactory("2.4"));
+
+    return context;
+  }
+
+  @Provides @Singleton
   public Parser parser(HapiContext context) {
-    return context.getGenericParser();
+    return context.getPipeParser();
   }
 }

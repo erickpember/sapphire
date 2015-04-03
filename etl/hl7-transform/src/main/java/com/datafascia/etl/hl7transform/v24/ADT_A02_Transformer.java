@@ -41,7 +41,7 @@ public class ADT_A02_Transformer extends BaseTransformer {
           + "-1"))) {
 
         ObservationListData observationList = extractObx(OBX_ROOT_PATH, "", terser,
-            ObservationType.A02, V24);
+            ObservationType.A02);
 
         outputEvents.add(Event.builder()
             .institutionId(institutionId)

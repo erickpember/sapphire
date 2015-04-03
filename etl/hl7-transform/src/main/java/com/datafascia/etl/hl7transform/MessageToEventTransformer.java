@@ -46,14 +46,13 @@ public abstract class MessageToEventTransformer {
    * This method must convert segments to appropriate versions of NTE and OBX in order to call
    * and wrap toObservationData.
    *
-   * @param version Hl7 version.
    * @param obx Segment to convert to OBX
    * @param segmentNotes Segment to convert to List<NTE>
    * @param observationType Type of message from which the aforementioned segments were extracted.
    * @return EventData representation of OBX segment.
    * @throws HL7Exception Parsing error encountered in toObservationData.
    */
-  protected abstract ObservationData segmentsToObservationData(String version, Segment obx,
+  protected abstract ObservationData segmentsToObservationData(Segment obx,
       List<Segment> segmentNotes, ObservationType observationType) throws HL7Exception;
 
   /**
@@ -81,12 +80,11 @@ public abstract class MessageToEventTransformer {
    * @param nteRootPath Terser path to find NTE, varies between message types.
    * @param terser Like XPath for HL7, extracts segments from parsed HL7 using a path.
    * @param observationType The subtype of the wrapping message, such as AO1.
-   * @param version Version of HL7 to parse.
    * @return EventData subclass containing a list of Observations stored in our internal format.
    * @throws ca.uhn.hl7v2.HL7Exception Failure to parse HL7 with terser.
    */
   protected ObservationListData extractObx(String obxRootPath, String nteRootPath, Terser terser,
-      ObservationType observationType, String version)
+      ObservationType observationType)
       throws HL7Exception {
     String obxSubscript = "";
     String currentObxPath = obxRootPath.replace(SUBSCRIPT_PLACEHOLDER, obxSubscript);
@@ -110,7 +108,7 @@ public abstract class MessageToEventTransformer {
         currentNtePath = nteRootPath.replace(SUBSCRIPT_PLACEHOLDER, obxSubscript)
             + nteSubscript;
       }
-      observations.add(segmentsToObservationData(version, obx, notes, observationType));
+      observations.add(segmentsToObservationData(obx, notes, observationType));
 
       obxSubscript = incrementSubscript(obxSubscript);
       currentObxPath = obxRootPath.replace(SUBSCRIPT_PLACEHOLDER, obxSubscript);

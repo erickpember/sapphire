@@ -1,10 +1,10 @@
 // Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.etl.hl7transform.v23;
+package com.datafascia.etl.hl7transform.v24;
 
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
-import ca.uhn.hl7v2.model.v23.message.ORU_R01;
+import ca.uhn.hl7v2.model.v24.message.ORU_R01;
 import ca.uhn.hl7v2.util.Terser;
 import com.datafascia.domain.event.Event;
 import com.datafascia.domain.event.EventType;
@@ -17,7 +17,7 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Extracts OBX data from an A06 message.
+ * Extracts OBX data from an ORU message.
  * Further parsing of elements outside the OBX is not yet done.
  */
 @Slf4j
@@ -25,9 +25,9 @@ public class ORU_R01_Transformer extends BaseTransformer {
 
   // HAPI paths to retrieve the segments. Differs between some message types.
   private static final String OBX_ROOT_PATH
-      = "/RESPONSE/ORDER_OBSERVATION/OBSERVATION" + SUBSCRIPT_PLACEHOLDER + "/OBX";
+      = "/PATIENT_RESULT/ORDER_OBSERVATION/OBSERVATION" + SUBSCRIPT_PLACEHOLDER + "/OBX";
   private static final String NTE_ROOT_PATH
-      = "/RESPONSE/ORDER_OBSERVATION/OBSERVATION" + SUBSCRIPT_PLACEHOLDER + "/NTE";
+      = "/PATIENT_RESULT/ORDER_OBSERVATION/OBSERVATION" + SUBSCRIPT_PLACEHOLDER + "/NTE";
 
   @Override
   public Class<? extends Message> getApplicableMessageType() {
@@ -44,7 +44,7 @@ public class ORU_R01_Transformer extends BaseTransformer {
       if (!Strings.isNullOrEmpty(terser.get(OBX_ROOT_PATH.replace(SUBSCRIPT_PLACEHOLDER, "")
           + "-1"))) {
         ObservationListData observationList = extractObx(OBX_ROOT_PATH, NTE_ROOT_PATH, terser,
-            ObservationType.ORU, V23);
+            ObservationType.ORU);
 
         outputEvents.add(Event.builder()
             .institutionId(institutionId)
@@ -56,8 +56,7 @@ public class ORU_R01_Transformer extends BaseTransformer {
 
       return outputEvents;
     } catch (HL7Exception e) {
-      log.debug("HL7 transformer failed to transform input:{}", input);
-      throw new IllegalStateException("Transform failed to build PatientData from HL7 message.", e);
+      throw new IllegalStateException("Transform failed to extract data from HL7 message", e);
     }
   }
 }

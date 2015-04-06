@@ -143,7 +143,7 @@ public class ObxTransformTest {
 
   private static void handleV23R01(Terser terser) throws HL7Exception {
     for (int i = 0; i < 10000; i++) {
-      String insert = i == 0 ? "" :  "(" + Integer.toString(i) + ")";
+      String insert = i == 0 ? "" : "(" + Integer.toString(i) + ")";
       String obxSegmentPath = segmentRoot + insert + "/OBX";
       log.info("Getting segment: " + obxSegmentPath);
 
@@ -159,7 +159,7 @@ public class ObxTransformTest {
 
       // Iterate NTEs for the OBX.
       for (int j = 0; j < 10000; j++) {
-        String nteinsert =  "(" + Integer.toString(j) + ")";
+        String nteinsert = "(" + Integer.toString(j) + ")";
         if (j == 0) {
           nteinsert = "";
         }

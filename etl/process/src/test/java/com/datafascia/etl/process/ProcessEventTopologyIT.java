@@ -188,7 +188,7 @@ public class ProcessEventTopologyIT {
 
     Patient dummyPatient = new Patient();
     dummyPatient.setInstitutionPatientId(patientData.getInstitutionPatientId());
-    Id<Patient> patientId = PatientRepository.getPatientId(dummyPatient);
+    Id<Patient> patientId = PatientRepository.getEntityId(dummyPatient);
 
     Patient patient = patientRepository.read(patientId).get();
     assertEquals(patient.getInstitutionPatientId(), patientData.getInstitutionPatientId());

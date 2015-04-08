@@ -49,7 +49,7 @@ public class PatientRepositoryTest extends BaseRepositoryTest {
 
   @Test(dependsOnGroups = "patients")
   public void should_list_patients_starting_from_specified_patient() {
-    Id<Patient> startPatientId = PatientRepository.getPatientId(patient2);
+    Id<Patient> startPatientId = PatientRepository.getEntityId(patient2);
     assertEquals(patientRepo.list(Optional.of(startPatientId), Optional.empty(), 5).size(), 2);
   }
 

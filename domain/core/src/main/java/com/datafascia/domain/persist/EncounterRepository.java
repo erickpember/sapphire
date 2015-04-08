@@ -49,7 +49,7 @@ public class EncounterRepository extends BaseRepository {
     super(accumuloTemplate);
   }
 
-  private static String toRowId(Id<Patient> patientId, Id<Encounter> encounterId) {
+  static String toRowId(Id<Patient> patientId, Id<Encounter> encounterId) {
     return toRowId(Patient.class, patientId) + toRowId(Encounter.class, encounterId);
   }
 

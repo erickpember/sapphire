@@ -83,6 +83,7 @@ public class EncounterRepository extends BaseRepository {
       hospitalization.setPeriod(new Interval<>());
 
       encounter = new Encounter();
+      encounter.setId(Id.of(extractEntityId(key)));
       encounter.setHospitalisation(hospitalization);
     }
 

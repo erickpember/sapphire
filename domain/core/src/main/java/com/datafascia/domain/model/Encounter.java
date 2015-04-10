@@ -26,9 +26,13 @@ import lombok.extern.slf4j.Slf4j;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "Encounter") @IdNamespace(URNFactory.NS_ENCOUNTER_ID)
 public class Encounter {
-  /** Identifies the encounter. */
+  /** identity of the resource assigned by the server responsible for storing it */
   @JsonProperty("@id")
   private Id<Encounter> id;
+
+  /** institution encounter identifier, for example, value from HL7 field PV1-19 */
+  @JsonProperty("identifier")
+  private String identifier;
 
   /** Status of the encounter. */
   @JsonProperty("status")

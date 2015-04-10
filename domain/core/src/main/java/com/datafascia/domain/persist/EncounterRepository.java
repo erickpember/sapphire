@@ -34,6 +34,7 @@ import org.apache.hadoop.io.Text;
 public class EncounterRepository extends BaseRepository {
 
   private static final String COLUMN_FAMILY = Encounter.class.getSimpleName();
+  private static final String IDENTIFIER = "identifier";
   private static final String ADMIT_TIME = "admitTime";
   private static final EncounterRowMapper ENCOUNTER_ROW_MAPPER = new EncounterRowMapper();
 
@@ -53,6 +54,17 @@ public class EncounterRepository extends BaseRepository {
   }
 
   /**
+   * Generates primary key from institution encounter identifier.
+   *
+   * @param encounter
+   *     encounter to read property from
+   * @return primary key
+   */
+  public static Id<Encounter> getEntityId(Encounter encounter) {
+    return Id.of(encounter.getIdentifier());
+  }
+
+  /**
    * Saves entity.
    *
    * @param patient
@@ -61,6 +73,8 @@ public class EncounterRepository extends BaseRepository {
    *     to save
    */
   public void save(Patient patient, Encounter encounter) {
+    encounter.setId(getEntityId(encounter));
+
     accumuloTemplate.save(
         Tables.PATIENT,
         toRowId(patient.getId(), encounter.getId()),
@@ -69,6 +83,7 @@ public class EncounterRepository extends BaseRepository {
           public void putWriteOperations(MutationBuilder mutationBuilder) {
             mutationBuilder
                 .columnFamily(COLUMN_FAMILY)
+                .put(IDENTIFIER, encounter.getIdentifier())
                 .put(ADMIT_TIME, encounter.getHospitalisation().getPeriod().getStartInclusive());
           }
         });
@@ -91,6 +106,9 @@ public class EncounterRepository extends BaseRepository {
     public void onReadEntry(Map.Entry<Key, Value> entry) {
       String value = entry.getValue().toString();
       switch (entry.getKey().getColumnQualifier().toString()) {
+        case IDENTIFIER:
+          encounter.setIdentifier(value);
+          break;
         case ADMIT_TIME:
           encounter.getHospitalisation().getPeriod().setStartInclusive(Instant.parse(value));
           break;

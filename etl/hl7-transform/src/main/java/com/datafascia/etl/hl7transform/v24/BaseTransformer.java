@@ -225,6 +225,8 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
 
   private EncounterData toEncounterData(PV1 pv1) throws HL7Exception {
     return EncounterData.builder()
+        .identifier(
+            pv1.getVisitNumber().getID().getValue())
         .admitTime(
             toInstant(pv1.getAdmitDateTime().getTimeOfAnEvent()))
         .build();

@@ -16,6 +16,9 @@ import org.apache.avro.reflect.AvroEncode;
 @AllArgsConstructor @Builder @Data @NoArgsConstructor
 public class EncounterData {
 
+  /** institution encounter identifier, for example, value from HL7 field PV1-19 */
+  private String identifier;
+
   @AvroEncode(using = InstantEncoding.class)
   private Instant admitTime;
 }

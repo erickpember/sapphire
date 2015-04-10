@@ -96,6 +96,7 @@ public class EventTest {
         .language(LanguageCode.en)
         .build();
     EncounterData originalEncounterData = EncounterData.builder()
+        .identifier("encounterIdentifier")
         .admitTime(Instant.now())
         .build();
     AdmitData originalAdmitData = AdmitData.builder()

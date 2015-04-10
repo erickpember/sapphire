@@ -146,6 +146,7 @@ public class ProcessEventTopologyIT {
         .language(LanguageCode.en)
         .build();
     EncounterData encounterData = EncounterData.builder()
+        .identifier("encounterIdentifier")
         .admitTime(Instant.now())
         .build();
     AdmitData admitData = AdmitData.builder()

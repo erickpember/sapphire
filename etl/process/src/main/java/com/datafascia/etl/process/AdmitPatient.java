@@ -2,7 +2,6 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.process;
 
-import com.datafascia.common.persist.Id;
 import com.datafascia.common.time.Interval;
 import com.datafascia.domain.event.AdmitData;
 import com.datafascia.domain.event.EncounterData;
@@ -16,7 +15,6 @@ import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import java.time.Instant;
 import java.util.Arrays;
-import java.util.UUID;
 import java.util.function.Consumer;
 import javax.inject.Inject;
 
@@ -39,12 +37,13 @@ public class AdmitPatient implements Consumer<Event> {
     hospitalization.setPeriod(period);
 
     Encounter encounter = new Encounter();
-    encounter.setId(Id.of(UUID.randomUUID().toString()));
+    encounter.setIdentifier(fromEncounter.getIdentifier());
+    encounter.setId(EncounterRepository.getEntityId(encounter));
     encounter.setHospitalisation(hospitalization);
     return encounter;
   }
 
-  private Patient createPatient(PatientData patientData, Encounter encounter) {
+  private static Patient createPatient(PatientData patientData, Encounter encounter) {
     Patient patient = new Patient();
     patient.setInstitutionPatientId(patientData.getInstitutionPatientId());
     patient.setAccountNumber(patientData.getAccountNumber());

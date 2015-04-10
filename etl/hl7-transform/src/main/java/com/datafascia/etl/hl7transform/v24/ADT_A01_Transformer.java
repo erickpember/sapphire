@@ -36,6 +36,15 @@ public class ADT_A01_Transformer extends BaseTransformer {
     ADT_A01 message = (ADT_A01) input;
 
     try {
+      AdmitData admitData = toAdmitData(message.getPID(), message.getPV1());
+
+      outputEvents.add(Event.builder()
+          .institutionId(institutionId)
+          .facilityId(facilityId)
+          .type(EventType.PATIENT_ADMIT)
+          .data(admitData)
+          .build());
+
       Terser terser = new Terser(input);
 
       // See if OBX exists. Message.getObx() and other Message methods don't work for some reason.
@@ -51,15 +60,6 @@ public class ADT_A01_Transformer extends BaseTransformer {
             .data(observationList)
             .build());
       }
-
-      AdmitData admitData = toAdmitData(message.getPID(), message.getPV1());
-
-      outputEvents.add(Event.builder()
-          .institutionId(institutionId)
-          .facilityId(facilityId)
-          .type(EventType.PATIENT_ADMIT)
-          .data(admitData)
-          .build());
 
       return outputEvents;
     } catch (HL7Exception e) {

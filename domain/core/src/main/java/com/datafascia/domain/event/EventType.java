@@ -13,14 +13,14 @@ public enum EventType implements Code<String> {
   UNKNOWN("UNKNOWN"),
   PATIENT_ADMIT("PATIENT_ADMIT"),
   PATIENT_DISCHARGE("PATIENT_DISCHARGE"),
-  OBSERVATION("OBSERVATION");
+  OBSERVATIONS_ADD("OBSERVATIONS_ADD");
 
   private String code;
 
   private static final CodeToEnumMapper<String, EventType> CODE_TO_ENUM_MAPPER =
       new CodeToEnumMapper<>(EventType.class);
 
-  private EventType(String code) {
+  EventType(String code) {
     this.code = code;
   }
 

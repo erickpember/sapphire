@@ -49,7 +49,7 @@ public class ORU_R01_Transformer extends BaseTransformer {
         outputEvents.add(Event.builder()
             .institutionId(institutionId)
             .facilityId(facilityId)
-            .type(EventType.OBSERVATION)
+            .type(EventType.OBSERVATIONS_ADD)
             .data(observationList)
             .build());
       }

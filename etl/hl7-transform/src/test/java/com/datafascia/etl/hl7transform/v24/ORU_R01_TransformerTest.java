@@ -81,7 +81,7 @@ public class ORU_R01_TransformerTest {
           + " type:{}, data:{}", event.getInstitutionId(), event.getFacilityId(), event.getType(),
           event.getData());
 
-      if (event.getType().equals(EventType.OBSERVATION)) {
+      if (event.getType().equals(EventType.OBSERVATIONS_ADD)) {
         assertNotNull(event.getData());
         ObservationListData obxListData = (ObservationListData) event.getData();
         List<ObservationData> obxList = obxListData.getObservations();

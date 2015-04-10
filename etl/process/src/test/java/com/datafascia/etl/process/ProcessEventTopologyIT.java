@@ -19,17 +19,22 @@ import com.datafascia.common.configuration.guice.ConfigureModule;
 import com.datafascia.common.inject.Injectors;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.storm.trident.StreamFactory;
+import com.datafascia.domain.event.AddObservationsData;
 import com.datafascia.domain.event.AdmitPatientData;
 import com.datafascia.domain.event.EncounterData;
 import com.datafascia.domain.event.Event;
 import com.datafascia.domain.event.EventType;
+import com.datafascia.domain.event.ObservationData;
+import com.datafascia.domain.event.ObservationType;
 import com.datafascia.domain.event.PatientData;
 import com.datafascia.domain.model.Encounter;
 import com.datafascia.domain.model.Gender;
 import com.datafascia.domain.model.MaritalStatus;
+import com.datafascia.domain.model.Observation;
 import com.datafascia.domain.model.Patient;
 import com.datafascia.domain.model.Race;
 import com.datafascia.domain.persist.EncounterRepository;
+import com.datafascia.domain.persist.ObservationRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.domain.persist.Tables;
 import com.google.inject.Injector;
@@ -39,6 +44,7 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import javax.inject.Singleton;
 import org.apache.accumulo.core.client.Connector;
@@ -81,11 +87,17 @@ public class ProcessEventTopologyIT {
   private static final String EVENT_TOPIC = "event";
   private static final String EVENT_SPOUT_ID = "eventSpout";
 
+  private static final String NUMERICAL_PAIN_LEVEL_LOW = "numericalPainLevelLow";
+  private static final String NUMERICAL_PAIN_LEVEL_HIGH = "numericalPainLevelHigh";
+  private static final String NUMERICAL_PAIN_LEVEL_LOW_VALUE = "1";
+  private static final String NUMERICAL_PAIN_LEVEL_HIGH_VALUE = "2";
+
   private static ConnectorFactory connectorFactory;
   private static Injector injector;
   private static Connector connector;
   private static PatientRepository patientRepository;
   private static EncounterRepository encounterRepository;
+  private static ObservationRepository observationRepository;
 
   private ProcessEventTopology topology;
   private FeederBatchSpout eventSpout;
@@ -112,6 +124,7 @@ public class ProcessEventTopologyIT {
 
     patientRepository = injector.getInstance(PatientRepository.class);
     encounterRepository = injector.getInstance(EncounterRepository.class);
+    observationRepository = injector.getInstance(ObservationRepository.class);
 
     topology = new ProcessEventTopology();
 
@@ -132,7 +145,7 @@ public class ProcessEventTopologyIT {
     connector.tableOperations().delete(Tables.PATIENT);
   }
 
-  private Event createEvent() {
+  private Event createAdmitPatientEvent() {
     PatientData patientData = PatientData.builder()
         .institutionPatientId("institutionPatientId")
         .accountNumber("accountNumber")
@@ -179,23 +192,29 @@ public class ProcessEventTopologyIT {
     feedEvent(serializer.encodeReflect(EVENT_TOPIC, event));
   }
 
+  private static Id<Patient> getPatientId(String institutionPatientId) {
+    Patient dummyPatient = new Patient();
+    dummyPatient.setInstitutionPatientId(institutionPatientId);
+    return PatientRepository.getEntityId(dummyPatient);
+  }
+
+  private Id<Encounter> getLastEncounterId(Id<Patient> patientId) {
+    Patient patient = patientRepository.read(patientId).get();
+    return patient.getLastEncounterId();
+  }
+
   @Test
   public void should_save_patient_and_encounter() throws Exception {
-    Event event = createEvent();
+    Event event = createAdmitPatientEvent();
     feedEvent(event);
 
     AdmitPatientData admitPatientData = (AdmitPatientData) event.getData();
     PatientData patientData = admitPatientData.getPatient();
-
-    Patient dummyPatient = new Patient();
-    dummyPatient.setInstitutionPatientId(patientData.getInstitutionPatientId());
-    Id<Patient> patientId = PatientRepository.getEntityId(dummyPatient);
-
-    Patient patient = patientRepository.read(patientId).get();
-    assertEquals(patient.getInstitutionPatientId(), patientData.getInstitutionPatientId());
-
     EncounterData encounterData = admitPatientData.getEncounter();
-    Id<Encounter> encounterId = patient.getLastEncounterId();
+
+    Id<Patient> patientId = getPatientId(patientData.getInstitutionPatientId());
+    Id<Encounter> encounterId = getLastEncounterId(patientId);
+
     Optional<Encounter> optionalEncounter = encounterRepository.read(patientId, encounterId);
     assertTrue(optionalEncounter.isPresent());
 
@@ -203,5 +222,68 @@ public class ProcessEventTopologyIT {
     assertEquals(
         encounter.getHospitalisation().getPeriod().getStartInclusive(),
         encounterData.getAdmitTime());
+  }
+
+  private Event createAddObservationsEvent(PatientData patient, EncounterData encounter) {
+    ObservationData observation1 = ObservationData.builder()
+        .id(NUMERICAL_PAIN_LEVEL_LOW)
+        .value(Arrays.asList(NUMERICAL_PAIN_LEVEL_LOW_VALUE))
+        .observationDateAndTime(Instant.now())
+        .observationType(ObservationType.A01)
+        .resultStatus("resultStatus")
+        .valueType("valueType")
+        .build();
+
+    ObservationData observation2 = ObservationData.builder()
+        .id(NUMERICAL_PAIN_LEVEL_HIGH)
+        .value(Arrays.asList(NUMERICAL_PAIN_LEVEL_HIGH_VALUE))
+        .observationDateAndTime(Instant.now())
+        .observationType(ObservationType.A01)
+        .resultStatus("resultStatus")
+        .valueType("valueType")
+        .build();
+
+    AddObservationsData addObservationsData = AddObservationsData.builder()
+        .institutionPatientId(patient.getInstitutionPatientId())
+        .encounterIdentifier(encounter.getIdentifier())
+        .observations(Arrays.asList(observation1, observation2))
+        .build();
+
+    return Event.builder()
+        .institutionId(URI.create("urn:df-institution:institution"))
+        .facilityId(URI.create("urn:df-facility:facility"))
+        .type(EventType.OBSERVATIONS_ADD)
+        .data(addObservationsData)
+        .build();
+  }
+
+  @Test
+  public void should_save_observations() throws Exception {
+    Event admitPatientEvent = createAdmitPatientEvent();
+    feedEvent(admitPatientEvent);
+
+    AdmitPatientData admitPatientData = (AdmitPatientData) admitPatientEvent.getData();
+    Event addObservationsEvent = createAddObservationsEvent(
+        admitPatientData.getPatient(), admitPatientData.getEncounter());
+    feedEvent(addObservationsEvent);
+
+    AddObservationsData addObservationsData = (AddObservationsData) addObservationsEvent.getData();
+
+    Id<Patient> patientId = getPatientId(addObservationsData.getInstitutionPatientId());
+    Id<Encounter> encounterId = getLastEncounterId(patientId);
+
+    List<Observation> observations = observationRepository.list(patientId, encounterId);
+    assertEquals(observations.size(), 2);
+
+    for (Observation observation : observations) {
+      switch (observation.getName().getCode()) {
+        case NUMERICAL_PAIN_LEVEL_LOW:
+          assertEquals(observation.getValues().getText(), NUMERICAL_PAIN_LEVEL_LOW_VALUE);
+          break;
+        case NUMERICAL_PAIN_LEVEL_HIGH:
+          assertEquals(observation.getValues().getText(), NUMERICAL_PAIN_LEVEL_HIGH_VALUE);
+          break;
+      }
+    }
   }
 }

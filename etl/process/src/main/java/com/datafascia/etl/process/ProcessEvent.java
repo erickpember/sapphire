@@ -20,6 +20,9 @@ public class ProcessEvent extends BaseFilter {
   @Inject
   private transient AdmitPatient admitPatient;
 
+  @Inject
+  private transient AddObservations addObservations;
+
   @Override
   public boolean isKeep(TridentTuple tuple) {
     Event event = (Event) tuple.getValueByField(F.EVENT);
@@ -27,6 +30,9 @@ public class ProcessEvent extends BaseFilter {
     switch (event.getType()) {
       case PATIENT_ADMIT:
         admitPatient.accept(event);
+        break;
+      case OBSERVATIONS_ADD:
+        addObservations.accept(event);
         break;
       default:
         log.debug("Ignored event type [{}]", event.getType());

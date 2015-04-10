@@ -8,7 +8,7 @@ import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v24.message.ADT_A01;
 import ca.uhn.hl7v2.parser.Parser;
-import com.datafascia.domain.event.AdmitData;
+import com.datafascia.domain.event.AdmitPatientData;
 import com.datafascia.domain.event.Event;
 import com.datafascia.domain.event.EventType;
 import com.datafascia.domain.event.ObservationData;
@@ -88,7 +88,7 @@ public class ADT_A01_TransformerTest {
       } else if (event.getType().equals(EventType.PATIENT_ADMIT)) {
         assertNotNull(event.getData());
 
-        AdmitData a01 = (AdmitData) event.getData();
+        AdmitPatientData a01 = (AdmitPatientData) event.getData();
 
         assertEquals(a01.getPatient().getInstitutionPatientId(), "97554803");
 

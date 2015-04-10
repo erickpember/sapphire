@@ -6,7 +6,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v24.message.ADT_A03;
 import ca.uhn.hl7v2.util.Terser;
-import com.datafascia.domain.event.AdmitData;
+import com.datafascia.domain.event.AdmitPatientData;
 import com.datafascia.domain.event.Event;
 import com.datafascia.domain.event.EventType;
 import com.datafascia.domain.event.ObservationListData;
@@ -52,13 +52,13 @@ public class ADT_A03_Transformer extends BaseTransformer {
             .build());
       }
 
-      AdmitData admitData = toAdmitData(message.getPID(), message.getPV1());
+      AdmitPatientData admitPatientData = toAdmitData(message.getPID(), message.getPV1());
 
       outputEvents.add(Event.builder()
           .institutionId(institutionId)
           .facilityId(facilityId)
           .type(EventType.PATIENT_DISCHARGE)
-          .data(admitData)
+          .data(admitPatientData)
           .build());
 
       return outputEvents;

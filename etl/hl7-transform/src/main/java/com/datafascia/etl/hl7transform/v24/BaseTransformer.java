@@ -14,7 +14,7 @@ import ca.uhn.hl7v2.model.v24.segment.OBX;
 import ca.uhn.hl7v2.model.v24.segment.PID;
 import ca.uhn.hl7v2.model.v24.segment.PV1;
 import ca.uhn.hl7v2.util.Terser;
-import com.datafascia.domain.event.AdmitData;
+import com.datafascia.domain.event.AdmitPatientData;
 import com.datafascia.domain.event.EncounterData;
 import com.datafascia.domain.event.ObservationData;
 import com.datafascia.domain.event.ObservationListData;
@@ -44,8 +44,8 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
 
   protected static final String SUBSCRIPT_PLACEHOLDER = "REPLACEME";
 
-  protected AdmitData toAdmitData(PID pid, PV1 pv1) throws HL7Exception {
-    return AdmitData.builder()
+  protected AdmitPatientData toAdmitData(PID pid, PV1 pv1) throws HL7Exception {
+    return AdmitPatientData.builder()
         .patient(toPatientData(pid))
         .encounter(toEncounterData(pv1))
         .build();

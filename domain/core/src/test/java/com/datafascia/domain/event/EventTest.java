@@ -99,7 +99,7 @@ public class EventTest {
         .identifier("encounterIdentifier")
         .admitTime(Instant.now())
         .build();
-    AdmitData originalAdmitData = AdmitData.builder()
+    AdmitPatientData originalAdmitPatientData = AdmitPatientData.builder()
         .patient(originalPatientData)
         .encounter(originalEncounterData)
         .build();
@@ -110,22 +110,22 @@ public class EventTest {
         .institutionId(URI.create("institution"))
         .facilityId(URI.create("facility"))
         .type(EventType.PATIENT_ADMIT)
-        .data(originalAdmitData)
+        .data(originalAdmitPatientData)
         .build();
     byte[] bytes = serializer.encodeReflect(TOPIC, originalEvent);
 
     Event event = deserializer.decodeReflect(TOPIC, bytes, Event.class);
     assertEquals(event.getType(), originalEvent.getType());
 
-    AdmitData admitData = (AdmitData) event.getData();
+    AdmitPatientData admitPatientData = (AdmitPatientData) event.getData();
 
-    PatientData patientData = admitData.getPatient();
+    PatientData patientData = admitPatientData.getPatient();
     assertEquals(patientData.getFirstName(), originalPatientData.getFirstName());
     assertEquals(patientData.getGender(), originalPatientData.getGender());
     assertEquals(patientData.getBirthDate(), originalPatientData.getBirthDate());
     assertEquals(patientData.getLanguage(), originalPatientData.getLanguage());
 
-    EncounterData encounterData = admitData.getEncounter();
+    EncounterData encounterData = admitPatientData.getEncounter();
     assertEquals(encounterData.getAdmitTime(), originalEncounterData.getAdmitTime());
   }
 }

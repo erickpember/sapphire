@@ -6,7 +6,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v24.message.ADT_A01;
 import ca.uhn.hl7v2.util.Terser;
-import com.datafascia.domain.event.AdmitData;
+import com.datafascia.domain.event.AdmitPatientData;
 import com.datafascia.domain.event.Event;
 import com.datafascia.domain.event.EventType;
 import com.datafascia.domain.event.ObservationListData;
@@ -36,13 +36,13 @@ public class ADT_A01_Transformer extends BaseTransformer {
     ADT_A01 message = (ADT_A01) input;
 
     try {
-      AdmitData admitData = toAdmitData(message.getPID(), message.getPV1());
+      AdmitPatientData admitPatientData = toAdmitData(message.getPID(), message.getPV1());
 
       outputEvents.add(Event.builder()
           .institutionId(institutionId)
           .facilityId(facilityId)
           .type(EventType.PATIENT_ADMIT)
-          .data(admitData)
+          .data(admitPatientData)
           .build());
 
       Terser terser = new Terser(input);

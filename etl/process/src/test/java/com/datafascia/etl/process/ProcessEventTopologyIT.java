@@ -19,7 +19,7 @@ import com.datafascia.common.configuration.guice.ConfigureModule;
 import com.datafascia.common.inject.Injectors;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.storm.trident.StreamFactory;
-import com.datafascia.domain.event.AdmitData;
+import com.datafascia.domain.event.AdmitPatientData;
 import com.datafascia.domain.event.EncounterData;
 import com.datafascia.domain.event.Event;
 import com.datafascia.domain.event.EventType;
@@ -149,7 +149,7 @@ public class ProcessEventTopologyIT {
         .identifier("encounterIdentifier")
         .admitTime(Instant.now())
         .build();
-    AdmitData admitData = AdmitData.builder()
+    AdmitPatientData admitPatientData = AdmitPatientData.builder()
         .patient(patientData)
         .encounter(encounterData)
         .build();
@@ -157,7 +157,7 @@ public class ProcessEventTopologyIT {
         .institutionId(URI.create("urn:df-institution:institution"))
         .facilityId(URI.create("urn:df-facility:facility"))
         .type(EventType.PATIENT_ADMIT)
-        .data(admitData)
+        .data(admitPatientData)
         .build();
   }
 
@@ -184,8 +184,8 @@ public class ProcessEventTopologyIT {
     Event event = createEvent();
     feedEvent(event);
 
-    AdmitData admitData = (AdmitData) event.getData();
-    PatientData patientData = admitData.getPatient();
+    AdmitPatientData admitPatientData = (AdmitPatientData) event.getData();
+    PatientData patientData = admitPatientData.getPatient();
 
     Patient dummyPatient = new Patient();
     dummyPatient.setInstitutionPatientId(patientData.getInstitutionPatientId());
@@ -194,7 +194,7 @@ public class ProcessEventTopologyIT {
     Patient patient = patientRepository.read(patientId).get();
     assertEquals(patient.getInstitutionPatientId(), patientData.getInstitutionPatientId());
 
-    EncounterData encounterData = admitData.getEncounter();
+    EncounterData encounterData = admitPatientData.getEncounter();
     Id<Encounter> encounterId = patient.getLastEncounterId();
     Optional<Encounter> optionalEncounter = encounterRepository.read(patientId, encounterId);
     assertTrue(optionalEncounter.isPresent());

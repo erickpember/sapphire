@@ -3,7 +3,7 @@
 package com.datafascia.etl.process;
 
 import com.datafascia.common.time.Interval;
-import com.datafascia.domain.event.AdmitData;
+import com.datafascia.domain.event.AdmitPatientData;
 import com.datafascia.domain.event.EncounterData;
 import com.datafascia.domain.event.Event;
 import com.datafascia.domain.event.PatientData;
@@ -63,9 +63,9 @@ public class AdmitPatient implements Consumer<Event> {
 
   @Override
   public void accept(Event event) {
-    AdmitData admitData = (AdmitData) event.getData();
-    Encounter encounter = createEncounter(admitData.getEncounter());
-    Patient patient = createPatient(admitData.getPatient(), encounter);
+    AdmitPatientData admitPatientData = (AdmitPatientData) event.getData();
+    Encounter encounter = createEncounter(admitPatientData.getEncounter());
+    Patient patient = createPatient(admitPatientData.getPatient(), encounter);
 
     patientRepository.save(patient);
     encounterRepository.save(patient, encounter);

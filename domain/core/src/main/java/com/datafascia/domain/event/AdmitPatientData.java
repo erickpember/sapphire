@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
  * Data included when admitting patient.
  */
 @AllArgsConstructor @Builder @Data @NoArgsConstructor
-public class AdmitData implements EventData {
+public class AdmitPatientData implements EventData {
 
   private PatientData patient;
   private EncounterData encounter;

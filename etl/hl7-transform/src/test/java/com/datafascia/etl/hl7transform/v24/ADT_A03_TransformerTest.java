@@ -8,11 +8,11 @@ import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v24.message.ADT_A03;
 import ca.uhn.hl7v2.parser.Parser;
+import com.datafascia.domain.event.AddObservationsData;
 import com.datafascia.domain.event.AdmitPatientData;
 import com.datafascia.domain.event.Event;
 import com.datafascia.domain.event.EventType;
 import com.datafascia.domain.event.ObservationData;
-import com.datafascia.domain.event.ObservationListData;
 import com.google.common.io.Resources;
 import java.io.IOException;
 import java.net.URI;
@@ -75,8 +75,8 @@ public class ADT_A03_TransformerTest {
 
       if (event.getType().equals(EventType.OBSERVATIONS_ADD)) {
         assertNotNull(event.getData());
-        ObservationListData obxListData = (ObservationListData) event.getData();
-        List<ObservationData> obxList = obxListData.getObservations();
+        AddObservationsData addObservationsData = (AddObservationsData) event.getData();
+        List<ObservationData> obxList = addObservationsData.getObservations();
         assertEquals(obxList.size(), 2, "Wrong size of observations collected.");
         ObservationData observation = obxList.get(0);
 

@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
  * An event containing a list of observations.
  */
 @AllArgsConstructor @Builder @Data @NoArgsConstructor
-public class ObservationListData implements EventData {
+public class AddObservationsData implements EventData {
 
   private List<ObservationData> observations;
 }

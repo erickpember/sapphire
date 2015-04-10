@@ -6,9 +6,9 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v24.message.ADT_A01;
 import ca.uhn.hl7v2.util.Terser;
+import com.datafascia.domain.event.AddObservationsData;
 import com.datafascia.domain.event.Event;
 import com.datafascia.domain.event.EventType;
-import com.datafascia.domain.event.ObservationListData;
 import com.datafascia.domain.event.ObservationType;
 import com.google.common.base.Strings;
 import java.net.URI;
@@ -43,14 +43,14 @@ public class ADT_A08_Transformer extends BaseTransformer {
       if (!Strings.isNullOrEmpty(terser.get(OBX_ROOT_PATH.replace(SUBSCRIPT_PLACEHOLDER, "")
           + "-1"))) {
 
-        ObservationListData observationList = extractObx(OBX_ROOT_PATH, "", terser,
+        AddObservationsData addObservationsData = extractObx(OBX_ROOT_PATH, "", terser,
             ObservationType.A08);
 
         outputEvents.add(Event.builder()
             .institutionId(institutionId)
             .facilityId(facilityId)
             .type(EventType.OBSERVATIONS_ADD)
-            .data(observationList)
+            .data(addObservationsData)
             .build());
       }
 

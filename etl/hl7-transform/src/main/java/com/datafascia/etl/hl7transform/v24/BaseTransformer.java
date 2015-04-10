@@ -14,10 +14,10 @@ import ca.uhn.hl7v2.model.v24.segment.OBX;
 import ca.uhn.hl7v2.model.v24.segment.PID;
 import ca.uhn.hl7v2.model.v24.segment.PV1;
 import ca.uhn.hl7v2.util.Terser;
+import com.datafascia.domain.event.AddObservationsData;
 import com.datafascia.domain.event.AdmitPatientData;
 import com.datafascia.domain.event.EncounterData;
 import com.datafascia.domain.event.ObservationData;
-import com.datafascia.domain.event.ObservationListData;
 import com.datafascia.domain.event.ObservationType;
 import com.datafascia.domain.event.PatientData;
 import com.datafascia.domain.model.Gender;
@@ -164,7 +164,7 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
    * @return EventData subclass containing a list of Observations stored in our internal format.
    * @throws ca.uhn.hl7v2.HL7Exception Failure to parse HL7 with terser.
    */
-  protected ObservationListData extractObx(String obxRootPath, String nteRootPath, Terser terser,
+  protected AddObservationsData extractObx(String obxRootPath, String nteRootPath, Terser terser,
       ObservationType observationType)
       throws HL7Exception {
     String obxSubscript = "";
@@ -194,7 +194,7 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
       obxSubscript = incrementSubscript(obxSubscript);
       currentObxPath = obxRootPath.replace(SUBSCRIPT_PLACEHOLDER, obxSubscript);
     }
-    return ObservationListData.builder()
+    return AddObservationsData.builder()
         .observations(observations)
         .build();
   }

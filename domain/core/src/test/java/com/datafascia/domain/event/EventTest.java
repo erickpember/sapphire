@@ -81,7 +81,7 @@ public class EventTest {
   }
 
   @Test
-  public void should_decode() {
+  public void should_decode_admit_patient_event() {
     PatientData originalPatientData = PatientData.builder()
         .institutionPatientId("institutionPatientId")
         .accountNumber("accountNumber")
@@ -101,9 +101,6 @@ public class EventTest {
     AdmitPatientData originalAdmitPatientData = AdmitPatientData.builder()
         .patient(originalPatientData)
         .encounter(originalEncounterData)
-        .build();
-    ObservationListData originalObservationData = ObservationListData.builder()
-        .observations(null)
         .build();
     Event originalEvent = Event.builder()
         .institutionId(URI.create("institution"))

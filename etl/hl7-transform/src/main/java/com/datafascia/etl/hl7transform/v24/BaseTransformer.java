@@ -118,9 +118,10 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
         .comments(comments)
         .natureOfAbnormalTest(obx.getNatureOfAbnormalTest().encode())
         .effectiveDateOfLastNormalObservation(
-            obx.getDateLastObservationNormalValue().getTimeOfAnEvent().encode())
+            toInstant(obx.getDateLastObservationNormalValue().getTimeOfAnEvent()))
         .userDefinedAccessChecks(obx.getUserDefinedAccessChecks().encode())
-        .observationDateAndTime(obx.getDateTimeOfTheObservation().getTimeOfAnEvent().encode())
+        .observationDateAndTime(
+            toInstant(obx.getDateTimeOfTheObservation().getTimeOfAnEvent()))
         .responsibleObserver(obx.getResponsibleObserver().encode())
         .resultStatus(obx.getObservationResultStatus().getValueOrEmpty())
         .probability(probability)
@@ -257,6 +258,10 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
   }
 
   private Instant toInstant(TSComponentOne fromTime) throws HL7Exception {
+    if (fromTime.isEmpty()) {
+      return null;
+    }
+
     ZonedDateTime zonedDateTime = ZonedDateTime.of(
         fromTime.getYear(), fromTime.getMonth(), fromTime.getDay(),
         fromTime.getHour(), fromTime.getMinute(), fromTime.getSecond(),

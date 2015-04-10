@@ -4,6 +4,8 @@ package com.datafascia.common.avro;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.Arrays;
+import org.apache.avro.AvroTypeException;
 import org.apache.avro.Schema;
 import org.apache.avro.io.Decoder;
 import org.apache.avro.io.Encoder;
@@ -19,17 +21,34 @@ public class InstantEncoding extends CustomEncoding<Instant> {
    * Constructor
    */
   public InstantEncoding() {
-    schema = Schema.create(Schema.Type.LONG);
-    schema.addProp("CustomEncoding", InstantEncoding.class.getSimpleName());
+    Schema longSchema = Schema.create(Schema.Type.LONG);
+    longSchema.addProp("CustomEncoding", InstantEncoding.class.getSimpleName());
+
+    schema = Schema.createUnion(Arrays.asList(Schema.create(Schema.Type.NULL), longSchema));
   }
 
   @Override
   protected void write(Object datum, Encoder out) throws IOException {
-    out.writeLong(((Instant) datum).toEpochMilli());
+    if (datum == null) {
+      out.writeIndex(0);
+      out.writeNull();
+    } else {
+      out.writeIndex(1);
+      out.writeLong(((Instant) datum).toEpochMilli());
+    }
   }
 
   @Override
   protected Instant read(Object reuse, Decoder in) throws IOException {
-    return Instant.ofEpochMilli(in.readLong());
+    int unionIndex = in.readIndex();
+    switch (unionIndex) {
+      case 0:
+        in.readNull();
+        return null;
+      case 1:
+        return Instant.ofEpochMilli(in.readLong());
+      default:
+        throw new AvroTypeException("Unknown union index " + unionIndex);
+    }
   }
 }

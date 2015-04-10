@@ -2,11 +2,14 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.event;
 
+import com.datafascia.common.avro.InstantEncoding;
+import java.time.Instant;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.avro.reflect.AvroEncode;
 import org.apache.avro.reflect.Nullable;
 
 /**
@@ -85,8 +88,8 @@ public class ObservationData {
   /**
    * OBX.12
    */
-  @Nullable
-  private String effectiveDateOfLastNormalObservation;
+  @AvroEncode(using = InstantEncoding.class)
+  private Instant effectiveDateOfLastNormalObservation;
 
   /**
    * OBX.13
@@ -97,8 +100,8 @@ public class ObservationData {
   /**
    * OBX.14
    */
-  @Nullable
-  private String observationDateAndTime;
+  @AvroEncode(using = InstantEncoding.class)
+  private Instant observationDateAndTime;
 
   /**
    * OBX.15

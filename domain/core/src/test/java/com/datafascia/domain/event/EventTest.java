@@ -13,7 +13,6 @@ import java.net.URI;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
-
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -34,10 +33,10 @@ public class EventTest {
     ObservationData originalObservationData = ObservationData.builder()
         .abnormalFlags(Arrays.asList("flag1", "flag2"))
         .comments(Arrays.asList("comment1", "comment2"))
-        .effectiveDateOfLastNormalObservation("effectiveDateOfLastNormalObservation")
+        .effectiveDateOfLastNormalObservation(Instant.now())
         .id("id")
         .natureOfAbnormalTest("natureOfAbnormalTest")
-        .observationDateAndTime("observationDateAndTime")
+        .observationDateAndTime(Instant.now())
         .observationMethod(Arrays.asList("method1", "method2"))
         .observationType(ObservationType.A01)
         .probability("probability")
@@ -53,7 +52,7 @@ public class EventTest {
     byte[] bytes = serializer.encodeReflect(TOPIC, originalObservationData);
     ObservationData observationData = deserializer.decodeReflect(TOPIC, bytes,
         ObservationData.class);
-    assertEquals(originalObservationData,observationData);
+    assertEquals(observationData, originalObservationData);
   }
 
   @Test
@@ -68,7 +67,7 @@ public class EventTest {
     byte[] bytes = serializer.encodeReflect(TOPIC, originalObservationData);
     ObservationData observationData = deserializer.decodeReflect(TOPIC, bytes,
         ObservationData.class);
-    assertEquals(originalObservationData,observationData);
+    assertEquals(observationData, originalObservationData);
   }
 
   @Test(expectedExceptions = NullPointerException.class)
@@ -78,7 +77,7 @@ public class EventTest {
     byte[] bytes = serializer.encodeReflect(TOPIC, originalObservationData);
     ObservationData observationData = deserializer.decodeReflect(TOPIC, bytes,
         ObservationData.class);
-    assertEquals(originalObservationData,observationData);
+    assertEquals(observationData, originalObservationData);
   }
 
   @Test

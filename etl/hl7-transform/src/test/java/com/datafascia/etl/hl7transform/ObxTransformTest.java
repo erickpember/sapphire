@@ -21,6 +21,7 @@ import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -107,13 +108,13 @@ public class ObxTransformTest {
           assertEquals(obdata.getId(), "HT^HEIGHT");
           assertEquals(obdata.getValue().get(0), "17.72");
           assertEquals(obdata.getValueUnits(), "in");
-          assertEquals(obdata.getObservationDateAndTime(), "20150102");
+          assertEquals(obdata.getObservationDateAndTime(), Instant.parse("2015-01-02T08:00:00Z"));
         } else if (i == 2) {
           assertEquals(obdata.getValueType(), "NM");
           assertEquals(obdata.getId(), "WT^WEIGHT");
           assertEquals(obdata.getValue().get(0), "1.8");
           assertEquals(obdata.getValueUnits(), "kg");
-          assertEquals(obdata.getObservationDateAndTime(), "20150102");
+          assertEquals(obdata.getObservationDateAndTime(), Instant.parse("2015-01-02T08:00:00Z"));
         }
       }
     }
@@ -132,13 +133,13 @@ public class ObxTransformTest {
           assertEquals(obdata.getId(), "HT^HEIGHT");
           assertEquals(obdata.getValue().get(0), "69.02");
           assertEquals(obdata.getValueUnits(), "in");
-          assertEquals(obdata.getObservationDateAndTime(), "20150219");
+          assertEquals(obdata.getObservationDateAndTime(), Instant.parse("2015-02-19T08:00:00Z"));
         } else if (i == 1) {
           assertEquals(obdata.getValueType(), "NM");
           assertEquals(obdata.getId(), "WT^WEIGHT");
           assertEquals(obdata.getValue().get(0), "70");
           assertEquals(obdata.getValueUnits(), "kg");
-          assertEquals(obdata.getObservationDateAndTime(), "20150219");
+          assertEquals(obdata.getObservationDateAndTime(), Instant.parse("2015-02-19T08:00:00Z"));
         }
       }
     }
@@ -188,7 +189,7 @@ public class ObxTransformTest {
           assertEquals(obdata.getReferenceRange(), "<20");
           assertEquals(obdata.getAbnormalFlags().get(0), "H");
           assertEquals(obdata.getResultStatus(), "C");
-          assertEquals(obdata.getObservationDateAndTime(), "201502061224");
+          assertEquals(obdata.getObservationDateAndTime(), Instant.parse("2015-02-06T20:24:00Z"));
           assertEquals(obdata.getProducersId(), "CB");
           assertEquals(obdata.getResponsibleObserver(), "17191^HO^WAI-KIT");
           assertEquals(obdata.getComments().get(0), "Interpretive Ranges:");

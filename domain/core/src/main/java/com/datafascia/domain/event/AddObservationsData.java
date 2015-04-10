@@ -14,5 +14,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor @Builder @Data @NoArgsConstructor
 public class AddObservationsData implements EventData {
 
+  private String institutionPatientId;
+  private String encounterIdentifier;
   private List<ObservationData> observations;
 }

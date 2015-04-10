@@ -32,6 +32,8 @@ public class ADT_A06_Transformer extends BaseTransformer {
 
   @Override
   public List<Event> transform(URI institutionId, URI facilityId, Message input) {
+    ADT_A06 message = (ADT_A06) input;
+
     List<Event> outputEvents = new ArrayList<>();
     try {
       Terser terser = new Terser(input);
@@ -40,7 +42,12 @@ public class ADT_A06_Transformer extends BaseTransformer {
       if (!Strings.isNullOrEmpty(terser.get(OBX_ROOT_PATH.replace(SUBSCRIPT_PLACEHOLDER, "")
           + "-1"))) {
 
-        AddObservationsData addObservationsData = extractObx(OBX_ROOT_PATH, "", terser,
+        AddObservationsData addObservationsData = toAddObservationsData(
+            message.getPID(),
+            message.getPV1(),
+            OBX_ROOT_PATH,
+            "",
+            terser,
             ObservationType.A06);
 
         outputEvents.add(Event.builder()
@@ -53,8 +60,8 @@ public class ADT_A06_Transformer extends BaseTransformer {
 
       return outputEvents;
     } catch (HL7Exception e) {
-      log.debug("HL7 transformer failed to transform input:{}", input);
-      throw new IllegalStateException("Transform failed to build PatientData from HL7 message.", e);
+      log.debug("HL7 transformer failed to transform input: {}", input);
+      throw new IllegalStateException("Failed to transform HL7 message", e);
     }
   }
 }

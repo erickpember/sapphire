@@ -32,9 +32,9 @@ public class ADT_A01_Transformer extends BaseTransformer {
 
   @Override
   public List<Event> transform(URI institutionId, URI facilityId, Message input) {
-    List<Event> outputEvents = new ArrayList<>();
     ADT_A01 message = (ADT_A01) input;
 
+    List<Event> outputEvents = new ArrayList<>();
     try {
       AdmitPatientData admitPatientData = toAdmitData(message.getPID(), message.getPV1());
 
@@ -50,7 +50,12 @@ public class ADT_A01_Transformer extends BaseTransformer {
       // See if OBX exists. Message.getObx() and other Message methods don't work for some reason.
       if (!Strings.isNullOrEmpty(terser.get(OBX_ROOT_PATH.replace(SUBSCRIPT_PLACEHOLDER, "")
           + "-1"))) {
-        AddObservationsData addObservationsData = extractObx(OBX_ROOT_PATH, "", terser,
+        AddObservationsData addObservationsData = toAddObservationsData(
+            message.getPID(),
+            message.getPV1(),
+            OBX_ROOT_PATH,
+            "",
+            terser,
             ObservationType.A01);
 
         outputEvents.add(Event.builder()
@@ -63,8 +68,8 @@ public class ADT_A01_Transformer extends BaseTransformer {
 
       return outputEvents;
     } catch (HL7Exception e) {
-      log.debug("HL7 transformer failed to transform input:{}", input);
-      throw new IllegalStateException("Transform failed to build PatientData from HL7 message.", e);
+      log.debug("HL7 transformer failed to transform input: {}", input);
+      throw new IllegalStateException("Failed to transform HL7 message", e);
     }
   }
 }

@@ -36,6 +36,8 @@ public class ORU_R01_Transformer extends BaseTransformer {
 
   @Override
   public List<Event> transform(URI institutionId, URI facilityId, Message input) {
+    ORU_R01 message = (ORU_R01) input;
+
     List<Event> outputEvents = new ArrayList<>();
     try {
       Terser terser = new Terser(input);
@@ -43,7 +45,12 @@ public class ORU_R01_Transformer extends BaseTransformer {
       // See if OBX exists. Message.getObx() and other Message methods don't work for some reason.
       if (!Strings.isNullOrEmpty(terser.get(OBX_ROOT_PATH.replace(SUBSCRIPT_PLACEHOLDER, "")
           + "-1"))) {
-        AddObservationsData addObservationsData = extractObx(OBX_ROOT_PATH, NTE_ROOT_PATH, terser,
+        AddObservationsData addObservationsData = toAddObservationsData(
+            message.getPATIENT_RESULT().getPATIENT().getPID(),
+            message.getPATIENT_RESULT().getPATIENT().getVISIT().getPV1(),
+            OBX_ROOT_PATH,
+            NTE_ROOT_PATH,
+            terser,
             ObservationType.ORU);
 
         outputEvents.add(Event.builder()

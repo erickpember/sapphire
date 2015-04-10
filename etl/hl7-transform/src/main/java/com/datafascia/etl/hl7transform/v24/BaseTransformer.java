@@ -157,6 +157,8 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
   /**
    * General purpose utility to parse OBX and NTE segments out of HL7 messages.
    *
+   * @param pid PID segment
+   * @param pv1 PV1 segment
    * @param obxRootPath Terser path to find OBX, varies between message types.
    * @param nteRootPath Terser path to find NTE, varies between message types.
    * @param terser Like XPath for HL7, extracts segments from parsed HL7 using a path.
@@ -164,9 +166,15 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
    * @return EventData subclass containing a list of Observations stored in our internal format.
    * @throws ca.uhn.hl7v2.HL7Exception Failure to parse HL7 with terser.
    */
-  protected AddObservationsData extractObx(String obxRootPath, String nteRootPath, Terser terser,
+  protected AddObservationsData toAddObservationsData(
+      PID pid,
+      PV1 pv1,
+      String obxRootPath,
+      String nteRootPath,
+      Terser terser,
       ObservationType observationType)
-      throws HL7Exception {
+        throws HL7Exception {
+
     String obxSubscript = "";
     String currentObxPath = obxRootPath.replace(SUBSCRIPT_PLACEHOLDER, obxSubscript);
     List<ObservationData> observations = new ArrayList<>();
@@ -194,7 +202,12 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
       obxSubscript = incrementSubscript(obxSubscript);
       currentObxPath = obxRootPath.replace(SUBSCRIPT_PLACEHOLDER, obxSubscript);
     }
+
     return AddObservationsData.builder()
+        .institutionPatientId(
+            pid.getPatientIdentifierList(0).getID().getValue())
+        .encounterIdentifier(
+            pv1.getVisitNumber().getID().getValue())
         .observations(observations)
         .build();
   }

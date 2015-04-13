@@ -71,6 +71,7 @@
     <module>emerge/core</module>
     <module>emerge/csv</module>
     <module>etl/hl7-ingest</module>
+    <module>etl/web-services-ingest</module>
     <module>etl/hl7-transform</module>
     <module>etl/process</module>
     <module>integration-tests</module>

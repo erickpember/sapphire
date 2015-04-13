@@ -360,4 +360,8 @@ public class ApiIT {
         },
         new AccumuloModule());
   }
+
+  public static Injector getInjector() {
+    return injector;
+  }
 }

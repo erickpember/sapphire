@@ -7,7 +7,6 @@ import com.datafascia.common.jackson.InstantSerializer;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.urn.URNFactory;
 import com.datafascia.common.urn.annotations.IdNamespace;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -76,7 +75,7 @@ public class Patient extends Person {
   private String managingOrg;
 
   /** last encounter for the patient */
-  @JsonIgnore
+  @JsonProperty("lastEncounterId")
   private Id<Encounter> lastEncounterId;
 
   /** Whether this patient record is in active use.*/

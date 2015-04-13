@@ -2,20 +2,29 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.services;
 
+import com.codahale.metrics.MetricRegistry;
 import com.datafascia.api.client.DatafasciaApi;
 import com.datafascia.api.client.DatafasciaApiBuilder;
 import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.common.accumulo.AccumuloConfiguration;
 import com.datafascia.common.accumulo.AccumuloImport;
 import com.datafascia.common.accumulo.AccumuloModule;
+import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
 import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.SubjectAuthorizationsSupplier;
 import com.datafascia.common.kafka.KafkaConfig;
+import com.datafascia.common.persist.Id;
 import com.datafascia.common.shiro.FakeRealm;
 import com.datafascia.common.shiro.RoleExposingRealm;
+import com.datafascia.domain.model.Gender;
+import com.datafascia.domain.model.MaritalStatus;
+import com.datafascia.domain.model.Name;
+import com.datafascia.domain.model.Patient;
+import com.datafascia.domain.model.Race;
 import com.datafascia.domain.model.Version;
+import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.dropwizard.testing.DropwizardTestApp;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -25,11 +34,16 @@ import com.google.common.io.Resources;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.neovisionaries.i18n.LanguageCode;
 import java.io.File;
 import java.io.FileWriter;
 import java.net.URI;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Instance;
@@ -59,7 +73,7 @@ public class ApiIT {
   protected static AccumuloConfiguration accConfig;
   protected static KafkaConfig kafkaConfig;
   protected static Injector injector;
-  protected static DropwizardTestApp<APIConfiguration> app;
+  public static DropwizardTestApp<APIConfiguration> app;
   protected static Connector connect;
   protected static DatafasciaApi api;
   protected static ThreadState threadState;
@@ -185,6 +199,149 @@ public class ApiIT {
     failDir.delete();
 
     connect.tableOperations().create("Patient");
+
+    addStaticData();
+  }
+
+  private void addStaticData() throws Exception {
+    AccumuloTemplate template = new AccumuloTemplate(connect,
+        injector.getInstance(ColumnVisibilityPolicy.class),
+        injector.getInstance(AuthorizationsSupplier.class),
+        injector.getInstance(MetricRegistry.class));
+    PatientRepository repo = new PatientRepository(template);
+
+    repo.save(new Patient() {
+      {
+        setName(new Name() {
+          {
+            setFirst("ECMNOTES");
+            setLast("TEST");
+          }
+        }
+        );
+        setGender(Gender.FEMALE);
+        setMaritalStatus(MaritalStatus.ANNULLED);
+        setRace(Race.AMERICAN_INDIAN);
+        setActive(true);
+        setLangs(Arrays.asList(LanguageCode.aa));
+        setBirthDate(LocalDate.parse("1977-01-01T05:00:00Z", dateFormat));
+        setId(Id.of("urn:df-patientId-1:96087004"));
+        setInstitutionPatientId("urn:df-institution-patientId-1:UCSF::96087004");
+        setLastEncounterId(Id.of("UCSF |  | 039ae46a-20a1-4bcd-abb9-68e38d4222c0"));
+      }
+    }
+    );
+
+    repo.save(new Patient() {
+      {
+        setName(new Name() {
+          {
+            setFirst("ONE");
+            setMiddle("A");
+            setLast("ECM-MSSGE");
+          }
+        }
+        );
+        setGender(Gender.FEMALE);
+        setMaritalStatus(MaritalStatus.DIVORCED);
+        setRace(Race.ASIAN);
+        setActive(true);
+        setLangs(Arrays.asList(LanguageCode.aa, LanguageCode.pi, LanguageCode.wa));
+        setBirthDate(LocalDate.parse("1960-06-06T04:00:00Z", dateFormat));
+        setId(Id.of("urn:df-patientId-1:96087039"));
+        setInstitutionPatientId("urn:df-institution-patientId-1:UCSF::96087039");
+        setLastEncounterId(Id.of("UCSF |  | 0728eb62-2f16-484f-8628-a320e99c635d"));
+      }
+    }
+    );
+
+    repo.save(new Patient() {
+      {
+        setName(new Name() {
+          {
+            setFirst("ONE");
+            setMiddle("B");
+            setLast("ECM-MSSGE");
+          }
+        }
+        );
+        setGender(Gender.FEMALE);
+        setMaritalStatus(MaritalStatus.DOMESTIC_PARTNER);
+        setRace(Race.BLACK);
+        setActive(true);
+        setLangs(new ArrayList<>());
+        setBirthDate(LocalDate.parse("1954-10-29T05:00:00Z", dateFormat));
+        setId(Id.of("urn:df-patientId-1:96087047"));
+        setInstitutionPatientId("urn:df-institution-patientId-1:UCSF:SICU:96087047");
+      }
+    }
+    );
+
+    repo.save(new Patient() {
+      {
+        setName(new Name() {
+          {
+            setFirst("ONE");
+            setMiddle("C");
+            setLast("ECM-MSSGE");
+          }
+        }
+        );
+        setGender(Gender.MALE);
+        setMaritalStatus(MaritalStatus.INTERLOCUTORY);
+        setRace(Race.OTHER);
+        setActive(true);
+        setLangs(new ArrayList<>());
+        setBirthDate(LocalDate.parse("1996-07-29T04:00:00Z", dateFormat));
+        setId(Id.of("urn:df-patientId-1:96087055"));
+        setInstitutionPatientId("urn:df-institution-patientId-1:UCSF::96087055");
+      }
+    }
+    );
+
+    repo.save(new Patient() {
+      {
+        setName(new Name() {
+          {
+            setFirst("ONE");
+            setMiddle("D");
+            setLast("ECM-MSSGE");
+          }
+        }
+        );
+        setGender(Gender.MALE);
+        setMaritalStatus(MaritalStatus.NEVER_MARRIED);
+        setRace(Race.WHITE);
+        setActive(true);
+        setLangs(new ArrayList<>());
+        setBirthDate(LocalDate.parse("1977-10-29T04:00:00Z", dateFormat));
+        setId(Id.of("urn:df-patientId-1:96087063"));
+        setInstitutionPatientId("urn:df-institution-patientId-1:UCSF::96087063");
+      }
+    }
+    );
+
+    repo.save(new Patient() {
+      {
+        setName(new Name() {
+          {
+            setFirst("ONE");
+            setMiddle("C");
+            setLast("MB-CHILD");
+          }
+        }
+        );
+        setGender(Gender.MALE);
+        setMaritalStatus(MaritalStatus.UNMARRIED);
+        setRace(Race.PACIFIC_ISLANDER);
+        setActive(true);
+        setLangs(new ArrayList<>());
+        setBirthDate(LocalDate.parse("1999-02-20T05:00:00Z", dateFormat));
+        setId(Id.of("urn:df-patientId-1:97534012"));
+        setInstitutionPatientId("urn:df-institution-patientId-1:UCSF:SICU:97534012");
+      }
+    }
+    );
   }
 
   /**

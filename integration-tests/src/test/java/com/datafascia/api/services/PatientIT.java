@@ -22,6 +22,7 @@ public class PatientIT extends ApiIT {
    */
   @Test
   public void testPatient() throws Exception {
+    int count = 0;
     for (Patient pat : api.patients(null, true, 1000).getCollection()) {
       String id = pat.getId().toString();
       switch (id) {
@@ -56,7 +57,9 @@ public class PatientIT extends ApiIT {
               "urn:df-patientId-1:97534012", "urn:df-institution-patientId-1:UCSF:SICU:97534012");
           break;
       }
+      count++;
     }
+    assertEquals(count, 6, "testPatient did not find its expected patients!");
   }
 
   /**

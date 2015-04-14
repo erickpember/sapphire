@@ -4,6 +4,7 @@ package com.datafascia.common.accumulo;
 
 import com.codahale.metrics.MetricRegistry;
 import com.codahale.metrics.Timer;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -12,12 +13,14 @@ import java.util.function.Predicate;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.accumulo.core.client.BatchDeleter;
 import org.apache.accumulo.core.client.BatchWriter;
 import org.apache.accumulo.core.client.BatchWriterConfig;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.MutationsRejectedException;
 import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.client.TableNotFoundException;
+import org.apache.accumulo.core.data.Range;
 
 /**
  * Accumulo data access template methods
@@ -185,6 +188,32 @@ public class AccumuloTemplate {
    */
   public <E> List<E> queryForList(Scanner scanner, RowMapper<E> rowMapper) {
     return queryForList(scanner, rowMapper, entity -> true);
+  }
+
+  /**
+   * Deletes all entries for an entity.
+   *
+   * @param tableName
+   *     table name
+   * @param rowIdPrefix
+   *     row ID prefix
+   */
+  public void delete(String tableName, String rowIdPrefix) {
+    BatchDeleter deleter = null;
+    try {
+      deleter = connector.createBatchDeleter(
+          tableName, authorizationsSupplier.get(), 1, new BatchWriterConfig());
+      deleter.setRanges(Arrays.asList(Range.prefix(rowIdPrefix)));
+      deleter.delete();
+    } catch (MutationsRejectedException e) {
+      throw new IllegalStateException("Cannot delete row ID prefix " + rowIdPrefix, e);
+    } catch (TableNotFoundException e) {
+      throw new IllegalStateException("Table " + tableName + " not found", e);
+    } finally {
+      if (deleter != null) {
+        deleter.close();
+      }
+    }
   }
 
   private <E> Timer.Context getTimerContext(String methodName, RowMapper<E> rowMapper) {

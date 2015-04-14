@@ -11,6 +11,8 @@ import com.datafascia.domain.model.Version;
 import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import java.util.List;
 import java.util.Map;
+import retrofit.client.Response;
+import retrofit.http.DELETE;
 import retrofit.http.GET;
 import retrofit.http.Path;
 import retrofit.http.Query;
@@ -40,6 +42,16 @@ public interface DatafasciaApi {
    */
   @GET("/patient")
   PagedCollection<Patient> patients(@QueryMap Map<String, String> params);
+
+  /**
+   * Deletes patient.
+   *
+   * @param patientId
+   *     patient ID
+   * @return HTTP response
+   */
+  @DELETE("/patient/{patientId}")
+  Response deletePatient(@Path("patientId") String patientId);
 
   /**
    * @param encounterId the unique identifier for the encounter

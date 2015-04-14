@@ -230,4 +230,14 @@ public class PatientRepository extends BaseRepository {
       return accumuloTemplate.queryForList(scanner, PATIENT_ROW_MAPPER, patient -> true, maxLim);
     }
   }
+
+  /**
+   * Deletes patient.
+   *
+   * @param patientId
+   *     patient ID
+   */
+  public void delete(Id<Patient> patientId) {
+    accumuloTemplate.delete(Tables.PATIENT, toRowId(patientId));
+  }
 }

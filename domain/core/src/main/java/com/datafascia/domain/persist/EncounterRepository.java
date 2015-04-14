@@ -12,6 +12,7 @@ import com.datafascia.domain.model.Encounter;
 import com.datafascia.domain.model.Hospitalization;
 import com.datafascia.domain.model.Patient;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -136,5 +137,20 @@ public class EncounterRepository extends BaseRepository {
     scanner.fetchColumnFamily(new Text(COLUMN_FAMILY));
 
     return accumuloTemplate.queryForObject(scanner, ENCOUNTER_ROW_MAPPER);
+  }
+
+  /**
+   * Finds encounters for a patient.
+   *
+   * @param patientId
+   *     parent entity ID
+   * @return encounters
+   */
+  public List<Encounter> list(Id<Patient> patientId) {
+    Scanner scanner = accumuloTemplate.createScanner(Tables.PATIENT);
+    scanner.setRange(Range.prefix(PatientRepository.toRowId(patientId)));
+    scanner.fetchColumnFamily(new Text(COLUMN_FAMILY));
+
+    return accumuloTemplate.queryForList(scanner, ENCOUNTER_ROW_MAPPER);
   }
 }

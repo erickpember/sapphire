@@ -72,7 +72,7 @@ public class PatientRepository extends BaseRepository {
    * @param patientId the patient identifier
    * @return row ID
    */
-  private static String toRowId(Id<Patient> patientId) {
+  static String toRowId(Id<Patient> patientId) {
     return toRowId(Patient.class, patientId);
   }
 

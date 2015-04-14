@@ -4,13 +4,14 @@ package com.datafascia.api.resources;
 
 import com.codahale.metrics.annotation.Timed;
 import com.datafascia.common.api.ApiParams;
+import com.datafascia.common.persist.Id;
 import com.datafascia.common.time.Interval;
 import com.datafascia.domain.model.Observation;
-import com.datafascia.domain.persist.opal.FindObservationsCoordinator;
+import com.datafascia.domain.persist.FindObservationsCoordinator;
 import com.google.common.base.Strings;
 import java.time.Instant;
 import java.time.format.DateTimeFormatter;
-import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -54,7 +55,7 @@ public class ObservationResource {
    * @return collection of observations, empty if none found
    */
   @GET @Timed
-  public Collection<Observation> findObservations(
+  public List<Observation> findObservations(
       @QueryParam(ApiParams.PATIENT_ID) String patientId,
       @QueryParam(ApiParams.START_TIME) String startCaptureTimeString,
       @QueryParam(ApiParams.END_TIME) String endCaptureTimeString) {
@@ -80,7 +81,7 @@ public class ObservationResource {
     }
 
     return findObservationsCoordinator.findObservationsByPatientId(
-        patientId, Optional.ofNullable(captureTimeRange));
+        Id.of(patientId), Optional.ofNullable(captureTimeRange));
   }
 
   private Instant parseDateTime(String input) {

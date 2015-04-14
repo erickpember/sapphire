@@ -12,7 +12,7 @@ import com.neovisionaries.i18n.LanguageCode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Optional;
-import org.testng.annotations.BeforeClass;
+import javax.inject.Inject;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -20,17 +20,14 @@ import static org.testng.Assert.assertEquals;
 /**
  * Test for Patient Repository
  */
-public class PatientRepositoryTest extends BaseRepositoryTest {
+public class PatientRepositoryTest extends RepositoryTestSupport {
 
+  @Inject
   private PatientRepository patientRepo;
+
   private Patient patient1;
   private Patient patient2;
   private Patient patient3;
-
-  @BeforeClass
-  public void setupTemplate() {
-    patientRepo = new PatientRepository(accumuloTemplate);
-  }
 
   @Test(dependsOnGroups = "patients")
   public void should_list_inactive_patients() {

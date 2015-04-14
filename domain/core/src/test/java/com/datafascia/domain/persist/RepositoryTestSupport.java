@@ -3,31 +3,30 @@
 package com.datafascia.domain.persist;
 
 import com.datafascia.common.accumulo.AccumuloConfiguration;
-import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
 import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.ConnectorFactory;
 import com.datafascia.common.accumulo.FixedAuthorizationsSupplier;
 import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
 import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.google.inject.Provides;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.apache.accumulo.core.client.Connector;
-import org.apache.accumulo.core.client.admin.TableOperations;
+import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
-import org.testng.annotations.Guice;
 
 /**
  * Base for mock Accumulo repository tests.
  */
-@Guice(modules = BaseRepositoryTest.Module.class)
-public class BaseRepositoryTest {
+public abstract class RepositoryTestSupport {
 
   /**
    * Provides test dependencies
    */
-  public static class Module extends AbstractModule {
+  private static class TestModule extends AbstractModule {
     @Override
     protected void configure() {
       bind(AuthorizationsSupplier.class).to(FixedAuthorizationsSupplier.class);
@@ -43,7 +42,7 @@ public class BaseRepositoryTest {
     public ConnectorFactory connectorFactory() {
       return new ConnectorFactory(AccumuloConfiguration.builder()
           .instance(ConnectorFactory.MOCK_INSTANCE)
-          .zooKeepers("localhost")
+          .zooKeepers("")
           .user("root")
           .password("secret")
           .build());
@@ -53,16 +52,16 @@ public class BaseRepositoryTest {
   @Inject
   private Connector connector;
 
-  @Inject
-  protected AccumuloTemplate accumuloTemplate;
-
   @BeforeClass
-  public void beforeClass() throws Exception {
-    setupPatientTable();
+  public void beforeRepositoryTestSupport() throws Exception {
+    Injector injector = Guice.createInjector(new TestModule());
+    injector.injectMembers(this);
+
+    connector.tableOperations().create(Tables.PATIENT);
   }
 
-  private void setupPatientTable() throws Exception {
-    TableOperations tableOps = connector.tableOperations();
-    tableOps.create("Patient");
+  @AfterClass
+  public void afterRepositoryTestSupport() throws Exception {
+    connector.tableOperations().delete(Tables.PATIENT);
   }
 }

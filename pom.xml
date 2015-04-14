@@ -74,6 +74,7 @@
     <module>etl/hl7-transform</module>
     <module>etl/process</module>
     <module>integration-tests</module>
+    <module>scenario-tests</module>
     <module>shell</module>
   </modules>
 
@@ -477,6 +478,12 @@
       <plugins>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>2.18.1</version>
+        </plugin>
+
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-shade-plugin</artifactId>
           <version>2.3</version>
           <configuration>
@@ -551,7 +558,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-failsafe-plugin</artifactId>
-        <version>2.18.1</version>
         <configuration>
           <argLine>${failsafe.argLine}</argLine>
         </configuration>

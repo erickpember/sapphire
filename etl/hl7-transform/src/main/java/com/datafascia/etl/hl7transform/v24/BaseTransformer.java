@@ -50,8 +50,12 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
    * @return observation data
    * @throws HL7Exception Parsing error encountered in toObservationData.
    */
-  private ObservationData segmentsToObservationData(Segment obx,
-      List<Segment> segmentNotes, ObservationType observationType) throws HL7Exception {
+  private ObservationData segmentsToObservationData(
+      Segment obx,
+      List<Segment> segmentNotes,
+      ObservationType observationType)
+          throws HL7Exception {
+
     ArrayList<NTE> ntes = new ArrayList<>();
     for (Segment seg : segmentNotes) {
       ntes.add((NTE) seg);
@@ -68,8 +72,12 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
    * @return Avro-friendly Pojo.
    * @throws HL7Exception
    */
-  protected ObservationData toObservationData(OBX obx, List<NTE> ntes,
-      ObservationType observationType) throws HL7Exception {
+  protected ObservationData toObservationData(
+      OBX obx,
+      List<NTE> ntes,
+      ObservationType observationType)
+          throws HL7Exception {
+
     List<String> observationMethod = new ArrayList<>();
     for (CE ce : obx.getObservationMethod()) {
       observationMethod.add(ce.getText().encode());
@@ -102,26 +110,42 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
     }
 
     return ObservationData.builder()
-        .observationMethod(observationMethod)
-        .abnormalFlags(abnormalFlags)
-        .comments(comments)
-        .natureOfAbnormalTest(obx.getNatureOfAbnormalTest().encode())
+        .observationMethod(
+            observationMethod)
+        .abnormalFlags(
+            abnormalFlags)
+        .comments(
+            comments)
+        .natureOfAbnormalTest(
+            obx.getNatureOfAbnormalTest().encode())
         .effectiveDateOfLastNormalObservation(
             toInstant(obx.getDateLastObservationNormalValue().getTimeOfAnEvent()))
-        .userDefinedAccessChecks(obx.getUserDefinedAccessChecks().encode())
+        .userDefinedAccessChecks(
+            obx.getUserDefinedAccessChecks().encode())
         .observationDateAndTime(
             toInstant(obx.getDateTimeOfTheObservation().getTimeOfAnEvent()))
-        .responsibleObserver(obx.getResponsibleObserver().encode())
-        .resultStatus(obx.getObservationResultStatus().getValueOrEmpty())
-        .probability(probability)
-        .producersId(obx.getProducerSID().encode())
-        .valueUnits(obx.getUnits().encode())
-        .valueType(obx.getValueType().getValueOrEmpty())
-        .subId(obx.getObservationSubId().getValueOrEmpty())
-        .value(observationValue)
-        .id(obx.getObservationIdentifier().encode())
-        .referenceRange(obx.getReferencesRange().encode())
-        .observationType(observationType)
+        .responsibleObserver(
+            obx.getResponsibleObserver().encode())
+        .resultStatus(
+            obx.getObservationResultStatus().getValueOrEmpty())
+        .probability(
+            probability)
+        .producersId(
+            obx.getProducerSID().encode())
+        .valueUnits(
+            obx.getUnits().encode())
+        .valueType(
+            obx.getValueType().getValueOrEmpty())
+        .subId(
+            obx.getObservationSubId().getValueOrEmpty())
+        .value(
+            observationValue)
+        .id(
+            obx.getObservationIdentifier().encode())
+        .referenceRange(
+            obx.getReferencesRange().encode())
+        .observationType(
+            observationType)
         .build();
   }
 
@@ -153,7 +177,7 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
    * @param terser Like XPath for HL7, extracts segments from parsed HL7 using a path.
    * @param observationType The subtype of the wrapping message, such as AO1.
    * @return EventData subclass containing a list of Observations stored in our internal format.
-   * @throws ca.uhn.hl7v2.HL7Exception Failure to parse HL7 with terser.
+   * @throws HL7Exception Failure to parse HL7 with terser.
    */
   protected AddObservationsData toAddObservationsData(
       PID pid,
@@ -162,7 +186,7 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
       String nteRootPath,
       Terser terser,
       ObservationType observationType)
-        throws HL7Exception {
+          throws HL7Exception {
 
     String obxSubscript = "";
     String currentObxPath = obxRootPath.replace(SUBSCRIPT_PLACEHOLDER, obxSubscript);

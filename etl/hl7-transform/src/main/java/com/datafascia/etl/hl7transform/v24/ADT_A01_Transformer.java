@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
  * Handles admit patient message.
  */
 @Slf4j
-public class ADT_A01_Transformer extends BaseTransformer {
+public class ADT_A01_Transformer extends AdmitPatientTransformer {
 
   private static final String OBX_ROOT_PATH = "/OBX" + SUBSCRIPT_PLACEHOLDER;
 
@@ -36,7 +36,7 @@ public class ADT_A01_Transformer extends BaseTransformer {
 
     List<Event> outputEvents = new ArrayList<>();
     try {
-      AdmitPatientData admitPatientData = toAdmitData(message.getPID(), message.getPV1());
+      AdmitPatientData admitPatientData = toAdmitPatientData(message.getPID(), message.getPV1());
 
       outputEvents.add(Event.builder()
           .institutionId(institutionId)

@@ -23,7 +23,7 @@ import lombok.extern.slf4j.Slf4j;
  * Gotcha: Hapi has no ADT_A13 type for v2.4, it's apparently handled as a subtype of A01.
  */
 @Slf4j
-public class ADT_A13_Transformer extends BaseTransformer {
+public class ADT_A13_Transformer extends AdmitPatientTransformer {
 
   private static final String OBX_ROOT_PATH = "/OBX" + SUBSCRIPT_PLACEHOLDER;
 

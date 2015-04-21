@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
  * A08 messages as a subtype of A01.
  */
 @Slf4j
-public class ADT_A08_Transformer extends BaseTransformer {
+public class ADT_A08_Transformer extends AdmitPatientTransformer {
 
   private static final String OBX_ROOT_PATH = "/OBX" + SUBSCRIPT_PLACEHOLDER;
 

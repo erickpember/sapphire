@@ -21,7 +21,7 @@ import lombok.extern.slf4j.Slf4j;
  * Further parsing of elements outside the OBX is not yet done.
  */
 @Slf4j
-public class ADT_A02_Transformer extends BaseTransformer {
+public class ADT_A02_Transformer extends AdmitPatientTransformer {
 
   private static final String OBX_ROOT_PATH = "/OBX" + SUBSCRIPT_PLACEHOLDER;
 

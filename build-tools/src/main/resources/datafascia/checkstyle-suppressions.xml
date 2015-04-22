@@ -9,6 +9,7 @@
 
 <suppressions>
   <suppress files="[/\\]target[/\\]" checks=".*"/>
+  <suppress files="[/\\]com[/\\]datafascia[/\\]etl[/\\]hl7transform[/\\]v.*" checks="FileLength"/>
   <suppress files="[/\\]src[/\\]test[/\\]java[/\\]" checks="FileLength"/>
   <suppress files="[/\\]src[/\\]test[/\\]java[/\\]" checks="IllegalCatch"/>
   <suppress files="[/\\]src[/\\]test[/\\]java[/\\]" checks="JavadocMethod"/>

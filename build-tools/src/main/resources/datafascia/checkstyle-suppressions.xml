@@ -8,12 +8,8 @@
     "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
 
 <suppressions>
-  <suppress checks=".*" files="[/\\]target[/\\]"/>
-  <suppress checks="JavadocMethod" files=".*Test.*\.java"/>
-  <suppress checks="JavadocMethod" files=".*IT\.java"/>
-  <suppress checks="IllegalCatch" files=".*Test.*\.java"/>
-  <suppress checks="IllegalCatch" files=".*IT\.java"/>
-  <suppress checks="FileLength" files=".*Test.*\.java"/>
-  <suppress checks="FileLength" files=".*IT\.java"/>
+  <suppress files="[/\\]target[/\\]" checks=".*"/>
+  <suppress files="[/\\]src[/\\]test[/\\]java[/\\]" checks="FileLength"/>
+  <suppress files="[/\\]src[/\\]test[/\\]java[/\\]" checks="IllegalCatch"/>
+  <suppress files="[/\\]src[/\\]test[/\\]java[/\\]" checks="JavadocMethod"/>
 </suppressions>
-

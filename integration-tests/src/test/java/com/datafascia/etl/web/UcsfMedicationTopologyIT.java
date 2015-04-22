@@ -3,26 +3,45 @@
 package com.datafascia.etl.web;
 
 import backtype.storm.Config;
-import backtype.storm.LocalCluster;
+import backtype.storm.ILocalCluster;
+import backtype.storm.Testing;
 import backtype.storm.generated.StormTopology;
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
+import backtype.storm.testing.TestJob;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.topology.base.BaseRichBolt;
 import backtype.storm.tuple.Tuple;
-import com.datafascia.api.services.ApiIT;
 import com.datafascia.common.accumulo.AccumuloConfiguration;
+import com.datafascia.common.accumulo.AuthorizationsSupplier;
+import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
+import com.datafascia.common.accumulo.ConnectorFactory;
+import com.datafascia.common.accumulo.FixedAuthorizationsSupplier;
+import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
+import com.datafascia.common.inject.Injectors;
+import com.datafascia.common.storm.DependencyInjectingBaseRichSpoutProxy;
+import com.datafascia.domain.persist.PatientRepository;
+import com.datafascia.domain.persist.Tables;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
+import com.google.inject.AbstractModule;
+import com.google.inject.Provides;
+import java.io.File;
 import java.io.FileInputStream;
 import java.security.KeyStore;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import javax.net.ssl.SSLContext;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.accumulo.core.client.Connector;
+import org.apache.accumulo.core.client.Instance;
+import org.apache.accumulo.minicluster.MiniAccumuloInstance;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.conn.ssl.SSLContexts;
@@ -41,7 +60,7 @@ import static com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo;
 import static com.github.tomakehurst.wiremock.client.WireMock.urlMatching;
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig;
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
+import static org.testng.Assert.fail;
 
 /**
  * Test for the UCSF medication topology.
@@ -55,8 +74,49 @@ public class UcsfMedicationTopologyIT {
 
   public WireMockServer wireMockServer;
 
-  @BeforeClass
-  public static void setup() throws Exception {
+  /**
+   * Provides test dependencies
+   */
+  private static class TestModule extends AbstractModule {
+    @Override
+    protected void configure() {
+      bind(AuthorizationsSupplier.class).to(FixedAuthorizationsSupplier.class);
+      bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
+    }
+
+    @Provides @Singleton
+    public AccumuloConfiguration accumuloConfiguration() {
+      String instanceName = "plugin-it-instance";
+      try {
+        Instance instance = new MiniAccumuloInstance(
+            instanceName, new File("target/accumulo-maven-plugin/" + instanceName));
+
+        return new AccumuloConfiguration(
+            instanceName, instance.getZooKeepers(), "root", "supersecret");
+      } catch (Exception e) {
+        e.printStackTrace();
+        throw new IllegalStateException("Cannot get Accumulo instance", e);
+      }
+    }
+
+    @Provides @Singleton
+    public Connector connector(ConnectorFactory factory) {
+      return factory.getConnector();
+    }
+
+    @Provides @Singleton
+    public ConnectorFactory connectorFactory(AccumuloConfiguration configuration) {
+      return new ConnectorFactory(configuration);
+    }
+  }
+
+  @Inject
+  private Connector connector;
+
+  @Inject
+  private PatientRepository patientRepository;
+
+  private void setupTls() throws Exception {
     KeyStore trustStore  = KeyStore.getInstance(KeyStore.getDefaultType());
     FileInputStream instream = new FileInputStream(trustStorePath);
     try {
@@ -73,44 +133,56 @@ public class UcsfMedicationTopologyIT {
         .build());
   }
 
+  @BeforeClass
+  public void beforeClass() throws Exception {
+    Injectors.overrideWith(new TestModule());
+    Injectors.getInjector().injectMembers(this);
+
+    setupTls();
+  }
+
+  @AfterClass
+  public void afterClass() throws Exception {
+    connector.tableOperations().delete(Tables.PATIENT);
+  }
+
   @Test
   public void testTopology() throws Exception {
     int port = startStandinService();
-    AccumuloConfiguration config = ApiIT.getInjector().getInstance(AccumuloConfiguration.class);
 
-    UcsfMedicationSpout spout = new UcsfMedicationSpout(config.getInstance(),
-        config.getZooKeepers(), config.getUser(), config.getPassword(), "https://localhost:" + port
-        + "/medication", Duration.ofMinutes(5));
+    UcsfMedicationSpout spout = new UcsfMedicationSpout(
+        "https://localhost:" + port + "/medication", Duration.ofMinutes(5));
 
-    submitTopology(spout);
+    submitTopology(spout, new TestBolt());
   }
 
-  public static void submitTopology(UcsfMedicationSpout spout) throws Exception {
+  public static void submitTopology(UcsfMedicationSpout spout, TestBolt testBolt) throws Exception {
     // Topology config
-    Config conf = new Config();
-    conf.registerMetricsConsumer(backtype.storm.metric.LoggingMetricsConsumer.class, 1);
-    conf.setDebug(true);
-    conf.setNumWorkers(4);
+    Config config = new Config();
+    config.setDebug(true);
 
     // Construct topology
     TopologyBuilder builder = new TopologyBuilder();
-    builder.setSpout("spout1", spout);
-    // A basic bolt to ensure it receives the expected tuples.
-    builder.setBolt("bolt1", new TestBolt()).shuffleGrouping("spout1");
-    LocalCluster cluster = new LocalCluster();
-    StormTopology topo = builder.createTopology();
-    cluster.submitTopology("ucsfMed", conf, topo);
+    builder.setSpout(UcsfMedicationSpout.ID, new DependencyInjectingBaseRichSpoutProxy(spout));
 
-    Instant start = Instant.now();
-    while (!TestBolt.tuplesReceived.get()) {
-      if (Instant.now().minusMillis(10000).isAfter(start)) {
-        assertTrue(false, "Test bolt failed to receive tuples within ten seconds.");
+    builder.setBolt("bolt1", testBolt).shuffleGrouping(UcsfMedicationSpout.ID);
+    StormTopology topology = builder.createTopology();
+
+    Testing.withLocalCluster(new TestJob() {
+      @Override
+      public void run(ILocalCluster cluster) throws Exception {
+        cluster.submitTopology(
+            UcsfMedicationTopologyIT.class.getSimpleName(), config, topology);
+
+        Instant start = Instant.now();
+        while (!TestBolt.tuplesReceived.get()) {
+          if (Instant.now().minusMillis(10000).isAfter(start)) {
+            fail("Test bolt failed to receive tuples within ten seconds.");
+          }
+          TimeUnit.SECONDS.sleep(1);
+        }
       }
-      Thread.sleep(1);
-    }
-
-    cluster.killTopology("ucsfMed");
-    cluster.shutdown();
+    });
   }
 
   /**

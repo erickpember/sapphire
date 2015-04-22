@@ -2,10 +2,6 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.web;
 
-import com.codahale.metrics.MetricRegistry;
-import com.datafascia.common.accumulo.AccumuloTemplate;
-import com.datafascia.common.accumulo.FixedAuthorizationsSupplier;
-import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.web.RestUtils;
 import com.datafascia.domain.model.Patient;
@@ -21,19 +17,13 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import javax.inject.Inject;
 import javax.net.ssl.SSLContext;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.accumulo.core.client.AccumuloException;
-import org.apache.accumulo.core.client.AccumuloSecurityException;
-import org.apache.accumulo.core.client.Connector;
-import org.apache.accumulo.core.client.Instance;
-import org.apache.accumulo.core.client.ZooKeeperInstance;
-import org.apache.accumulo.core.client.security.tokens.PasswordToken;
 
 /**
  * A spout for UCSF medication data.
@@ -44,51 +34,31 @@ import org.apache.accumulo.core.client.security.tokens.PasswordToken;
  */
 @Slf4j
 public class UcsfMedicationSpout extends AbstractWebSpout {
+
+  public static final String ID = UcsfMedicationSpout.class.getSimpleName();
   public static final String medJsonField = "medJson";
+
+  @Inject
+  private transient PatientRepository patientRepository;
+
   private String restBase;
-  private String instanceName;
-  private String zookeeper;
-  private String username;
-  private String password;
   private Duration duration;
   private Map<Id<Patient>, Instant> lastPolls = new HashMap<>();
 
   /**
    * Creates a UcsfMedicationSpout
-   * @param instanceName The instance to connect to.
-   * @param zookeeper The zookeepers to connect to.
-   * @param username Username to connect with.
-   * @param password Password for the user.
+   *
    * @param restBase Base address of the web service.
    * @param duration Duration between polls.
    */
-  public UcsfMedicationSpout(String instanceName, String zookeeper, String username,
-      String password, String restBase, Duration duration) {
-    this.instanceName = instanceName;
-    this.zookeeper = zookeeper;
-    this.username = username;
-    this.password = password;
+  public UcsfMedicationSpout(String restBase, Duration duration) {
     this.duration = duration;
     this.restBase = restBase;
   }
 
-  /**
-   * Returns a usable PatientRepository
-   * @return A usable PatientRepository
-   * @throws AccumuloSecurityException When provided credentials are incorrect.
-   * @throws AccumuloException When unable to connect to accumulo.
-   */
-  public PatientRepository getRepo() throws AccumuloSecurityException, AccumuloException {
-    Instance instance = new ZooKeeperInstance(instanceName, zookeeper);
-    Connector connector = instance.getConnector(username, new PasswordToken(password));
-    AccumuloTemplate template = new AccumuloTemplate(connector, new FixedColumnVisibilityPolicy()
-        , new FixedAuthorizationsSupplier(), new MetricRegistry());
-    return new PatientRepository(template);
-  }
-
   @Override
   protected List<String> getFields() {
-    return Arrays.asList(new String[] {medJsonField});
+    return Arrays.asList(medJsonField);
   }
 
   @Override
@@ -106,10 +76,6 @@ public class UcsfMedicationSpout extends AbstractWebSpout {
       return getMedResponses(getActivePatients());
     } catch (IOException e) {
       log.error("Unable to connect to given service.", e);
-    } catch (AccumuloSecurityException e) {
-      log.error("Bad credentials connecting to accumulo.", e);
-    } catch (AccumuloException e) {
-      log.error("Unable to connect to accumulo.", e);
     } catch (UnrecoverableKeyException | CertificateException | NoSuchAlgorithmException
         | KeyStoreException | KeyManagementException e) {
       log.error("Error establishing TLS connection to medications service.", e);
@@ -118,15 +84,15 @@ public class UcsfMedicationSpout extends AbstractWebSpout {
     return null;
   }
 
-  private List<Patient> getActivePatients() throws AccumuloSecurityException, AccumuloException {
+  private List<Patient> getActivePatients() {
     List<Patient> patients = new ArrayList<>();
     Id<Patient> lastPatient = null;
 
     while (true) {
       Optional<Id<Patient>> optLastPatient = lastPatient == null ? Optional.empty() : Optional.of
           (lastPatient);
-      Collection<Patient> patientCollection = getRepo().list(optLastPatient,
-          Optional.of(Boolean.TRUE), 1000);
+      List<Patient> patientCollection = patientRepository.list(
+          optLastPatient, Optional.of(Boolean.TRUE), 1000);
       if (patientCollection.isEmpty() || (patientCollection.size() == 1 && lastPatient != null)) {
         break;
       }

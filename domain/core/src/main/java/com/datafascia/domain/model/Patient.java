@@ -44,7 +44,7 @@ public class Patient extends Person {
 
  /** A list of contacts associated with the patient.*/
   @JsonProperty("contacts")
-  private List<Contact> contactDetails;
+  private List<RelatedPerson> contactDetails;
 
   /** Date and time the patient was entered into the system.*/
   @JsonProperty("creationDate") @JsonSerialize(using = InstantSerializer.class)

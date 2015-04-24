@@ -15,13 +15,13 @@ import static org.testng.Assert.assertEquals;
 public class ContactTest extends ModelTestBase {
   @Test
   public <T extends Object> void testContact() throws IOException, URISyntaxException {
-    Contact decoded = (Contact) geneticEncodeDecodeTest(TestModels.contact);
+    RelatedPerson decoded = (RelatedPerson) geneticEncodeDecodeTest(TestModels.contact);
     assertEquals(decoded.getAddress(), TestModels.address);
     assertEquals(decoded.getName(), TestModels.name);
     assertEquals(decoded.getGender(), Gender.UNDIFFERENTIATED);
     assertEquals(decoded.getBirthDate(), TestModels.getDate());
     assertEquals(decoded.getPhoto(), TestModels.getPhoto());
-    assertEquals(decoded.getRelationship(), "Tester");
+    assertEquals(decoded.getRelationship(), TestModels.codeable);
   }
 
   @Test

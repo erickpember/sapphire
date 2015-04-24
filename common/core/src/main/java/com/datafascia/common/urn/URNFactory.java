@@ -20,6 +20,8 @@ public class URNFactory {
   public static final String URN = "urn";
   /** URN separator */
   public static final String URN_SEP = ":";
+  /** Namespace for dataFascia Oid identifier */
+  public static final String NS_OID = "oid";
   /** Namespace for dataFascia patient identifier */
   public static final String NS_PATIENT_ID = "df-patientId-1";
   /** Namespace for dataFascia patient encounter identifier */
@@ -28,6 +30,52 @@ public class URNFactory {
   public static final String NS_OBSERVATION_ID = "df-encounterId-1";
   /** Namespace for dataFascia patient hospitalization identifier */
   public static final String NS_HOSPITALIZATION_ID = "df-hospitalizationId-1";
+  /** Namespace for dataFascia practitioner identifier */
+  public static final String NS_PRACTITIONER_ID = "df-practitionerId-1";
+  /** Namespace for dataFascia patient-related person identifier */
+  public static final String NS_RELATED_PERSON_ID = "df-related-personId-1";
+  /** Namespace for dataFascia medication prescription identifier */
+  public static final String NS_PRESCRIPTION_ID = "df-prescriptionId-1";
+  /** Namespace for dataFascia body site identifier */
+  public static final String NS_BODY_SITE_ID = "df-body-site-1";
+  /** Namespace for dataFascia healthcare device identifier */
+  public static final String NS_DEVICE_ID = "df-deviceId-1";
+  /** Namespace for dataFascia group identifier */
+  public static final String NS_GROUP_ID = "df-groupId-1";
+  /** Namespace for dataFascia imaging study identifier */
+  public static final String NS_IMAGING_STUDY_ID = "df-imaging-studyId-1";
+  /** Namespace for dataFascia immunization identifier */
+  public static final String NS_IMMUNIZATION_ID = "df-immunizationId-1";
+  /** Namespace for dataFascia imaging study identifier */
+  public static final String NS_PROCEDURE_ID = "df-procedureId-1";
+  /** Namespace for dataFascia specimen identifier */
+  public static final String NS_SPECIMEN_ID = "df-specimenId-1";
+  /** Namespace for dataFascia specimen container identifier */
+  public static final String NS_SPECIMEN_CONTAINER_ID = "df-specimen-containerId-1";
+  /** Namespace for dataFascia diagnostic report identifier */
+  public static final String NS_DIAGNOSTIC_REPORT_ID = "df-diagnostic-reportId-1";
+  /** Namespace for dataFascia diagnostic order identifier */
+  public static final String NS_DIAGNOSTIC_ORDER_ID = "df-diagnostic-orderId-1";
+  /** Namespace for dataFascia document reference identifier */
+  public static final String NS_DOCUMENT_REFERENCE_ID = "df-document-referenceId-1";
+  /** Namespace for dataFascia medication administration identifier */
+  public static final String NS_MEDICATION_ID = "df-medicationId-1";
+  /** Namespace for dataFascia medication administration identifier */
+  public static final String NS_MEDICATION_ADMINISTRATION_ID = "df-medication-administrationId-1";
+  /** Namespace for dataFascia medication dispense identifier */
+  public static final String NS_MEDICATION_DISPENSE_ID = "df-medication-dispenseId-1";
+  /** Namespace for dataFascia medication statement identifier */
+  public static final String NS_MEDICATION_STATEMENT_ID = "df-medication-statementId-1";
+  /** Namespace for dataFascia healthcare service identifier */
+  public static final String NS_HEALTHCARE_SERVICE_ID = "df-healthcare-serviceId-1";
+  /** Namespace for dataFascia location identifier */
+  public static final String NS_LOCATION_ID = "df-locationId-1";
+  /** Namespace for dataFascia location identifier */
+  public static final String NS_SUBSTANCE_ID = "df-substanceId-1";
+  /** Namespace for dataFascia organization identifier */
+  public static final String NS_ORGANIZATION_ID = "df-organizationId-1";
+  /** Namespace for dataFascia condition identifier */
+  public static final String NS_CONDITION_ID = "df-conditionId-1";
   /** Namespace for dataFascia model types */
   public static final String NS_MODEL_TYPE = "df-model-1";
   /** URN prefix for dataFascia model types */

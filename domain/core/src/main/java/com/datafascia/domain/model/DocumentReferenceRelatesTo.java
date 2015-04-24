@@ -2,25 +2,25 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.model;
 
+import com.datafascia.common.persist.Id;
 import com.datafascia.common.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 
 /**
- * Represents a contact relating a person to a patient.
+ * Relationships to other documents from a DocumentReference.
  */
-@Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode(callSuper = true)
+@Data @NoArgsConstructor @JsonTypeName(URNFactory.MODEL_PREFIX + "DocumentReferenceRelatesTo")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
-@JsonTypeName(URNFactory.MODEL_PREFIX + "Contact") @ToString(callSuper = true)
-public class Contact extends Person {
-  /** Relationship of the contact to the person.*/
-  @JsonProperty("relationship")
-  private String relationship;
+public class DocumentReferenceRelatesTo {
+  /** Who authored the document. */
+  @JsonProperty("code")
+  private DocumentRelationshipType code;
+
+  /** Who authored the document. */
+  @JsonProperty("targetId")
+  private Id<DocumentReference> targetId;
 }

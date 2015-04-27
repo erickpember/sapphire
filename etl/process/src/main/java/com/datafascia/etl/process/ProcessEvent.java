@@ -21,6 +21,9 @@ public class ProcessEvent extends BaseFilter {
   private transient AdmitPatient admitPatient;
 
   @Inject
+  private transient DischargePatient dischargePatient;
+
+  @Inject
   private transient AddObservations addObservations;
 
   @Override
@@ -30,6 +33,9 @@ public class ProcessEvent extends BaseFilter {
     switch (event.getType()) {
       case PATIENT_ADMIT:
         admitPatient.accept(event);
+        break;
+      case PATIENT_DISCHARGE:
+        dischargePatient.accept(event);
         break;
       case OBSERVATIONS_ADD:
         addObservations.accept(event);

@@ -27,12 +27,14 @@ public class PatientRepositoryTest extends RepositoryTestSupport {
   private PatientRepository patientRepository;
 
   private Patient patient1;
-  private Patient patient2;
+  private Patient inactivePatient;
   private Patient patient3;
 
   @Test(dependsOnGroups = "patients")
   public void should_list_inactive_patients() {
-    assertEquals(patientRepository.list(Optional.empty(), Optional.of(false), 1).size(), 1);
+    List<Patient> patients = patientRepository.list(Optional.empty(), Optional.of(false), 5);
+
+    assertEquals(patients.get(0), inactivePatient);
   }
 
   @Test(dependsOnGroups = "patients")
@@ -47,7 +49,7 @@ public class PatientRepositoryTest extends RepositoryTestSupport {
 
   @Test(dependsOnGroups = "patients")
   public void should_list_patients_starting_from_specified_patient() {
-    Id<Patient> startPatientId = PatientRepository.getEntityId(patient2);
+    Id<Patient> startPatientId = PatientRepository.getEntityId(inactivePatient);
     List<Patient> patients = patientRepository.list(
         Optional.of(startPatientId), Optional.empty(), 5);
 
@@ -116,7 +118,7 @@ public class PatientRepositoryTest extends RepositoryTestSupport {
 
   @Test(groups = "patients")
   public void getInactive() {
-    patient2 = new Patient() {
+    inactivePatient = new Patient() {
       {
         setInstitutionPatientId("UCSF-13579");
         setAccountNumber("13579");
@@ -135,7 +137,7 @@ public class PatientRepositoryTest extends RepositoryTestSupport {
         setActive(false);
       }
     };
-    testPatientSet(patient2);
+    testPatientSet(inactivePatient);
   }
 
   private void testPatientSet(Patient originalPatient) {

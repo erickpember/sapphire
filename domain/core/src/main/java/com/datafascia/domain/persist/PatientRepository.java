@@ -224,8 +224,9 @@ public class PatientRepository extends BaseRepository {
 
     Limit<Patient> maxLim = new Limit<>(count);
     if (optActive.isPresent()) {
+      boolean active = optActive.get();
       return accumuloTemplate.queryForList(
-          scanner, PATIENT_ROW_MAPPER, patient -> patient.isActive() == optActive.get(), maxLim);
+          scanner, PATIENT_ROW_MAPPER, patient -> patient.isActive() == active, maxLim);
     } else {
       return accumuloTemplate.queryForList(scanner, PATIENT_ROW_MAPPER, patient -> true, maxLim);
     }

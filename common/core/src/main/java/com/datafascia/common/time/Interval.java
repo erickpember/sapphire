@@ -8,8 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Range of time in the open interval [startInclusive, endExclusive). That is, instants must be
- * before the upper bound endpoint.
+ * Range of time in the open interval [startInclusive, endExclusive). That is,
+ * items in the interval must be less than the end boundary.
  *
  * @param <T> instant type
  */

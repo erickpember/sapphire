@@ -11,6 +11,7 @@ import com.datafascia.domain.model.Race;
 import com.neovisionaries.i18n.LanguageCode;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
 import org.testng.annotations.Test;
@@ -23,7 +24,7 @@ import static org.testng.Assert.assertEquals;
 public class PatientRepositoryTest extends RepositoryTestSupport {
 
   @Inject
-  private PatientRepository patientRepo;
+  private PatientRepository patientRepository;
 
   private Patient patient1;
   private Patient patient2;
@@ -31,33 +32,36 @@ public class PatientRepositoryTest extends RepositoryTestSupport {
 
   @Test(dependsOnGroups = "patients")
   public void should_list_inactive_patients() {
-    assertEquals(patientRepo.list(Optional.empty(), Optional.of(false), 1).size(), 1);
+    assertEquals(patientRepository.list(Optional.empty(), Optional.of(false), 1).size(), 1);
   }
 
   @Test(dependsOnGroups = "patients")
   public void should_list_active_patients() {
-    assertEquals(patientRepo.list(Optional.empty(), Optional.of(true), 5).size(), 2);
+    assertEquals(patientRepository.list(Optional.empty(), Optional.of(true), 5).size(), 2);
   }
 
   @Test(dependsOnGroups = "patients")
   public void should_list_all_patients() {
-    assertEquals(patientRepo.list(Optional.empty(), Optional.empty(), 5).size(), 3);
+    assertEquals(patientRepository.list(Optional.empty(), Optional.empty(), 5).size(), 3);
   }
 
   @Test(dependsOnGroups = "patients")
   public void should_list_patients_starting_from_specified_patient() {
     Id<Patient> startPatientId = PatientRepository.getEntityId(patient2);
-    assertEquals(patientRepo.list(Optional.of(startPatientId), Optional.empty(), 5).size(), 2);
+    List<Patient> patients = patientRepository.list(
+        Optional.of(startPatientId), Optional.empty(), 5);
+
+    assertEquals(patients.size(), 2);
   }
 
   @Test
-  private void testNonExistentPatient() {
-    Optional<Patient> patNonExistent = patientRepo.read(Id.of("asdf"));
+  public void testNonExistentPatient() {
+    Optional<Patient> patNonExistent = patientRepository.read(Id.of("asdf"));
     assertEquals(Optional.empty(), patNonExistent);
   }
 
   @Test(groups = "patients") @SuppressWarnings("serial")
-  private void getActiveWithLanguages() {
+  public void getActiveWithLanguages() {
     patient1 = new Patient() {
       {
         setInstitutionPatientId("UCSF-12345");
@@ -87,7 +91,7 @@ public class PatientRepositoryTest extends RepositoryTestSupport {
   }
 
   @Test(groups = "patients")
-  private void getActiveWithoutLanguages() {
+  public void getActiveWithoutLanguages() {
     patient3 = new Patient() {
       {
         setInstitutionPatientId("UCSF-67890");
@@ -111,7 +115,7 @@ public class PatientRepositoryTest extends RepositoryTestSupport {
   }
 
   @Test(groups = "patients")
-  private void getInactive() {
+  public void getInactive() {
     patient2 = new Patient() {
       {
         setInstitutionPatientId("UCSF-13579");
@@ -135,10 +139,10 @@ public class PatientRepositoryTest extends RepositoryTestSupport {
   }
 
   private void testPatientSet(Patient originalPatient) {
-    patientRepo.save(originalPatient);
+    patientRepository.save(originalPatient);
 
     // Not checking if the optional has data, as we *want* it to fail if it's empty.
-    Patient fetchedPatient = patientRepo.read(originalPatient.getId()).get();
+    Patient fetchedPatient = patientRepository.read(originalPatient.getId()).get();
 
     assertEquals(fetchedPatient, originalPatient);
   }

@@ -9,7 +9,6 @@ import com.datafascia.common.accumulo.RowMapper;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.time.Interval;
 import com.datafascia.domain.model.Encounter;
-import com.datafascia.domain.model.Hospitalization;
 import com.datafascia.domain.model.Patient;
 import java.time.Instant;
 import java.util.List;
@@ -36,7 +35,7 @@ public class EncounterRepository extends BaseRepository {
 
   private static final String COLUMN_FAMILY = Encounter.class.getSimpleName();
   private static final String IDENTIFIER = "identifier";
-  private static final String ADMIT_TIME = "admitTime";
+  private static final String PERIOD_START = "periodStart";
   private static final EncounterRowMapper ENCOUNTER_ROW_MAPPER = new EncounterRowMapper();
 
   /**
@@ -85,7 +84,7 @@ public class EncounterRepository extends BaseRepository {
             mutationBuilder
                 .columnFamily(COLUMN_FAMILY)
                 .put(IDENTIFIER, encounter.getIdentifier())
-                .put(ADMIT_TIME, encounter.getHospitalisation().getPeriod().getStartInclusive());
+                .put(PERIOD_START, encounter.getPeriod().getStartInclusive());
           }
         });
   }
@@ -95,12 +94,9 @@ public class EncounterRepository extends BaseRepository {
 
     @Override
     public void onBeginRow(Key key) {
-      Hospitalization hospitalization = new Hospitalization();
-      hospitalization.setPeriod(new Interval<>());
-
       encounter = new Encounter();
       encounter.setId(Id.of(extractEntityId(key)));
-      encounter.setHospitalisation(hospitalization);
+      encounter.setPeriod(new Interval<>());
     }
 
     @Override
@@ -110,8 +106,8 @@ public class EncounterRepository extends BaseRepository {
         case IDENTIFIER:
           encounter.setIdentifier(value);
           break;
-        case ADMIT_TIME:
-          encounter.getHospitalisation().getPeriod().setStartInclusive(Instant.parse(value));
+        case PERIOD_START:
+          encounter.getPeriod().setStartInclusive(Instant.parse(value));
           break;
       }
     }

@@ -9,7 +9,6 @@ import com.datafascia.common.jackson.CSVMapper;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.model.Encounter;
 import com.datafascia.domain.model.Gender;
-import com.datafascia.domain.model.Hospitalization;
 import com.datafascia.domain.model.Name;
 import com.datafascia.domain.model.Observation;
 import com.datafascia.domain.model.PagedCollection;
@@ -149,24 +148,25 @@ public class EmergeDemographicCSVGenerator {
    * Populate the demographic data with the encounter object.
    *
    * @param demo
-   * @param encount
+   *     populate demographic record
+   * @param encounter
+   *     read data from encounter
    */
-  private static void addEncounterData(Demographic demo, Encounter encount) {
-    Hospitalization hosp = encount.getHospitalisation();
-    if (hosp != null && hosp.getPeriod() != null && hosp.getPeriod().getStartInclusive() != null) {
-      ZonedDateTime admitTime = ZonedDateTime.ofInstant(hosp.getPeriod().getStartInclusive(),
-          TIME_ZONE);
+  private static void addEncounterData(Demographic demo, Encounter encounter) {
+    if (encounter.getPeriod() != null && encounter.getPeriod().getStartInclusive() != null) {
+      ZonedDateTime admitTime = ZonedDateTime.ofInstant(
+          encounter.getPeriod().getStartInclusive(), TIME_ZONE);
       demo.setSicuAdmissionDate(DATE_FORMATTER.format(admitTime));
     }
 
-    Optional<String> height = getObservationValue(encount, HEIGHT);
+    Optional<String> height = getObservationValue(encounter, HEIGHT);
     if (height.isPresent()) {
       // UCSF stores height in inches, but the CSV expects centimeters.
       Double dheight = Double.parseDouble(height.get()) * 2.54;
       demo.setPatientAdmissionHeightCm(dheight.toString());
     }
 
-    Optional<String> weight = getObservationValue(encount, WEIGHT);
+    Optional<String> weight = getObservationValue(encounter, WEIGHT);
     if (weight.isPresent()) {
       demo.setPatientAdmissionWeightKg(weight.get());
     }

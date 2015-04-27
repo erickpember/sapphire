@@ -8,7 +8,6 @@ import com.datafascia.domain.event.EncounterData;
 import com.datafascia.domain.event.Event;
 import com.datafascia.domain.event.PatientData;
 import com.datafascia.domain.model.Encounter;
-import com.datafascia.domain.model.Hospitalization;
 import com.datafascia.domain.model.Name;
 import com.datafascia.domain.model.Patient;
 import com.datafascia.domain.persist.EncounterRepository;
@@ -33,13 +32,10 @@ public class AdmitPatient implements Consumer<Event> {
     Interval<Instant> period = new Interval<>();
     period.setStartInclusive(fromEncounter.getAdmitTime());
 
-    Hospitalization hospitalization = new Hospitalization();
-    hospitalization.setPeriod(period);
-
     Encounter encounter = new Encounter();
     encounter.setIdentifier(fromEncounter.getIdentifier());
     encounter.setId(EncounterRepository.getEntityId(encounter));
-    encounter.setHospitalisation(hospitalization);
+    encounter.setPeriod(period);
     return encounter;
   }
 

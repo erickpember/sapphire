@@ -219,9 +219,7 @@ public class ProcessEventTopologyIT {
     assertTrue(optionalEncounter.isPresent());
 
     Encounter encounter = optionalEncounter.get();
-    assertEquals(
-        encounter.getHospitalisation().getPeriod().getStartInclusive(),
-        encounterData.getAdmitTime());
+    assertEquals(encounter.getPeriod().getStartInclusive(), encounterData.getAdmitTime());
   }
 
   private Event createAddObservationsEvent(PatientData patient, EncounterData encounter) {

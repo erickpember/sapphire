@@ -6,7 +6,6 @@ import com.datafascia.common.time.Interval;
 import com.datafascia.domain.model.CodeableConcept;
 import com.datafascia.domain.model.Encounter;
 import com.datafascia.domain.model.Gender;
-import com.datafascia.domain.model.Hospitalization;
 import com.datafascia.domain.model.MaritalStatus;
 import com.datafascia.domain.model.Name;
 import com.datafascia.domain.model.Observation;
@@ -66,12 +65,9 @@ public class FindObservationsCoordinatorTest extends RepositoryTestSupport {
     Interval<Instant> period = new Interval<>();
     period.setStartInclusive(Instant.now());
 
-    Hospitalization hospitalization = new Hospitalization();
-    hospitalization.setPeriod(period);
-
     Encounter encounter = new Encounter();
     encounter.setIdentifier("encounterIdentifier");
-    encounter.setHospitalisation(hospitalization);
+    encounter.setPeriod(period);
     return encounter;
   }
 

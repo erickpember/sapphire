@@ -1,5 +1,0 @@
-Scenario4-Step1.hl7|urn:df-patientId-1:97552037|97552037|3|true
-Scenario4-Step2.hl7|urn:df-patientId-1:97552037|97552037|3|true
-Scenario4-Step3.hl7|urn:df-patientId-1:97552037|97552037|3|true
-Scenario4-Step4.hl7|urn:df-patientId-1:97552037|97552037|3|true
-Scenario4-Step5.hl7|urn:df-patientId-1:97552037|97552037|3|false

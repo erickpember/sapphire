@@ -5,14 +5,12 @@ package com.datafascia.scenarios;
 import com.datafascia.api.client.DatafasciaApi;
 import com.datafascia.api.client.DatafasciaApiBuilder;
 import com.datafascia.common.io.ResourceUtils;
+import com.datafascia.common.jackson.DFObjectMapper;
 import com.datafascia.domain.model.Encounter;
-import com.datafascia.domain.model.Hospitalization;
 import com.datafascia.domain.model.Patient;
 import com.datafascia.shell.Main;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.io.Resources;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.StringReader;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -35,15 +33,14 @@ public class ScenariosIT {
   private static final ZoneId TIME_ZONE = ZoneId.of("America/Los_Angeles");
   private static final DateTimeFormatter DATE_FORMATTER
       = DateTimeFormatter.ISO_LOCAL_DATE;
-
   private static final DateTimeFormatter dateFormat
       = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
-
-  private static String mllpIngestCmd = "ingest-hl7-files";
+  private static final String mllpIngestCmd = "ingest-hl7-files";
 
   private String mllpHost = null;
   private String mllpPort = null;
   private static DatafasciaApi api;
+  private static ObjectMapper mapper = DFObjectMapper.objectMapper();
 
   /**
    * Prepare the integration test to run.
@@ -72,8 +69,9 @@ public class ScenariosIT {
    */
   @Test
   public void testScenario1() throws Exception {
-    log.info("executing Scenario1.txt");
-    processScenario("Scenario1.txt", "NATUS-ADULT", "ONE", "A", "FEMALE", "UNKNOWN",
+    log.info("Executing unknown-female-adm-upd-obs-dis.json");
+    processScenario("unknown-female-adm-upd-obs-dis.json",
+        "NATUS-ADULT", "ONE", "A", "FEMALE", "UNKNOWN",
         LocalDateTime.parse("1984-10-01T05:00:00Z", dateFormat).toLocalDate(),
         LocalDateTime.parse("2014-10-01T19:01:00Z", dateFormat).toLocalDate());
   }
@@ -85,8 +83,9 @@ public class ScenariosIT {
    */
   @Test
   public void testScenario2() throws Exception {
-    log.info("executing Scenario2.txt");
-    processScenario("Scenario2.txt", "TEST", "INPBM", "", "MALE", "WHITE",
+    log.info("Executing white-male-adm-xfr-upd-dis.json");
+    processScenario("white-male-adm-xfr-upd-dis.json",
+        "TEST", "INPBM", "", "MALE", "WHITE",
         LocalDateTime.parse("1970-05-01T05:00:00Z", dateFormat).toLocalDate(),
         LocalDateTime.parse("2014-12-23T18:08:00Z", dateFormat).toLocalDate());
   }
@@ -98,8 +97,9 @@ public class ScenariosIT {
    */
   @Test
   public void testScenario3() throws Exception {
-    log.info("executing Scenario3.txt");
-    processScenario("Scenario3.txt", "TEST", "OUTPTBM", "", "FEMALE", "WHITE",
+    log.info("Executing white-female-adm-xfr-upd-dis.json");
+    processScenario("white-female-adm-xfr-upd-dis.json",
+        "TEST", "OUTPTBM", "", "FEMALE", "WHITE",
         LocalDateTime.parse("1980-05-01T05:00:00Z", dateFormat).toLocalDate(),
         LocalDateTime.parse("2014-12-23T18:13:00Z", dateFormat).toLocalDate());
   }
@@ -111,8 +111,9 @@ public class ScenariosIT {
    */
   @Test
   public void testScenario4() throws Exception {
-    log.info("executing Scenario4.txt");
-    processScenario("Scenario4.txt", "TEST", "CHILDBM", "", "MALE", "WHITE",
+    log.info("Executing white-male-child-adm-xfr-upd-obs-dis.json");
+    processScenario("white-male-child-adm-xfr-upd-obs-dis.json",
+        "TEST", "CHILDBM", "", "MALE", "WHITE",
         LocalDateTime.parse("2000-05-01T05:00:00Z", dateFormat).toLocalDate(),
         LocalDateTime.parse("2014-12-23T19:55:00Z", dateFormat).toLocalDate());
   }
@@ -124,8 +125,9 @@ public class ScenariosIT {
    */
   @Test
   public void testScenario5() throws Exception {
-    log.info("executing Scenario5.txt");
-    processScenario("Scenario5.txt", "MB-HIM", "FOUR", "A", "MALE", "AMERICAN_INDIAN",
+    log.info("Executing nativeAmerican-male-adm-upd-dis.json");
+    processScenario("nativeAmerican-male-adm-upd-dis.json",
+        "MB-HIM", "FOUR", "A", "MALE", "AMERICAN_INDIAN",
         LocalDateTime.parse("2009-02-19T05:00:00Z", dateFormat).toLocalDate(),
         LocalDateTime.parse("2015-02-19T21:24:00Z", dateFormat).toLocalDate());
   }
@@ -137,18 +139,21 @@ public class ScenariosIT {
    */
   @Test
   public void testScenario40() throws Exception {
-    log.info("executing Scenario40.txt");
-    processScenario("Scenario40.txt", "TRN-TWO", "GIRL", "", "FEMALE", "ASIAN",
+    log.info("Executing asian-female-infant-adm-xfr-upd-xfr-upd.json");
+    processScenario("asian-female-infant-adm-xfr-upd-xfr-upd.json",
+        "TRN-TWO", "GIRL", "", "FEMALE", "ASIAN",
         LocalDateTime.parse("2015-01-02T05:00:00Z", dateFormat).toLocalDate(),
         LocalDateTime.parse("2015-01-02T21:42:00Z", dateFormat).toLocalDate());
   }
 
   /**
-   * Process the scenario file.  Each scenario file contains one or more steps.  Each step
-   * is a pipe, '|', delimited string with the following schema:
+   * Process the scenario file.
    *
-   * HL7 Message File|Patient ID|Institution Patient Id|Ingest Delay|Active Status
+   * A scenario file is a JSON file which defines the complete scenario to test. A scenario
+   * comprises the description along with all the steps that need to be executed. Each step
+   * contains the following information:
    *
+   * Step Description     - a short description of the scenario step
    * HL7 Message File     - the HL7 base file name from the resources directory
    * Patient ID           - the internal patient identifier
    * Intition Pattient Id - the institution patient identifier
@@ -169,18 +174,14 @@ public class ScenariosIT {
   private void processScenario(String scenarioFile, String lastName, String firstName,
       String middleName, String gender, String race, LocalDate birthDate, LocalDate admitDate)
       throws Exception {
-    String line = null;
-    try (BufferedReader reader = new BufferedReader(
-        new StringReader(ResourceUtils.resource("scenarios/" + scenarioFile)))) {
-      while ((line = reader.readLine()) != null) {
-        log.info("executing step: {}", line);
-        String[] stepComps = line.split("\\|");
-        ingestHL7Message(stepComps[0], Integer.parseInt(stepComps[3]));
-        validateStep(lastName, firstName, middleName, gender, race,
-            birthDate, admitDate, stepComps[1], stepComps[2], stepComps[4]);
-      }
-    } catch (IOException e) {
-      log.error("IO Exception: {}", e);
+    String text = ResourceUtils.resource("scenarios/" + scenarioFile);
+    Scenario scenario = mapper.readValue(text, Scenario.class);
+    log.info(scenario.getDescription());
+    for (ScenarioStep step : scenario.getSteps()) {
+      log.info("Executing step: {}", step.getDescription());
+      ingestHL7Message(step.getMessageFile(), step.getWaitInterval());
+      validateStep(lastName, firstName, middleName, gender, race, birthDate, admitDate,
+          scenario.getPatientId(), scenario.getInstitutionId(), step.getPatientStatus());
     }
   }
 
@@ -216,9 +217,9 @@ public class ScenariosIT {
    */
   private void validateStep(String lastName, String firstName, String middleName,
       String gender, String race, LocalDate birthDate, LocalDate admitDate,
-      String patientId, String institutionPatientId, String active) {
-    log.info("looking for {} and active {}", patientId, Boolean.parseBoolean(active));
-    for (Patient pat : api.patients(patientId, Boolean.parseBoolean(active), 1).getCollection()) {
+      String patientId, String institutionPatientId, boolean active) {
+    log.info("Looking for {} and active {}", patientId, active);
+    for (Patient pat : api.patients(patientId, active, 1).getCollection()) {
       if (pat.getId().toString().equals(patientId)) {
         validatePatient(pat, lastName, firstName, middleName, gender, race, birthDate,
             patientId, institutionPatientId);
@@ -263,12 +264,16 @@ public class ScenariosIT {
   private void validateEncounter(Patient patient, LocalDate expectedTime) {
     // Get the last encounter for the patient
     Encounter encounter = api.lastvisit(patient.getId().toString());
-    Hospitalization hosp = encounter.getHospitalisation();
-    if (hosp != null && hosp.getPeriod() != null && hosp.getPeriod().getStartInclusive() != null) {
-      ZonedDateTime admitTime = ZonedDateTime.ofInstant(hosp.getPeriod().getStartInclusive(),
+    if (encounter != null && encounter.getPeriod().getStartInclusive() != null) {
+      ZonedDateTime admitTime = ZonedDateTime.ofInstant(encounter.getPeriod().getStartInclusive(),
           TIME_ZONE);
       assertEquals(DATE_FORMATTER.format(admitTime), expectedTime.toString());
     } else {
+      if (encounter == null) {
+        log.info("null encounter");
+      } else if (encounter.getPeriod().getStartInclusive() == null) {
+        log.info("null start");
+      }
       fail("Invalid Admission Date for " + patient.getId().toString());
     }
   }

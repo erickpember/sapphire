@@ -1,0 +1,36 @@
+{
+  "@type": "Scenario",
+  "description": "Typical stay for Native American male",
+  "patientId": "urn:df-patientId-1:97554846",
+  "institutionId": "97554846",
+  "steps": [
+    {
+      "@type": "ScenarioStep",
+      "description": "Admit MBHIM^FOUR^A",
+      "messageFile": "Scenario5-Step1.hl7",
+      "waitInterval": "3",
+      "patientStatus": "true"
+    },
+    {
+      "@type": "ScenarioStep",
+      "description": "Update MSH Security",
+      "messageFile": "Scenario5-Step2.hl7",
+      "waitInterval": "3",
+      "patientStatus": "true"
+    },
+    {
+      "@type": "ScenarioStep",
+      "description": "Update Hospital Service to Peds Hosp Md",
+      "messageFile": "Scenario5-Step3.hl7",
+      "waitInterval": "3",
+      "patientStatus": "true"
+    },
+    {
+      "@type": "ScenarioStep",
+      "description": "Discharge patient",
+      "messageFile": "Scenario5-Step4.hl7",
+      "waitInterval": "3",
+      "patientStatus": "false"
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "@type":  "Scenario",
+  "description": "Typical stay for female of unknown or unspecified race",
+  "patientId": "urn:df-patientId-1:97546762",
+  "institutionId": "97546762",
+  "steps": [
+    {
+      "@type":  "ScenarioStep",
+      "description": "Admit NATUS-ADULT ONE A",
+      "messageFile": "Scenario1-Step1.hl7",
+      "waitInterval": "3",
+      "patientStatus": "true"
+    },
+    {
+      "@type":  "ScenarioStep",
+      "description": "Update MSH Security and add role",
+      "messageFile": "Scenario1-Step2.hl7",
+      "waitInterval": "3",
+      "patientStatus": "true"
+    },
+    {
+      "@type":  "ScenarioStep",
+      "description": "Observe calculated BMI and update race to native American",
+      "messageFile": "Scenario1-Step3.hl7",
+      "waitInterval": "3",
+      "patientStatus": "true"
+    },
+    {
+      "@type":  "ScenarioStep",
+      "description": "Discharge patient billing, observed weight and height, update race to Unknown",
+      "messageFile": "Scenario1-Step4.hl7",
+      "waitInterval": "3",
+      "patientStatus": "false"
+    }
+  ]
+}

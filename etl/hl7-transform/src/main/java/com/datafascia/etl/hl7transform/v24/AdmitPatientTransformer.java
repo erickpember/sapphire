@@ -58,6 +58,8 @@ public abstract class AdmitPatientTransformer extends BaseTransformer {
             pv1.getVisitNumber().getID().getValue())
         .admitTime(
             toInstant(pv1.getAdmitDateTime().getTimeOfAnEvent()))
+        .dischargeTime(
+            toInstant(pv1.getDischargeDateTime(0).getTimeOfAnEvent()))
         .build();
   }
 

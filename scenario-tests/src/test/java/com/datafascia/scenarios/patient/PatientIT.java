@@ -4,11 +4,13 @@ package com.datafascia.scenarios.patient;
 
 import com.datafascia.api.client.DatafasciaApi;
 import com.datafascia.api.client.DatafasciaApiBuilder;
+import com.datafascia.domain.model.Encounter;
 import com.datafascia.domain.model.PagedCollection;
 import com.datafascia.domain.model.Patient;
 import com.datafascia.shell.Main;
 import com.google.common.io.Resources;
 import java.net.URI;
+import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.BeforeClass;
@@ -64,7 +66,11 @@ public class PatientIT {
     // Then the patient is deactivated
     PagedCollection<Patient> patients = apiClient.patients(PATIENT_ID, false, 1);
     Patient patient = patients.getCollection().iterator().next();
-
     assertEquals(patient.isActive(), false);
+
+    // And encounter period end is set to discharge time
+    Encounter encounter = apiClient.lastvisit(PATIENT_ID);
+    assertEquals(
+        encounter.getPeriod().getEndExclusive(), Instant.parse("2014-12-24T18:27:00Z"));
   }
 }

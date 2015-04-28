@@ -21,4 +21,7 @@ public class EncounterData {
 
   @AvroEncode(using = InstantEncoding.class)
   private Instant admitTime;
+
+  @AvroEncode(using = InstantEncoding.class)
+  private Instant dischargeTime;
 }

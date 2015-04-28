@@ -36,6 +36,7 @@ public class EncounterRepository extends BaseRepository {
   private static final String COLUMN_FAMILY = Encounter.class.getSimpleName();
   private static final String IDENTIFIER = "identifier";
   private static final String PERIOD_START = "periodStart";
+  private static final String PERIOD_END = "periodEnd";
   private static final EncounterRowMapper ENCOUNTER_ROW_MAPPER = new EncounterRowMapper();
 
   /**
@@ -84,7 +85,8 @@ public class EncounterRepository extends BaseRepository {
             mutationBuilder
                 .columnFamily(COLUMN_FAMILY)
                 .put(IDENTIFIER, encounter.getIdentifier())
-                .put(PERIOD_START, encounter.getPeriod().getStartInclusive());
+                .put(PERIOD_START, encounter.getPeriod().getStartInclusive())
+                .put(PERIOD_END, encounter.getPeriod().getEndExclusive());
           }
         });
   }
@@ -108,6 +110,9 @@ public class EncounterRepository extends BaseRepository {
           break;
         case PERIOD_START:
           encounter.getPeriod().setStartInclusive(Instant.parse(value));
+          break;
+        case PERIOD_END:
+          encounter.getPeriod().setEndExclusive(Instant.parse(value));
           break;
       }
     }

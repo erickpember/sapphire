@@ -18,6 +18,7 @@ import com.datafascia.domain.model.Patient;
 import com.datafascia.domain.model.Ratio;
 import com.fasterxml.jackson.core.type.TypeReference;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -135,15 +136,15 @@ public class MedicationAdministrationRepository extends BaseRepository {
           break;
         case DOSAGE_SITE_CODING_CODE:
           String siteCode = decodeString(value);
-          dosage.setSite(new CodeableConcept(siteCode, siteCode));
+          dosage.setSite(new CodeableConcept(Arrays.asList(siteCode), siteCode));
           break;
         case DOSAGE_ROUTE_CODING_CODE:
           String routeCode = decodeString(value);
-          dosage.setRoute(new CodeableConcept(routeCode, routeCode));
+          dosage.setRoute(new CodeableConcept(Arrays.asList(routeCode), routeCode));
           break;
         case DOSAGE_METHOD_CODING_CODE:
           String methodCode = decodeString(value);
-          dosage.setMethod(new CodeableConcept(methodCode, methodCode));
+          dosage.setMethod(new CodeableConcept(Arrays.asList(methodCode), methodCode));
           break;
         case DOSAGE_QUANTITY_VALUE:
           dosage.getQuantity().setValue(decodeBigDecimal(value));
@@ -239,9 +240,9 @@ public class MedicationAdministrationRepository extends BaseRepository {
             if (dosage != null) {
               mutationBuilder
                   .put(DOSAGE_TEXT, dosage.getText())
-                  .put(DOSAGE_SITE_CODING_CODE, dosage.getSite().getCode())
-                  .put(DOSAGE_ROUTE_CODING_CODE, dosage.getRoute().getCode())
-                  .put(DOSAGE_METHOD_CODING_CODE, dosage.getMethod().getCode())
+                  .put(DOSAGE_SITE_CODING_CODE, dosage.getSite().getCodings().get(0))
+                  .put(DOSAGE_ROUTE_CODING_CODE, dosage.getRoute().getCodings().get(0))
+                  .put(DOSAGE_METHOD_CODING_CODE, dosage.getMethod().getCodings().get(0))
                   .put(DOSAGE_QUANTITY_VALUE, dosage.getQuantity().getValue())
                   .put(DOSAGE_QUANTITY_UNITS, dosage.getQuantity().getUnit())
                   .put(DOSAGE_RATE_NUMERATOR_VALUE, dosage.getRate().getNumerator().getValue())

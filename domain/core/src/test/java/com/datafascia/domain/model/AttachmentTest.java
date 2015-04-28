@@ -27,8 +27,11 @@ public class AttachmentTest extends ModelTestBase {
   @Test
   public void testJsonProperties() throws IOException {
     ArrayList<String> jsonProperties = new ArrayList<>();
-    jsonProperties.add("code");
+    jsonProperties.add("contentType");
     jsonProperties.add("language");
+    jsonProperties.add("creation");
+    jsonProperties.add("size");
+    jsonProperties.add("hash");
     jsonProperties.add("data");
     jsonProperties.add("url");
     jsonProperties.add("title");

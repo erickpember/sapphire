@@ -64,7 +64,7 @@ public class EncounterDao extends OpalDao {
       Hospitalization hospit = new Hospitalization();
       hospit.setPeriod(period);
 
-      encounter.setHospitalisation(hospit);
+      encounter.setHospitalization(hospit);
     }
 
     List<Observation> observations = new ArrayList<Observation>();
@@ -130,10 +130,10 @@ public class EncounterDao extends OpalDao {
     ObservationValue ovWeight = new ObservationValue();
     ovWeight.setQuantity(qWeight);
     Observation oWeight = new Observation();
-    oWeight.setValues(ovWeight);
+    oWeight.setValue(ovWeight);
     oWeight.setName(new CodeableConcept() {
       {
-        setCode(WEIGHT);
+        setCodings(Arrays.asList(WEIGHT));
       }
     });
 
@@ -164,10 +164,10 @@ public class EncounterDao extends OpalDao {
     ObservationValue ovHeight = new ObservationValue();
     ovHeight.setQuantity(qHeight);
     Observation oHeight = new Observation();
-    oHeight.setValues(ovHeight);
+    oHeight.setValue(ovHeight);
     oHeight.setName(new CodeableConcept() {
       {
-        setCode(HEIGHT);
+        setCodings(Arrays.asList(HEIGHT));
       }
     });
 

@@ -22,7 +22,7 @@ public class OrganizationContact {
 
   /** A name associated with the contact. */
   @JsonProperty("name")
-  private Name name;
+  private HumanName name;
 
   /** Contact details (telephone, email, etc) for the contact. */
   @JsonProperty("telecoms")

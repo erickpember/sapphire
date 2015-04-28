@@ -6,10 +6,11 @@ package com.datafascia.domain.model;
  * Codes providing the status of an observation
  */
 public enum ObservationStatus {
-  Registered,
-  Preliminary,
-  Final,
-  Amended,
-  Cancelled,
-  EnteredInError
+  REGISTERED,
+  PRELIMINARY,
+  FINAL,
+  AMENDED,
+  CANCELLED,
+  ENTERED_IN_ERROR,
+  UNKNOWN
 }

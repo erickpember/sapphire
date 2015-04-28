@@ -7,16 +7,16 @@ import com.datafascia.common.time.Interval;
 import com.datafascia.domain.model.CodeableConcept;
 import com.datafascia.domain.model.Encounter;
 import com.datafascia.domain.model.Gender;
+import com.datafascia.domain.model.HumanName;
 import com.datafascia.domain.model.MaritalStatus;
 import com.datafascia.domain.model.MedicationAdministration;
 import com.datafascia.domain.model.MedicationAdministrationDosage;
 import com.datafascia.domain.model.MedicationAdministrationStatus;
-import com.datafascia.domain.model.Name;
 import com.datafascia.domain.model.NumericQuantity;
 import com.datafascia.domain.model.Patient;
+import com.datafascia.domain.model.PatientCommunication;
 import com.datafascia.domain.model.Race;
 import com.datafascia.domain.model.Ratio;
-import com.neovisionaries.i18n.LanguageCode;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -44,15 +44,24 @@ public class MedicationAdministrationRepositoryTest extends RepositoryTestSuppor
     Patient patient = new Patient();
     patient.setInstitutionPatientId("UCSF-12345");
     patient.setAccountNumber("12345");
-    patient.setName(
-        new Name() {
+    patient.setNames(Arrays.asList(new HumanName() {
+      {
+        setFirstName("pat1firstname");
+        setMiddleName("pat1middlename");
+        setFamily(Arrays.asList("pat1lastname"));
+      }
+    }));
+    patient.setCommunication(new PatientCommunication() {
+      {
+        setPreferred(true);
+        setLanguage(new CodeableConcept() {
           {
-            setFirst("pat1firstname");
-            setMiddle("pat1middlename");
-            setLast("pat1lastname");
+            setCodings(Arrays.asList("English"));
+            setText("English");
           }
         });
-    patient.setLangs(Arrays.asList(LanguageCode.en));
+      }
+    });
     patient.setGender(Gender.MALE);
     patient.setBirthDate(LocalDate.now());
     patient.setMaritalStatus(MaritalStatus.MARRIED);
@@ -82,9 +91,24 @@ public class MedicationAdministrationRepositoryTest extends RepositoryTestSuppor
     administration.setMedicationId(Id.of("medicationId"));
 
     MedicationAdministrationDosage dosage = new MedicationAdministrationDosage();
-    dosage.setSite(new CodeableConcept("site", "site"));
-    dosage.setRoute(new CodeableConcept("route", "route"));
-    dosage.setMethod(new CodeableConcept("method", "method"));
+    dosage.setSite(new CodeableConcept() {
+      {
+        setCodings(Arrays.asList("site"));
+        setText("site");
+      }
+    });
+    dosage.setRoute(new CodeableConcept() {
+      {
+        setCodings(Arrays.asList("route"));
+        setText("route");
+      }
+    });
+    dosage.setMethod(new CodeableConcept() {
+      {
+        setCodings(Arrays.asList("method"));
+        setText("method");
+      }
+    });
     dosage.setQuantity(new NumericQuantity());
     dosage.setRate(new Ratio(new NumericQuantity(), new NumericQuantity()));
     administration.setDosage(dosage);

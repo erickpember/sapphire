@@ -56,78 +56,47 @@ public class TestModels {
     }
   }
 
+  public static Interval<Instant> period = new Interval<Instant>() {
+    {
+      setStartInclusive(getDateTime());
+      setEndExclusive(getDateTime());
+    }
+  };
+
   public static Address address = new Address() {
     {
-      setStreet("1234 Test Avenue");
+      setLines(Arrays.asList("1234 Test Avenue"));
       setCity("Test City");
+      setText("text");
       setStateProvince("Testlavania");
       setPostalCode("12345-6789");
       setUnit("F");
       setCountry(CountryCode.US);
+      setUse(AddressUse.HOME);
+      setPeriod(period);
     }
   };
 
-  public static Name name = new Name() {
+  public static HumanName humanName = new HumanName() {
     {
-      setFirst("Tester");
-      setMiddle("Testard");
-      setLast("Testington");
-    }
-  };
-
-  public static Caregiver caregiver = new Caregiver() {
-    {
-      setAddress(address);
-      setSpecialty(Specialty.Allergy);
-      setName(name);
-      setGender(Gender.UNDIFFERENTIATED);
-      setBirthDate(getDate());
-      setPhoto(TestModels.getPhoto());
-      setOrganization("Test Corp.");
+      setGiven(Arrays.asList("Tester"));
+      setFamily(Arrays.asList("Testington"));
     }
   };
 
   public static CodeableConcept codeable = new CodeableConcept() {
     {
-      setCode("Codeable");
+      setCodings(Arrays.asList("Codeable"));
       setText("Concept");
     }
   };
 
-  public static RelatedPerson contact = new RelatedPerson() {
+  public static PersonLink personLink = new PersonLink() {
     {
-      setAddress(address);
-      setName(name);
-      setGender(Gender.UNDIFFERENTIATED);
-      setBirthDate(getDate());
-      setPhoto(TestModels.getPhoto());
-      setRelationship(codeable);
-    }
-  };
-
-  public static Patient patient = new Patient() {
-    {
-      setActive(true);
-      setAddress(address);
-      setBirthDate(getDate());
-      setPhoto(TestModels.getPhoto());
-      setName(name);
-      setCareProvider(Arrays.asList(caregiver, caregiver));
-      setContactDetails(Arrays.asList(contact, contact));
-      setCreationDate(getDateTime());
-      setDeceased(false);
-      setId(Id.of("1234"));
-      setLangs(Arrays.asList(LanguageCode.en, LanguageCode.ch));
-      setManagingOrg("Test Corp.");
-      setMaritalStatus(MaritalStatus.DOMESTIC_PARTNER);
-      setRace(Race.BLACK);
-    }
-  };
-
-  public static Interval<Instant> period = new Interval<Instant>() {
-    {
-      setStartInclusive(getDateTime());
-      setEndExclusive(getDateTime());
+      setTargetPatientId(Id.of("Patient"));
+      setTargetPractitionerId(Id.of("Practitioner"));
+      setTargetRelatedPersonId(Id.of("RelatedPerson"));
+      setAssurance(PersonLinkAssurance.LEVEL1);
     }
   };
 
@@ -140,11 +109,29 @@ public class TestModels {
     }
   };
 
-  public static Position position = new Position() {
+  public static RelatedPerson relatedPerson = new RelatedPerson() {
     {
-      setLatitude(new BigDecimal(56.185158));
-      setLongitude(new BigDecimal(-4.050253));
-      setAltitude(new BigDecimal(109));
+      // General Person fields
+      setActive(true);
+      setGender(Gender.FEMALE);
+      setManagingOrganizationId(Id.of("Organization"));
+      setPhoto(TestModels.getPhoto());
+      setAddresses(Arrays.asList(address));
+      setTelecoms(Arrays.asList(contactPoint));
+      setNames(Arrays.asList(humanName));
+      setLinks(Arrays.asList(personLink));
+      setBirthDate(getDate());
+
+      setRelationship(codeable);
+      setPatientId(Id.of("Patient"));
+      setId(Id.of("RelatedPerson"));
+    }
+  };
+
+  public static Reference reference = new Reference() {
+    {
+      setDisplay("display");
+      setReference("reference");
     }
   };
 
@@ -158,6 +145,112 @@ public class TestModels {
       setPartOfId(Id.of("partOf"));
       setLocationIds(Arrays.asList(Id.of("location")));
       setActive(true);
+    }
+  };
+
+  public static PractitionerRole practitionerRole = new PractitionerRole() {
+    {
+      setRole(codeable);
+      setSpecialty(codeable);
+      setLocationId(Id.of("location"));
+      setManagingOrganizationId(Id.of("managingOrganization"));
+      setPeriod(period);
+      setHealthcareServiceIds(Arrays.asList(Id.of("healthcareService")));
+    }
+  };
+
+  public static Qualification qualification = new Qualification() {
+    {
+      setCode(codeable);
+      setPeriod(period);
+      setIssuerId(Id.of("issuer"));
+    }
+  };
+
+  public static Practitioner practitioner = new Practitioner() {
+    {
+      setId(Id.of("id"));
+      setPractitionerRoles(Arrays.asList(practitionerRole));
+      setTelecoms(Arrays.asList(contactPoint));
+      setCommunications(Arrays.asList(LanguageCode.es));
+      setQualifications(Arrays.asList(TestModels.qualification));
+    }
+  };
+
+  public static PatientCareProvider patientCareProvider = new PatientCareProvider() {
+    {
+      setPractitioner(practitioner);
+      setOrganization(organization);
+    }
+  };
+
+  public static PatientCommunication patientCommunication = new PatientCommunication() {
+    {
+      setPreferred(true);
+      setLanguage(codeable);
+    }
+  };
+
+  public static PatientContact patientContact = new PatientContact() {
+    {
+      setAddress(address);
+      setGender(Gender.FEMALE);
+      setName(humanName);
+      setOrganizationId(Id.of("Organization"));
+      setPeriod(period);
+      setRelationships(Arrays.asList(codeable));
+      setTelecoms(Arrays.asList(contactPoint));
+    }
+  };
+
+  public static PatientLink patientLink = new PatientLink() {
+    {
+      setOtherId(Id.of("Patient"));
+      setType(PatientLinkType.REFER);
+    }
+  };
+  public static PatientAnimal patientAnimal = new PatientAnimal() {
+    {
+      setBreed(codeable);
+      setGenderStatus(codeable);
+      setSpecies(codeable);
+    }
+  };
+
+  public static Patient patient = new Patient() {
+    {
+      setActive(true);
+      setGender(Gender.FEMALE);
+      setManagingOrganizationId(Id.of("Organization"));
+      setPhoto(TestModels.getPhoto());
+      setAddresses(Arrays.asList(address));
+      setTelecoms(Arrays.asList(contactPoint));
+      setNames(Arrays.asList(humanName));
+      setLinks(Arrays.asList(personLink));
+      setBirthDate(getDate());
+      setMultipleBirthInteger(new BigDecimal(9001));
+      setDeceased(true);
+      setMultipleBirthBoolean(true);
+      setLastEncounterId(Id.of("Encounter"));
+      setId(Id.of("Patient"));
+      setCreationDate(getDateTime());
+      setCareProviders(Arrays.asList(patientCareProvider));
+      setCommunication(patientCommunication);
+      setContacts(Arrays.asList(patientContact));
+      setPatientLinks(Arrays.asList(patientLink));
+      setMaritalStatus(MaritalStatus.ANNULLED);
+      setAnimal(patientAnimal);
+      setRace(Race.AMERICAN_INDIAN);
+      setAccountNumber("accountNumber");
+      setInstitutionPatientId("institutionPatientId");
+    }
+  };
+
+  public static Position position = new Position() {
+    {
+      setLatitude(new BigDecimal(56.185158));
+      setLongitude(new BigDecimal(-4.050253));
+      setAltitude(new BigDecimal(109));
     }
   };
 
@@ -180,8 +273,10 @@ public class TestModels {
 
   public static Participant participant = new Participant() {
     {
-      setRole(codeable);
-      setIndividual(getURI());
+      setTypes(Arrays.asList(codeable));
+      setPeriod(period);
+      setIndividualPractitionerId(Id.of("IndividualPractitioner"));
+      setIndividualRelatedPersonId(Id.of("IndividualRelatedPerson"));
     }
   };
 
@@ -192,6 +287,9 @@ public class TestModels {
       setData("test text".getBytes());
       setUrl(getURI());
       setTitle("test text");
+      setHash("6AFC05EAE22E994F1C7DD48E58F8895DD9028223".getBytes());
+      setSize(new BigDecimal("9"));
+      setCreation(getDateTime());
     }
   };
 
@@ -228,13 +326,16 @@ public class TestModels {
 
   public static ObservationValue value = new ObservationValue() {
     {
-      setQuantity(numericQuantity);
-      setCode(codeable);
       setAttachment(attachment);
-      setRatio(ratio);
+      setCodeableConcept(codeable);
+      setTime(duration);
+      setDateTime(TestModels.getDateTime());
       setPeriod(period);
+      setQuantity(numericQuantity);
+      setRange(range);
+      setRatio(ratio);
       setSampledData(sampledData);
-      setText("A value");
+      setString("string");
     }
   };
 
@@ -503,15 +604,21 @@ public class TestModels {
     }
   };
 
-  public static Schedule schedule = new Schedule() {
+  public static Timing timing = new Timing() {
     {
       setRepeatDuration(new BigDecimal(9001));
+      setRepeatFrequency(new BigDecimal(9001));
+      setRepeatFrequencyMax(new BigDecimal(9001));
+      setRepeatPeriod(new BigDecimal(9001));
+      setRepeatPeriodMax(new BigDecimal(9001));
       setRepeatEnd(getDateTime());
-      setRepeatCount(9001);
-      setRepeatFrequency(2600);
-      setEvent(period);
-      setRepeatWhen(ScheduleEventType.WAKE);
-      setRepeatUnits(ScheduleTimeUnit.WK);
+      setRepeatCount(0);
+      setRepeatBounds(period);
+      setEvents(Arrays.asList(getDateTime()));
+      setRepeatWhen(TimingEventType.AC);
+      setRepeatDurationUnits(TimingTimeUnit.D);
+      setRepeatPeriodUnits(TimingTimeUnit.D);
+      setRepeatUnits(TimingTimeUnit.D);
     }
   };
 
@@ -535,7 +642,7 @@ public class TestModels {
           setDoseRange(range);
           setMaxDosePerPeriod(ratio);
           setRate(ratio);
-          setTiming(schedule);
+          setTiming(timing);
           setText("text");
         }
       };
@@ -552,7 +659,7 @@ public class TestModels {
           setDoseRange(range);
           setMaxDosePerPeriod(ratio);
           setRate(ratio);
-          setTiming(schedule);
+          setTiming(timing);
         }
       };
 
@@ -564,7 +671,6 @@ public class TestModels {
           setValidityPeriod(period);
           setDispenseQuantity(numericQuantity);
           setExpectedSupplyDuration(numericQuantity);
-
         }
       };
 
@@ -623,104 +729,363 @@ public class TestModels {
         }
       };
 
-  public static ReferenceRange referenceRange = new ReferenceRange() {
-    {
-      setMeaning(codeable);
-      setAge(numericInterval);
-    }
-  };
+  public static ObservationReferenceRange observationReferenceRange
+      = new ObservationReferenceRange() {
+        {
+          setMeaning(codeable);
+          setAge(range);
+        }
+      };
 
   public static ObservationValue observationValue = new ObservationValue() {
     {
-      setQuantity(numericQuantity);
-      setCode(codeable);
       setAttachment(attachment);
-      setRatio(ratio);
+      setCodeableConcept(codeable);
+      setTime(duration);
+      setDateTime(TestModels.getDateTime());
       setPeriod(period);
+      setQuantity(numericQuantity);
+      setRange(range);
+      setRatio(ratio);
       setSampledData(sampledData);
-      setText("An observation");
+      setString("string");
     }
   };
 
-  public static ObservationRelated related = new ObservationRelated() {
+  public static ObservationRelated observationRelated = new ObservationRelated() {
     {
-      setType(Arrays.asList(ObservationRelationshipType.DerivedFrom));
-      setTarget(getURI());
+      setType(Arrays.asList(ObservationRelationshipType.DERIVED_FROM));
+      setTargetId(Id.of("target"));
+    }
+  };
+
+  public static ObservationPerformer observationPerformer = new ObservationPerformer() {
+    {
+      setOrganizationId(Id.of("Organization"));
+      setPatientId(Id.of("Patient"));
+      setPractitionerId(Id.of("Practitioner"));
+    }
+  };
+
+  public static ObservationSubject observationSubject = new ObservationSubject() {
+    {
+      setDeviceId(Id.of("Device"));
+      setGroupId(Id.of("Group"));
+      setLocationId(Id.of("Location"));
+      setPatientId(Id.of("Patient"));
+    }
+  };
+
+  public static DeviceComponentSpecification deviceComponentSpecification
+      = new DeviceComponentSpecification() {
+        {
+          setSpecType(codeable);
+          setId(Id.of("DeviceComponentSpecification"));
+          setProductionSpec("productionSpec");
+        }
+      };
+
+  public static DeviceComponent deviceComponent = new DeviceComponent() {
+    {
+      setLanguageCode(codeable);
+      setParameterGroup(codeable);
+      setType(codeable);
+      setMeasurementPrinciple(DeviceComponentMeasurementPrinciple.ACOUSTICAL);
+      setId(Id.of("DeviceComponent"));
+      setParentId(Id.of("DeviceComponent"));
+      setSourceId(Id.of("Device"));
+      setLastSystemChange(getDateTime());
+      setOperationalStatuses(Arrays.asList(codeable));
+      setProductionSpecifications(Arrays.asList(deviceComponentSpecification));
+    }
+  };
+
+  public static DeviceMetricCalibration deviceMetricCalibration = new DeviceMetricCalibration() {
+    {
+      setState(DeviceMetricCalibrationState.CALIBRATED);
+      setType(DeviceMetricCalibrationType.GAIN);
+      setTime(getDateTime());
+    }
+  };
+
+  public static DeviceMetric deviceMetric = new DeviceMetric() {
+    {
+      setType(codeable);
+      setUnit(codeable);
+      setCategory(DeviceMetricCategory.CALCULATION);
+      setColor(DeviceMetricColor.BLACK);
+      setOperationalStatus(DeviceMetricOperationalStatus.OFF);
+      setMeasurementPeriod(duration);
+      setParentId(Id.of("DeviceComponent"));
+      setId(Id.of("DeviceMetric"));
+      setSourceId(Id.of("Device"));
+      setCalibrations(Arrays.asList(deviceMetricCalibration));
+    }
+  };
+
+  public static ObservationDevice observationDevice = new ObservationDevice() {
+    {
+      setDeviceId(Id.of("Device"));
+      setDeviceMetricId(Id.of("DeviceMetric"));
     }
   };
 
   public static Observation observation = new Observation() {
     {
-      setId(Id.of("1234"));
-      setName(codeable);
-      setValues(observationValue);
-      setInterpretation(ObservationInterpretation.A);
-      setComments("The patient is alive.");
-      setApplies(period);
-      setIssued(getDateTime());
-      setStatus(ObservationStatus.Final);
-      setReliability(ObservationReliability.Ok);
-      setSite(codeable);
-      setMethod(codeable);
+      setBodySiteCodeableConcept(codeable);
+      setCode(codeable);
+      setDataAbsentReason(codeable);
       setIdentifier(codeable);
-      setSubject(getURI());
-      setSpecimen(getURI());
-      setPerformer(getURI());
-      setRange(Arrays.asList(referenceRange, referenceRange));
-      setRelatedTo(Arrays.asList(related, related));
+      setInterpretation(codeable);
+      setMethod(codeable);
+      setName(codeable);
+      setBodySiteReferenceId(Id.of("BodySite"));
+      setEncounterId(Id.of("Encounter"));
+      setId(Id.of("Observation"));
+      setSpecimenId(Id.of("Specimen"));
+      setAppliesDateTime(getDateTime());
+      setIssued(getDateTime());
+      setAppliesPeriod(period);
+      setPerformers(Arrays.asList(observationPerformer));
+      setReferenceRanges(Arrays.asList(observationReferenceRange));
+      setRelated(Arrays.asList(observationRelated));
+      setDevice(observationDevice);
+      setReliability(ObservationReliability.CALIBRATING);
+      setStatus(ObservationStatus.AMENDED);
+      setSubject(observationSubject);
+      setValue(observationValue);
+      setComments("comments");
     }
   };
 
   public static Person person = new Person() {
     {
-      setName(name);
-      setAddress(address);
-      setGender(Gender.MALE);
-      setBirthDate(getDate());
+      setActive(true);
+      setGender(Gender.FEMALE);
+      setManagingOrganizationId(Id.of("Organization"));
       setPhoto(TestModels.getPhoto());
-    }
-  };
-
-  public static EncounterAccomodation accomodation = new EncounterAccomodation() {
-    {
-      setBed(getURI());
-      setPeriod(period);
+      setAddresses(Arrays.asList(address));
+      setTelecoms(Arrays.asList(contactPoint));
+      setNames(Arrays.asList(humanName));
+      setLinks(Arrays.asList(personLink));
+      setBirthDate(getDate());
     }
   };
 
   public static Hospitalization hospitalization = new Hospitalization() {
     {
-      setId(Id.of("1234"));
-      setOrigin(getURI());
-      setPeriod(period);
-      setAccomodation(accomodation);
-      setDiet(codeable);
-      setSpecialCourtesy(codeable);
-      setSpecialArrangement(codeable);
-      setDestination(getURI());
-      setDischargeDisposition(codeable);
-      setDischargeDiagnosis(getURI());
       setReadmission(true);
+      setAdmitSource(codeable);
+      setDietPreference(codeable);
+      setDischargeDisposition(codeable);
+      setId(Id.of("Hospitalization"));
+      setDestinationId(Id.of("Location"));
+      setOriginId(Id.of("Location"));
+      setPeriod(period);
+      setSpecialArrangements(Arrays.asList(codeable));
+      setSpecialCourtesies(Arrays.asList(codeable));
+      setDischargeDiagnosis(reference);
+    }
+  };
+
+  public static EpisodeOfCareTeamMember episodeOfCareTeamMember = new EpisodeOfCareTeamMember() {
+    {
+      setOrganizationMemberId(Id.of("Organization"));
+      setPractitionerMemberId(Id.of("Practitioner"));
+      setPeriod(period);
+      setRoles(Arrays.asList(codeable));
+    }
+  };
+
+  public static ReferralRequestRecipient referralRequestRecipient = new ReferralRequestRecipient() {
+    {
+      setOrganizationRecipientId(Id.of("Organization"));
+      setPractitionerRecipientId(Id.of("Practitioner"));
+    }
+  };
+
+  public static ReferralRequestRequester referralRequestRequester = new ReferralRequestRequester() {
+    {
+      setOrganizationRequesterId(Id.of("Organization"));
+      setPatientRequesterId(Id.of("Patient"));
+      setPractitionerRequesterId(Id.of("Practitioner"));
+    }
+  };
+
+  public static ReferralRequest referralRequest = new ReferralRequest() {
+    {
+      setPriority(codeable);
+      setReason(codeable);
+      setSpecialty(codeable);
+      setType(codeable);
+      setEncounterId(Id.of("Encounter"));
+      setPatientId(Id.of("Patient"));
+      setId(Id.of("ReferralRequest"));
+      setDateSent(getDateTime());
+      setFulfillmentTime(period);
+      setServicesRequested(Arrays.asList(codeable));
+      setSupportingInformation(Arrays.asList(reference));
+      setRecipients(Arrays.asList(referralRequestRecipient));
+      setRequester(referralRequestRequester);
+      setStatus(ReferralRequestStatus.ACCEPTED);
+      setDescription("description");
+    }
+  };
+
+  public static Slot slot = new Slot() {
+    {
+      setOverbooked(true);
+      setType(codeable);
+      setSchedule(Id.of("Schedule"));
+      setId(Id.of("Slot"));
+      setEnd(getDateTime());
+      setStart(getDateTime());
+      setFreeBusyType(SlotFreeBusyType.BUSY);
+      setComment("comment");
+    }
+  };
+
+  public static Schedule schedule = new Schedule() {
+    {
+      setTypes(codeable);
+      setId(Id.of("Schedule"));
+      setPlanningHorizon(TestModels.period);
+      setActor(TestModels.reference);
+      setComment("comment");
+    }
+  };
+
+  public static OrderSubject orderSubject = new OrderSubject() {
+    {
+      setDeviceId(Id.of("Device"));
+      setGroupId(Id.of("Group"));
+      setPatientId(Id.of("Patient"));
+      setSubstanceId(Id.of("Substance"));
+    }
+  };
+
+  public static OrderTarget orderTarget = new OrderTarget() {
+    {
+      setDeviceId(Id.of("Device"));
+      setOrganizationId(Id.of("Organization"));
+      setPractitionerId(Id.of("Practitioner"));
+    }
+  };
+
+  public static OrderWhen orderWhen = new OrderWhen() {
+    {
+      setCode(codeable);
+      setSchedule(timing);
+    }
+  };
+
+  public static Order order = new Order() {
+    {
+      setReasonCodeableConcept(codeable);
+      setId(Id.of("Order"));
+      setSourceId(Id.of("Source"));
+      setDateTime(TestModels.getDateTime());
+      setDetails(Arrays.asList(reference));
+      setSubject(orderSubject);
+      setTarget(orderTarget);
+      setWhen(orderWhen);
+      setAuthority(reference);
+      setReasonReference(reference);
+    }
+  };
+
+  public static AppointmentParticipantActor appointmentParticipantActor
+      = new AppointmentParticipantActor() {
+        {
+          setDeviceId(Id.of("Device"));
+          setHealthcareServiceId(Id.of("HealthcareService"));
+          setLocationId(Id.of("Location"));
+          setPatientId(Id.of("Patient"));
+          setPractitionerId(Id.of("Practitioner"));
+          setRelatedPersonId(Id.of("RelatedPerson"));
+        }
+      };
+
+  public static AppointmentParticipant appointmentParticipant = new AppointmentParticipant() {
+    {
+      setActor(appointmentParticipantActor);
+      setRequired(AppointmentParticipantRequired.INFORMATION_ONLY);
+      setStatus(AppointmentParticipantStatus.ACCEPTED);
+      setType(codeable);
+    }
+  };
+
+  public static Appointment appointment = new Appointment() {
+    {
+      setStatus(AppointmentStatus.ARRIVED);
+      setPriority(new BigDecimal(9001));
+      setReason(codeable);
+      setType(codeable);
+      setId(Id.of("Appointment"));
+      setOrderId(Id.of("Order"));
+      setEnd(TestModels.getDateTime());
+      setStart(TestModels.getDateTime());
+      setParticipants(Arrays.asList(TestModels.appointmentParticipant));
+      setSlotIds(Arrays.asList(Id.of("Slot")));
+      setComment("comment");
+      setDescription("description");
+    }
+  };
+
+  public static EpisodeOfCare episodeOfCare = new EpisodeOfCare() {
+    {
+      setStatus(EpisodeOfCareStatus.ACTIVE);
+      setId(Id.of("EpisodeOfCare"));
+      setManagingOrganizationId(Id.of("Organization"));
+      setPatientId(Id.of("Patient"));
+      setCareManagerId(Id.of("Practitioner"));
+      setPeriod(period);
+      setTypes(Arrays.asList(codeable));
+      setStatusHistory(Arrays.asList(EpisodeOfCareStatus.ACTIVE));
+      setCareTeam(Arrays.asList(episodeOfCareTeamMember));
+      setConditionIds(Arrays.asList(Id.of("Condition")));
+      setReferralRequestIds(Arrays.asList(Id.of("ReferralRequest")));
+    }
+  };
+
+  public static EncounterStatusHistory encounterStatusHistory = new EncounterStatusHistory() {
+    {
+      setStatus(EncounterStatus.ARRIVED);
+      setPeriod(period);
+    }
+  };
+
+  public static EncounterLocation encounterLocation = new EncounterLocation() {
+    {
+      setStatus(EncounterLocationStatus.PLANNED);
+      setLocationId(Id.of("Location"));
+      setPeriod(period);
     }
   };
 
   public static Encounter encounter = new Encounter() {
     {
-      setId(Id.of("1234"));
-      setStatus(EncounterStatus.InProgress);
-      setEclass(EncounterClass.Ambulatory);
-      setType(EncounterType.OKI);
+      setLength(duration);
+      setEClass(EncounterClass.AMBULATORY);
+      setPriority(EncounterPriority.Emergency);
+      setStatus(EncounterStatus.ARRIVED);
+      setHospitalization(hospitalization);
+      setFulfillsId(Id.of("Appointment"));
+      setId(Id.of("Encounter"));
+      setPartOfId(Id.of("Encounter"));
+      setEpisodeOfCareId(Id.of("EpisodeOfCare"));
+      setServiceProviderId(Id.of("Organization"));
+      setPatientId(Id.of("Patient"));
       setPeriod(period);
-      setReason(codeable);
-      setIndication(getURI());
-      setPriority(EncounterPriority.SemiUrgent);
-      setServiceProvider(getURI());
-      setHospitalisation(hospitalization);
-      setLocation(Arrays.asList(location, location));
-      setParticipants(Arrays.asList(participant, participant));
-      setLinkedTo(getURI());
-      setObservations(Arrays.asList(observation, observation));
-      setPatient(getURI());
+      setReasons(Arrays.asList(codeable));
+      setLocations(Arrays.asList(encounterLocation));
+      setStatusHistory(Arrays.asList(encounterStatusHistory));
+      setTypes(Arrays.asList(EncounterType.ADMS));
+      setIncomingReferralRequestIds(Arrays.asList(Id.of("EpisodeOfCare")));
+      setParticipants(Arrays.asList(participant));
+      setIndications(Arrays.asList(reference));
+      setIdentifier("identifier");
+      setObservations(Arrays.asList(observation));
     }
   };
 
@@ -728,37 +1093,8 @@ public class TestModels {
     {
       setAddress(address);
       setTelecoms(Arrays.asList(contactPoint));
-      setName(name);
+      setName(humanName);
       setPurpose("it passes butter");
-    }
-  };
-
-  public static PractitionerRole practitionerRole = new PractitionerRole() {
-    {
-      setRole(codeable);
-      setSpecialty(codeable);
-      setLocationId(Id.of("location"));
-      setManagingOrganizationId(Id.of("managingOrganization"));
-      setPeriod(period);
-      setHealthcareServiceIds(Arrays.asList(Id.of("healthcareService")));
-    }
-  };
-
-  public static Qualification qualification = new Qualification() {
-    {
-      setCode(codeable);
-      setPeriod(period);
-      setIssuerId(Id.of("issuer"));
-    }
-  };
-
-  public static Practitioner practitioner = new Practitioner() {
-    {
-      setId(Id.of("id"));
-      setPractitionerRoles(Arrays.asList(practitionerRole));
-      setTelecoms(Arrays.asList(contactPoint));
-      setCommunications(Arrays.asList(LanguageCode.es));
-      setQualifications(Arrays.asList(TestModels.qualification));
     }
   };
 
@@ -1130,7 +1466,7 @@ public class TestModels {
           setQuantity(numericQuantity);
           setMaxDosePerPeriod(ratio);
           setRate(ratio);
-          setSchedule(schedule);
+          setSchedule(timing);
           setText("text");
         }
       };

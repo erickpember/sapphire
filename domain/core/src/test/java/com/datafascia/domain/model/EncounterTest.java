@@ -20,43 +20,55 @@ public class EncounterTest extends ModelTestBase {
   @Test
   public <T extends Object> void testEncounter() throws IOException, URISyntaxException {
     Encounter decoded = (Encounter) geneticEncodeDecodeTest(TestModels.encounter);
-    assertEquals(decoded.getId(), Id.of("1234"));
-    assertEquals(decoded.getStatus(), EncounterStatus.InProgress);
-    assertEquals(decoded.getEclass(), EncounterClass.Ambulatory);
-    assertEquals(decoded.getType(), EncounterType.OKI);
+
+    assertEquals(decoded.getLength(), TestModels.duration);
+    assertEquals(decoded.getEClass(), EncounterClass.AMBULATORY);
+    assertEquals(decoded.getPriority(), EncounterPriority.Emergency);
+    assertEquals(decoded.getStatus(), EncounterStatus.ARRIVED);
+    assertEquals(decoded.getHospitalization(), TestModels.hospitalization);
+    assertEquals(decoded.getFulfillsId(), Id.of("Appointment"));
+    assertEquals(decoded.getId(), Id.of("Encounter"));
+    assertEquals(decoded.getPartOfId(), Id.of("Encounter"));
+    assertEquals(decoded.getEpisodeOfCareId(), Id.of("EpisodeOfCare"));
+    assertEquals(decoded.getServiceProviderId(), Id.of("Organization"));
+    assertEquals(decoded.getPatientId(), Id.of("Patient"));
     assertEquals(decoded.getPeriod(), TestModels.period);
-    assertEquals(decoded.getReason(), TestModels.codeable);
-    assertEquals(decoded.getIndication(), TestModels.getURI());
-    assertEquals(decoded.getPriority(), EncounterPriority.SemiUrgent);
-    assertEquals(decoded.getServiceProvider(), TestModels.getURI());
-    assertEquals(decoded.getHospitalisation(), TestModels.hospitalization);
-    assertEquals(decoded.getLocation(), Arrays.asList(TestModels.location, TestModels.location));
-    assertEquals(decoded.getParticipants(),
-        Arrays.asList(TestModels.participant, TestModels.participant));
-    assertEquals(decoded.getLinkedTo(), TestModels.getURI());
-    assertEquals(decoded.getObservations(),
-        Arrays.asList(TestModels.observation, TestModels.observation));
-    assertEquals(decoded.getPatient(), TestModels.getURI());
+    assertEquals(decoded.getReasons(), Arrays.asList(TestModels.codeable));
+    assertEquals(decoded.getLocations(), Arrays.asList(TestModels.encounterLocation));
+    assertEquals(decoded.getStatusHistory(), Arrays.asList(TestModels.encounterStatusHistory));
+    assertEquals(decoded.getTypes(), Arrays.asList(EncounterType.ADMS));
+    assertEquals(decoded.getIncomingReferralRequestIds(), Arrays.asList(Id.of("EpisodeOfCare")));
+    assertEquals(decoded.getParticipants(), Arrays.asList(TestModels.participant));
+    assertEquals(decoded.getIndications(), Arrays.asList(TestModels.reference));
+    assertEquals(decoded.getIdentifier(), "identifier");
+    assertEquals(decoded.getObservations(),Arrays.asList(TestModels.observation));
   }
 
   @Test
   public void testJsonProperties() throws IOException {
     ArrayList<String> jsonProperties = new ArrayList<>();
+    jsonProperties.add("eClass");
+    jsonProperties.add("episodeOfCare");
+    jsonProperties.add("fulfillsId");
+    jsonProperties.add("hospitalization");
     jsonProperties.add("@id");
-    jsonProperties.add("status");
-    jsonProperties.add("class");
-    jsonProperties.add("type");
-    jsonProperties.add("period");
-    jsonProperties.add("reason");
-    jsonProperties.add("indication");
-    jsonProperties.add("priority");
-    jsonProperties.add("serviceProvider");
-    jsonProperties.add("hospitalisation");
-    jsonProperties.add("location");
+    jsonProperties.add("identifier");
+    jsonProperties.add("incomingReferralRequestIds");
+    jsonProperties.add("indications");
+    jsonProperties.add("length");
+    jsonProperties.add("locations");
     jsonProperties.add("participants");
-    jsonProperties.add("linkedTo");
+    jsonProperties.add("partOfId");
+    jsonProperties.add("patientId");
+    jsonProperties.add("period");
+    jsonProperties.add("priority");
+    jsonProperties.add("reasons");
+    jsonProperties.add("serviceProviderId");
+    jsonProperties.add("status");
+    jsonProperties.add("statusHistory");
+    jsonProperties.add("types");
     jsonProperties.add("observations");
-    jsonProperties.add("patient");
+
     geneticJsonContainsFieldsTest(TestModels.encounter, jsonProperties);
   }
 }

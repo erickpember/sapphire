@@ -6,12 +6,13 @@ package com.datafascia.domain.model;
  * Represents the class of an encounter.
  */
 public enum EncounterClass {
-  Inpatient,
-  Outpatient,
-  Ambulatory,
-  Emergency,
-  Home,
-  Field,
-  Daytime,
-  Virtual
+  INPATIENT,
+  OUTPATIENT,
+  AMBULATORY,
+  EMERGENCY,
+  HOME,
+  FIELD,
+  DAYTIME,
+  VIRTUAL,
+  OTHER
 }

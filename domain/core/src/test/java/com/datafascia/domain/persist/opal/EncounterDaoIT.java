@@ -42,19 +42,19 @@ public class EncounterDaoIT extends DaoIT {
   }
 
   public void assertValues(Encounter enco, BigDecimal weight, BigDecimal height, Instant date) {
-    assertEquals(date, enco.getHospitalisation().getPeriod().getStartInclusive());
+    assertEquals(date, enco.getHospitalization().getPeriod().getStartInclusive());
 
     boolean foundHeight = false;
     boolean foundWeight = false;
     for (Observation ob : enco.getObservations()) {
-      if (ob.getName().getCode().equals(EncounterDao.WEIGHT)) {
+      if (ob.getName().getCodings().get(0).equals(EncounterDao.WEIGHT)) {
         foundWeight = true;
-        assertEquals(ob.getValues().getQuantity().getValue(), weight);
-        assertEquals(ob.getValues().getQuantity().getUnit(), UnitsSymbolMap.getUnit("kg"));
-      } else if (ob.getName().getCode().equals(EncounterDao.HEIGHT)) {
+        assertEquals(ob.getValue().getQuantity().getValue(), weight);
+        assertEquals(ob.getValue().getQuantity().getUnit(), UnitsSymbolMap.getUnit("kg"));
+      } else if (ob.getName().getCodings().get(0).equals(EncounterDao.HEIGHT)) {
         foundHeight = true;
-        assertEquals(ob.getValues().getQuantity().getValue(), height);
-        assertEquals(ob.getValues().getQuantity().getUnit(), UnitsSymbolMap.getUnit("in"));
+        assertEquals(ob.getValue().getQuantity().getValue(), height);
+        assertEquals(ob.getValue().getQuantity().getUnit(), UnitsSymbolMap.getUnit("in"));
       }
     }
 

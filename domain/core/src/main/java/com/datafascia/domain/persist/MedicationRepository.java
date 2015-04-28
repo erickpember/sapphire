@@ -16,6 +16,7 @@ import com.datafascia.domain.model.MedicationPackage;
 import com.datafascia.domain.model.Product;
 import com.datafascia.domain.model.ProductBatch;
 import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -79,7 +80,7 @@ public class MedicationRepository extends BaseRepository {
           break;
         case CODE_CODING_CODE:
           String code = decodeString(value);
-          medication.setCode(new CodeableConcept(code, code));
+          medication.setCode(new CodeableConcept(Arrays.asList(code), code));
           break;
         case IS_BRAND:
           medication.setIsBrand(decodeBoolean(value));
@@ -92,7 +93,7 @@ public class MedicationRepository extends BaseRepository {
           break;
         case PRODUCT_FORM_CODING_CODE:
           String formCode = decodeString(value);
-          medication.getProduct().setForm(new CodeableConcept(formCode, formCode));
+          medication.getProduct().setForm(new CodeableConcept(Arrays.asList(formCode), formCode));
           break;
         case PRODUCT_INGREDIENTS:
           medication.getProduct().setIngredients(decode(value, INGREDIENT_LIST_TYPE));
@@ -102,7 +103,8 @@ public class MedicationRepository extends BaseRepository {
           break;
         case PACKAGE_CONTAINER_CODING_CODE:
           String containerCode = decodeString(value);
-          medication.getPackage().setContainer(new CodeableConcept(containerCode, containerCode));
+          medication.getPackage().setContainer(new CodeableConcept(Arrays.asList(containerCode),
+              containerCode));
           break;
         case PACKAGE_CONTENTS:
           medication.getPackage().setContents(decode(value, CONTENT_LIST_TYPE));
@@ -154,16 +156,17 @@ public class MedicationRepository extends BaseRepository {
           public void putWriteOperations(MutationBuilder mutationBuilder) {
             mutationBuilder.columnFamily(COLUMN_FAMILY)
                 .put(NAME, medication.getName())
-                .put(CODE_CODING_CODE, medication.getCode().getCode())
+                .put(CODE_CODING_CODE, medication.getCode().getCodings().get(0))
                 .put(IS_BRAND, medication.getIsBrand())
                 .put(MANUFACTURER_ID, medication.getManufacturerId())
                 .put(KIND, medication.getKind())
-                .put(PRODUCT_FORM_CODING_CODE, medication.getProduct().getForm().getCode())
+                .put(PRODUCT_FORM_CODING_CODE, medication.getProduct().getForm().getCodings()
+                    .get(0))
                 .put(PRODUCT_INGREDIENTS, medication.getProduct().getIngredients())
                 .put(PRODUCT_BATCHES, medication.getProduct().getBatches())
                 .put(
                     PACKAGE_CONTAINER_CODING_CODE,
-                    medication.getPackage().getContainer().getCode())
+                    medication.getPackage().getContainer().getCodings().get(0))
                 .put(PACKAGE_CONTENTS, medication.getPackage().getContents());
           }
         });

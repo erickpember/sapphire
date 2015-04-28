@@ -22,7 +22,7 @@ public class MedicationDispenseDosageInstruction {
 
   /** When medication should be administered. */
   @JsonProperty("timing")
-  private Schedule timing;
+  private Timing timing;
 
   /** Boolean | CodeableConcept, Take "as needed". */
   @JsonProperty("asNeeded")

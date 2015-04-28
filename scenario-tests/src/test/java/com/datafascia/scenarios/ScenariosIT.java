@@ -246,9 +246,9 @@ public class ScenariosIT {
   private void validatePatient(Patient patient, String lastName, String firstName,
       String middleName, String gender, String race,
       LocalDate birthDate, String patientId, String institutionPatientId) {
-    assertEquals(patient.getName().getFirst(), firstName);
-    assertEquals(patient.getName().getMiddle(), middleName);
-    assertEquals(patient.getName().getLast(), lastName);
+    assertEquals(patient.getNames().get(0).getFirstName(), firstName);
+    assertEquals(patient.getNames().get(0).getMiddleName(), middleName);
+    assertEquals(patient.getNames().get(0).getLastName(), lastName);
     assertEquals(patient.getBirthDate(), birthDate);
     assertEquals(patient.getRace().toString(), race);
     assertEquals(patient.getGender().toString(), gender);

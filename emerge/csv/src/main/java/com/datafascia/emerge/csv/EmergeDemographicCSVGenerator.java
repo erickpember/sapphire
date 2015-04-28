@@ -9,7 +9,7 @@ import com.datafascia.common.jackson.CSVMapper;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.model.Encounter;
 import com.datafascia.domain.model.Gender;
-import com.datafascia.domain.model.Name;
+import com.datafascia.domain.model.HumanName;
 import com.datafascia.domain.model.Observation;
 import com.datafascia.domain.model.PagedCollection;
 import com.datafascia.domain.model.Patient;
@@ -42,8 +42,8 @@ public class EmergeDemographicCSVGenerator {
   // Date format the CSV is expecting.
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
   // Name format
-  private static final String NAME_FMT
-          = "<[" + Name.FIRST + "," + Name.MIDDLE + "," + Name.LAST + "]; separator=\" \">";
+  private static final String NAME_FMT =
+      "<[" + HumanName.GIVEN + "," + HumanName.FAMILY + "]; separator=\" \">";
 
   private static final String HEIGHT = "Height";
   private static final String WEIGHT = "Weight";
@@ -141,7 +141,7 @@ public class EmergeDemographicCSVGenerator {
     demo.setRace(pat.getRace().getCode());
     demo.setSubjectPatientId(pat.getInstitutionPatientId());
     demo.setSubjectPatcom(pat.getAccountNumber());
-    demo.setPatientName(pat.getName().format(NAME_FMT));
+    demo.setPatientName(pat.getNames().get(0).format(NAME_FMT));
   }
 
   /**
@@ -183,10 +183,11 @@ public class EmergeDemographicCSVGenerator {
     List<Observation> observations = encount.getObservations();
     if (observations != null) {
       for (Observation observ : observations) {
-        if (observ.getName() != null && observ.getName().getCode() != null
-                && observ.getName().getCode().equals(code)) {
-          if (observ.getValues() != null && observ.getValues().getQuantity() != null) {
-            return Optional.of(observ.getValues().getQuantity().getValue().toString());
+        if (observ.getName() != null && observ.getName().getCodings() != null
+            && observ.getName().getCodings().get(0) != null
+            && observ.getName().getCodings().get(0).equals(code)) {
+          if (observ.getValue() != null && observ.getValue().getQuantity() != null) {
+            return Optional.of(observ.getValue().getQuantity().getValue().toString());
           }
         }
       }

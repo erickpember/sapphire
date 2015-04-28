@@ -28,7 +28,7 @@ public class MedicationStatementDosageTest extends ModelTestBase {
     assertEquals(decoded.getQuantity(), TestModels.numericQuantity);
     assertEquals(decoded.getMaxDosePerPeriod(), TestModels.ratio);
     assertEquals(decoded.getRate(), TestModels.ratio);
-    assertEquals(decoded.getSchedule(), TestModels.schedule);
+    assertEquals(decoded.getSchedule(), TestModels.timing);
     assertEquals(decoded.getText(), "text");
   }
 

@@ -2,11 +2,14 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.model;
 
+import com.datafascia.common.time.Interval;
 import com.datafascia.common.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.neovisionaries.i18n.CountryCode;
+import java.time.Instant;
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,9 +24,21 @@ import lombok.extern.slf4j.Slf4j;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "Address")
 public class Address {
-  /** Name of the street.*/
-  @JsonProperty("street")
-  private String street;
+  /** 1 or many lines that make up street name, number, direction, PO BOX, appt, etc. */
+  @JsonProperty("lines")
+  private List<String> lines;
+
+  /** Home | work | temp | old - purpose of this address. Required in FHIR. */
+  @JsonProperty("use")
+  private AddressUse use;
+
+  /** Text representation of the address.*/
+  @JsonProperty("text")
+  private String text;
+
+  /** Time period when this address was/is in use. */
+  @JsonProperty("period")
+  private Interval<Instant> period;
 
   /** Name of the city.*/
   @JsonProperty("city")

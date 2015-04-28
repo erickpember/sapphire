@@ -6,9 +6,10 @@ package com.datafascia.domain.model;
  * Represents the status of an encounter
  */
 public enum EncounterStatus {
-  Planned,
-  InProgress,
-  OnLeave,
-  Finished,
-  Cancelled
+  PLANNED,
+  ARRIVED,
+  IN_PROGRESS,
+  ON_LEAVE,
+  FINISHED,
+  CANCELLED
 }

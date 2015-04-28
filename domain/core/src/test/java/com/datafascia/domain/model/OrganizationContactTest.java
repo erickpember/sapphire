@@ -21,7 +21,7 @@ public class OrganizationContactTest extends ModelTestBase {
 
     assertEquals(decoded.getAddress(),TestModels.address);
     assertEquals(decoded.getTelecoms(),Arrays.asList(TestModels.contactPoint));
-    assertEquals(decoded.getName(),TestModels.name);
+    assertEquals(decoded.getName(),TestModels.humanName);
     assertEquals(decoded.getPurpose(),"it passes butter");
   }
 

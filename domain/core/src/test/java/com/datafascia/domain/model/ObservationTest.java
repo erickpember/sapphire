@@ -12,52 +12,64 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 
 /**
- * Test code for observation model.
+ * Test code for the Observation model.
  */
 public class ObservationTest extends ModelTestBase {
   @Test
   public <T extends Object> void testObservation() throws IOException, URISyntaxException {
     Observation decoded = (Observation) geneticEncodeDecodeTest(TestModels.observation);
-    assertEquals(decoded.getId(), Id.of("1234"));
-    assertEquals(decoded.getName(), TestModels.codeable);
-    assertEquals(decoded.getValues(), TestModels.observationValue);
-    assertEquals(decoded.getInterpretation(), ObservationInterpretation.A);
-    assertEquals(decoded.getComments(), "The patient is alive.");
-    assertEquals(decoded.getApplies(), TestModels.period);
-    assertEquals(decoded.getIssued(), TestModels.getDateTime());
-    assertEquals(decoded.getStatus(), ObservationStatus.Final);
-    assertEquals(decoded.getReliability(), ObservationReliability.Ok);
-    assertEquals(decoded.getSite(), TestModels.codeable);
-    assertEquals(decoded.getMethod(), TestModels.codeable);
+    assertEquals(decoded.getBodySiteCodeableConcept(), TestModels.codeable);
+    assertEquals(decoded.getCode(), TestModels.codeable);
+    assertEquals(decoded.getDataAbsentReason(), TestModels.codeable);
     assertEquals(decoded.getIdentifier(), TestModels.codeable);
-    assertEquals(decoded.getSubject(), TestModels.getURI());
-    assertEquals(decoded.getSpecimen(), TestModels.getURI());
-    assertEquals(decoded.getPerformer(), TestModels.getURI());
-    assertEquals(decoded.getRange(), Arrays.asList(TestModels.referenceRange,
-        TestModels.referenceRange));
-    assertEquals(decoded.getRelatedTo(), Arrays.asList(TestModels.related, TestModels.related));
+    assertEquals(decoded.getInterpretation(), TestModels.codeable);
+    assertEquals(decoded.getMethod(), TestModels.codeable);
+    assertEquals(decoded.getName(), TestModels.codeable);
+    assertEquals(decoded.getBodySiteReferenceId(), Id.of("BodySite"));
+    assertEquals(decoded.getEncounterId(), Id.of("Encounter"));
+    assertEquals(decoded.getId(), Id.of("Observation"));
+    assertEquals(decoded.getSpecimenId(), Id.of("Specimen"));
+    assertEquals(decoded.getAppliesDateTime(), TestModels.getDateTime());
+    assertEquals(decoded.getIssued(), TestModels.getDateTime());
+    assertEquals(decoded.getAppliesPeriod(), TestModels.period);
+    assertEquals(decoded.getPerformers(), Arrays.asList(TestModels.observationPerformer));
+    assertEquals(decoded.getReferenceRanges(), Arrays.asList(TestModels.observationReferenceRange));
+    assertEquals(decoded.getRelated(), Arrays.asList(TestModels.observationRelated));
+    assertEquals(decoded.getDevice(), TestModels.observationDevice);
+    assertEquals(decoded.getReliability(), ObservationReliability.CALIBRATING);
+    assertEquals(decoded.getStatus(), ObservationStatus.AMENDED);
+    assertEquals(decoded.getSubject(), TestModels.observationSubject);
+    assertEquals(decoded.getValue(), TestModels.observationValue);
+    assertEquals(decoded.getComments(), "comments");
   }
 
   @Test
   public void testJsonProperties() throws IOException {
     ArrayList<String> jsonProperties = new ArrayList<>();
-    jsonProperties.add("@id");
-    jsonProperties.add("name");
-    jsonProperties.add("values");
-    jsonProperties.add("interpretation");
+    jsonProperties.add("appliesDateTime");
+    jsonProperties.add("appliesPeriod");
+    jsonProperties.add("bodySiteCodeableConcept");
+    jsonProperties.add("bodySiteReferenceId");
+    jsonProperties.add("code");
     jsonProperties.add("comments");
-    jsonProperties.add("applies");
-    jsonProperties.add("issued");
-    jsonProperties.add("status");
-    jsonProperties.add("reliability");
-    jsonProperties.add("site");
-    jsonProperties.add("method");
+    jsonProperties.add("dataAbsentReason");
+    jsonProperties.add("device");
+    jsonProperties.add("encounterId");
+    jsonProperties.add("@id");
     jsonProperties.add("identifier");
+    jsonProperties.add("interpretation");
+    jsonProperties.add("issued");
+    jsonProperties.add("method");
+    jsonProperties.add("name");
+    jsonProperties.add("performers");
+    jsonProperties.add("referenceRanges");
+    jsonProperties.add("related");
+    jsonProperties.add("reliability");
+    jsonProperties.add("specimenId");
+    jsonProperties.add("status");
     jsonProperties.add("subject");
-    jsonProperties.add("specimen");
-    jsonProperties.add("performer");
-    jsonProperties.add("range");
-    jsonProperties.add("relatedTo");
+    jsonProperties.add("value");
+
     geneticJsonContainsFieldsTest(TestModels.observation, jsonProperties);
   }
 }

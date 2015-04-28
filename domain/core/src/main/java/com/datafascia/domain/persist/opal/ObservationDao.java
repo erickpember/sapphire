@@ -9,6 +9,7 @@ import com.datafascia.domain.model.Observation;
 import com.datafascia.domain.model.ObservationValue;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -86,11 +87,12 @@ public class ObservationDao extends OpalDao {
 
   private Observation createObservation(UpdateField field, Value value) {
     ObservationValue observationValue = new ObservationValue();
-    observationValue.setText(decodeString(value));
+    observationValue.setString(decodeString(value));
 
     Observation observation = new Observation();
-    observation.setName(new CodeableConcept(field.getFieldName(), field.getDisplayName()));
-    observation.setValues(observationValue);
+    observation.setName(new CodeableConcept(Arrays.asList(field.getFieldName()),
+        field.getDisplayName()));
+    observation.setValue(observationValue);
     return observation;
   }
 }

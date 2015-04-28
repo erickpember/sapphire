@@ -13,6 +13,7 @@ import com.datafascia.domain.model.Patient;
 import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.ObservationRepository;
 import com.datafascia.domain.persist.PatientRepository;
+import java.util.Arrays;
 import java.util.function.Consumer;
 import javax.inject.Inject;
 
@@ -40,12 +41,12 @@ public class AddObservations implements Consumer<Event> {
 
   private static Observation toObservation(ObservationData fromObservation) {
     ObservationValue observationValue = new ObservationValue();
-    observationValue.setText(fromObservation.getValue().get(0));
+    observationValue.setString(fromObservation.getValue().get(0));
 
     String code = fromObservation.getId();
     Observation observation = new Observation();
-    observation.setName(new CodeableConcept(code, code));
-    observation.setValues(observationValue);
+    observation.setName(new CodeableConcept(Arrays.asList(code), code));
+    observation.setValue(observationValue);
     observation.setIssued(fromObservation.getObservationDateAndTime());
     return observation;
   }

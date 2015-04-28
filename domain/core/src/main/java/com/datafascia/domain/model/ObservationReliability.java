@@ -7,11 +7,11 @@ package com.datafascia.domain.model;
  * of an observation.
  */
 public enum ObservationReliability {
-  Ok,
-  Ongoing,
-  Early,
-  Questionable,
-  Calibrating,
-  Error,
-  Unknown
+  OK,
+  ONGOING,
+  EARLY,
+  QUESTIONABLE,
+  CALIBRATING,
+  ERROR,
+  UNKNOWN
 }

@@ -14,7 +14,7 @@ public enum Gender implements Code<String> {
   UNKNOWN("UNK"),
   FEMALE("F"),
   MALE("M"),
-  UNDIFFERENTIATED("UN");
+  OTHER("OTH");
 
   private String code;
 

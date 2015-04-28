@@ -4,6 +4,7 @@ package com.datafascia.domain.model;
 
 import com.datafascia.common.jackson.LocalDateDeserializer;
 import com.datafascia.common.jackson.LocalDateSerializer;
+import com.datafascia.common.persist.Id;
 import com.datafascia.common.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
@@ -12,6 +13,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.awt.Image;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -26,13 +28,13 @@ import lombok.extern.slf4j.Slf4j;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "Person")
 public class Person {
-  /** A name associated with the individual.*/
-  @JsonProperty("name")
-  private Name name;
+  /** One or more names associated with the person.*/
+  @JsonProperty("names")
+  private List<HumanName> names;
 
-  /** Addresses for the individual.*/
-  @JsonProperty("address")
-  private Address address;
+ /** A list of contacts associated with the person.*/
+  @JsonProperty("telecoms")
+  private List<ContactPoint> telecoms;
 
   /** The gender that the patient is considered to have for administration purposes.*/
   @JsonProperty("gender")
@@ -43,7 +45,23 @@ public class Person {
   @JsonDeserialize(using = LocalDateDeserializer.class)
   private LocalDate birthDate;
 
+  /** One or more addresses for the person.*/
+  @JsonProperty("addresses")
+  private List<Address> addresses;
+
   /** Image of the person.*/
   @JsonProperty("photo")
   private Link<Image> photo;
+
+  /** The Organization that is the custodian of the person record.*/
+  @JsonProperty("managingOrganizationId")
+  private Id<Organization> managingOrganizationId;
+
+  /** Whether or not this person's record is in active use.*/
+  @JsonProperty("active")
+  private boolean active;
+
+  /** Link to a resource that concerns the same actual person.*/
+  @JsonProperty("links")
+  private List<PersonLink> links;
 }

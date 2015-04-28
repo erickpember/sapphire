@@ -2,52 +2,42 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.model;
 
-import com.datafascia.common.jackson.InstantDeserializer;
-import com.datafascia.common.jackson.InstantSerializer;
+import com.datafascia.common.persist.Id;
 import com.datafascia.common.time.Interval;
 import com.datafascia.common.urn.URNFactory;
+import com.datafascia.common.urn.annotations.IdNamespace;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import java.math.BigDecimal;
 import java.time.Instant;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Specifies an event that may occur multiple times.
+ * Represents a Schedule model. Controls dates and times available for the performance
+ * of a service and/or use of a resource.
  */
 @Data @NoArgsConstructor @JsonTypeName(URNFactory.MODEL_PREFIX + "Schedule")
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
+@IdNamespace(URNFactory.NS_SCHEDULE_ID)
 public class Schedule {
-  /** Period when the event occurs. */
-  @JsonProperty("event")
-  private Interval<Instant> event;
+  /** External identifier. */
+  @JsonProperty("@id")
+  private Id<Schedule> id;
 
-  /** Relationship target by means of a predefined code. */
-  @JsonProperty("repeatFrequency")
-  private Integer repeatFrequency;
+  /** Categorization of healthcare services or other appointment types. */
+  @JsonProperty("types")
+  private CodeableConcept types;
 
-  /** HS | WAKE | AC | ACM | ACD | ACV | PC | PCM | PCD | PCV - common life events. */
-  @JsonProperty("repeatWhen")
-  private ScheduleEventType repeatWhen;
+  /** The resource this schedule resource is providing availability information for. */
+  @JsonProperty("actor")
+  private Reference actor;
 
-  /** Repeating or event-related duration. */
-  @JsonProperty("repeatDuration")
-  private BigDecimal repeatDuration;
+  /** The period of time for the slots in this Schedule Model. */
+  @JsonProperty("planningHorizon")
+  private Interval<Instant> planningHorizon;
 
-  /** Either s | min | h | d | wk | mo | a - unit of time (UCUM). */
-  @JsonProperty("repeatUnits")
-  private ScheduleTimeUnit repeatUnits;
-
-  /** Number of times to repeat. */
-  @JsonProperty("repeatCount")
-  private Integer repeatCount;
-
-  /** When to stop repeats. */
-  @JsonProperty("repeatEnd") @JsonSerialize(using = InstantSerializer.class)
-  @JsonDeserialize(using = InstantDeserializer.class)
-  private Instant repeatEnd;
+  /** Comments on the availability to describe any extended information. */
+  @JsonProperty("comment")
+  private String comment;
 }

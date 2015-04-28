@@ -29,7 +29,7 @@ public class MedicationPrescriptionDosageInstructionTest extends ModelTestBase {
     assertEquals(decoded.getDoseRange(), TestModels.range);
     assertEquals(decoded.getMaxDosePerPeriod(), TestModels.ratio);
     assertEquals(decoded.getRate(), TestModels.ratio);
-    assertEquals(decoded.getTiming(), TestModels.schedule);
+    assertEquals(decoded.getTiming(), TestModels.timing);
     assertEquals(decoded.getText(), "text");
   }
 

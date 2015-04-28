@@ -9,8 +9,8 @@ import com.datafascia.common.urn.annotations.IdNamespace;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import java.net.URI;
 import java.time.Instant;
+import java.util.List;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 /**
  * An interaction between a patient and healthcare provider(s) for the purpose of providing
  * healthcare service(s) or assessing the health status of a patient.
+ * This represents the hospitalization Element in the fhir Encounter Model.
  */
 @Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode @ToString
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
@@ -31,37 +32,33 @@ public class Hospitalization {
   @JsonProperty("@id")
   private Id<Hospitalization> id;
 
-  /** The location from which the patient came befor admission */
-  @JsonProperty("origin")
-  private URI origin;
+  /** The location from which the patient came before admission */
+  @JsonProperty("originId")
+  private Id<Location> originId;
 
   /** From where patient was admitted (physician referral, transfer). */
   @JsonProperty("admitSource")
   private CodeableConcept admitSource;
 
+  /** Diet preferences reported by the patient. */
+  @JsonProperty("dietPreference")
+  private CodeableConcept dietPreference;
+
+  /** Special courtesies (VIP, board member). */
+  @JsonProperty("specialCourtesies")
+  private List<CodeableConcept> specialCourtesies;
+
+  /** Wheelchair, translator, stretcher, etc. */
+  @JsonProperty("specialArrangements")
+  private List<CodeableConcept> specialArrangements;
+
+  /** Location to which the patient is discharged. */
+  @JsonProperty("destinationId")
+  private Id<Location> destinationId;
+
   /** Period during which the patient was admitted. */
   @JsonProperty("period")
   private Interval<Instant> period;
-
-  /** Where the patient stays during this encounter. */
-  @JsonProperty("accomodation")
-  private EncounterAccomodation accomodation;
-
-  /** Dietary restrictions for the patient. */
-  @JsonProperty("diet")
-  private CodeableConcept diet;
-
-  /** Special courtesies (VIP, board member). */
-  @JsonProperty("specialCourtesy")
-  private CodeableConcept specialCourtesy;
-
-  /** Wheelchair, translator, stretcher, etc. */
-  @JsonProperty("specialArrangement")
-  private CodeableConcept specialArrangement;
-
-  /** Location to which the patient is discharged. */
-  @JsonProperty("destination")
-  private URI destination;
 
   /** Category or kind of location after discharge. */
   @JsonProperty("dischargeDisposition")
@@ -72,9 +69,9 @@ public class Hospitalization {
    * surgery, and workup are complete.
    */
   @JsonProperty("dischargeDiagnosis")
-  private URI dischargeDiagnosis;
+  private Reference dischargeDiagnosis;
 
   /** Whether this hospitalization is a readmission. */
   @JsonProperty("readmission")
-  private boolean readmission;
+  private Boolean readmission;
 }

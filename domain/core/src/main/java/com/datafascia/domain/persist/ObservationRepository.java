@@ -35,7 +35,7 @@ import org.apache.hadoop.io.Text;
 public class ObservationRepository extends BaseRepository {
 
   private static final String COLUMN_FAMILY = Observation.class.getSimpleName();
-  private static final String CODE = "code";
+  private static final String CODE = "codings";
   private static final String VALUE_STRING = "valueString";
   private static final String ISSUED = "issued";
 
@@ -55,13 +55,13 @@ public class ObservationRepository extends BaseRepository {
       byte[] value = entry.getValue().get();
       switch (entry.getKey().getColumnQualifier().toString()) {
         case CODE:
-          String code = decodeString(value);
-          observation.setName(new CodeableConcept(code, code));
+          List<String> codes = decodeStringList(value);
+          observation.setName(new CodeableConcept(codes, codes.get(0)));
           break;
         case VALUE_STRING:
           ObservationValue observationValue = new ObservationValue();
-          observationValue.setText(decodeString(value));
-          observation.setValues(observationValue);
+          observationValue.setString(decodeString(value));
+          observation.setValue(observationValue);
           break;
         case ISSUED:
           observation.setIssued(decodeInstant(value));
@@ -120,8 +120,8 @@ public class ObservationRepository extends BaseRepository {
           public void putWriteOperations(MutationBuilder mutationBuilder) {
             mutationBuilder
                 .columnFamily(COLUMN_FAMILY)
-                .put(CODE, observation.getName().getCode())
-                .put(VALUE_STRING, observation.getValues().getText())
+                .put(CODE, observation.getName().getCodings())
+                .put(VALUE_STRING, observation.getValue().getString())
                 .put(ISSUED, observation.getIssued());
           }
         });

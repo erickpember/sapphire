@@ -6,11 +6,11 @@ package com.datafascia.domain.model;
  * Codes specifying how two observations are related
  */
 public enum ObservationRelationshipType {
-  HasComponent,
-  HasMember,
-  DerivedFrom,
-  SequelTo,
-  Replaces,
-  QualifiedBy,
-  InterferedBy
+  HAS_COMPONENT,
+  HAS_MEMBER,
+  DERIVED_FROM,
+  SEQUEL_TO,
+  REPLACES,
+  QUALIFIED_BY,
+  INTERFERED_BY
 }

@@ -25,9 +25,28 @@ public class URNFactory {
   /** Namespace for dataFascia patient identifier */
   public static final String NS_PATIENT_ID = "df-patientId-1";
   /** Namespace for dataFascia patient encounter identifier */
-  public static final String NS_ENCOUNTER_ID = "df-observationId-1";
+  public static final String NS_ENCOUNTER_ID = "df-encounterId-1";
+  /** Namespace for dataFascia appointment identifier */
+  public static final String NS_APPOINTMENT_ID = "df-appointmentId-1";
+  /** Namespace for dataFascia schedule identifier */
+  public static final String NS_SCHEDULE_ID = "df-scheduleId-1";
+  /** Namespace for dataFascia schedule slot identifier */
+  public static final String NS_SLOT_ID = "df-slotId-1";
+  /** Namespace for dataFascia order identifier */
+  public static final String NS_ORDER_ID = "df-orderId-1";
+  /** Namespace for dataFascia device component identifier */
+  public static final String NS_DEVICE_COMPONENT_ID = "df-device-componentId-1";
+  /** Namespace for dataFascia device component production specification identifier */
+  public static final String NS_DEVICE_COMPONENT_SPECIFICATION_ID
+      = "df-device-component-specificationId-1";
+  /** Namespace for dataFascia device metric identifier */
+  public static final String NS_DEVICE_METRIC_ID = "df-device-metricId-1";
+  /** Namespace for dataFascia patient episode of care identifier */
+  public static final String NS_EPISODE_OF_CARE_ID = "df-episode-of-careId-1";
   /** Namespace for dataFascia patient observation identifier */
-  public static final String NS_OBSERVATION_ID = "df-encounterId-1";
+  public static final String NS_OBSERVATION_ID = "df-observationId-1";
+  /** Namespace for dataFascia patient referral request identifier */
+  public static final String NS_REFERRAL_REQUEST_ID = "df-referral-requestId-1";
   /** Namespace for dataFascia patient hospitalization identifier */
   public static final String NS_HOSPITALIZATION_ID = "df-hospitalizationId-1";
   /** Namespace for dataFascia practitioner identifier */
@@ -70,7 +89,7 @@ public class URNFactory {
   public static final String NS_HEALTHCARE_SERVICE_ID = "df-healthcare-serviceId-1";
   /** Namespace for dataFascia location identifier */
   public static final String NS_LOCATION_ID = "df-locationId-1";
-  /** Namespace for dataFascia location identifier */
+  /** Namespace for dataFascia substance identifier */
   public static final String NS_SUBSTANCE_ID = "df-substanceId-1";
   /** Namespace for dataFascia organization identifier */
   public static final String NS_ORGANIZATION_ID = "df-organizationId-1";

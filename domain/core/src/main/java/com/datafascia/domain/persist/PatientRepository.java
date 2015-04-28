@@ -9,17 +9,18 @@ import com.datafascia.common.accumulo.MutationSetter;
 import com.datafascia.common.accumulo.RowMapper;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.urn.URNFactory;
+import com.datafascia.domain.model.CodeableConcept;
 import com.datafascia.domain.model.Gender;
+import com.datafascia.domain.model.HumanName;
 import com.datafascia.domain.model.MaritalStatus;
-import com.datafascia.domain.model.Name;
 import com.datafascia.domain.model.Patient;
+import com.datafascia.domain.model.PatientCommunication;
 import com.datafascia.domain.model.Race;
-import com.neovisionaries.i18n.LanguageCode;
-import java.util.Collections;
+import com.fasterxml.jackson.core.type.TypeReference;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.stream.Collectors;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.Scanner;
@@ -27,6 +28,7 @@ import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
 import org.apache.hadoop.io.Text;
+
 
 /**
  * Patient data access.
@@ -50,10 +52,13 @@ public class PatientRepository extends BaseRepository {
   private static final String BIRTH_DATE = "birthDate";
   private static final String MARITAL_STATUS = "maritalStatus";
   private static final String RACE = "race";
-  private static final String LANGUAGES = "languages";
+  private static final String COMMUNICATION = "communications";
   private static final String LAST_ENCOUNTER_ID = "lastEncounterId";
   private static final String ACTIVE = "active";
   private static final PatientRowMapper PATIENT_ROW_MAPPER = new PatientRowMapper();
+
+  private static final TypeReference<List<PatientCommunication>> COMMUNICATION_LIST_TYPE
+      = new TypeReference<List<PatientCommunication>>() { };
 
   /**
    * Constructor
@@ -106,16 +111,14 @@ public class PatientRepository extends BaseRepository {
                 .columnFamily(COLUMN_FAMILY)
                 .put(INSTITUTION_PATIENT_ID, patient.getInstitutionPatientId())
                 .put(ACCOUNT_NUMBER, patient.getAccountNumber())
-                .put(FIRST_NAME, patient.getName().getFirst())
-                .put(MIDDLE_NAME, patient.getName().getMiddle())
-                .put(LAST_NAME, patient.getName().getLast())
+                .put(FIRST_NAME, patient.getNames().get(0).getFirstName())
+                .put(MIDDLE_NAME, patient.getNames().get(0).getMiddleName())
+                .put(LAST_NAME, patient.getNames().get(0).getLastName())
                 .put(GENDER, patient.getGender().getCode())
                 .put(BIRTH_DATE, patient.getBirthDate())
                 .put(MARITAL_STATUS, patient.getMaritalStatus().getCode())
                 .put(RACE, patient.getRace().getCode())
-                .put(LANGUAGES, patient.getLangs().stream()
-                    .map(LanguageCode::name)
-                    .collect(Collectors.toList()))
+                .put(COMMUNICATION, patient.getCommunication().getLanguage().getCodings().get(0))
                 .put(LAST_ENCOUNTER_ID, patient.getLastEncounterId())
                 .put(ACTIVE, String.valueOf(patient.isActive()));
           }
@@ -129,11 +132,11 @@ public class PatientRepository extends BaseRepository {
     public void onBeginRow(Key key) {
       patient = new Patient();
       patient.setId(Id.of(extractEntityId(key)));
-      patient.setName(new Name());
+      patient.setNames(Arrays.asList(new HumanName()));
       patient.setGender(Gender.UNKNOWN);
       patient.setMaritalStatus(MaritalStatus.UNKNOWN);
       patient.setRace(Race.UNKNOWN);
-      patient.setLangs(Collections.emptyList());
+      patient.setCommunication(new PatientCommunication());
     }
 
     @Override
@@ -147,13 +150,16 @@ public class PatientRepository extends BaseRepository {
           patient.setAccountNumber(decodeString(value));
           break;
         case FIRST_NAME:
-          patient.getName().setFirst(decodeString(value));
+          patient.getNames().get(0).setFirstName(decodeString(value));
           break;
         case MIDDLE_NAME:
-          patient.getName().setMiddle(decodeString(value));
+          patient.getNames().get(0).setMiddleName(decodeString(value));
           break;
         case LAST_NAME:
-          patient.getName().setLast(decodeString(value));
+          System.out.println("patient: " + patient);
+          System.out.println("patient.getnames.get0:" + patient.getNames().get(0));
+          patient.getNames().get(0).
+              setFamily(Arrays.asList(decodeString(value)));
           break;
         case GENDER:
           patient.setGender(Gender.of(decodeString(value)).orElse(Gender.UNKNOWN));
@@ -168,10 +174,9 @@ public class PatientRepository extends BaseRepository {
         case RACE:
           patient.setRace(Race.of(decodeString(value)).orElse(Race.UNKNOWN));
           break;
-        case LANGUAGES:
-          patient.setLangs(decodeStringList(value).stream()
-              .map(LanguageCode::getByCode)
-              .collect(Collectors.toList()));
+        case COMMUNICATION:
+          patient.setCommunication(new PatientCommunication(new CodeableConcept(Arrays.asList(
+              decodeString(value)), decodeString(value)), true));
           break;
         case LAST_ENCOUNTER_ID:
           patient.setLastEncounterId(Id.of(decodeString(value)));

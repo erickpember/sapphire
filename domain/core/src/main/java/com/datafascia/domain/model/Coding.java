@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 /**
  * Represents a Coding datatype.
  * A coding is a representation of a defined concept using a symbol from a defined "code system".
- * While similar to the more common CodeableConcept, this is a separate Complex Type in the Fhir
+ * While similar to the more common CodeableConcept, this is a separate Complex Type in the FHIR
  * ontology.
  */
 @Data @NoArgsConstructor @JsonTypeName(URNFactory.MODEL_PREFIX + "Coding")

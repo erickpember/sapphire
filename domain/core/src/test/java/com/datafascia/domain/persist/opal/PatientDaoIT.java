@@ -85,9 +85,9 @@ public class PatientDaoIT extends DaoIT {
    */
   public void validatePatient(Patient patient, String firstName, String middleName, String lastName,
       LocalDate birthDate, String patId, String instId) {
-    assertEquals(patient.getName().getFirst(), firstName);
-    assertEquals(patient.getName().getMiddle(), middleName);
-    assertEquals(patient.getName().getLast(), lastName);
+    assertEquals(patient.getNames().get(0).getGiven().get(0), firstName);
+    assertEquals(patient.getNames().get(0).getGiven().get(1), middleName);
+    assertEquals(patient.getNames().get(0).getFamily().get(0), lastName);
     assertEquals(patient.getBirthDate(), birthDate);
     assertEquals(patient.getId().toString(), patId);
     assertEquals(patient.getInstitutionPatientId(), instId);

@@ -37,7 +37,7 @@ public class DocumentReference {
   @JsonProperty("type")
   private CodeableConcept type;
 
-  /** Categorization of document, Fhir name "class" is reserved keyword in Java. */
+  /** Categorization of document, FHIR name "class" is reserved keyword in Java. */
   @JsonProperty("documentReferenceClass")
   private CodeableConcept documentReferenceClass;
 

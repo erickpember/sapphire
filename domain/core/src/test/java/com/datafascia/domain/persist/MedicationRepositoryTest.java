@@ -7,6 +7,7 @@ import com.datafascia.domain.model.CodeableConcept;
 import com.datafascia.domain.model.Medication;
 import com.datafascia.domain.model.MedicationPackage;
 import com.datafascia.domain.model.Product;
+import java.util.Arrays;
 import java.util.Optional;
 import javax.inject.Inject;
 import org.testng.annotations.Test;
@@ -24,17 +25,32 @@ public class MedicationRepositoryTest extends RepositoryTestSupport {
   private Medication createMedication() {
     Medication medication = new Medication();
     medication.setName("name");
-    medication.setCode(new CodeableConcept("code", "code"));
+    medication.setCode(new CodeableConcept() {
+      {
+        setCodings(Arrays.asList("code"));
+        setText("code");
+      }
+    });
     medication.setIsBrand(Boolean.TRUE);
     medication.setManufacturerId(Id.of("manufacturerId"));
     medication.setKind("kind");
 
     Product product = new Product();
-    product.setForm(new CodeableConcept("formCode", "formCode"));
+    product.setForm(new CodeableConcept() {
+      {
+        setCodings(Arrays.asList("formCode"));
+        setText("formCode");
+      }
+    });
     medication.setProduct(product);
 
     MedicationPackage aPackage = new MedicationPackage();
-    aPackage.setContainer(new CodeableConcept("containerCode", "containerCode"));
+    aPackage.setContainer(new CodeableConcept() {
+      {
+        setCodings(Arrays.asList("containerCode"));
+        setText("containerCode");
+      }
+    });
     medication.setPackage(aPackage);
     return medication;
   }

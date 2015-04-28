@@ -7,7 +7,7 @@ import com.datafascia.common.accumulo.RowMapper;
 import com.datafascia.common.accumulo.SingleValueRowMapper;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.model.Gender;
-import com.datafascia.domain.model.Name;
+import com.datafascia.domain.model.HumanName;
 import com.datafascia.domain.model.Patient;
 import com.datafascia.domain.model.Race;
 import com.google.common.base.Enums;
@@ -194,7 +194,7 @@ public class PatientDao extends OpalDao {
     patient.setId(Id.of(patientId));
     patient.setGender(Gender.UNKNOWN);
     patient.setRace(Race.UNKNOWN);
-    Name name = new Name();
+    HumanName name = new HumanName();
 
     for (Entry<Key, Value> entry : scanner) {
       Value value = entry.getValue();
@@ -205,13 +205,13 @@ public class PatientDao extends OpalDao {
       try {
         switch (colFam) {
           case dF_pidGivenName :
-            name.setFirst(decodeString(value));
+            name.setGiven(Arrays.asList(decodeString(value)));
             break;
           case dF_pidFamilyName :
-            name.setLast(decodeString(value));
+            name.setFamily(Arrays.asList(decodeString(value)));
             break;
           case dF_pidMiddleInitialOrName :
-            name.setMiddle(decodeString(value));
+            name.setMiddleName(decodeString(value));
             break;
           case dF_pidSex :
             Gender gender = Gender.of(decodeString(value)).orElse(Gender.UNKNOWN);
@@ -231,7 +231,7 @@ public class PatientDao extends OpalDao {
           default :
             break;
         }
-        patient.setName(name);
+        patient.setNames(Arrays.asList(name));
 
         return Optional.of(patient);
       } catch (DateTimeParseException e) {

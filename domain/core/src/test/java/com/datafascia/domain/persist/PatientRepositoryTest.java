@@ -3,14 +3,15 @@
 package com.datafascia.domain.persist;
 
 import com.datafascia.common.persist.Id;
+import com.datafascia.domain.model.CodeableConcept;
 import com.datafascia.domain.model.Gender;
+import com.datafascia.domain.model.HumanName;
 import com.datafascia.domain.model.MaritalStatus;
-import com.datafascia.domain.model.Name;
 import com.datafascia.domain.model.Patient;
+import com.datafascia.domain.model.PatientCommunication;
 import com.datafascia.domain.model.Race;
-import com.neovisionaries.i18n.LanguageCode;
 import java.time.LocalDate;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -68,18 +69,22 @@ public class PatientRepositoryTest extends RepositoryTestSupport {
       {
         setInstitutionPatientId("UCSF-12345");
         setAccountNumber("12345");
-        setName(new Name() {
+        setNames(Arrays.asList(new HumanName() {
           {
-            setFirst("pat1firstname");
-            setMiddle("pat1middlename");
-            setLast("pat1lastname");
+            setFirstName("pat1firstname");
+            setMiddleName("pat1middlename");
+            setFamily(Arrays.asList("pat1lastname"));
           }
-        });
-        setLangs(new ArrayList<LanguageCode>() {
+        }));
+        setCommunication(new PatientCommunication() {
           {
-            add(LanguageCode.en);
-            add(LanguageCode.aa);
-            add(LanguageCode.tg);
+            setPreferred(true);
+            setLanguage(new CodeableConcept() {
+              {
+                setCodings(Arrays.asList("EN"));
+                setText("EN");
+              }
+            });
           }
         });
         setGender(Gender.MALE);
@@ -98,14 +103,24 @@ public class PatientRepositoryTest extends RepositoryTestSupport {
       {
         setInstitutionPatientId("UCSF-67890");
         setAccountNumber("67890");
-        setName(new Name() {
+        setNames(Arrays.asList(new HumanName() {
           {
-            setFirst("pat2firstname");
-            setMiddle("pat2middlename");
-            setLast("pat2lastname");
+            setFirstName("pat2firstname");
+            setMiddleName("pat2middlename");
+            setFamily(Arrays.asList("pat2lastname"));
+          }
+        }));
+        setCommunication(new PatientCommunication() {
+          {
+            setPreferred(true);
+            setLanguage(new CodeableConcept() {
+              {
+                setCodings(Arrays.asList("EN"));
+                setText("EN");
+              }
+            });
           }
         });
-        setLangs(new ArrayList<>());
         setGender(Gender.FEMALE);
         setBirthDate(LocalDate.now());
         setMaritalStatus(MaritalStatus.DIVORCED);
@@ -122,15 +137,25 @@ public class PatientRepositoryTest extends RepositoryTestSupport {
       {
         setInstitutionPatientId("UCSF-13579");
         setAccountNumber("13579");
-        setName(new Name() {
+        setNames(Arrays.asList(new HumanName() {
           {
-            setFirst("pat3firstname");
-            setMiddle("pat3middlename");
-            setLast("pat3lastname");
+            setFirstName("pat3firstname");
+            setMiddleName("pat3middlename");
+            setFamily(Arrays.asList("pat3lastname"));
+          }
+        }));
+        setCommunication(new PatientCommunication() {
+          {
+            setPreferred(true);
+            setLanguage(new CodeableConcept() {
+              {
+                setCodings(Arrays.asList("EN"));
+                setText("EN");
+              }
+            });
           }
         });
-        setLangs(new ArrayList<>());
-        setGender(Gender.UNDIFFERENTIATED);
+        setGender(Gender.UNKNOWN);
         setBirthDate(LocalDate.now());
         setMaritalStatus(MaritalStatus.DOMESTIC_PARTNER);
         setRace(Race.BLACK);

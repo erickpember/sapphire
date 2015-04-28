@@ -16,10 +16,12 @@ import com.datafascia.common.kafka.KafkaConfig;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.shiro.FakeRealm;
 import com.datafascia.common.shiro.RoleExposingRealm;
+import com.datafascia.domain.model.CodeableConcept;
 import com.datafascia.domain.model.Gender;
+import com.datafascia.domain.model.HumanName;
 import com.datafascia.domain.model.MaritalStatus;
-import com.datafascia.domain.model.Name;
 import com.datafascia.domain.model.Patient;
+import com.datafascia.domain.model.PatientCommunication;
 import com.datafascia.domain.model.Race;
 import com.datafascia.domain.model.Version;
 import com.datafascia.dropwizard.testing.DropwizardTestApp;
@@ -31,13 +33,11 @@ import com.google.common.io.Resources;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.neovisionaries.i18n.LanguageCode;
 import java.io.File;
 import java.io.FileWriter;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
@@ -201,18 +201,27 @@ public class ApiIT {
   private void addStaticData() throws Exception {
     api.createPatient(new Patient() {
       {
-        setName(new Name() {
+        setNames(Arrays.asList(new HumanName() {
           {
-            setFirst("ECMNOTES");
-            setLast("TEST");
+            setFirstName("ECMNOTES");
+            setLastName("TEST");
           }
-        }
-        );
+        }));
         setGender(Gender.FEMALE);
         setMaritalStatus(MaritalStatus.ANNULLED);
         setRace(Race.AMERICAN_INDIAN);
         setActive(true);
-        setLangs(Arrays.asList(LanguageCode.aa));
+        setCommunication(new PatientCommunication() {
+          {
+            setPreferred(true);
+            setLanguage(new CodeableConcept() {
+              {
+                setCodings(Arrays.asList("EN"));
+                setText("EN");
+              }
+            });
+          }
+        });
         setBirthDate(LocalDate.parse("1977-01-01T05:00:00Z", dateFormat));
         setId(Id.of("urn:df-patientId-1:96087004"));
         setInstitutionPatientId("urn:df-institution-patientId-1:UCSF::96087004");
@@ -224,19 +233,28 @@ public class ApiIT {
 
     api.createPatient(new Patient() {
       {
-        setName(new Name() {
+        setNames(Arrays.asList(new HumanName() {
           {
-            setFirst("ONE");
-            setMiddle("A");
-            setLast("ECM-MSSGE");
+            setFirstName("ONE");
+            setMiddleName("A");
+            setLastName("ECM-MSSGE");
           }
-        }
-        );
+        }));
         setGender(Gender.FEMALE);
         setMaritalStatus(MaritalStatus.DIVORCED);
         setRace(Race.ASIAN);
         setActive(true);
-        setLangs(Arrays.asList(LanguageCode.aa, LanguageCode.pi, LanguageCode.wa));
+        setCommunication(new PatientCommunication() {
+          {
+            setPreferred(true);
+            setLanguage(new CodeableConcept() {
+              {
+                setCodings(Arrays.asList("EN"));
+                setText("EN");
+              }
+            });
+          }
+        });
         setBirthDate(LocalDate.parse("1960-06-06T04:00:00Z", dateFormat));
         setId(Id.of("urn:df-patientId-1:96087039"));
         setInstitutionPatientId("urn:df-institution-patientId-1:UCSF::96087039");
@@ -248,19 +266,28 @@ public class ApiIT {
 
     api.createPatient(new Patient() {
       {
-        setName(new Name() {
+        setNames(Arrays.asList(new HumanName() {
           {
-            setFirst("ONE");
-            setMiddle("B");
-            setLast("ECM-MSSGE");
+            setFirstName("ONE");
+            setMiddleName("B");
+            setLastName("ECM-MSSGE");
           }
-        }
-        );
+        }));
         setGender(Gender.FEMALE);
         setMaritalStatus(MaritalStatus.DOMESTIC_PARTNER);
         setRace(Race.BLACK);
         setActive(true);
-        setLangs(new ArrayList<>());
+        setCommunication(new PatientCommunication() {
+          {
+            setPreferred(true);
+            setLanguage(new CodeableConcept() {
+              {
+                setCodings(Arrays.asList("EN"));
+                setText("EN");
+              }
+            });
+          }
+        });
         setBirthDate(LocalDate.parse("1954-10-29T05:00:00Z", dateFormat));
         setId(Id.of("urn:df-patientId-1:96087047"));
         setInstitutionPatientId("urn:df-institution-patientId-1:UCSF:SICU:96087047");
@@ -271,19 +298,28 @@ public class ApiIT {
 
     api.createPatient(new Patient() {
       {
-        setName(new Name() {
+        setNames(Arrays.asList(new HumanName() {
           {
-            setFirst("ONE");
-            setMiddle("C");
-            setLast("ECM-MSSGE");
+            setFirstName("ONE");
+            setMiddleName("C");
+            setLastName("ECM-MSSGE");
           }
-        }
-        );
+        }));
         setGender(Gender.MALE);
         setMaritalStatus(MaritalStatus.INTERLOCUTORY);
         setRace(Race.OTHER);
         setActive(true);
-        setLangs(new ArrayList<>());
+        setCommunication(new PatientCommunication() {
+          {
+            setPreferred(true);
+            setLanguage(new CodeableConcept() {
+              {
+                setCodings(Arrays.asList("EN"));
+                setText("EN");
+              }
+            });
+          }
+        });
         setBirthDate(LocalDate.parse("1996-07-29T04:00:00Z", dateFormat));
         setId(Id.of("urn:df-patientId-1:96087055"));
         setInstitutionPatientId("urn:df-institution-patientId-1:UCSF::96087055");
@@ -294,19 +330,28 @@ public class ApiIT {
 
     api.createPatient(new Patient() {
       {
-        setName(new Name() {
+        setNames(Arrays.asList(new HumanName() {
           {
-            setFirst("ONE");
-            setMiddle("D");
-            setLast("ECM-MSSGE");
+            setFirstName("ONE");
+            setMiddleName("D");
+            setLastName("ECM-MSSGE");
           }
-        }
-        );
+        }));
         setGender(Gender.MALE);
         setMaritalStatus(MaritalStatus.NEVER_MARRIED);
         setRace(Race.WHITE);
         setActive(true);
-        setLangs(new ArrayList<>());
+        setCommunication(new PatientCommunication() {
+          {
+            setPreferred(true);
+            setLanguage(new CodeableConcept() {
+              {
+                setCodings(Arrays.asList("EN"));
+                setText("EN");
+              }
+            });
+          }
+        });
         setBirthDate(LocalDate.parse("1977-10-29T04:00:00Z", dateFormat));
         setId(Id.of("urn:df-patientId-1:96087063"));
         setInstitutionPatientId("urn:df-institution-patientId-1:UCSF::96087063");
@@ -317,19 +362,28 @@ public class ApiIT {
 
     api.createPatient(new Patient() {
       {
-        setName(new Name() {
+        setNames(Arrays.asList(new HumanName() {
           {
-            setFirst("ONE");
-            setMiddle("C");
-            setLast("MB-CHILD");
+            setFirstName("ONE");
+            setMiddleName("C");
+            setLastName("MB-CHILD");
           }
-        }
-        );
+        }));
         setGender(Gender.MALE);
         setMaritalStatus(MaritalStatus.UNMARRIED);
         setRace(Race.PACIFIC_ISLANDER);
         setActive(true);
-        setLangs(new ArrayList<>());
+        setCommunication(new PatientCommunication() {
+          {
+            setPreferred(true);
+            setLanguage(new CodeableConcept() {
+              {
+                setCodings(Arrays.asList("EN"));
+                setText("EN");
+              }
+            });
+          }
+        });
         setBirthDate(LocalDate.parse("1999-02-20T05:00:00Z", dateFormat));
         setId(Id.of("urn:df-patientId-1:97534012"));
         setInstitutionPatientId("urn:df-institution-patientId-1:UCSF:SICU:97534012");

@@ -274,12 +274,12 @@ public class ProcessEventTopologyIT {
     assertEquals(observations.size(), 2);
 
     for (Observation observation : observations) {
-      switch (observation.getName().getCode()) {
+      switch (observation.getName().getCodings().get(0)) {
         case NUMERICAL_PAIN_LEVEL_LOW:
-          assertEquals(observation.getValues().getText(), NUMERICAL_PAIN_LEVEL_LOW_VALUE);
+          assertEquals(observation.getValue().getString(), NUMERICAL_PAIN_LEVEL_LOW_VALUE);
           break;
         case NUMERICAL_PAIN_LEVEL_HIGH:
-          assertEquals(observation.getValues().getText(), NUMERICAL_PAIN_LEVEL_HIGH_VALUE);
+          assertEquals(observation.getValue().getString(), NUMERICAL_PAIN_LEVEL_HIGH_VALUE);
           break;
       }
     }

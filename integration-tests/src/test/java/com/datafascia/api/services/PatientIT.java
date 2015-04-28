@@ -68,9 +68,9 @@ public class PatientIT extends ApiIT {
    */
   public void validatePatient(Patient patient, String firstName, String middleName,
       String lastName, LocalDate birthDate, String patId, String instId) {
-    assertEquals(patient.getName().getFirst(), firstName);
-    assertEquals(patient.getName().getMiddle(), middleName);
-    assertEquals(patient.getName().getLast(), lastName);
+    assertEquals(patient.getNames().get(0).getFirstName(), firstName);
+    assertEquals(patient.getNames().get(0).getMiddleName(), middleName);
+    assertEquals(patient.getNames().get(0).getLastName(), lastName);
     assertEquals(patient.getBirthDate(), birthDate);
     assertEquals(patient.getId().toString(), patId);
     assertEquals(patient.getInstitutionPatientId(), instId);

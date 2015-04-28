@@ -22,7 +22,7 @@ public class MedicationStatementDosage {
 
   /** When/ how often was medication taken? */
   @JsonProperty("schedule")
-  private Schedule schedule;
+  private Timing schedule;
 
   /** Take "as needed" f(or x). */
   @JsonProperty("asNeededBoolean")

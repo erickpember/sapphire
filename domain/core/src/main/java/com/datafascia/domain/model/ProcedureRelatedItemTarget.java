@@ -11,12 +11,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * Part of a Procedure model, an item related to the Procedure
- * of these types:
+ * Part of a Procedure model, an item related to the Procedure of these types:
  * Condition, DiagnosticReport, ImagingStudy, Immunization, MedicationAdministration,
  * MedicationDispense, MedicationPrescription, MedicationStatement
- *
- * These link types are not implemented although part of the Fhir spec:
+ * <p>
+ * These link types are not implemented although part of the FHIR specification:
  * AllergyIntolerance, CarePlan, FamilyMemberHistory, ImmunizationRecommendation
  */
 @Data @NoArgsConstructor @JsonTypeName(URNFactory.MODEL_PREFIX + "ProcedureRelatedItemTarget")

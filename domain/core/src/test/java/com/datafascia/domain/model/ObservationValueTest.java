@@ -10,32 +10,39 @@ import org.testng.annotations.Test;
 import static org.testng.Assert.assertEquals;
 
 /**
- * Test code for ObservationValue model.
+ * Test code for the ObservationValue Element of the Observation model.
  */
 public class ObservationValueTest extends ModelTestBase {
   @Test
   public <T extends Object> void testObservationValue() throws IOException, URISyntaxException {
     ObservationValue decoded
         = (ObservationValue) geneticEncodeDecodeTest(TestModels.observationValue);
-    assertEquals(decoded.getQuantity(), TestModels.numericQuantity);
-    assertEquals(decoded.getCode(), TestModels.codeable);
     assertEquals(decoded.getAttachment(), TestModels.attachment);
-    assertEquals(decoded.getRatio(), TestModels.ratio);
+    assertEquals(decoded.getCodeableConcept(), TestModels.codeable);
+    assertEquals(decoded.getTime(), TestModels.duration);
+    assertEquals(decoded.getDateTime(), TestModels.getDateTime());
     assertEquals(decoded.getPeriod(), TestModels.period);
+    assertEquals(decoded.getQuantity(), TestModels.numericQuantity);
+    assertEquals(decoded.getRange(), TestModels.range);
+    assertEquals(decoded.getRatio(), TestModels.ratio);
     assertEquals(decoded.getSampledData(), TestModels.sampledData);
-    assertEquals(decoded.getText(), "An observation");
+    assertEquals(decoded.getString(), "string");
   }
 
   @Test
   public void testJsonProperties() throws IOException {
     ArrayList<String> jsonProperties = new ArrayList<>();
-    jsonProperties.add("quantity");
-    jsonProperties.add("code");
     jsonProperties.add("attachment");
-    jsonProperties.add("ratio");
+    jsonProperties.add("codeableConcept");
+    jsonProperties.add("dateTime");
     jsonProperties.add("period");
+    jsonProperties.add("quantity");
+    jsonProperties.add("range");
+    jsonProperties.add("ratio");
     jsonProperties.add("sampleData");
-    jsonProperties.add("text");
+    jsonProperties.add("string");
+    jsonProperties.add("time");
+
     geneticJsonContainsFieldsTest(TestModels.observationValue, jsonProperties);
   }
 }

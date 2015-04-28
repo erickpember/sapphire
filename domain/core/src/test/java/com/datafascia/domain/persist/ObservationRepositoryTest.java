@@ -6,13 +6,13 @@ import com.datafascia.common.time.Interval;
 import com.datafascia.domain.model.CodeableConcept;
 import com.datafascia.domain.model.Encounter;
 import com.datafascia.domain.model.Gender;
+import com.datafascia.domain.model.HumanName;
 import com.datafascia.domain.model.MaritalStatus;
-import com.datafascia.domain.model.Name;
 import com.datafascia.domain.model.Observation;
 import com.datafascia.domain.model.ObservationValue;
 import com.datafascia.domain.model.Patient;
+import com.datafascia.domain.model.PatientCommunication;
 import com.datafascia.domain.model.Race;
-import com.neovisionaries.i18n.LanguageCode;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -43,15 +43,24 @@ public class ObservationRepositoryTest extends RepositoryTestSupport {
     Patient patient = new Patient();
     patient.setInstitutionPatientId("UCSF-12345");
     patient.setAccountNumber("12345");
-    patient.setName(
-        new Name() {
+    patient.setNames(Arrays.asList(new HumanName() {
+      {
+        setFirstName("pat1firstname");
+        setMiddleName("pat1middlename");
+        setFamily(Arrays.asList("pat1lastname"));
+      }
+    }));
+    patient.setCommunication(new PatientCommunication() {
+      {
+        setPreferred(true);
+        setLanguage(new CodeableConcept() {
           {
-            setFirst("pat1firstname");
-            setMiddle("pat1middlename");
-            setLast("pat1lastname");
+            setCodings(Arrays.asList("English"));
+            setText("English");
           }
         });
-    patient.setLangs(Arrays.asList(LanguageCode.en));
+      }
+    });
     patient.setGender(Gender.MALE);
     patient.setBirthDate(LocalDate.now());
     patient.setMaritalStatus(MaritalStatus.MARRIED);
@@ -72,11 +81,11 @@ public class ObservationRepositoryTest extends RepositoryTestSupport {
 
   private Observation createObservation(String code, String value) {
     ObservationValue observationValue = new ObservationValue();
-    observationValue.setText(value);
+    observationValue.setString(value);
 
     Observation observation = new Observation();
-    observation.setName(new CodeableConcept(code, code));
-    observation.setValues(observationValue);
+    observation.setName(new CodeableConcept(Arrays.asList(code), code));
+    observation.setValue(observationValue);
     observation.setIssued(Instant.now());
     return observation;
   }
@@ -98,7 +107,7 @@ public class ObservationRepositoryTest extends RepositoryTestSupport {
     List<Observation> observations = observationRepository.list(patient.getId(), encounter.getId());
     assertEquals(observations.size(), 2);
     for (Observation observation : observations) {
-      switch (observation.getName().getCode()) {
+      switch (observation.getName().getCodings().get(0)) {
         case NUMERICAL_PAIN_LEVEL_LOW:
           assertEquals(observation, observation1);
           break;

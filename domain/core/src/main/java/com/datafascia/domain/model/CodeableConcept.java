@@ -6,6 +6,7 @@ import com.datafascia.common.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -19,9 +20,9 @@ import lombok.ToString;
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "CodeableConcept")
 public class CodeableConcept {
-  /** Coding Code defined by a terminology system.*/
-  @JsonProperty("code")
-  private String code;
+  /** Code defined by a terminology system.*/
+  @JsonProperty("codings")
+  private List<String> codings;
 
   /** Plain text representation of the concept.*/
   @JsonProperty("text")

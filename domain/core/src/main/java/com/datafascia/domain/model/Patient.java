@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.neovisionaries.i18n.LanguageCode;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import lombok.EqualsAndHashCode;
@@ -38,18 +38,6 @@ public class Patient extends Person {
   @JsonProperty("institutionPatientId")
   private String institutionPatientId;
 
-  /** Account number from HL7 field PID-18.*/
-  private String accountNumber;
-
- /** A list of contacts associated with the patient.*/
-  @JsonProperty("contacts")
-  private List<RelatedPerson> contactDetails;
-
-  /** Date and time the patient was entered into the system.*/
-  @JsonProperty("creationDate") @JsonSerialize(using = InstantSerializer.class)
-  @JsonDeserialize(using = InstantDeserializer.class)
-  private Instant creationDate;
-
   /** Indicates if the individual is deceased or not.*/
   @JsonProperty("deceased")
   private boolean deceased;
@@ -58,27 +46,47 @@ public class Patient extends Person {
   @JsonProperty("maritalStatus")
   private MaritalStatus maritalStatus;
 
-  /** The patient's race.*/
-  @JsonProperty("race")
-  private Race race;
+  /** Whether patient is part of a multiple birth.*/
+  @JsonProperty("multipleBirthBoolean")
+  private boolean multipleBirthBoolean;
 
-  /** Languages which may be used to communicate with the patient about his or her health.*/
-  @JsonProperty("languages")
-  private List<LanguageCode> langs;
+  /** If patient is part of a multiple birth, how many were born?*/
+  @JsonProperty("multipleBirthInteger")
+  private BigDecimal multipleBirthInteger;
 
-  /** Patient's nominated care provider.*/
-  @JsonProperty("careProvider")
-  private List<Caregiver> careProvider;
+  /** One or more contact party (guardian/partner/friend/etc.) for the patient.*/
+  @JsonProperty("contacts")
+  private List<PatientContact> contacts;
 
-  /** Organization that is the custodian of the patient record.*/
-  @JsonProperty("managingOrganization")
-  private String managingOrg;
+  /** If this patient is a non-human animal, animal-specific details about the patient.*/
+  @JsonProperty("animal")
+  private PatientAnimal animal;
 
-  /** last encounter for the patient */
+  /** A language the Patient speaks. FHIR has this as a list. */
+  @JsonProperty("communication")
+  private PatientCommunication communication;
+
+  /** Patient's nominated care providers.*/
+  @JsonProperty("careProviders")
+  private List<PatientCareProvider> careProviders;
+
+  /** Link to another Patient. Element "link" in FHIR.*/
+  @JsonProperty("patientLinks")
+  private List<PatientLink> patientLinks;
+
+  /** Last encounter for the patient. Not in the FHIR Patient Model.*/
   @JsonProperty("lastEncounterId")
   private Id<Encounter> lastEncounterId;
 
-  /** Whether this patient record is in active use.*/
-  @JsonProperty("active")
-  private boolean active;
+  /** The patient's race. Not in the FHIR Patient Model.*/
+  @JsonProperty("race")
+  private Race race;
+
+  /** Account number from HL7 field PID-18. Not in the FHIR Patient Model.*/
+  private String accountNumber;
+
+  /** Date and time the patient was entered into the system. Not in the FHIR Patient model.*/
+  @JsonProperty("creationDate") @JsonSerialize(using = InstantSerializer.class)
+  @JsonDeserialize(using = InstantDeserializer.class)
+  private Instant creationDate;
 }

@@ -15,8 +15,6 @@ import com.datafascia.api.services.ApiIT;
 import com.datafascia.common.accumulo.AccumuloConfiguration;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
-import com.google.common.io.Resources;
-import java.io.File;
 import java.io.FileInputStream;
 import java.security.KeyStore;
 import java.time.Duration;
@@ -50,9 +48,9 @@ import static org.testng.Assert.assertTrue;
  */
 @Slf4j
 public class UcsfMedicationTopologyIT {
-  private static final String trustStorePath = toPath("client.jks");
+  private static final String trustStorePath = "/tmp/datafascia-test/client.jks";
   private static final String trustStorePassword = "secret";
-  private static final String keyStorePath = toPath("server.jks");
+  private static final String keyStorePath = "/tmp/datafascia-test/server.jks";
   private static final String keyStorePassword = "secret";
 
   public WireMockServer wireMockServer;
@@ -153,14 +151,6 @@ public class UcsfMedicationTopologyIT {
     HttpResponse response = httpClient.execute(new HttpGet(url));
     String content = EntityUtils.toString(response.getEntity());
     return content;
-  }
-
-  private static String toPath(String resourcePath) {
-    try {
-      return new File(Resources.getResource(resourcePath).toURI()).getCanonicalPath();
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
   }
 
   @AfterClass

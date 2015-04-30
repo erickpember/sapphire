@@ -37,7 +37,7 @@
     <unitsofmeasure.version>0.7.1</unitsofmeasure.version>
     <dropwizard.version>0.8.0</dropwizard.version>
     <guava.version>18.0</guava.version>
-    <guice.version>3.0</guice.version>
+    <guice.version>4.0</guice.version>
     <hadoop.version>2.2.0</hadoop.version>
     <hapi.version>2.2</hapi.version>
     <jackson.version>2.5.1</jackson.version>

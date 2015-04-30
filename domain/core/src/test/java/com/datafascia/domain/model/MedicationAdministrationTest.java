@@ -3,27 +3,23 @@
 package com.datafascia.domain.model;
 
 import com.datafascia.common.persist.Id;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 /**
- * Test code for medicationAdministration model.
+ * {@link MedicationAdministration} test
  */
 public class MedicationAdministrationTest extends ModelTestBase {
-  @Test
-  public <T extends Object> void testMedicationAdministration()
-      throws IOException, URISyntaxException {
-    MedicationAdministration decoded
-        = (MedicationAdministration) geneticEncodeDecodeTest(
-            TestModels.medicationAdministration);
 
-    assertTrue(decoded.getWasNotGiven());
+  @Test
+  public void testMedicationAdministration() throws Exception {
+    MedicationAdministration decoded = (MedicationAdministration) geneticEncodeDecodeTest(
+        TestModels.medicationAdministration);
+
+    assertEquals(decoded.getWasNotGiven(), Boolean.TRUE);
     assertEquals(decoded.getDeviceId(), Id.of("device"));
     assertEquals(decoded.getEncounterId(), Id.of("encounter"));
     assertEquals(decoded.getId(), Id.of("id"));
@@ -31,7 +27,7 @@ public class MedicationAdministrationTest extends ModelTestBase {
     assertEquals(decoded.getPrescriptionId(), Id.of("prescription"));
     assertEquals(decoded.getPatientId(), Id.of("patient"));
     assertEquals(decoded.getPractitionerId(), Id.of("practitioner"));
-    assertEquals(decoded.getEffectiveTime(), TestModels.period);
+    assertEquals(decoded.getEffectiveTimePeriod(), TestModels.period);
     assertEquals(decoded.getReasonsGiven(), Arrays.asList(TestModels.codeable));
     assertEquals(decoded.getReasonsNotGiven(), Arrays.asList(TestModels.codeable));
     assertEquals(decoded.getDosage(), TestModels.medicationAdministrationDosage);
@@ -39,20 +35,19 @@ public class MedicationAdministrationTest extends ModelTestBase {
   }
 
   @Test
-  public void testJsonProperties() throws IOException {
+  public void testJsonProperties() throws Exception {
     ArrayList<String> jsonProperties = new ArrayList<>();
     jsonProperties.add("deviceId");
     jsonProperties.add("dosage");
-    jsonProperties.add("effectiveTime");
+    jsonProperties.add("effectiveTimePeriod");
     jsonProperties.add("encounterId");
     jsonProperties.add("@id");
     jsonProperties.add("medicationId");
     jsonProperties.add("patientId");
     jsonProperties.add("practitionerId");
-    jsonProperties.add("prescription");
     jsonProperties.add("prescriptionId");
     jsonProperties.add("reasonsNotGiven");
-    jsonProperties.add("reasonsNotGiven");
+    jsonProperties.add("reasonsGiven");
     jsonProperties.add("status");
 
     geneticJsonContainsFieldsTest(TestModels.medicationAdministration, jsonProperties);

@@ -615,7 +615,7 @@ public class TestModels {
           setPrescriptionId(Id.of("prescription"));
           setPatientId(Id.of("patient"));
           setPractitionerId(Id.of("practitioner"));
-          setEffectiveTime(period);
+          setEffectiveTimePeriod(period);
           setReasonsGiven(Arrays.asList(codeable));
           setReasonsNotGiven(Arrays.asList(codeable));
           setDosage(medicationAdministrationDosage);

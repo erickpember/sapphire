@@ -58,8 +58,8 @@ public class MedicationAdministration {
   private List<CodeableConcept> reasonsGiven;
 
   /** Start and end time of administration. */
-  @JsonProperty("effectiveTime")
-  private Interval<Instant> effectiveTime;
+  @JsonProperty("effectiveTimePeriod")
+  private Interval<Instant> effectiveTimePeriod;
 
   /** What was administered? */
   @JsonProperty("medicationId")

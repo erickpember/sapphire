@@ -228,6 +228,7 @@ public class ApiIT {
         setId(Id.of("urn:df-patientId-1:96087004"));
         setInstitutionPatientId("urn:df-institution-patientId-1:UCSF::96087004");
         setLastEncounterId(Id.of("UCSF |  | 039ae46a-20a1-4bcd-abb9-68e38d4222c0"));
+        setAccountNumber("AccountNumber1");
       }
     }
     );
@@ -251,6 +252,7 @@ public class ApiIT {
         setId(Id.of("urn:df-patientId-1:96087039"));
         setInstitutionPatientId("urn:df-institution-patientId-1:UCSF::96087039");
         setLastEncounterId(Id.of("UCSF |  | 0728eb62-2f16-484f-8628-a320e99c635d"));
+        setAccountNumber("AccountNumber2");
       }
     }
     );
@@ -273,6 +275,7 @@ public class ApiIT {
         setBirthDate(LocalDate.parse("1954-10-29T05:00:00Z", dateFormat));
         setId(Id.of("urn:df-patientId-1:96087047"));
         setInstitutionPatientId("urn:df-institution-patientId-1:UCSF:SICU:96087047");
+        setAccountNumber("AccountNumber3");
       }
     }
     );
@@ -295,6 +298,7 @@ public class ApiIT {
         setBirthDate(LocalDate.parse("1996-07-29T04:00:00Z", dateFormat));
         setId(Id.of("urn:df-patientId-1:96087055"));
         setInstitutionPatientId("urn:df-institution-patientId-1:UCSF::96087055");
+        setAccountNumber("AccountNumber4");
       }
     }
     );
@@ -317,6 +321,7 @@ public class ApiIT {
         setBirthDate(LocalDate.parse("1977-10-29T04:00:00Z", dateFormat));
         setId(Id.of("urn:df-patientId-1:96087063"));
         setInstitutionPatientId("urn:df-institution-patientId-1:UCSF::96087063");
+        setAccountNumber("AccountNumber5");
       }
     }
     );
@@ -339,6 +344,7 @@ public class ApiIT {
         setBirthDate(LocalDate.parse("1999-02-20T05:00:00Z", dateFormat));
         setId(Id.of("urn:df-patientId-1:97534012"));
         setInstitutionPatientId("urn:df-institution-patientId-1:UCSF:SICU:97534012");
+        setAccountNumber("AccountNumber6");
       }
     }
     );

@@ -36,6 +36,11 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
+      <artifactId>df-emerge-csv</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
       <artifactId>df-etl-web-services-ingest</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -87,6 +92,12 @@
       <groupId>com.github.tomakehurst</groupId>
       <artifactId>wiremock</artifactId>
       <version>1.55</version>
+    </dependency>
+
+    <dependency>
+      <groupId>net.sf.opencsv</groupId>
+      <artifactId>opencsv</artifactId>
+      <version>2.3</version>
     </dependency>
 
     <dependency>

@@ -4,10 +4,9 @@ package com.datafascia.etl.web;
 
 import backtype.storm.spout.SpoutOutputCollector;
 import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.base.BaseRichSpout;
-import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Values;
+import backtype.storm.utils.Utils;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -24,11 +23,6 @@ public abstract class AbstractWebSpout extends BaseRichSpout {
   private Instant nextPoll;
 
   @Override
-  public void declareOutputFields(OutputFieldsDeclarer declarer) {
-    declarer.declare(new Fields(getFields()));
-  }
-
-  @Override
   public void open(Map conf, TopologyContext context, SpoutOutputCollector collector) {
     this.collector = collector;
   }
@@ -42,11 +36,6 @@ public abstract class AbstractWebSpout extends BaseRichSpout {
    * @return A list of web call responses to pass to the topology.
    */
   abstract protected List<String> getResponses();
-
-  /**
-   * @return A list of fields to spout.
-   */
-  abstract List<String> getFields();
 
   @Override
   public void nextTuple() {
@@ -63,14 +52,10 @@ public abstract class AbstractWebSpout extends BaseRichSpout {
       }
     } else {
       /*
-       * Waiting a millisecond when called with no tuples to emit, as per recommendation in ISpout
-       * documentation.
+       * Sleep a millisecond when called with no tuples to emit, as recommended
+       * in ISpout documentation.
        */
-      try {
-        Thread.sleep(1);
-      } catch (InterruptedException e) {
-        log.error("Error waiting in nextTuple.", e);
-      }
+      Utils.sleep(1);
     }
   }
 }

@@ -2,6 +2,8 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.web;
 
+import backtype.storm.topology.OutputFieldsDeclarer;
+import backtype.storm.tuple.Fields;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.web.RestUtils;
 import com.datafascia.domain.model.Patient;
@@ -16,7 +18,6 @@ import java.security.cert.CertificateException;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * A spout for UCSF medication data.
- *
+ * <p>
  * It queries the UCSF medication service patient-by-patient for latest medication data and emits to
  * the topology. The service it connects to is a REST service from which a JSON response is
  * expected. The patient list and their associated visits are pulled from the PatientRepository.
@@ -36,7 +37,7 @@ import lombok.extern.slf4j.Slf4j;
 public class UcsfMedicationSpout extends AbstractWebSpout {
 
   public static final String ID = UcsfMedicationSpout.class.getSimpleName();
-  public static final String medJsonField = "medJson";
+  public static final String MEDICATION_JSON_FIELD = "medicationJson";
 
   @Inject
   private transient PatientRepository patientRepository;
@@ -57,8 +58,8 @@ public class UcsfMedicationSpout extends AbstractWebSpout {
   }
 
   @Override
-  protected List<String> getFields() {
-    return Arrays.asList(medJsonField);
+  public void declareOutputFields(OutputFieldsDeclarer declarer) {
+    declarer.declare(new Fields(MEDICATION_JSON_FIELD));
   }
 
   @Override

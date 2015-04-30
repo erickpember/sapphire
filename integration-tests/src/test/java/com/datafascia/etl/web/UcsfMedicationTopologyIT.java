@@ -6,12 +6,11 @@ import backtype.storm.Config;
 import backtype.storm.ILocalCluster;
 import backtype.storm.Testing;
 import backtype.storm.generated.StormTopology;
-import backtype.storm.task.OutputCollector;
-import backtype.storm.task.TopologyContext;
 import backtype.storm.testing.TestJob;
+import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.topology.TopologyBuilder;
-import backtype.storm.topology.base.BaseRichBolt;
+import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.tuple.Tuple;
 import com.datafascia.common.accumulo.AccumuloConfiguration;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
@@ -32,9 +31,9 @@ import java.io.FileInputStream;
 import java.security.KeyStore;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Map;
+import java.util.List;
+import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicBoolean;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import javax.net.ssl.SSLContext;
@@ -154,6 +153,14 @@ public class UcsfMedicationTopologyIT {
         "https://localhost:" + port + "/medication", Duration.ofMinutes(5));
 
     submitTopology(spout, new TestBolt());
+
+    assertEquals(
+        TestBolt.receivedTuples.getFirst().toString(),
+        "[{\"patient:\":\"urn:df-patientId-1:urn%3Adf-institution-patientId-1%3AUCSF%3A%3A96087" +
+            "004\",\"encounter\":\"UCSF |  | 039ae46a-20a1-4bcd-abb9-68e38d4222c0\",\"medicatio" +
+            "ns\":[{\"test\":\"test\"}]}, {\"patient:\":\"urn:df-patientId-1:urn%3Adf-instituti" +
+            "on-patientId-1%3AUCSF%3A%3A96087039\",\"encounter\":\"UCSF |  | 0728eb62-2f16-484f" +
+            "-8628-a320e99c635d\",\"medications\":[{\"test\":\"test\"}]}]");
   }
 
   public static void submitTopology(UcsfMedicationSpout spout, TestBolt testBolt) throws Exception {
@@ -175,7 +182,7 @@ public class UcsfMedicationTopologyIT {
             UcsfMedicationTopologyIT.class.getSimpleName(), config, topology);
 
         Instant start = Instant.now();
-        while (!TestBolt.tuplesReceived.get()) {
+        while (TestBolt.receivedTuples.isEmpty()) {
           if (Instant.now().minusMillis(10000).isAfter(start)) {
             fail("Test bolt failed to receive tuples within ten seconds.");
           }
@@ -233,26 +240,19 @@ public class UcsfMedicationTopologyIT {
   /**
    * A test bolt to ensure reception of the tuples.
    */
-  public static class TestBolt extends BaseRichBolt {
-    public static AtomicBoolean tuplesReceived = new AtomicBoolean(false);
-
-    @Override
-    public void prepare(Map stormConf, TopologyContext context, OutputCollector collector) {
-    }
-
-    @Override
-    public void execute(Tuple input) {
-      tuplesReceived.set(true);
-      assertEquals(input.getValues().get(0).toString(),
-          "[{\"patient:\":\"urn:df-patientId-1:urn%3Adf-institution-patientId-1%3AUCSF%3A%3A96087" +
-              "004\",\"encounter\":\"UCSF |  | 039ae46a-20a1-4bcd-abb9-68e38d4222c0\",\"medicatio" +
-              "ns\":[{\"test\":\"test\"}]}, {\"patient:\":\"urn:df-patientId-1:urn%3Adf-instituti" +
-              "on-patientId-1%3AUCSF%3A%3A96087039\",\"encounter\":\"UCSF |  | 0728eb62-2f16-484f" +
-              "-8628-a320e99c635d\",\"medications\":[{\"test\":\"test\"}]}]");
-    }
+  public static class TestBolt extends BaseBasicBolt {
+    public static ConcurrentLinkedDeque<List<String>> receivedTuples =
+        new ConcurrentLinkedDeque<>();
 
     @Override
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
+    }
+
+    @Override
+    public void execute(Tuple input, BasicOutputCollector collector) {
+      List<String> responses =
+          (List<String>) input.getValueByField(UcsfMedicationSpout.MEDICATION_JSON_FIELD);
+      receivedTuples.add(responses);
     }
   }
 }

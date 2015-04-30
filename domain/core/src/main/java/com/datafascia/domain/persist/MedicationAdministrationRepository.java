@@ -5,14 +5,29 @@ package com.datafascia.domain.persist;
 import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.accumulo.MutationBuilder;
 import com.datafascia.common.accumulo.MutationSetter;
+import com.datafascia.common.accumulo.RowMapper;
 import com.datafascia.common.persist.Id;
+import com.datafascia.common.time.Interval;
+import com.datafascia.domain.model.CodeableConcept;
 import com.datafascia.domain.model.Encounter;
 import com.datafascia.domain.model.MedicationAdministration;
 import com.datafascia.domain.model.MedicationAdministrationDosage;
+import com.datafascia.domain.model.MedicationAdministrationStatus;
+import com.datafascia.domain.model.NumericQuantity;
 import com.datafascia.domain.model.Patient;
+import com.datafascia.domain.model.Ratio;
+import com.fasterxml.jackson.core.type.TypeReference;
+import java.time.Instant;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.accumulo.core.client.Scanner;
+import org.apache.accumulo.core.data.Key;
+import org.apache.accumulo.core.data.Range;
+import org.apache.accumulo.core.data.Value;
+import org.apache.hadoop.io.Text;
 
 /**
  * Medication administration data access.
@@ -48,6 +63,114 @@ public class MedicationAdministrationRepository extends BaseRepository {
   private static final String DOSAGE_RATE_NUMERATOR_UNITS = "dosage.rate.numerator.units";
   private static final String DOSAGE_RATE_DENOMINATOR_VALUE = "dosage.rate.denominator.value";
   private static final String DOSAGE_RATE_DENOMINATOR_UNITS = "dosage.rate.denominator.units";
+
+  private static final MedicationAdministrationRowMapper MEDICATION_ADMINISTRATION_ROW_MAPPER =
+      new MedicationAdministrationRowMapper();
+  private static final TypeReference<List<CodeableConcept>> CODEABLE_CONCEPT_LIST_TYPE =
+      new TypeReference<List<CodeableConcept>>() { };
+
+  private static class MedicationAdministrationRowMapper
+      implements RowMapper<MedicationAdministration> {
+
+    private Interval<Instant> effectiveTimePeriod;
+    private MedicationAdministrationDosage dosage;
+    private MedicationAdministration administration;
+
+    @Override
+    public void onBeginRow(Key key) {
+      administration = new MedicationAdministration();
+      administration.setId(Id.of(extractEntityId(key)));
+
+      effectiveTimePeriod = new Interval<>();
+      administration.setEffectiveTimePeriod(effectiveTimePeriod);
+
+      dosage = new MedicationAdministrationDosage();
+      dosage.setQuantity(new NumericQuantity());
+      dosage.setRate(new Ratio(new NumericQuantity(), new NumericQuantity()));
+      administration.setDosage(dosage);
+    }
+
+    @Override
+    public void onReadEntry(Map.Entry<Key, Value> entry) {
+      byte[] value = entry.getValue().get();
+      switch (entry.getKey().getColumnQualifier().toString()) {
+        case STATUS:
+          administration.setStatus(MedicationAdministrationStatus.valueOf(decodeString(value)));
+          break;
+        case PATIENT_ID:
+          administration.setPatientId(Id.of(decodeString(value)));
+          break;
+        case PRACTITIONER_ID:
+          administration.setPractitionerId(Id.of(decodeString(value)));
+          break;
+        case ENCOUNTER_ID:
+          administration.setEncounterId(Id.of(decodeString(value)));
+          break;
+        case PRESCRIPTION_ID:
+          administration.setPrescriptionId(Id.of(decodeString(value)));
+          break;
+        case WAS_NOT_GIVEN:
+          administration.setWasNotGiven(decodeBoolean(value));
+          break;
+        case REASONS_NOT_GIVEN:
+          administration.setReasonsNotGiven(decode(value, CODEABLE_CONCEPT_LIST_TYPE));
+          break;
+        case REASONS_GIVEN:
+          administration.setReasonsGiven(decode(value, CODEABLE_CONCEPT_LIST_TYPE));
+          break;
+        case EFFECTIVE_TIME_PERIOD_START:
+          effectiveTimePeriod.setStartInclusive(decodeInstant(value));
+          break;
+        case EFFECTIVE_TIME_PERIOD_END:
+          effectiveTimePeriod.setEndExclusive(decodeInstant(value));
+          break;
+        case MEDICATION_ID:
+          administration.setMedicationId(Id.of(decodeString(value)));
+          break;
+        case DEVICE_ID:
+          administration.setDeviceId(Id.of(decodeString(value)));
+          break;
+        case DOSAGE_TEXT:
+          dosage.setText(decodeString(value));
+          break;
+        case DOSAGE_SITE_CODING_CODE:
+          String siteCode = decodeString(value);
+          dosage.setSite(new CodeableConcept(siteCode, siteCode));
+          break;
+        case DOSAGE_ROUTE_CODING_CODE:
+          String routeCode = decodeString(value);
+          dosage.setRoute(new CodeableConcept(routeCode, routeCode));
+          break;
+        case DOSAGE_METHOD_CODING_CODE:
+          String methodCode = decodeString(value);
+          dosage.setMethod(new CodeableConcept(methodCode, methodCode));
+          break;
+        case DOSAGE_QUANTITY_VALUE:
+          dosage.getQuantity().setValue(decodeBigDecimal(value));
+          break;
+        case DOSAGE_QUANTITY_UNITS:
+          dosage.getQuantity().setUnit(decodeUnit(value));
+          break;
+        case DOSAGE_RATE_NUMERATOR_VALUE:
+          dosage.getRate().getNumerator().setValue(decodeBigDecimal(value));
+          break;
+        case DOSAGE_RATE_NUMERATOR_UNITS:
+          dosage.getRate().getNumerator().setUnit(decodeUnit(value));
+          break;
+        case DOSAGE_RATE_DENOMINATOR_VALUE:
+          dosage.getRate().getDenominator().setValue(decodeBigDecimal(value));
+          break;
+        case DOSAGE_RATE_DENOMINATOR_UNITS:
+          dosage.getRate().getDenominator().setUnit(decodeUnit(value));
+          break;
+      }
+    }
+
+    @Override
+    public MedicationAdministration onEndRow() {
+      return administration;
+    }
+  }
 
   /**
    * Constructor
@@ -128,5 +251,22 @@ public class MedicationAdministrationRepository extends BaseRepository {
             }
           }
         });
+  }
+
+  /**
+   * Finds medication administrations for an encounter.
+   *
+   * @param patientId
+   *     parent entity ID
+   * @param encounterId
+   *     encounter ID
+   * @return medication administrations
+   */
+  public List<MedicationAdministration> list(Id<Patient> patientId, Id<Encounter> encounterId) {
+    Scanner scanner = accumuloTemplate.createScanner(Tables.PATIENT);
+    scanner.setRange(Range.prefix(EncounterRepository.toRowId(patientId, encounterId)));
+    scanner.fetchColumnFamily(new Text(COLUMN_FAMILY));
+
+    return accumuloTemplate.queryForList(scanner, MEDICATION_ADMINISTRATION_ROW_MAPPER);
   }
 }

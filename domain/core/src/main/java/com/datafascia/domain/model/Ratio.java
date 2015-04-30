@@ -6,17 +6,15 @@ import com.datafascia.common.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * A relationship of two Quantity values - expressed as a numerator and a denominator.
  */
-@Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode @ToString
+@AllArgsConstructor @Data @Slf4j @NoArgsConstructor
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "Ratio")
 public class Ratio {

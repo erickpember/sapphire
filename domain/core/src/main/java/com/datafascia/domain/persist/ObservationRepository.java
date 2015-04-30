@@ -12,7 +12,6 @@ import com.datafascia.domain.model.Encounter;
 import com.datafascia.domain.model.Observation;
 import com.datafascia.domain.model.ObservationValue;
 import com.datafascia.domain.model.Patient;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -53,18 +52,19 @@ public class ObservationRepository extends BaseRepository {
 
     @Override
     public void onReadEntry(Map.Entry<Key, Value> entry) {
-      String value = entry.getValue().toString();
+      byte[] value = entry.getValue().get();
       switch (entry.getKey().getColumnQualifier().toString()) {
         case CODE:
-          observation.setName(new CodeableConcept(value, value));
+          String code = decodeString(value);
+          observation.setName(new CodeableConcept(code, code));
           break;
         case VALUE_STRING:
           ObservationValue observationValue = new ObservationValue();
-          observationValue.setText(value);
+          observationValue.setText(decodeString(value));
           observation.setValues(observationValue);
           break;
         case ISSUED:
-          observation.setIssued(Instant.parse(value));
+          observation.setIssued(decodeInstant(value));
           break;
       }
     }

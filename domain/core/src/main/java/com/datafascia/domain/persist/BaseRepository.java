@@ -5,17 +5,18 @@ package com.datafascia.domain.persist;
 import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.jackson.DFObjectMapper;
 import com.datafascia.common.persist.Id;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.math.BigDecimal;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
+import javax.measure.Unit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.data.Key;
 
@@ -82,39 +83,103 @@ public abstract class BaseRepository {
   }
 
   /**
-   * Converts LocalDate to database representation.
+   * Converts value from database representation to specified Java type.
    *
-   * @param value
+   * @param json
+   *     to convert
+   * @param typeReference
+   *     type reference
+   * @param <T>
+   *     target Java type
+   * @return converted value
+   */
+  protected static <T> T decode(byte[] json, TypeReference<T> typeReference) {
+    try {
+      return OBJECT_MAPPER.readValue(json, typeReference);
+    } catch (IOException e) {
+      String jsonString = new String(json, StandardCharsets.UTF_8);
+      throw new IllegalStateException(
+          "Cannot convert JSON " + jsonString + " to type " + typeReference, e);
+    }
+  }
+
+  /**
+   * Converts value from database representation to BigDecimal.
+   *
+   * @param json
    *     to convert
    * @return converted value
    */
-  protected static String encode(LocalDate value) {
-    return DateTimeFormatter.BASIC_ISO_DATE.format(value);
+  protected static BigDecimal decodeBigDecimal(byte[] json) {
+    try {
+      return OBJECT_MAPPER.readValue(json, BigDecimal.class);
+    } catch (IOException e) {
+      String jsonString = new String(json, StandardCharsets.UTF_8);
+      throw new IllegalStateException("Cannot convert JSON " + jsonString, e);
+    }
+  }
+
+  /**
+   * Converts value from database representation to boolean.
+   *
+   * @param json
+   *     to convert
+   * @return converted value
+   */
+  protected static boolean decodeBoolean(byte[] json) {
+    try {
+      return OBJECT_MAPPER.readValue(json, Boolean.class);
+    } catch (IOException e) {
+      String jsonString = new String(json, StandardCharsets.UTF_8);
+      throw new IllegalStateException("Cannot convert JSON " + jsonString, e);
+    }
+  }
+
+  /**
+   * Converts value from database representation to Instant.
+   *
+   * @param json
+   *     to convert
+   * @return converted value
+   */
+  protected static Instant decodeInstant(byte[] json) {
+    try {
+      return OBJECT_MAPPER.readValue(json, Instant.class);
+    } catch (IOException e) {
+      String jsonString = new String(json, StandardCharsets.UTF_8);
+      throw new IllegalStateException("Cannot convert JSON " + jsonString, e);
+    }
   }
 
   /**
    * Converts value from database representation to LocalDate.
    *
-   * @param value
+   * @param json
    *     to convert
    * @return converted value
    */
-  protected static LocalDate decodeLocalDate(String value) {
-    return LocalDate.parse(value, DateTimeFormatter.BASIC_ISO_DATE);
+  protected static LocalDate decodeLocalDate(byte[] json) {
+    try {
+      return OBJECT_MAPPER.readValue(json, LocalDate.class);
+    } catch (IOException e) {
+      String jsonString = new String(json, StandardCharsets.UTF_8);
+      throw new IllegalStateException("Cannot convert JSON " + jsonString, e);
+    }
   }
 
   /**
-   * Converts String list to database representation.
+   * Converts value from database representation to String.
    *
-   * @param value
+   * @param json
    *     to convert
    * @return converted value
    */
-  protected static String encode(List<String> value) {
+  protected static String decodeString(byte[] json) {
     try {
-      return OBJECT_MAPPER.writeValueAsString(value);
-    } catch (JsonProcessingException e) {
-      throw new IllegalStateException(String.format("Cannot convert %s to JSON", value), e);
+      return OBJECT_MAPPER.readValue(json, String.class);
+    } catch (IOException e) {
+      String jsonString = new String(json, StandardCharsets.UTF_8);
+      throw new IllegalStateException("Cannot convert JSON " + jsonString, e);
     }
   }
 
@@ -125,11 +190,28 @@ public abstract class BaseRepository {
    *     to convert
    * @return converted value
    */
-  protected static List<String> decodeStringList(String json) {
+  protected static List<String> decodeStringList(byte[] json) {
     try {
       return OBJECT_MAPPER.readValue(json, STRING_LIST_TYPE_REFERENCE);
     } catch (IOException e) {
-      throw new IllegalStateException(String.format("Cannot convert JSON [%s]", json), e);
+      String jsonString = new String(json, StandardCharsets.UTF_8);
+      throw new IllegalStateException("Cannot convert JSON " + jsonString, e);
+    }
+  }
+
+  /**
+   * Converts value from database representation to Unit.
+   *
+   * @param json
+   *     to convert
+   * @return converted value
+   */
+  protected static Unit decodeUnit(byte[] json) {
+    try {
+      return OBJECT_MAPPER.readValue(json, Unit.class);
+    } catch (IOException e) {
+      String jsonString = new String(json, StandardCharsets.UTF_8);
+      throw new IllegalStateException("Cannot convert JSON " + jsonString, e);
     }
   }
 }

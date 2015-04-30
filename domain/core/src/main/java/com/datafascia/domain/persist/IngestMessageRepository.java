@@ -8,7 +8,6 @@ import com.datafascia.common.persist.Id;
 import com.datafascia.domain.model.IngestMessage;
 import java.net.URI;
 import java.nio.ByteBuffer;
-import java.time.Instant;
 import java.util.Map;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -64,28 +63,28 @@ public class IngestMessageRepository extends BaseRepository {
 
     @Override
     public void onReadEntry(Map.Entry<Key, Value> entry) {
-      String value = entry.getValue().toString();
+      byte[] value = entry.getValue().get();
       switch (entry.getKey().getColumnQualifier().toString()) {
         case TIMESTAMP:
-          message.setTimestamp(Instant.parse(value));
+          message.setTimestamp(decodeInstant(value));
           break;
         case INSTITUTION:
-          message.setInstitution(URI.create(value));
+          message.setInstitution(URI.create(decodeString(value)));
           break;
         case FACILITY:
-          message.setFacility(URI.create(value));
+          message.setFacility(URI.create(decodeString(value)));
           break;
         case DEPARTMENT:
-          message.setDepartment(URI.create(value));
+          message.setDepartment(URI.create(decodeString(value)));
           break;
         case SOURCE:
-          message.setSource(URI.create(value));
+          message.setSource(URI.create(decodeString(value)));
           break;
         case PAYLOAD_TYPE:
-          message.setPayloadType(URI.create(value));
+          message.setPayloadType(URI.create(decodeString(value)));
           break;
         case PAYLOAD:
-          message.setPayload(ByteBuffer.wrap(entry.getValue().get()));
+          message.setPayload(ByteBuffer.wrap(value));
           break;
       }
     }

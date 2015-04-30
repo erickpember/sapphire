@@ -10,7 +10,6 @@ import com.datafascia.common.persist.Id;
 import com.datafascia.common.time.Interval;
 import com.datafascia.domain.model.Encounter;
 import com.datafascia.domain.model.Patient;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -103,16 +102,16 @@ public class EncounterRepository extends BaseRepository {
 
     @Override
     public void onReadEntry(Map.Entry<Key, Value> entry) {
-      String value = entry.getValue().toString();
+      byte[] value = entry.getValue().get();
       switch (entry.getKey().getColumnQualifier().toString()) {
         case IDENTIFIER:
-          encounter.setIdentifier(value);
+          encounter.setIdentifier(decodeString(value));
           break;
         case PERIOD_START:
-          encounter.getPeriod().setStartInclusive(Instant.parse(value));
+          encounter.getPeriod().setStartInclusive(decodeInstant(value));
           break;
         case PERIOD_END:
-          encounter.getPeriod().setEndExclusive(Instant.parse(value));
+          encounter.getPeriod().setEndExclusive(decodeInstant(value));
           break;
       }
     }

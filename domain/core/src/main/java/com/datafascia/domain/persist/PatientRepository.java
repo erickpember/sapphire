@@ -110,12 +110,12 @@ public class PatientRepository extends BaseRepository {
                 .put(MIDDLE_NAME, patient.getName().getMiddle())
                 .put(LAST_NAME, patient.getName().getLast())
                 .put(GENDER, patient.getGender().getCode())
-                .put(BIRTH_DATE, encode(patient.getBirthDate()))
+                .put(BIRTH_DATE, patient.getBirthDate())
                 .put(MARITAL_STATUS, patient.getMaritalStatus().getCode())
                 .put(RACE, patient.getRace().getCode())
-                .put(LANGUAGES, encode(patient.getLangs().stream()
+                .put(LANGUAGES, patient.getLangs().stream()
                     .map(LanguageCode::name)
-                    .collect(Collectors.toList())))
+                    .collect(Collectors.toList()))
                 .put(LAST_ENCOUNTER_ID, patient.getLastEncounterId())
                 .put(ACTIVE, String.valueOf(patient.isActive()));
           }
@@ -138,34 +138,35 @@ public class PatientRepository extends BaseRepository {
 
     @Override
     public void onReadEntry(Map.Entry<Key, Value> entry) {
-      String value = entry.getValue().toString();
+      byte[] value = entry.getValue().get();
       switch (entry.getKey().getColumnQualifier().toString()) {
         case INSTITUTION_PATIENT_ID:
-          patient.setInstitutionPatientId(value);
+          patient.setInstitutionPatientId(decodeString(value));
           break;
         case ACCOUNT_NUMBER:
-          patient.setAccountNumber(value);
+          patient.setAccountNumber(decodeString(value));
           break;
         case FIRST_NAME:
-          patient.getName().setFirst(value);
+          patient.getName().setFirst(decodeString(value));
           break;
         case MIDDLE_NAME:
-          patient.getName().setMiddle(value);
+          patient.getName().setMiddle(decodeString(value));
           break;
         case LAST_NAME:
-          patient.getName().setLast(value);
+          patient.getName().setLast(decodeString(value));
           break;
         case GENDER:
-          patient.setGender(Gender.of(value).orElse(Gender.UNKNOWN));
+          patient.setGender(Gender.of(decodeString(value)).orElse(Gender.UNKNOWN));
           break;
         case BIRTH_DATE:
           patient.setBirthDate(decodeLocalDate(value));
           break;
         case MARITAL_STATUS:
-          patient.setMaritalStatus(MaritalStatus.of(value).orElse(MaritalStatus.UNKNOWN));
+          patient.setMaritalStatus(
+              MaritalStatus.of(decodeString(value)).orElse(MaritalStatus.UNKNOWN));
           break;
         case RACE:
-          patient.setRace(Race.of(value).orElse(Race.UNKNOWN));
+          patient.setRace(Race.of(decodeString(value)).orElse(Race.UNKNOWN));
           break;
         case LANGUAGES:
           patient.setLangs(decodeStringList(value).stream()
@@ -173,10 +174,10 @@ public class PatientRepository extends BaseRepository {
               .collect(Collectors.toList()));
           break;
         case LAST_ENCOUNTER_ID:
-          patient.setLastEncounterId(Id.of(value));
+          patient.setLastEncounterId(Id.of(decodeString(value)));
           break;
         case ACTIVE:
-          patient.setActive(Boolean.parseBoolean(value));
+          patient.setActive(decodeBoolean(value));
           break;
       }
     }

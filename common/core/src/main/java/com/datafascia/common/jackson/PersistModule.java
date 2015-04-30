@@ -4,6 +4,7 @@ package com.datafascia.common.jackson;
 
 import com.datafascia.common.persist.Id;
 import com.fasterxml.jackson.databind.module.SimpleModule;
+import java.time.LocalDate;
 
 /**
  * Module adds serializer and deserializer for persist classes.
@@ -16,5 +17,7 @@ public class PersistModule extends SimpleModule {
   public PersistModule() {
     addSerializer(Id.class, new IdSerializer());
     addDeserializer(Id.class, new IdDeserializer());
+    addSerializer(LocalDate.class, new LocalDateSerializer());
+    addDeserializer(LocalDate.class, new LocalDateDeserializer());
   }
 }

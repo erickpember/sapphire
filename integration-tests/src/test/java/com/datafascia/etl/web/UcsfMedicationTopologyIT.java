@@ -21,7 +21,6 @@ import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
 import com.datafascia.common.inject.Injectors;
 import com.datafascia.common.storm.DependencyInjectingBaseRichSpoutProxy;
 import com.datafascia.domain.persist.PatientRepository;
-import com.datafascia.domain.persist.Tables;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.inject.AbstractModule;
@@ -138,11 +137,6 @@ public class UcsfMedicationTopologyIT {
     Injectors.getInjector().injectMembers(this);
 
     setupTls();
-  }
-
-  @AfterClass
-  public void afterClass() throws Exception {
-    connector.tableOperations().delete(Tables.PATIENT);
   }
 
   @Test

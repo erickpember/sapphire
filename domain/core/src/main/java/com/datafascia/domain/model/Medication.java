@@ -8,8 +8,11 @@ import com.datafascia.common.urn.annotations.IdNamespace;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import lombok.AccessLevel;
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 /**
  * This model represents an instance of medication not an Immunization.
@@ -31,8 +34,8 @@ public class Medication {
   private CodeableConcept code;
 
   /** True if a brand. */
-  @JsonProperty("brand")
-  private Boolean brand;
+  @JsonProperty("isBrand")
+  private Boolean isBrand;
 
   /** Manufacturer of the item. */
   @JsonProperty("manufacturerId")
@@ -47,6 +50,14 @@ public class Medication {
   private Product product;
 
   /** Details about the packaged medication. */
-  @JsonProperty("medicationPackage")
-  private MedicationPackage medicationPackage;
+  @Getter(AccessLevel.NONE) @JsonProperty("package") @Setter(AccessLevel.NONE)
+  private MedicationPackage package_;
+
+  public MedicationPackage getPackage() {
+    return package_;
+  }
+
+  public void setPackage(MedicationPackage aPackage) {
+    this.package_ = aPackage;
+  }
 }

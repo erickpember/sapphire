@@ -3,9 +3,8 @@
 package com.datafascia.domain.model;
 
 import com.datafascia.common.persist.Id;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -15,14 +14,15 @@ import static org.testng.Assert.assertFalse;
  * Test code for Medication model.
  */
 public class MedicationTest extends ModelTestBase {
+
   @Test
-  public <T extends Object> void testMedication() throws IOException, URISyntaxException {
+  public void testMedication() throws Exception {
     Medication decoded = (Medication) geneticEncodeDecodeTest(TestModels.medication);
 
-    assertFalse(decoded.getBrand());
+    assertFalse(decoded.getIsBrand());
     assertEquals(decoded.getCode(), TestModels.codeable);
     assertEquals(decoded.getId(), Id.of("id"));
-    assertEquals(decoded.getMedicationPackage(), TestModels.medicationPackage);
+    assertEquals(decoded.getPackage(), TestModels.medicationPackage);
     assertEquals(decoded.getManufacturerId(), Id.of("manufacturer"));
     assertEquals(decoded.getProduct(), TestModels.product);
     assertEquals(decoded.getKind(), "kind");
@@ -30,16 +30,16 @@ public class MedicationTest extends ModelTestBase {
   }
 
   @Test
-  public void testJsonProperties() throws IOException {
-    ArrayList<String> jsonProperties = new ArrayList<>();
-    jsonProperties.add("brand");
-    jsonProperties.add("code");
-    jsonProperties.add("@id");
-    jsonProperties.add("kind");
-    jsonProperties.add("manufacturerId");
-    jsonProperties.add("medicationPackage");
-    jsonProperties.add("name");
-    jsonProperties.add("product");
+  public void testJsonProperties() throws Exception {
+    List<String> jsonProperties = Arrays.asList(
+        "@id",
+        "code",
+        "isBrand",
+        "kind",
+        "manufacturerId",
+        "name",
+        "package",
+        "product");
 
     geneticJsonContainsFieldsTest(TestModels.medication, jsonProperties);
   }

@@ -492,10 +492,10 @@ public class TestModels {
 
   public static Medication medication = new Medication() {
     {
-      setBrand(false);
+      setIsBrand(false);
       setCode(codeable);
       setId(Id.of("id"));
-      setMedicationPackage(medicationPackage);
+      setPackage(medicationPackage);
       setManufacturerId(Id.of("manufacturer"));
       setProduct(product);
       setKind("kind");

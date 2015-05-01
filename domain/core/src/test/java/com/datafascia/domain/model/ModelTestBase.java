@@ -9,7 +9,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
+import java.util.List;
 import org.testng.annotations.BeforeSuite;
 
 import static org.testng.Assert.assertEquals;
@@ -43,7 +43,7 @@ public class ModelTestBase {
    * @throws JsonProcessingException
    * @throws IOException
    */
-  public void geneticJsonContainsFieldsTest(Object test, ArrayList<String> jsonProperties)
+  public void geneticJsonContainsFieldsTest(Object test, List<String> jsonProperties)
       throws JsonProcessingException, IOException {
     String jsonString = mapper.writeValueAsString(test);
 

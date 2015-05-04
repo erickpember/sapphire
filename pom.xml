@@ -40,7 +40,7 @@
     <guice.version>4.0</guice.version>
     <hadoop.version>2.2.0</hadoop.version>
     <hapi.version>2.2</hapi.version>
-    <jackson.version>2.5.1</jackson.version>
+    <jackson.version>2.5.3</jackson.version>
     <java.version>1.8</java.version>
     <jcommander.version>1.47</jcommander.version>
     <jetty.version>9.2.9.v20150224</jetty.version>

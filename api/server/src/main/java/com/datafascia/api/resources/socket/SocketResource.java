@@ -3,6 +3,7 @@
 package com.datafascia.api.resources.socket;
 
 import com.datafascia.common.kafka.KafkaConfig;
+import java.io.IOException;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.atmosphere.config.service.Disconnect;
@@ -65,7 +66,11 @@ public final class SocketResource {
    */
   @Post
   public void onMessage(final AtmosphereResource resource) {
-    String message = IOUtils.readEntirely(resource).toString();
-    log.info("Test message: " + message + ", " + config.getGroupId());
+    try {
+      String message = IOUtils.readEntirely(resource).toString();
+      log.info("Test message: " + message + ", " + config.getGroupId());
+    } catch (IOException e) {
+      log.error("Error reading websocket message", e);
+    }
   }
 }

@@ -32,7 +32,7 @@
     <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
 
     <accumulo.version>1.6.2</accumulo.version>
-    <atmosphere.version>2.2.0</atmosphere.version>
+    <atmosphere.version>2.3.0</atmosphere.version>
     <avro.version>1.7.7</avro.version>
     <unitsofmeasure.version>0.7.1</unitsofmeasure.version>
     <dropwizard.version>0.8.0</dropwizard.version>

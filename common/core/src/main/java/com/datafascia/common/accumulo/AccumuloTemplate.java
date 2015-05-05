@@ -13,12 +13,15 @@ import java.util.function.Predicate;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.accumulo.core.client.AccumuloException;
+import org.apache.accumulo.core.client.AccumuloSecurityException;
 import org.apache.accumulo.core.client.BatchDeleter;
 import org.apache.accumulo.core.client.BatchWriter;
 import org.apache.accumulo.core.client.BatchWriterConfig;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.MutationsRejectedException;
 import org.apache.accumulo.core.client.Scanner;
+import org.apache.accumulo.core.client.TableExistsException;
 import org.apache.accumulo.core.client.TableNotFoundException;
 import org.apache.accumulo.core.data.Range;
 
@@ -57,6 +60,24 @@ public class AccumuloTemplate {
     this.columnVisibilityPolicy = columnVisibilityPolicy;
     this.authorizationsSupplier = authorizationsSupplier;
     this.metrics = metrics;
+  }
+
+  /**
+   * Creates table if it does not exist.
+   *
+   * @param tableName
+   *     table name
+   */
+  public void createTableIfNotExist(String tableName) {
+    if (connector.tableOperations().exists(tableName)) {
+      return;
+    }
+
+    try {
+      connector.tableOperations().create(tableName);
+    } catch (AccumuloException | AccumuloSecurityException | TableExistsException e) {
+      throw new IllegalStateException("Cannot create table " + tableName, e);
+    }
   }
 
   private BatchWriter createBatchWriter(String tableName) {

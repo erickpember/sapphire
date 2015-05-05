@@ -10,6 +10,7 @@ import java.util.Hashtable;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 
 /**
  * A test to ensure functionality of the CSV generation command.
@@ -20,6 +21,7 @@ import static org.testng.Assert.assertEquals;
  * in both places, and the test would erroneously pass. Here we have known good data, and
  * breaking changes in the transforms will cause a test failure.
  */
+@SuppressWarnings("serial")
 public class CsvIT {
   String fileLocation = "/tmp/datafascia-test/emerge.csv";
 
@@ -87,8 +89,7 @@ public class CsvIT {
       }
       String[] csvPatient = expectedPatients.remove(line[6]);
       if (csvPatient == null) {
-        throw new RuntimeException("Patient " + line[6] + " exists in the CSV, but is not " +
-            "accounted for in the tests.");
+        fail("Patient " + line[6] + " in CSV, but not " + "in the expected result set.");
       }
 
       assertEquals(csvPatient[0], line[7]);

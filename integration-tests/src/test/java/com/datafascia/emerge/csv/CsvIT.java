@@ -21,10 +21,10 @@ import static org.testng.Assert.fail;
  * in both places, and the test would erroneously pass. Here we have known good data, and
  * breaking changes in the transforms will cause a test failure.
  */
-@SuppressWarnings("serial")
 public class CsvIT {
   String fileLocation = "/tmp/datafascia-test/emerge.csv";
 
+  @SuppressWarnings("serial")
   Hashtable<String, String[]> expectedPatients = new Hashtable<String, String[]>() {
     {
       put("urn:df-institution-patientId-1:UCSF::96087004", new String[] {
@@ -89,7 +89,7 @@ public class CsvIT {
       }
       String[] csvPatient = expectedPatients.remove(line[6]);
       if (csvPatient == null) {
-        fail("Patient " + line[6] + " in CSV, but not " + "in the expected result set.");
+        fail("Patient " + line[6] + " in CSV, but not in the expected result set.");
       }
 
       assertEquals(csvPatient[0], line[7]);

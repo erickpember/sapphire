@@ -12,8 +12,11 @@ import com.fasterxml.jackson.module.jsonSchema.JsonSchema;
 import java.util.List;
 import java.util.Map;
 import retrofit.client.Response;
+import retrofit.http.Body;
 import retrofit.http.DELETE;
 import retrofit.http.GET;
+import retrofit.http.POST;
+import retrofit.http.PUT;
 import retrofit.http.Path;
 import retrofit.http.Query;
 import retrofit.http.QueryMap;
@@ -22,6 +25,30 @@ import retrofit.http.QueryMap;
  * Base interface for interacting with the dataFascia API.
  */
 public interface DatafasciaApi {
+
+  /**
+   * Creates patient.
+   *
+   * @param patient
+   *     patient values
+   * @return HTTP response
+   */
+  @POST("/patient")
+  Response createPatient(@Body Patient patient);
+
+  /**
+   * Completely replaces the content of the patient resource with the content
+   * given in the request.
+   *
+   * @param patientId
+   *     patient ID
+   * @param patient
+   *     new patient values
+   * @return patient
+   */
+  @PUT("/patient/{patientId}")
+  Patient updatePatient(@Path("patientId") String patientId, @Body Patient patient);
+
   /**
    * @param start the starting patient id
    * @param active boolean indicating type of patient to return

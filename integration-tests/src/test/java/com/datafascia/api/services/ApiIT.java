@@ -2,14 +2,12 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.services;
 
-import com.codahale.metrics.MetricRegistry;
 import com.datafascia.api.client.DatafasciaApi;
 import com.datafascia.api.client.DatafasciaApiBuilder;
 import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.common.accumulo.AccumuloConfiguration;
 import com.datafascia.common.accumulo.AccumuloImport;
 import com.datafascia.common.accumulo.AccumuloModule;
-import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
 import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
@@ -24,7 +22,6 @@ import com.datafascia.domain.model.Name;
 import com.datafascia.domain.model.Patient;
 import com.datafascia.domain.model.Race;
 import com.datafascia.domain.model.Version;
-import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.dropwizard.testing.DropwizardTestApp;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -43,7 +40,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Instance;
@@ -101,6 +97,7 @@ public class ApiIT {
 
     api = DatafasciaApiBuilder.endpoint(
         new URI("http://localhost:" + app.getLocalPort()), "testuser", "supersecret");
+    addStaticData();
   }
 
   /**
@@ -199,18 +196,10 @@ public class ApiIT {
     failDir.delete();
 
     connect.tableOperations().create("Patient");
-
-    addStaticData();
   }
 
   private void addStaticData() throws Exception {
-    AccumuloTemplate template = new AccumuloTemplate(connect,
-        injector.getInstance(ColumnVisibilityPolicy.class),
-        injector.getInstance(AuthorizationsSupplier.class),
-        injector.getInstance(MetricRegistry.class));
-    PatientRepository repo = new PatientRepository(template);
-
-    repo.save(new Patient() {
+    api.createPatient(new Patient() {
       {
         setName(new Name() {
           {
@@ -233,7 +222,7 @@ public class ApiIT {
     }
     );
 
-    repo.save(new Patient() {
+    api.createPatient(new Patient() {
       {
         setName(new Name() {
           {
@@ -257,7 +246,7 @@ public class ApiIT {
     }
     );
 
-    repo.save(new Patient() {
+    api.createPatient(new Patient() {
       {
         setName(new Name() {
           {
@@ -280,7 +269,7 @@ public class ApiIT {
     }
     );
 
-    repo.save(new Patient() {
+    api.createPatient(new Patient() {
       {
         setName(new Name() {
           {
@@ -303,7 +292,7 @@ public class ApiIT {
     }
     );
 
-    repo.save(new Patient() {
+    api.createPatient(new Patient() {
       {
         setName(new Name() {
           {
@@ -326,7 +315,7 @@ public class ApiIT {
     }
     );
 
-    repo.save(new Patient() {
+    api.createPatient(new Patient() {
       {
         setName(new Name() {
           {

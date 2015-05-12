@@ -81,14 +81,6 @@ public interface DatafasciaApi {
   Response deletePatient(@Path("patientId") String patientId);
 
   /**
-   * @param encounterId the unique identifier for the encounter
-   *
-   * @return encounter associated with the identifier
-   */
-  @GET("/encounter/{encounterId}")
-  Encounter encounter(@Path("encounterId") String encounterId);
-
-  /**
    * @param patientId the unique identifier for the patient
    *
    * @return last encounter for the patient

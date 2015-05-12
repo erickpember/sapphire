@@ -8,7 +8,6 @@ import com.datafascia.domain.model.Encounter;
 import com.datafascia.domain.model.Patient;
 import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.PatientRepository;
-import com.datafascia.domain.persist.opal.EncounterDao;
 import java.util.Optional;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -28,7 +27,6 @@ public class EncounterResource {
 
   private final PatientRepository patientRepository;
   private final EncounterRepository encounterRepository;
-  private final EncounterDao encounterDao;
 
   /**
    * Construct resource with associated data access objects
@@ -37,28 +35,14 @@ public class EncounterResource {
    *     patient repository
    * @param encounterRepository
    *     encounter repository
-   * @param encounterDao
-   *     encounter data access object
    */
   @Inject
   public EncounterResource(
       PatientRepository patientRepository,
-      EncounterRepository encounterRepository,
-      EncounterDao encounterDao) {
+      EncounterRepository encounterRepository) {
 
     this.patientRepository = patientRepository;
     this.encounterRepository = encounterRepository;
-    this.encounterDao = encounterDao;
-  }
-
-  /**
-   * @param id the encounter identifier
-   *
-   * @return Return a given encounter by ID.
-   */
-  @GET @Timed @Path("{id}")
-  public Encounter encounter(@PathParam("id") String id) {
-    return encounterDao.getEncounter(id);
   }
 
   /**

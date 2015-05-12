@@ -20,9 +20,9 @@ import javax.ws.rs.core.Response;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Resource object to model encounter information
+ * Encounter resource endpoint
  */
-@Slf4j @Path("/encounter") @Produces(MediaType.APPLICATION_JSON)
+@Slf4j @Path("/patient/{patientId}/encounter") @Produces(MediaType.APPLICATION_JSON)
 public class EncounterResource {
 
   private final PatientRepository patientRepository;
@@ -45,26 +45,33 @@ public class EncounterResource {
     this.encounterRepository = encounterRepository;
   }
 
+  private Patient getPatient(Id<Patient> patientId) {
+    Optional<Patient> optionalPatient = patientRepository.read(patientId);
+    if (!optionalPatient.isPresent()) {
+      throw new WebApplicationException(
+          String.format("Patient ID [%s] not found", patientId),
+          Response.Status.BAD_REQUEST);
+    }
+
+    return optionalPatient.get();
+  }
+
   /**
    * Gets last encounter for a patient.
    *
-   * @param aPatientId
+   * @param patientId
    *     patient ID
    * @return entity
    */
-  @GET @Timed @Path("last/{patientId}")
-  public Encounter getLast(@PathParam("patientId") String aPatientId) {
-    Id<Patient> patientId = Id.of(aPatientId);
-    Optional<Patient> optionalPatient = patientRepository.read(patientId);
-    if (!optionalPatient.isPresent()) {
-      throw new WebApplicationException("Patient not found", Response.Status.NOT_FOUND);
-    }
+  @GET @Path("/last") @Timed
+  public Encounter getLast(@PathParam("patientId") Id<Patient> patientId) {
+    Patient patient = getPatient(patientId);
 
-    Patient patient = optionalPatient.get();
     Optional<Encounter> optionalEncounter =
         encounterRepository.read(patientId, patient.getLastEncounterId());
-    if (!optionalPatient.isPresent()) {
-      throw new WebApplicationException("Last encounter not found", Response.Status.NOT_FOUND);
+    if (!optionalEncounter.isPresent()) {
+      throw new WebApplicationException(
+          "Last encounter not found for patient ID " + patientId, Response.Status.NOT_FOUND);
     }
 
     return optionalEncounter.get();

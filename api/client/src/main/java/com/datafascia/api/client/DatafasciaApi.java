@@ -85,7 +85,7 @@ public interface DatafasciaApi {
    *
    * @return last encounter for the patient
    */
-  @GET("/encounter/last/{patientId}")
+  @GET("/patient/{patientId}/encounter/last")
   Encounter lastvisit(@Path("patientId") String patientId);
 
   /**

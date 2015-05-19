@@ -30,6 +30,7 @@ public class YamlConfiguration extends AbstractHierarchicalFileConfiguration {
     setNodeValue(getRootNode(), yaml.load(reader));
   }
 
+  @SuppressWarnings("unchecked")
   protected void setNodeValue(ConfigurationNode targetNode, Object source) {
     if (source instanceof Map<?, ?>) {
       for (Map.Entry<String, Object> entry : ((Map<String, Object>) source).entrySet()) {
@@ -39,7 +40,7 @@ public class YamlConfiguration extends AbstractHierarchicalFileConfiguration {
         targetNode.addChild(childNode);
       }
     } else if (source instanceof Collection) {
-      for (Object child : (Iterable<? extends Object>) source) {
+      for (Object child : (Iterable<?>) source) {
         Node childNode = new Node("item");
         childNode.setReference(child);
         setNodeValue(childNode, child);

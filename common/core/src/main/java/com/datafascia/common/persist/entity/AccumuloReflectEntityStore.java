@@ -7,9 +7,14 @@ import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Optional;
 import javax.inject.Inject;
+import org.apache.accumulo.core.client.Scanner;
+import org.apache.accumulo.core.data.Range;
 import org.apache.avro.Schema;
 import org.apache.avro.reflect.ReflectData;
+import org.apache.hadoop.io.Text;
 
 /**
  * Persists Java objects to Accumulo by Avro reflection.
@@ -80,5 +85,16 @@ public class AccumuloReflectEntityStore implements ReflectEntityStore {
 
     accumuloTemplate.save(
         dataTableName, toRowId(entityId), new ReflectMutationSetter(schemaId, object));
+  }
+
+  @Override
+  public <E> Optional<E> read(EntityId entityId) {
+    Class<E> entityType = (Class<E>) entityId.getType();
+
+    Scanner scanner = accumuloTemplate.createScanner(dataTableName);
+    scanner.setRange(Range.exact(toRowId(entityId)));
+    scanner.fetchColumnFamily(new Text(entityType.getSimpleName()));
+
+    return accumuloTemplate.queryForObject(scanner, new ReflectRowMapper<>(entityType));
   }
 }

@@ -19,7 +19,7 @@ import com.google.inject.Provides;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.AllArgsConstructor;
@@ -27,11 +27,10 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.apache.accumulo.core.client.Connector;
-import org.apache.accumulo.core.client.Scanner;
-import org.apache.accumulo.core.data.Key;
-import org.apache.accumulo.core.data.Value;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertEquals;
 
 /**
  * {@link AccumuloReflectEntityStore} test
@@ -39,6 +38,7 @@ import org.testng.annotations.Test;
 public class AccumuloReflectEntityStoreTest {
 
   private static final String TABLE_NAME_PREFIX = "Test";
+  private static final EntityId PATIENT_ID = new EntityId(Patient.class, Id.of("patientId1"));
 
   /**
    * Provides test dependencies
@@ -113,31 +113,12 @@ public class AccumuloReflectEntityStoreTest {
         .build();
   }
 
-  private void scan() {
-    Scanner scanner = accumuloTemplate.createScanner(TABLE_NAME_PREFIX + "Data");
-    try {
-      for (Map.Entry<Key, Value> entry : scanner) {
-        System.out.format(
-            "%s %s %s %s\n",
-            entry.getKey().getRow(),
-            entry.getKey().getColumnFamily(),
-            entry.getKey().getColumnQualifier(),
-            entry.getValue());
-      }
-    } finally {
-      scanner.close();
-    }
-  }
-
   @Test
-  public void should_save_entity() {
+  public void should_read_entity() {
     Patient patient = createPatient();
+    entityStore.save(PATIENT_ID, patient);
 
-    Id<Patient> patientId = Id.of("patientId1");
-    EntityId entityId = new EntityId(Patient.class, patientId);
-
-    entityStore.save(entityId, patient);
-
-    scan();
+    Optional<Patient> optionalPatient = entityStore.read(PATIENT_ID);
+    assertEquals(optionalPatient.get(), patient);
   }
 }

@@ -29,13 +29,13 @@ public class DischargePatient implements Consumer<Event> {
   private Id<Patient> getPatientId(AdmitPatientData admitPatientData) {
     Patient patient = new Patient();
     patient.setInstitutionPatientId(admitPatientData.getPatient().getInstitutionPatientId());
-    return PatientRepository.getEntityId(patient);
+    return PatientRepository.generateId(patient);
   }
 
   private Id<Encounter> getEncounter(AdmitPatientData admitPatientData) {
     Encounter encounter = new Encounter();
     encounter.setIdentifier(admitPatientData.getEncounter().getIdentifier());
-    return EncounterRepository.getEntityId(encounter);
+    return EncounterRepository.generateId(encounter);
   }
 
   @Override

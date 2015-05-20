@@ -88,7 +88,7 @@ public class PatientRepository extends BaseRepository {
    *     patient to read property from
    * @return primary key
    */
-  public static Id<Patient> getEntityId(Patient patient) {
+  public static Id<Patient> generateId(Patient patient) {
     return Id.of(URNFactory.urn(URNFactory.NS_PATIENT_ID, patient.getInstitutionPatientId()));
   }
 
@@ -99,7 +99,7 @@ public class PatientRepository extends BaseRepository {
    *     to save
    */
   public void save(Patient patient) {
-    patient.setId(getEntityId(patient));
+    patient.setId(generateId(patient));
 
     accumuloTemplate.save(
         Tables.PATIENT,

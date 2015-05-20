@@ -195,7 +195,7 @@ public class ProcessEventTopologyIT {
   private static Id<Patient> getPatientId(String institutionPatientId) {
     Patient dummyPatient = new Patient();
     dummyPatient.setInstitutionPatientId(institutionPatientId);
-    return PatientRepository.getEntityId(dummyPatient);
+    return PatientRepository.generateId(dummyPatient);
   }
 
   private Id<Encounter> getLastEncounterId(Id<Patient> patientId) {

@@ -28,14 +28,14 @@ public class AddObservations implements Consumer<Event> {
   private static Patient getPatient(String institutionPatientId) {
     Patient patient = new Patient();
     patient.setInstitutionPatientId(institutionPatientId);
-    patient.setId(PatientRepository.getEntityId(patient));
+    patient.setId(PatientRepository.generateId(patient));
     return patient;
   }
 
   private static Encounter getEncounter(String encounterIdentifier) {
     Encounter encounter = new Encounter();
     encounter.setIdentifier(encounterIdentifier);
-    encounter.setId(EncounterRepository.getEntityId(encounter));
+    encounter.setId(EncounterRepository.generateId(encounter));
     return encounter;
   }
 

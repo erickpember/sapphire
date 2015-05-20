@@ -93,7 +93,7 @@ public class ObservationRepository extends BaseRepository {
         toRowId(Observation.class, observationId);
   }
 
-  private static Id<Observation> getEntityId(Observation observation) {
+  private static Id<Observation> generateId(Observation observation) {
     return (observation.getId() != null)
         ? observation.getId()
         : Id.of(UUID.randomUUID().toString());
@@ -110,7 +110,7 @@ public class ObservationRepository extends BaseRepository {
    *     to save
    */
   public void save(Patient patient, Encounter encounter, Observation observation) {
-    observation.setId(getEntityId(observation));
+    observation.setId(generateId(observation));
 
     accumuloTemplate.save(
         Tables.PATIENT,

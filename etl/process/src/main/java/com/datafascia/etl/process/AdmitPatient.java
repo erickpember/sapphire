@@ -36,7 +36,7 @@ public class AdmitPatient implements Consumer<Event> {
 
     Encounter encounter = new Encounter();
     encounter.setIdentifier(fromEncounter.getIdentifier());
-    encounter.setId(EncounterRepository.getEntityId(encounter));
+    encounter.setId(EncounterRepository.generateId(encounter));
     encounter.setPeriod(period);
     return encounter;
   }

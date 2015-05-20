@@ -193,7 +193,7 @@ public class MedicationAdministrationRepository extends BaseRepository {
         toRowId(MedicationAdministration.class, administrationId);
   }
 
-  private static Id<MedicationAdministration> getEntityId(MedicationAdministration administration) {
+  private static Id<MedicationAdministration> generateId(MedicationAdministration administration) {
     return (administration.getId() != null)
         ? administration.getId()
         : Id.of(UUID.randomUUID().toString());
@@ -210,7 +210,7 @@ public class MedicationAdministrationRepository extends BaseRepository {
    *     to save
    */
   public void save(Patient patient, Encounter encounter, MedicationAdministration administration) {
-    administration.setId(getEntityId(administration));
+    administration.setId(generateId(administration));
 
     accumuloTemplate.save(
         Tables.PATIENT,

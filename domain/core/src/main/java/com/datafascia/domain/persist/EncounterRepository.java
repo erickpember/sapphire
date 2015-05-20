@@ -60,7 +60,7 @@ public class EncounterRepository extends BaseRepository {
    *     encounter to read property from
    * @return primary key
    */
-  public static Id<Encounter> getEntityId(Encounter encounter) {
+  public static Id<Encounter> generateId(Encounter encounter) {
     return Id.of(encounter.getIdentifier());
   }
 
@@ -73,7 +73,7 @@ public class EncounterRepository extends BaseRepository {
    *     to save
    */
   public void save(Patient patient, Encounter encounter) {
-    encounter.setId(getEntityId(encounter));
+    encounter.setId(generateId(encounter));
 
     accumuloTemplate.save(
         Tables.PATIENT,

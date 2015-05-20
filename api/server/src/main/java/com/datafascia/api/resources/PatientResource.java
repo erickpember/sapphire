@@ -63,7 +63,7 @@ public class PatientResource {
   @Consumes(MediaType.APPLICATION_JSON) @POST
   public Response create(Patient patient) {
     // Check if patient already exists.
-    Id<Patient> patientId = PatientRepository.getEntityId(patient);
+    Id<Patient> patientId = PatientRepository.generateId(patient);
     Optional<Patient> optionalPatient = patientRepository.read(patientId);
     if (optionalPatient.isPresent()) {
       throw new WebApplicationException(

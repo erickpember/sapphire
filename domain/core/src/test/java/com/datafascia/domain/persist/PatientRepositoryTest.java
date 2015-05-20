@@ -50,7 +50,7 @@ public class PatientRepositoryTest extends RepositoryTestSupport {
 
   @Test(dependsOnGroups = "patients")
   public void should_list_patients_starting_from_specified_patient() {
-    Id<Patient> startPatientId = PatientRepository.getEntityId(inactivePatient);
+    Id<Patient> startPatientId = PatientRepository.generateId(inactivePatient);
     List<Patient> patients = patientRepository.list(
         Optional.of(startPatientId), Optional.empty(), 5);
 

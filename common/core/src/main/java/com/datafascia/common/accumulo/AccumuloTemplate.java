@@ -9,7 +9,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Spliterator;
+import java.util.Spliterators;
 import java.util.function.Predicate;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -149,6 +153,23 @@ public class AccumuloTemplate {
       timerContext.stop();
       scanner.close();
     }
+  }
+
+  /**
+   * Reads entries from rows into a stream of objects.
+   *
+   * @param scanner
+   *     scanner to read from
+   * @param rowMapper
+   *     callback to receive entries
+   * @param <E>
+   *     entity type
+   * @return entities
+   */
+  public <E> Stream<E> stream(Scanner scanner, RowMapper<E> rowMapper) {
+    RowIterator<E> rowIterator = new RowIterator<>(scanner, rowMapper);
+    Spliterator spliterator = Spliterators.spliteratorUnknownSize(rowIterator, Spliterator.ORDERED);
+    return StreamSupport.stream(spliterator, false);
   }
 
   /**

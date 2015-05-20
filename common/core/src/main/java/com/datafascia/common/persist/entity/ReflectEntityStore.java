@@ -3,6 +3,7 @@
 package com.datafascia.common.persist.entity;
 
 import java.util.Optional;
+import java.util.stream.Stream;
 
 /**
  * Entity persistence methods.
@@ -29,4 +30,39 @@ public interface ReflectEntityStore {
    * @return optional entity, empty if not found
    */
   <E> Optional<E> read(EntityId entityId);
+
+  /**
+   * Reads entities into stream.
+   *
+   * @param parentId
+   *     containing parent entity ID
+   * @param entityType
+   *     entity type
+   * @param <E>
+   *     entity type
+   * @return entity stream
+   */
+  <E> Stream<E> stream(EntityId parentId, Class<E> entityType);
+
+  /**
+   * Reads root entities into stream.
+   *
+   * @param entityType
+   *     entity type
+   * @param <E>
+   *     entity type
+   * @return entity stream
+   */
+  <E> Stream<E> stream(Class<E> entityType);
+
+  /**
+   * Reads root entities into stream.
+   *
+   * @param startEntityId
+   *     entity ID to start reading from
+   * @param <E>
+   *     entity type
+   * @return entity stream
+   */
+  <E> Stream<E> stream(EntityId startEntityId);
 }

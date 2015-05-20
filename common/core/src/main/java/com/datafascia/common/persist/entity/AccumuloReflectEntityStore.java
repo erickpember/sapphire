@@ -7,8 +7,8 @@ import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.data.Range;
@@ -96,5 +96,37 @@ public class AccumuloReflectEntityStore implements ReflectEntityStore {
     scanner.fetchColumnFamily(new Text(entityType.getSimpleName()));
 
     return accumuloTemplate.queryForObject(scanner, new ReflectRowMapper<>(entityType));
+  }
+
+  private static <E> String toRowIdPrefix(EntityId parentId, Class<E> entityType) {
+    String prefix = Optional.ofNullable(parentId)
+        .map(entityId -> toRowId(entityId))
+        .orElse("");
+    return prefix + entityType.getSimpleName() + COMPONENT_SEPARATOR;
+  }
+
+  @Override
+  public <E> Stream<E> stream(EntityId parentId, Class<E> entityType) {
+    Scanner scanner = accumuloTemplate.createScanner(dataTableName);
+    scanner.setRange(Range.prefix(toRowIdPrefix(parentId, entityType)));
+    scanner.fetchColumnFamily(new Text(entityType.getSimpleName()));
+
+    return accumuloTemplate.stream(scanner, new ReflectRowMapper<>(entityType));
+  }
+
+  @Override
+  public <E> Stream<E> stream(Class<E> entityType) {
+    return stream(null, entityType);
+  }
+
+  @Override
+  public <E> Stream<E> stream(EntityId startEntityId) {
+    Class<E> entityType = (Class<E>) startEntityId.getType();
+
+    Scanner scanner = accumuloTemplate.createScanner(dataTableName);
+    scanner.setRange(new Range(toRowId(startEntityId), null));
+    scanner.fetchColumnFamily(new Text(entityType.getSimpleName()));
+
+    return accumuloTemplate.stream(scanner, new ReflectRowMapper<>(entityType));
   }
 }

@@ -16,10 +16,12 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.AllArgsConstructor;
@@ -87,6 +89,12 @@ public class AccumuloReflectEntityStoreTest {
     private List<Integer> integers;
   }
 
+  @AllArgsConstructor @Builder @Data @NoArgsConstructor
+  private static class Encounter {
+    private String identifier;
+    private Instant admitTime;
+  }
+
   @Inject
   private AccumuloTemplate accumuloTemplate;
 
@@ -113,6 +121,13 @@ public class AccumuloReflectEntityStoreTest {
         .build();
   }
 
+  private static Encounter createEncounter(String identifier) {
+    return Encounter.builder()
+        .identifier(identifier)
+        .admitTime(Instant.now())
+        .build();
+  }
+
   @Test
   public void should_read_entity() {
     Patient patient = createPatient();
@@ -120,5 +135,42 @@ public class AccumuloReflectEntityStoreTest {
 
     Optional<Patient> optionalPatient = entityStore.read(PATIENT_ID);
     assertEquals(optionalPatient.get(), patient);
+  }
+
+  @Test
+  public void should_list_root_entities() {
+    Patient patient = createPatient();
+    entityStore.save(PATIENT_ID, patient);
+
+    List<Patient> patients = entityStore.stream(Patient.class)
+        .collect(Collectors.toList());
+    assertEquals(1, patients.size());
+    assertEquals(patients.get(0), patient);
+  }
+
+  @Test
+  public void should_list_child_entities() {
+    Patient patient = createPatient();
+    entityStore.save(PATIENT_ID, patient);
+
+    Encounter encounter1 = createEncounter("encounterId1");
+    EntityId encounterId1 = EntityId.builder()
+        .path(PATIENT_ID)
+        .path(Encounter.class, Id.of("encounterId1"))
+        .build();
+    entityStore.save(encounterId1, encounter1);
+
+    Encounter encounter2 = createEncounter("encounterId2");
+    EntityId encounterId2 = EntityId.builder()
+        .path(PATIENT_ID)
+        .path(Encounter.class, Id.of("encounterId2"))
+        .build();
+    entityStore.save(encounterId2, encounter2);
+
+    List<Encounter> encounters = entityStore.stream(PATIENT_ID, Encounter.class)
+        .collect(Collectors.toList());
+    assertEquals(2, encounters.size());
+    assertEquals(encounters.get(0), encounter1);
+    assertEquals(encounters.get(1), encounter2);
   }
 }

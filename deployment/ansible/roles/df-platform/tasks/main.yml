@@ -47,7 +47,7 @@
       docker exec {{ groups['accumulo-master-primary'][0] }}
       {{ accumulo_home }}/bin/accumulo shell --user root --password {{ accumulo_password }}
       --execute-command "execfile {{ df_platform_data_dir }}/create-accumulo-tables"
-  when: "'Patient' not in list_tables.stdout_lines"
+  when: "'IngestMessage' not in list_tables.stdout_lines"
 
 - name: List Kafka topics
   command: >

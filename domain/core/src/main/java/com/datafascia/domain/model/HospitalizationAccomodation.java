@@ -15,6 +15,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.avro.reflect.AvroSchema;
 
 /**
  * An Element of the Hospitalization model. Represents which bed the patient will be in, and for
@@ -29,6 +30,6 @@ public class HospitalizationAccomodation {
   private URI bed;
 
   /** Period during which the patient was assigned the bed.*/
-  @JsonProperty("period")
+  @AvroSchema(Interval.INSTANT_INTERVAL_SCHEMA) @JsonProperty("period")
   private Interval<Instant> period;
 }

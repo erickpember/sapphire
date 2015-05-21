@@ -10,18 +10,15 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.Instant;
 import java.util.List;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.avro.reflect.AvroSchema;
 
 /**
  * An Element in the Patient Model representing a contact party for the Patient.
  * This shall at least contain a contact's details or a reference to an organization.
  */
-@Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode @ToString
+@Data @NoArgsConstructor
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "PatientContact")
 public class PatientContact {
@@ -50,6 +47,6 @@ public class PatientContact {
   private Id<Organization> organizationId;
 
   /** The period during which this contact is valid to be contacted relating to this Patient. */
-  @JsonProperty("period")
+  @AvroSchema(Interval.INSTANT_INTERVAL_SCHEMA) @JsonProperty("period")
   private Interval<Instant> period;
 }

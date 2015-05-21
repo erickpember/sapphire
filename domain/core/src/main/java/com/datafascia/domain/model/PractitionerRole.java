@@ -12,6 +12,7 @@ import java.time.Instant;
 import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.avro.reflect.AvroSchema;
 
 /**
  * Role / Organization with which the Practitioner is associated.
@@ -33,7 +34,7 @@ public class PractitionerRole {
   private CodeableConcept specialty;
 
   /** The period during which the practitioner is authorized to perform in this role. */
-  @JsonProperty("period")
+  @AvroSchema(Interval.INSTANT_INTERVAL_SCHEMA) @JsonProperty("period")
   private Interval<Instant> period;
 
   /** The location at which the practitioner provides care. */

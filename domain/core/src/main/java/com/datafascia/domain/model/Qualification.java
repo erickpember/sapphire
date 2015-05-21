@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.Instant;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.avro.reflect.AvroSchema;
 
 /**
  * Represents qualifications obtained by training and certification.
@@ -23,7 +24,7 @@ public class Qualification {
   private CodeableConcept code;
 
   /** Period during which the qualification is valid. */
-  @JsonProperty("period")
+  @AvroSchema(Interval.INSTANT_INTERVAL_SCHEMA) @JsonProperty("period")
   private Interval<Instant> period;
 
   /** Organization that regulates and issues the qualification. */

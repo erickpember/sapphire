@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.avro.reflect.AvroSchema;
 
 /**
  * Measurements and simple assertions made about a patient, device or other subject.

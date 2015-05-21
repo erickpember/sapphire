@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.avro.reflect.AvroSchema;
 
 /**
  * Describes the event of a patient being given a dose of a non-vaccine medication.
@@ -58,7 +59,7 @@ public class MedicationAdministration {
   private List<CodeableConcept> reasonsGiven;
 
   /** Start and end time of administration. */
-  @JsonProperty("effectiveTimePeriod")
+  @AvroSchema(Interval.INSTANT_INTERVAL_SCHEMA) @JsonProperty("effectiveTimePeriod")
   private Interval<Instant> effectiveTimePeriod;
 
   /** What was administered? */

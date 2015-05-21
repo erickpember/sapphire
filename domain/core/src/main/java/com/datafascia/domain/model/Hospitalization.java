@@ -17,6 +17,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.avro.reflect.AvroSchema;
 
 /**
  * An interaction between a patient and healthcare provider(s) for the purpose of providing
@@ -57,7 +58,7 @@ public class Hospitalization {
   private Id<Location> destinationId;
 
   /** Period during which the patient was admitted. */
-  @JsonProperty("period")
+  @AvroSchema(Interval.INSTANT_INTERVAL_SCHEMA) @JsonProperty("period")
   private Interval<Instant> period;
 
   /** Category or kind of location after discharge. */

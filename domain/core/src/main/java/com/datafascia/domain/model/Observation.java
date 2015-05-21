@@ -18,6 +18,7 @@ import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
+import org.apache.avro.reflect.AvroSchema;
 
 /**
  * Represents a patient observation.
@@ -58,7 +59,7 @@ public class Observation {
    * This is usually either the time of the procedure or of specimen collection, but very often the
    * source of the date/time is not known, only the date/time itself.
    */
-  @JsonProperty("appliesPeriod")
+  @AvroSchema(Interval.INSTANT_INTERVAL_SCHEMA) @JsonProperty("appliesPeriod")
   private Interval<Instant> appliesPeriod;
 
   /**

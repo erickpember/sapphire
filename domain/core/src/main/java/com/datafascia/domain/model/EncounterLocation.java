@@ -11,6 +11,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.Instant;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.avro.reflect.AvroSchema;
 
 /**
  * Represents a EncounterLocation model.
@@ -27,6 +28,6 @@ public class EncounterLocation {
   private EncounterLocationStatus status;
 
   /** Time period during which the patient was present at the location. */
-  @JsonProperty("period")
+  @AvroSchema(Interval.INSTANT_INTERVAL_SCHEMA) @JsonProperty("period")
   private Interval<Instant> period;
 }

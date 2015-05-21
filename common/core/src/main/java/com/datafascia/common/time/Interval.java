@@ -15,10 +15,22 @@ import lombok.NoArgsConstructor;
  */
 @AllArgsConstructor @NoArgsConstructor @Data
 public class Interval<T extends Comparable<T>> {
+
+  public static final String INSTANT_INTERVAL_SCHEMA =
+      "{" +
+        "\"type\": \"record\", " +
+        "\"name\": \"InstantInterval\", " +
+        "\"fields\": [" +
+          "{ \"name\": \"start\", \"type\": \"string\" }," +
+          "{ \"name\": \"end\", \"type\": \"string\" }" +
+        "]" +
+      "}";
+
   @JsonProperty("start")
-  protected T startInclusive;
+  private T startInclusive;
+
   @JsonProperty("end")
-  protected T endExclusive;
+  private T endExclusive;
 
   /**
    * Checks if this interval contains the item.

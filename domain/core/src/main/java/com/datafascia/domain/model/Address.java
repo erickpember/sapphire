@@ -10,17 +10,14 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import com.neovisionaries.i18n.CountryCode;
 import java.time.Instant;
 import java.util.List;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.avro.reflect.AvroSchema;
 
 /**
  * Represents a physical address.
  */
-@Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode @ToString
+@Data @NoArgsConstructor
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "Address")
 public class Address {
@@ -37,7 +34,7 @@ public class Address {
   private String text;
 
   /** Time period when this address was/is in use. */
-  @JsonProperty("period")
+  @AvroSchema(Interval.INSTANT_INTERVAL_SCHEMA) @JsonProperty("period")
   private Interval<Instant> period;
 
   /** Name of the city.*/

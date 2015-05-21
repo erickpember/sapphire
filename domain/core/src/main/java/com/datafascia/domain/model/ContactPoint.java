@@ -10,6 +10,7 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.Instant;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.apache.avro.reflect.AvroSchema;
 
 /**
  * Details for contact points for a person or organization, including telephone, email, etc.
@@ -30,6 +31,6 @@ public class ContactPoint {
   private ContactPointUse use;
 
   /** Time period when the contact point was/is in use */
-  @JsonProperty("period")
+  @AvroSchema(Interval.INSTANT_INTERVAL_SCHEMA) @JsonProperty("period")
   private Interval<Instant> period;
 }

@@ -18,7 +18,7 @@ import java.time.Instant;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-
+import org.apache.avro.reflect.AvroSchema;
 
 /**
  * Holds a given value for an observation. This one value could be of any of the given
@@ -67,6 +67,6 @@ public class ObservationValue {
   private Instant dateTime;
 
   /** Range of time associated with the observation. */
-  @JsonProperty("period")
+  @AvroSchema(Interval.INSTANT_INTERVAL_SCHEMA) @JsonProperty("period")
   private Interval<Instant> period;
 }

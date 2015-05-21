@@ -12,18 +12,17 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.avro.reflect.AvroSchema;
 import org.stringtemplate.v4.ST;
 
 /**
  * A name of a human with text, parts and usage information.
  */
-@Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode @ToString
+@AllArgsConstructor @Builder @Data @NoArgsConstructor
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "HumanName")
 public class HumanName {
@@ -63,7 +62,7 @@ public class HumanName {
   private String text;
 
   /** Time period when name was/is in use. */
-  @JsonProperty("period")
+  @AvroSchema(Interval.INSTANT_INTERVAL_SCHEMA) @JsonProperty("period")
   private Interval<Instant> period;
 
   /**

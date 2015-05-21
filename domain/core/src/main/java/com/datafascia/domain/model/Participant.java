@@ -10,17 +10,14 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 import java.time.Instant;
 import java.util.List;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.avro.reflect.AvroSchema;
 
 /**
  * Identifies a participant in an Encounter. Either of type Practitioner or RelatedPerson.
  */
-@Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode @ToString
+@Data @NoArgsConstructor
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "Participant")
 public class Participant {
@@ -29,7 +26,7 @@ public class Participant {
   private List<CodeableConcept> types;
 
   /** Period of time during the encounter when the participant was present. */
-  @JsonProperty("period")
+  @AvroSchema(Interval.INSTANT_INTERVAL_SCHEMA) @JsonProperty("period")
   private Interval<Instant> period;
 
   /** Persons involved in the encounter other than the patient. */

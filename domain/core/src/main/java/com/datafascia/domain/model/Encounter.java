@@ -22,6 +22,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.avro.reflect.AvroSchema;
 
 /**
  * Represents a patient visit.
@@ -78,7 +79,7 @@ public class Encounter {
   private Id<Appointment> fulfillsId;
 
   /** The start and end time of the encounter. */
-  @JsonProperty("period")
+  @AvroSchema(Interval.INSTANT_INTERVAL_SCHEMA) @JsonProperty("period")
   private Interval<Instant> period;
 
   /** Quality of time the encounter lasted (less time absent). */

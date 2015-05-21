@@ -8,12 +8,17 @@ import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.common.accumulo.AccumuloConfiguration;
 import com.datafascia.common.accumulo.AccumuloImport;
 import com.datafascia.common.accumulo.AccumuloModule;
+import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
 import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.SubjectAuthorizationsSupplier;
+import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
+import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
 import com.datafascia.common.kafka.KafkaConfig;
 import com.datafascia.common.persist.Id;
+import com.datafascia.common.persist.entity.AccumuloReflectEntityStore;
+import com.datafascia.common.persist.entity.ReflectEntityStore;
 import com.datafascia.common.shiro.FakeRealm;
 import com.datafascia.common.shiro.RoleExposingRealm;
 import com.datafascia.domain.model.CodeableConcept;
@@ -24,6 +29,7 @@ import com.datafascia.domain.model.Patient;
 import com.datafascia.domain.model.PatientCommunication;
 import com.datafascia.domain.model.Race;
 import com.datafascia.domain.model.Version;
+import com.datafascia.domain.persist.Tables;
 import com.datafascia.dropwizard.testing.DropwizardTestApp;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -33,6 +39,7 @@ import com.google.common.io.Resources;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Provides;
 import java.io.File;
 import java.io.FileWriter;
 import java.net.URI;
@@ -40,6 +47,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
+import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Instance;
@@ -403,8 +411,17 @@ public class ApiIT {
           protected void configure() {
             bind(AccumuloConfiguration.class).toInstance(accumuloConfig());
             bind(AuthorizationsSupplier.class).to(SubjectAuthorizationsSupplier.class);
+            bind(AvroSchemaRegistry.class).to(MemorySchemaRegistry.class).in(Singleton.class);
             bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
             bind(RoleExposingRealm.class).to(FakeRealm.class);
+          }
+
+          @Provides @Singleton
+          public ReflectEntityStore entityStore(
+              AvroSchemaRegistry schemaRegistry, AccumuloTemplate accumuloTemplate) {
+
+            return new AccumuloReflectEntityStore(
+                schemaRegistry, Tables.ENTITY_PREFIX, accumuloTemplate);
           }
         },
         new AccumuloModule());

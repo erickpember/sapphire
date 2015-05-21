@@ -7,8 +7,10 @@ package com.datafascia.domain.persist;
  */
 public class Tables {
 
+  /** entity table name prefix */
+  public static final String ENTITY_PREFIX = "Entity";
+
   public static final String INGEST_MESSAGE = "IngestMessage";
-  public static final String PATIENT = "Patient";
 
   // Private constructor disallows creating instances of this class
   private Tables() {

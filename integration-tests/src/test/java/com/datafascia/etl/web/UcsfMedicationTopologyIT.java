@@ -13,14 +13,20 @@ import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.tuple.Tuple;
 import com.datafascia.common.accumulo.AccumuloConfiguration;
+import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
 import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.ConnectorFactory;
 import com.datafascia.common.accumulo.FixedAuthorizationsSupplier;
 import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
+import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
+import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
 import com.datafascia.common.inject.Injectors;
+import com.datafascia.common.persist.entity.AccumuloReflectEntityStore;
+import com.datafascia.common.persist.entity.ReflectEntityStore;
 import com.datafascia.common.storm.DependencyInjectingBaseRichSpoutProxy;
 import com.datafascia.domain.persist.PatientRepository;
+import com.datafascia.domain.persist.Tables;
 import com.github.tomakehurst.wiremock.WireMockServer;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import com.google.inject.AbstractModule;
@@ -79,6 +85,7 @@ public class UcsfMedicationTopologyIT {
     @Override
     protected void configure() {
       bind(AuthorizationsSupplier.class).to(FixedAuthorizationsSupplier.class);
+      bind(AvroSchemaRegistry.class).to(MemorySchemaRegistry.class).in(Singleton.class);
       bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
     }
 
@@ -105,6 +112,13 @@ public class UcsfMedicationTopologyIT {
     @Provides @Singleton
     public ConnectorFactory connectorFactory(AccumuloConfiguration configuration) {
       return new ConnectorFactory(configuration);
+    }
+
+    @Provides @Singleton
+    public ReflectEntityStore entityStore(
+        AvroSchemaRegistry schemaRegistry, AccumuloTemplate accumuloTemplate) {
+
+      return new AccumuloReflectEntityStore(schemaRegistry, Tables.ENTITY_PREFIX, accumuloTemplate);
     }
   }
 

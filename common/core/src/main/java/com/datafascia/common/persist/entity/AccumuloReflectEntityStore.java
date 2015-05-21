@@ -17,7 +17,7 @@ import org.apache.avro.reflect.ReflectData;
 import org.apache.hadoop.io.Text;
 
 /**
- * Persists Java objects to Accumulo by Avro reflection.
+ * Copies values between Java object fields and Accumulo entries by reflection.
  */
 public class AccumuloReflectEntityStore implements ReflectEntityStore {
 

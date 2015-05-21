@@ -65,103 +65,70 @@ public class PatientRepositoryTest extends RepositoryTestSupport {
 
   @Test(groups = "patients") @SuppressWarnings("serial")
   public void getActiveWithLanguages() {
-    patient1 = new Patient() {
-      {
-        setInstitutionPatientId("UCSF-12345");
-        setAccountNumber("12345");
-        setNames(Arrays.asList(new HumanName() {
-          {
-            setFirstName("pat1firstname");
-            setMiddleName("pat1middlename");
-            setFamily(Arrays.asList("pat1lastname"));
-          }
-        }));
-        setCommunication(new PatientCommunication() {
-          {
-            setPreferred(true);
-            setLanguage(new CodeableConcept() {
-              {
-                setCodings(Arrays.asList("EN"));
-                setText("EN");
-              }
-            });
-          }
-        });
-        setGender(Gender.MALE);
-        setBirthDate(LocalDate.now());
-        setMaritalStatus(MaritalStatus.MARRIED);
-        setRace(Race.ASIAN);
-        setActive(true);
-      }
-    };
+    patient1 = Patient.builder()
+        .institutionPatientId("UCSF-12345")
+        .accountNumber("12345")
+        .maritalStatus(MaritalStatus.MARRIED)
+        .race(Race.ASIAN)
+        .active(true)
+        .build();
+    patient1.setNames(Arrays.asList(HumanName.builder()
+        .given(Arrays.asList("pat1firstname", "pat1middlename"))
+        .family(Arrays.asList("pat1lastname"))
+        .build()));
+    patient1.setCommunication(PatientCommunication.builder()
+        .preferred(true)
+        .language(new CodeableConcept("en", "English"))
+        .build());
+    patient1.setGender(Gender.MALE);
+    patient1.setBirthDate(LocalDate.now());
+
     testPatientSet(patient1);
   }
 
   @Test(groups = "patients")
   public void getActiveWithoutLanguages() {
-    patient3 = new Patient() {
-      {
-        setInstitutionPatientId("UCSF-67890");
-        setAccountNumber("67890");
-        setNames(Arrays.asList(new HumanName() {
-          {
-            setFirstName("pat2firstname");
-            setMiddleName("pat2middlename");
-            setFamily(Arrays.asList("pat2lastname"));
-          }
-        }));
-        setCommunication(new PatientCommunication() {
-          {
-            setPreferred(true);
-            setLanguage(new CodeableConcept() {
-              {
-                setCodings(Arrays.asList("EN"));
-                setText("EN");
-              }
-            });
-          }
-        });
-        setGender(Gender.FEMALE);
-        setBirthDate(LocalDate.now());
-        setMaritalStatus(MaritalStatus.DIVORCED);
-        setRace(Race.PACIFIC_ISLANDER);
-        setActive(true);
-      }
-    };
+    patient3 = Patient.builder()
+        .institutionPatientId("UCSF-67890")
+        .accountNumber("67890")
+        .maritalStatus(MaritalStatus.DIVORCED)
+        .race(Race.PACIFIC_ISLANDER)
+        .active(true)
+        .build();
+    patient3.setNames(Arrays.asList(HumanName.builder()
+        .given(Arrays.asList("pat3firstname", "pat3middlename"))
+        .family(Arrays.asList("pat2lastname"))
+        .build()));
+    patient3.setCommunication(PatientCommunication.builder()
+        .preferred(true)
+        .language(new CodeableConcept("en", "English"))
+        .build());
+    patient3.setGender(Gender.FEMALE);
+    patient3.setBirthDate(LocalDate.now());
+
     testPatientSet(patient3);
   }
 
   @Test(groups = "patients")
   public void getInactive() {
-    inactivePatient = new Patient() {
-      {
-        setInstitutionPatientId("UCSF-13579");
-        setAccountNumber("13579");
-        setNames(Arrays.asList(new HumanName() {
-          {
-            setFirstName("pat3firstname");
-            setMiddleName("pat3middlename");
-            setFamily(Arrays.asList("pat3lastname"));
-          }
-        }));
-        setCommunication(new PatientCommunication() {
-          {
-            setPreferred(true);
-            setLanguage(new CodeableConcept() {
-              {
-                setCodings(Arrays.asList("EN"));
-                setText("EN");
-              }
-            });
-          }
-        });
-        setGender(Gender.UNKNOWN);
-        setBirthDate(LocalDate.now());
-        setMaritalStatus(MaritalStatus.DOMESTIC_PARTNER);
-        setRace(Race.BLACK);
-        setActive(false);
-      }
-    };
+    inactivePatient = Patient.builder()
+        .institutionPatientId("UCSF-13579")
+        .accountNumber("13579")
+        .maritalStatus(MaritalStatus.DOMESTIC_PARTNER)
+        .race(Race.BLACK)
+        .active(false)
+        .build();
+    inactivePatient.setNames(Arrays.asList(HumanName.builder()
+        .given(Arrays.asList("pat2firstname", "pat2middlename"))
+        .family(Arrays.asList("pat2lastname"))
+        .build()));
+    inactivePatient.setCommunication(PatientCommunication.builder()
+        .preferred(true)
+        .language(new CodeableConcept("en", "English"))
+        .build());
+    inactivePatient.setGender(Gender.UNKNOWN);
+    inactivePatient.setBirthDate(LocalDate.now());
+
     testPatientSet(inactivePatient);
   }
 

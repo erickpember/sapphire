@@ -8,26 +8,34 @@ import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.api.health.AccumuloHealthCheck;
 import com.datafascia.common.accumulo.AccumuloConfiguration;
 import com.datafascia.common.accumulo.AccumuloModule;
+import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
 import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.SubjectAuthorizationsSupplier;
+import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
+import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
 import com.datafascia.common.kafka.KafkaConfig;
+import com.datafascia.common.persist.entity.AccumuloReflectEntityStore;
+import com.datafascia.common.persist.entity.ReflectEntityStore;
 import com.datafascia.common.reflect.PackageUtils;
 import com.datafascia.common.shiro.FakeRealm;
 import com.datafascia.common.shiro.RealmInjectingEnvironmentLoaderListener;
 import com.datafascia.common.shiro.RoleExposingRealm;
 import com.datafascia.common.urn.URNMap;
 import com.datafascia.domain.model.Version;
+import com.datafascia.domain.persist.Tables;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Provides;
 import com.google.inject.servlet.GuiceServletContextListener;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import java.util.EnumSet;
+import javax.inject.Singleton;
 import javax.servlet.DispatcherType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.realm.Realm;
@@ -115,11 +123,20 @@ public class APIService extends Application<APIConfiguration> {
             bind(APIConfiguration.class).toInstance(config);
             bind(AccumuloConfiguration.class).toInstance(config.getAccumuloConfiguration());
             bind(AuthorizationsSupplier.class).to(SubjectAuthorizationsSupplier.class);
+            bind(AvroSchemaRegistry.class).to(MemorySchemaRegistry.class).in(Singleton.class);
             bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
             bind(KafkaConfig.class).toInstance(config.getKafkaConfig());
             bind(MetricRegistry.class).toInstance(environment.metrics());
             bind(Realm.class).toInstance(realm);
             bind(RoleExposingRealm.class).toInstance(realm);
+          }
+
+          @Provides @Singleton
+          public ReflectEntityStore entityStore(
+              AvroSchemaRegistry schemaRegistry, AccumuloTemplate accumuloTemplate) {
+
+            return new AccumuloReflectEntityStore(
+                schemaRegistry, Tables.ENTITY_PREFIX, accumuloTemplate);
           }
         },
         new AccumuloModule());

@@ -44,24 +44,14 @@ public class FindObservationsCoordinatorTest extends RepositoryTestSupport {
     Patient patient = new Patient();
     patient.setInstitutionPatientId("UCSF-12345");
     patient.setAccountNumber("12345");
-    patient.setNames(Arrays.asList(new HumanName() {
-      {
-        setFirstName("pat1firstname");
-        setMiddleName("pat1middlename");
-        setFamily(Arrays.asList("pat1lastname"));
-      }
-    }));
-    patient.setCommunication(new PatientCommunication() {
-      {
-        setPreferred(true);
-        setLanguage(new CodeableConcept() {
-          {
-            setCodings(Arrays.asList("English"));
-            setText("English");
-          }
-        });
-      }
-    });
+    patient.setNames(Arrays.asList(HumanName.builder()
+        .given(Arrays.asList("pat1firstname", "pat1middlename"))
+        .family(Arrays.asList("pat1lastname"))
+        .build()));
+    patient.setCommunication(PatientCommunication.builder()
+        .preferred(true)
+        .language(new CodeableConcept("en", "English"))
+        .build());
     patient.setGender(Gender.MALE);
     patient.setBirthDate(LocalDate.now());
     patient.setMaritalStatus(MaritalStatus.MARRIED);

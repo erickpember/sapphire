@@ -2,55 +2,48 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.persist;
 
-import com.datafascia.common.accumulo.AccumuloTemplate;
-import com.datafascia.common.accumulo.MutationBuilder;
-import com.datafascia.common.accumulo.MutationSetter;
-import com.datafascia.common.accumulo.RowMapper;
 import com.datafascia.common.persist.Id;
-import com.datafascia.common.time.Interval;
+import com.datafascia.common.persist.entity.EntityId;
+import com.datafascia.common.persist.entity.ReflectEntityStore;
 import com.datafascia.domain.model.Encounter;
 import com.datafascia.domain.model.Patient;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.accumulo.core.client.Scanner;
-import org.apache.accumulo.core.data.Key;
-import org.apache.accumulo.core.data.Range;
-import org.apache.accumulo.core.data.Value;
-import org.apache.hadoop.io.Text;
 
 /**
  * Encounter data access.
- * <p>
- * The row ID for an encounter entity has the format:
- * <pre>
- * Patient={patient key}&Encounter={encounterId}&
- * </pre>
  */
 @Slf4j
-public class EncounterRepository extends BaseRepository {
-
-  private static final String COLUMN_FAMILY = Encounter.class.getSimpleName();
-  private static final String IDENTIFIER = "identifier";
-  private static final String PERIOD_START = "periodStart";
-  private static final String PERIOD_END = "periodEnd";
-  private static final EncounterRowMapper ENCOUNTER_ROW_MAPPER = new EncounterRowMapper();
+public class EncounterRepository extends EntityStoreRepository {
 
   /**
    * Constructor
    *
-   * @param accumuloTemplate
-   *     data access operations template
+   * @param entityStore
+   *     entity store
    */
   @Inject
-  public EncounterRepository(AccumuloTemplate accumuloTemplate) {
-    super(accumuloTemplate);
+  public EncounterRepository(ReflectEntityStore entityStore) {
+    super(entityStore);
   }
 
-  static String toRowId(Id<Patient> patientId, Id<Encounter> encounterId) {
-    return toRowId(Patient.class, patientId) + toRowId(Encounter.class, encounterId);
+  /**
+   * Converts patient ID and encounter ID to entity ID.
+   *
+   * @param patientId
+   *     patient ID
+   * @param encounterId
+   *     encounter ID
+   * @return entity ID
+   */
+  static EntityId toEntityId(Id<Patient> patientId, Id<Encounter> encounterId) {
+    return EntityId.builder()
+        .path(PatientRepository.toEntityId(patientId))
+        .path(Encounter.class, encounterId)
+        .build();
   }
 
   /**
@@ -75,51 +68,7 @@ public class EncounterRepository extends BaseRepository {
   public void save(Patient patient, Encounter encounter) {
     encounter.setId(generateId(encounter));
 
-    accumuloTemplate.save(
-        Tables.PATIENT,
-        toRowId(patient.getId(), encounter.getId()),
-        new MutationSetter() {
-          @Override
-          public void putWriteOperations(MutationBuilder mutationBuilder) {
-            mutationBuilder
-                .columnFamily(COLUMN_FAMILY)
-                .put(IDENTIFIER, encounter.getIdentifier())
-                .put(PERIOD_START, encounter.getPeriod().getStartInclusive())
-                .put(PERIOD_END, encounter.getPeriod().getEndExclusive());
-          }
-        });
-  }
-
-  private static class EncounterRowMapper implements RowMapper<Encounter> {
-    private Encounter encounter;
-
-    @Override
-    public void onBeginRow(Key key) {
-      encounter = new Encounter();
-      encounter.setId(Id.of(extractEntityId(key)));
-      encounter.setPeriod(new Interval<>());
-    }
-
-    @Override
-    public void onReadEntry(Map.Entry<Key, Value> entry) {
-      byte[] value = entry.getValue().get();
-      switch (entry.getKey().getColumnQualifier().toString()) {
-        case IDENTIFIER:
-          encounter.setIdentifier(decodeString(value));
-          break;
-        case PERIOD_START:
-          encounter.getPeriod().setStartInclusive(decodeInstant(value));
-          break;
-        case PERIOD_END:
-          encounter.getPeriod().setEndExclusive(decodeInstant(value));
-          break;
-      }
-    }
-
-    @Override
-    public Encounter onEndRow() {
-      return encounter;
-    }
+    entityStore.save(toEntityId(patient.getId(), encounter.getId()), encounter);
   }
 
   /**
@@ -132,11 +81,7 @@ public class EncounterRepository extends BaseRepository {
    * @return optional entity, empty if not found
    */
   public Optional<Encounter> read(Id<Patient> patientId, Id<Encounter> encounterId) {
-    Scanner scanner = accumuloTemplate.createScanner(Tables.PATIENT);
-    scanner.setRange(Range.exact(toRowId(patientId, encounterId)));
-    scanner.fetchColumnFamily(new Text(COLUMN_FAMILY));
-
-    return accumuloTemplate.queryForObject(scanner, ENCOUNTER_ROW_MAPPER);
+    return entityStore.read(toEntityId(patientId, encounterId));
   }
 
   /**
@@ -147,10 +92,7 @@ public class EncounterRepository extends BaseRepository {
    * @return encounters
    */
   public List<Encounter> list(Id<Patient> patientId) {
-    Scanner scanner = accumuloTemplate.createScanner(Tables.PATIENT);
-    scanner.setRange(Range.prefix(PatientRepository.toRowId(patientId)));
-    scanner.fetchColumnFamily(new Text(COLUMN_FAMILY));
-
-    return accumuloTemplate.queryForList(scanner, ENCOUNTER_ROW_MAPPER);
+    return entityStore.stream(PatientRepository.toEntityId(patientId), Encounter.class)
+        .collect(Collectors.toList());
   }
 }

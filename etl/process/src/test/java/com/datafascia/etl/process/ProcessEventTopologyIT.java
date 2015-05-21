@@ -7,6 +7,7 @@ import backtype.storm.Testing;
 import backtype.storm.testing.TestJob;
 import backtype.storm.tuple.Values;
 import com.datafascia.common.accumulo.AccumuloConfiguration;
+import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
 import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.ConnectorFactory;
@@ -18,6 +19,8 @@ import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
 import com.datafascia.common.configuration.guice.ConfigureModule;
 import com.datafascia.common.inject.Injectors;
 import com.datafascia.common.persist.Id;
+import com.datafascia.common.persist.entity.AccumuloReflectEntityStore;
+import com.datafascia.common.persist.entity.ReflectEntityStore;
 import com.datafascia.common.storm.trident.StreamFactory;
 import com.datafascia.domain.event.AddObservationsData;
 import com.datafascia.domain.event.AdmitPatientData;
@@ -37,7 +40,6 @@ import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.ObservationRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.domain.persist.Tables;
-import com.google.inject.Injector;
 import com.google.inject.Provides;
 import com.neovisionaries.i18n.LanguageCode;
 import java.net.URI;
@@ -46,9 +48,9 @@ import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.apache.accumulo.core.client.Connector;
-import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -71,16 +73,29 @@ public class ProcessEventTopologyIT {
       bind(AuthorizationsSupplier.class).to(FixedAuthorizationsSupplier.class);
       bind(AvroSchemaRegistry.class).to(MemorySchemaRegistry.class).in(Singleton.class);
       bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
-    }
-
-    @Provides
-    public ConnectorFactory getConnectorFactory() {
-      return ProcessEventTopologyIT.connectorFactory;
+      bind(ReflectEntityStore.class).to(AccumuloReflectEntityStore.class);
     }
 
     @Provides @Singleton
-    public Connector getConnector(ConnectorFactory factory) {
+    public Connector connector(ConnectorFactory factory) {
       return factory.getConnector();
+    }
+
+    @Provides
+    public ConnectorFactory connectorFactory() {
+      return new ConnectorFactory(AccumuloConfiguration.builder()
+          .instance(ConnectorFactory.MOCK_INSTANCE)
+          .zooKeepers("")
+          .user("root")
+          .password("secret")
+          .build());
+    }
+
+    @Provides @Singleton
+    public AccumuloReflectEntityStore entityStore(
+        AvroSchemaRegistry schemaRegistry, AccumuloTemplate accumuloTemplate) {
+
+      return new AccumuloReflectEntityStore(schemaRegistry, Tables.ENTITY_PREFIX, accumuloTemplate);
     }
   }
 
@@ -92,40 +107,35 @@ public class ProcessEventTopologyIT {
   private static final String NUMERICAL_PAIN_LEVEL_LOW_VALUE = "1";
   private static final String NUMERICAL_PAIN_LEVEL_HIGH_VALUE = "2";
 
-  private static ConnectorFactory connectorFactory;
-  private static Injector injector;
-  private static Connector connector;
-  private static PatientRepository patientRepository;
-  private static EncounterRepository encounterRepository;
-  private static ObservationRepository observationRepository;
+  @Inject
+  private Connector connector;
+
+  @Inject
+  private AccumuloReflectEntityStore entityStore;
+
+  @Inject
+  private PatientRepository patientRepository;
+
+  @Inject
+  private EncounterRepository encounterRepository;
+
+  @Inject
+  private ObservationRepository observationRepository;
+
+  @Inject
+  private Serializer serializer;
 
   private ProcessEventTopology topology;
   private FeederBatchSpout eventSpout;
-  private Serializer serializer;
 
   @BeforeClass
   public void beforeClass() {
-    connectorFactory = new ConnectorFactory(AccumuloConfiguration.builder()
-        .instance(ConnectorFactory.MOCK_INSTANCE)
-        .zooKeepers("")
-        .user("root")
-        .password("")
-        .build());
-
     Injectors.overrideWith(new TestModule());
-    injector = Injectors.getInjector();
-
-    connector = injector.getInstance(Connector.class);
+    Injectors.getInjector().injectMembers(this);
   }
 
   @BeforeMethod
   public void beforeMethod() throws Exception {
-    connector.tableOperations().create(Tables.PATIENT);
-
-    patientRepository = injector.getInstance(PatientRepository.class);
-    encounterRepository = injector.getInstance(EncounterRepository.class);
-    observationRepository = injector.getInstance(ObservationRepository.class);
-
     topology = new ProcessEventTopology();
 
     eventSpout = new FeederBatchSpout(Arrays.asList(F.BYTES));
@@ -136,13 +146,6 @@ public class ProcessEventTopologyIT {
             return topology.newStream(EVENT_SPOUT_ID, eventSpout);
           }
         });
-
-    serializer = new Serializer(injector.getInstance(AvroSchemaRegistry.class));
-  }
-
-  @AfterMethod
-  public void afterMethod() throws Exception {
-    connector.tableOperations().delete(Tables.PATIENT);
   }
 
   private Event createAdmitPatientEvent() {

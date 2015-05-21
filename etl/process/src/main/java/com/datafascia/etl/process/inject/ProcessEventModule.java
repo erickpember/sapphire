@@ -3,6 +3,7 @@
 package com.datafascia.etl.process.inject;
 
 import com.codahale.metrics.MetricRegistry;
+import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
 import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.ConnectorFactory;
@@ -11,6 +12,9 @@ import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
 import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
 import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
 import com.datafascia.common.configuration.guice.ConfigureModule;
+import com.datafascia.common.persist.entity.AccumuloReflectEntityStore;
+import com.datafascia.common.persist.entity.ReflectEntityStore;
+import com.datafascia.domain.persist.Tables;
 import com.google.inject.Provides;
 import javax.inject.Singleton;
 import org.apache.accumulo.core.client.Connector;
@@ -31,5 +35,12 @@ public class ProcessEventModule extends ConfigureModule {
   @Provides @Singleton
   public Connector connector(ConnectorFactory connectorFactory) {
     return connectorFactory.getConnector();
+  }
+
+  @Provides @Singleton
+  public ReflectEntityStore entityStore(
+      AvroSchemaRegistry schemaRegistry, AccumuloTemplate accumuloTemplate) {
+
+    return new AccumuloReflectEntityStore(schemaRegistry, Tables.ENTITY_PREFIX, accumuloTemplate);
   }
 }

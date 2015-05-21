@@ -3,19 +3,27 @@
 package com.datafascia.domain.persist;
 
 import com.datafascia.common.accumulo.AccumuloConfiguration;
+import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
 import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.ConnectorFactory;
 import com.datafascia.common.accumulo.FixedAuthorizationsSupplier;
 import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
+import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
+import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
+import com.datafascia.common.persist.entity.AccumuloReflectEntityStore;
+import com.datafascia.common.persist.entity.ReflectEntityStore;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
+import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.apache.accumulo.core.client.Connector;
-import org.testng.annotations.AfterClass;
+import org.apache.accumulo.core.client.Scanner;
+import org.apache.accumulo.core.data.Key;
+import org.apache.accumulo.core.data.Value;
 import org.testng.annotations.BeforeClass;
 
 /**
@@ -30,7 +38,9 @@ public abstract class RepositoryTestSupport {
     @Override
     protected void configure() {
       bind(AuthorizationsSupplier.class).to(FixedAuthorizationsSupplier.class);
+      bind(AvroSchemaRegistry.class).to(MemorySchemaRegistry.class).in(Singleton.class);
       bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
+      bind(ReflectEntityStore.class).to(AccumuloReflectEntityStore.class);
     }
 
     @Provides @Singleton
@@ -47,21 +57,40 @@ public abstract class RepositoryTestSupport {
           .password("secret")
           .build());
     }
+
+    @Provides @Singleton
+    public AccumuloReflectEntityStore entityStore(
+        AvroSchemaRegistry schemaRegistry, AccumuloTemplate accumuloTemplate) {
+
+      return new AccumuloReflectEntityStore(schemaRegistry, Tables.ENTITY_PREFIX, accumuloTemplate);
+    }
   }
 
   @Inject
-  private Connector connector;
+  private AccumuloTemplate accumuloTemplate;
+
+  @Inject
+  private AccumuloReflectEntityStore entityStore;
 
   @BeforeClass
   public void beforeRepositoryTestSupport() throws Exception {
     Injector injector = Guice.createInjector(new TestModule());
     injector.injectMembers(this);
-
-    connector.tableOperations().create(Tables.PATIENT);
   }
 
-  @AfterClass
-  public void afterRepositoryTestSupport() throws Exception {
-    connector.tableOperations().delete(Tables.PATIENT);
+  protected void scan() {
+    Scanner scanner = accumuloTemplate.createScanner(entityStore.getDataTableName());
+    try {
+      for (Map.Entry<Key, Value> entry : scanner) {
+        System.out.format(
+            "%s %s %s %s\n",
+            entry.getKey().getRow(),
+            entry.getKey().getColumnFamily(),
+            entry.getKey().getColumnQualifier(),
+            entry.getValue());
+      }
+    } finally {
+      scanner.close();
+    }
   }
 }

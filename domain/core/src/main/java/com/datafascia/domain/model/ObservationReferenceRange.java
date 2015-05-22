@@ -6,20 +6,15 @@ import com.datafascia.common.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
-import org.apache.avro.reflect.AvroSchema;
 
 /**
  * Measurements and simple assertions made about a patient, device or other subject.
  */
-@Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode
+@Data @NoArgsConstructor
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
-@JsonTypeName(URNFactory.MODEL_PREFIX + "ObservationReferenceRange") @ToString(callSuper = true)
+@JsonTypeName(URNFactory.MODEL_PREFIX + "ObservationReferenceRange")
 public class ObservationReferenceRange {
   /** Low range, if relevant. Low range comparator can not be > or >= or empty. */
   @JsonProperty("low")

@@ -15,17 +15,17 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Represents a patient record.
  */
-@Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode(callSuper = true)
+@AllArgsConstructor @Builder @Data @EqualsAndHashCode(callSuper = true) @NoArgsConstructor
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "Patient") @IdNamespace(URNFactory.NS_PATIENT_ID)
 @ToString(callSuper = true)
@@ -89,4 +89,8 @@ public class Patient extends Person {
   @JsonProperty("creationDate") @JsonSerialize(using = InstantSerializer.class)
   @JsonDeserialize(using = InstantDeserializer.class)
   private Instant creationDate;
+
+  /** Whether this patient's record is in active use.*/
+  @JsonProperty("active")
+  private boolean active;
 }

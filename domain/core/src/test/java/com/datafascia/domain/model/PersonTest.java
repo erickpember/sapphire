@@ -3,23 +3,19 @@
 package com.datafascia.domain.model;
 
 import com.datafascia.common.persist.Id;
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 /**
  * Test code for Person model.
  */
 public class PersonTest extends ModelTestBase {
   @Test
-  public <T extends Object> void testPerson() throws IOException, URISyntaxException {
+  public void testPerson() throws Exception {
     Person decoded = (Person) geneticEncodeDecodeTest(TestModels.person);
-    assertTrue(decoded.isActive());
     assertEquals(decoded.getGender(), Gender.FEMALE);
     assertEquals(decoded.getManagingOrganizationId(), Id.of("Organization"));
     assertEquals(decoded.getPhoto(), TestModels.getPhoto());
@@ -31,9 +27,8 @@ public class PersonTest extends ModelTestBase {
   }
 
   @Test
-  public void testJsonProperties() throws IOException {
+  public void testJsonProperties() throws Exception {
     ArrayList<String> jsonProperties = new ArrayList<>();
-    jsonProperties.add("active");
     jsonProperties.add("addresses");
     jsonProperties.add("birthDate");
     jsonProperties.add("gender");

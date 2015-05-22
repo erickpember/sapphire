@@ -6,6 +6,7 @@ import com.datafascia.common.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import java.util.Arrays;
 import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -27,4 +28,16 @@ public class CodeableConcept {
   /** Plain text representation of the concept.*/
   @JsonProperty("text")
   private String text;
+
+  /**
+   * Constructor
+   *
+   * @param code
+   *     code defined by a coding system
+   * @param text
+   *     plain text representation of the concept
+   */
+  public CodeableConcept(String code, String text) {
+    this(Arrays.asList(code), text);
+  }
 }

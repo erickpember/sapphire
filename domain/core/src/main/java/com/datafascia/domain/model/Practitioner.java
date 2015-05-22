@@ -15,12 +15,11 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Represents a practitioner.
  */
-@Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode(callSuper = true)
+@NoArgsConstructor @Getter @Setter @EqualsAndHashCode(callSuper = true)
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "Practitioner") @IdNamespace(URNFactory.NS_PRACTITIONER_ID)
 @ToString(callSuper = true)
@@ -28,10 +27,6 @@ public class Practitioner extends Person {
   /** Identifier for the practitioner. */
   @JsonProperty("@id")
   private Id<Practitioner> id;
-
-  /** A list of contacts associated with the practitioner. */
-  @JsonProperty("telecoms")
-  private List<ContactPoint> telecoms;
 
   /** Roles which the practitioner may perform. */
   @JsonProperty("practitionerRoles")

@@ -112,7 +112,6 @@ public class TestModels {
   public static RelatedPerson relatedPerson = new RelatedPerson() {
     {
       // General Person fields
-      setActive(true);
       setGender(Gender.FEMALE);
       setManagingOrganizationId(Id.of("Organization"));
       setPhoto(TestModels.getPhoto());
@@ -860,7 +859,6 @@ public class TestModels {
 
   public static Person person = new Person() {
     {
-      setActive(true);
       setGender(Gender.FEMALE);
       setManagingOrganizationId(Id.of("Organization"));
       setPhoto(TestModels.getPhoto());

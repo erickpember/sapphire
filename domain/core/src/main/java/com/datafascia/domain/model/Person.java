@@ -14,17 +14,13 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import java.awt.Image;
 import java.time.LocalDate;
 import java.util.List;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Represents a human being.
  */
-@Slf4j @NoArgsConstructor @Getter @Setter @EqualsAndHashCode @ToString
+@Data @NoArgsConstructor
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
 @JsonTypeName(URNFactory.MODEL_PREFIX + "Person")
 public class Person {
@@ -32,7 +28,7 @@ public class Person {
   @JsonProperty("names")
   private List<HumanName> names;
 
- /** A list of contacts associated with the person.*/
+  /** A list of contacts associated with the person.*/
   @JsonProperty("telecoms")
   private List<ContactPoint> telecoms;
 
@@ -56,10 +52,6 @@ public class Person {
   /** The Organization that is the custodian of the person record.*/
   @JsonProperty("managingOrganizationId")
   private Id<Organization> managingOrganizationId;
-
-  /** Whether or not this person's record is in active use.*/
-  @JsonProperty("active")
-  private boolean active;
 
   /** Link to a resource that concerns the same actual person.*/
   @JsonProperty("links")

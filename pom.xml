@@ -36,6 +36,7 @@
     <avro.version>1.7.7</avro.version>
     <commons-lang3.version>3.3.2</commons-lang3.version>
     <unitsofmeasure.version>0.7.1</unitsofmeasure.version>
+    <drools.version>6.2.0.Final</drools.version>
     <dropwizard.version>0.8.0</dropwizard.version>
     <guava.version>18.0</guava.version>
     <guice.version>4.0</guice.version>
@@ -78,6 +79,7 @@
     <module>etl/nar</module>
     <module>etl/web-services-ingest</module>
     <module>integration-tests</module>
+    <module>rules</module>
     <module>scenario-tests</module>
     <module>shell</module>
   </modules>
@@ -469,9 +471,21 @@
       </dependency>
 
       <dependency>
+        <groupId>org.drools</groupId>
+        <artifactId>drools-compiler</artifactId>
+        <version>${drools.version}</version>
+      </dependency>
+
+      <dependency>
         <groupId>org.eclipse.jetty.websocket</groupId>
         <artifactId>websocket-server</artifactId>
         <version>${jetty.version}</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.kie</groupId>
+        <artifactId>kie-api</artifactId>
+        <version>${drools.version}</version>
       </dependency>
 
       <dependency>
@@ -646,6 +660,7 @@
         <configuration>
           <excludes>
             <exclude>kafka*</exclude>
+            <exclude>**org.drools*</exclude>
           </excludes>
         </configuration>
         <executions>

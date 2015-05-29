@@ -134,25 +134,6 @@
       touch {{ docker_image_creator_home }}/storm-supervisor.created
       creates={{ docker_image_creator_home }}/storm-supervisor.created
 
-- name: Copy application package
-  copy:
-    src: "{{ playbook_dir }}/../../shell/target/df-shell-{{ df_platform_version }}-bin.tar.gz"
-    dest: "{{ company_package_dir }}/df-shell-{{ df_platform_version }}-bin.tar.gz"
-
-- name: Copy df-etl-hl7-ingest Dockerfile
-  template:
-    src: "{{ playbook_dir }}/roles/df-etl-hl7-ingest/templates/df-etl-hl7-ingest-Dockerfile"
-    dest: "{{ company_package_dir }}/df-etl-hl7-ingest-Dockerfile"
-
-- name: Create df-etl-hl7-ingest Docker image
-  shell: >
-      docker build
-      --file={{ company_package_dir }}/df-etl-hl7-ingest-Dockerfile
-      --tag=datafascia/df-etl-hl7-ingest
-      {{ company_package_dir }} &&
-      touch {{ docker_image_creator_home }}/df-etl-hl7-ingest.created
-      creates={{ docker_image_creator_home }}/df-etl-hl7-ingest.created
-
 - name: Copy df-api-server package
   copy:
     src: "{{ playbook_dir }}/../../api/server/target/df-api-server-{{ df_platform_version }}.jar"

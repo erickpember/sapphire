@@ -2,10 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.rules.model;
 
-import com.datafascia.common.urn.URNFactory;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonTypeName;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -13,8 +10,6 @@ import lombok.NoArgsConstructor;
  * Represents a first pass at representing RxNorm data for matching.
  */
 @Data @NoArgsConstructor
-@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "@type")
-@JsonTypeName(URNFactory.MODEL_PREFIX + "RxNorm")
 public class RxNorm {
   /** dF-internal group name. */
   @JsonProperty("medsGroup")
@@ -37,8 +32,8 @@ public class RxNorm {
   private String pca;
 
   /** Drug brand name. */
-  @JsonProperty("brandName")
-  private String brandName;
+  @JsonProperty("brand")
+  private String brand;
 
   /** Name of drug. */
   @JsonProperty("rxcuiSCD")

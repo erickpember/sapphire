@@ -3,7 +3,10 @@
 package com.datafascia.rules.util;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.kie.api.KieBase;
 import org.kie.api.KieBaseConfiguration;
@@ -22,6 +25,7 @@ import org.kie.internal.io.ResourceFactory;
 
 /**
  * Helper methods for testing purposes
+ * From www.plugtree.com
  */
 @Slf4j
 public class TestUtil {
@@ -126,4 +130,20 @@ public class TestUtil {
   private TestUtil() {
   }
 
+  /**
+   * Returns a set of duplicates found in a string list in input.
+   *
+   * @param listContainingDuplicates A list possibly containing duplicates.
+   * @return A list of duplicate strings found in the input.
+   */
+  public static Set<String> findDuplicates(List<String> listContainingDuplicates) {
+    final Set<String> setToReturn = new HashSet();
+    final Set<String> set1 = new HashSet();
+    for (String string : listContainingDuplicates) {
+      if (!set1.add(string)) {
+        setToReturn.add(string);
+      }
+    }
+    return setToReturn;
+  }
 }

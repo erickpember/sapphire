@@ -50,6 +50,7 @@
     <metrics.version>3.1.0</metrics.version>
     <mockito.version>1.10.19</mockito.version>
     <neovisionaries.version>1.14</neovisionaries.version>
+    <nifi.version>0.1.0-incubating</nifi.version>
     <reflections.version>0.9.9</reflections.version>
     <retrofit.version>1.9.0</retrofit.version>
     <shiro.version>1.2.3</shiro.version>
@@ -70,10 +71,12 @@
     <module>domain/core</module>
     <module>emerge/core</module>
     <module>emerge/csv</module>
-    <module>etl/hl7-ingest</module>
-    <module>etl/web-services-ingest</module>
+    <module>etl/components</module>
     <module>etl/hl7-transform</module>
+    <module>etl/hl7-ingest</module>
+    <module>etl/nar</module>
     <module>etl/process</module>
+    <module>etl/web-services-ingest</module>
     <module>integration-tests</module>
     <module>scenario-tests</module>
     <module>shell</module>
@@ -340,6 +343,17 @@
             <artifactId>log4j</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+
+      <dependency>
+        <groupId>org.apache.nifi</groupId>
+        <artifactId>nifi-api</artifactId>
+        <version>${nifi.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.nifi</groupId>
+        <artifactId>nifi-processor-utils</artifactId>
+        <version>${nifi.version}</version>
       </dependency>
 
       <dependency>

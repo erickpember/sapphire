@@ -1,1 +1,2 @@
+com.datafascia.etl.ingest.ArchiveIngestMessage
 com.datafascia.etl.ingest.ListenHL7

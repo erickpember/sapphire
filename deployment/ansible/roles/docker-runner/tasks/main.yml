@@ -141,30 +141,6 @@
           datafascia/kafka
   when: "'datafascia/kafka:latest' not in list_containers.stdout_lines"
 
-- name: Run Storm nimbus
-  command: >
-      {{ docker_run_command }}
-          {{ groups['storm-nimbus'][0] }}
-          --detach
-          --env=STORM_NIMBUS_HOST={{ groups['storm-nimbus'][0] }}
-          --env=ZOOKEEPER_SERVERS={{ groups['zookeeper'] | join(',') }}
-          --publish=6627:6627
-          --publish=8080:8080
-          --volume={{ company_data_prefix }}:{{ company_data_prefix }}
-          datafascia/storm-nimbus
-  when: "'datafascia/storm-nimbus:latest' not in list_containers.stdout_lines"
-
-- name: Run Storm supervisor
-  command: >
-      {{ docker_run_command }}
-          {{ groups['storm-supervisor'][0] }}
-          --detach
-          --env=STORM_NIMBUS_HOST={{ groups['storm-nimbus'][0] }}
-          --env=ZOOKEEPER_SERVERS={{ groups['zookeeper'] | join(',') }}
-          --volume={{ company_data_prefix }}:{{ company_data_prefix }}
-          datafascia/storm-supervisor
-  when: "'datafascia/storm-supervisor:latest' not in list_containers.stdout_lines"
-
 - name: Stop df-api-server
   shell: docker stop api1.local.datafascia.com && docker rm api1.local.datafascia.com
   ignore_errors: True

@@ -106,34 +106,6 @@
       touch {{ docker_image_creator_home }}/kafka.created
       creates={{ docker_image_creator_home }}/kafka.created
 
-- name: Copy Storm nimbus Dockerfile
-  template:
-    src: "{{ playbook_dir }}/roles/storm-nimbus/templates/storm-nimbus-Dockerfile"
-    dest: "{{ company_package_dir }}/storm-nimbus-Dockerfile"
-
-- name: Create Storm nimbus Docker image
-  shell: >
-      docker build
-      --file={{ company_package_dir }}/storm-nimbus-Dockerfile
-      --tag=datafascia/storm-nimbus
-      {{ company_package_dir }} &&
-      touch {{ docker_image_creator_home }}/storm-nimbus.created
-      creates={{ docker_image_creator_home }}/storm-nimbus.created
-
-- name: Copy Storm supervisor Dockerfile
-  template:
-    src: "{{ playbook_dir }}/roles/storm-supervisor/templates/storm-supervisor-Dockerfile"
-    dest: "{{ company_package_dir }}/storm-supervisor-Dockerfile"
-
-- name: Create Storm supervisor Docker image
-  shell: >
-      docker build
-      --file={{ company_package_dir }}/storm-supervisor-Dockerfile
-      --tag=datafascia/storm-supervisor
-      {{ company_package_dir }} &&
-      touch {{ docker_image_creator_home }}/storm-supervisor.created
-      creates={{ docker_image_creator_home }}/storm-supervisor.created
-
 - name: Copy df-api-server package
   copy:
     src: "{{ playbook_dir }}/../../api/server/target/df-api-server-{{ df_platform_version }}.jar"

@@ -72,10 +72,8 @@
     <module>emerge/core</module>
     <module>emerge/csv</module>
     <module>etl/components</module>
-    <module>etl/hl7-transform</module>
     <module>etl/hl7-ingest</module>
     <module>etl/nar</module>
-    <module>etl/process</module>
     <module>etl/web-services-ingest</module>
     <module>integration-tests</module>
     <module>scenario-tests</module>

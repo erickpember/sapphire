@@ -1,13 +1,12 @@
 ---
 - name: Download Java
-  uri:
-    url: http://download.oracle.com/otn-pub/java/jdk/{{ java_package_version }}-{{ java_package_build }}/{{ java_package }}
-    HEADER_Cookie: oraclelicense=accept-securebackup-cookie
+  get_url:
+    url: http://s3-us-west-2.amazonaws.com/datafascia-packages/{{ java_package }}
     dest: "{{ company_package_dir }}/{{ java_package }}"
-    creates: "{{ company_package_dir }}/{{ java_package }}"
 
 - name: Install Java
-  command: rpm --install {{ company_package_dir }}/{{ java_package }}
+  command: >
+      rpm --install {{ company_package_dir }}/{{ java_package }}
       creates=/usr/java/jre{{ java_version }}
 
 - name: Install Unlimited Strength Jurisdiction Policy Files

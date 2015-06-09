@@ -28,18 +28,13 @@
   register: epel_repo
 
 - name: Add EPEL YUM repository
-  command: rpm --install http://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm
+  yum: name=epel-release
   when: epel_repo.stat.exists == False
 
 - name: Install python-pip
   yum:
-      name=python-pip
-      enablerepo=epel
+    name: python-pip
+    enablerepo: epel
 
 - name: Install httplib2
   pip: name=httplib2
-
-- name: Add Cloudera YUM repository
-  copy:
-      src=cloudera-cdh5.repo
-      dest=/etc/yum.repos.d/cloudera-cdh5.repo

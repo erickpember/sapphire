@@ -4,7 +4,7 @@ accumulo_password: secret
 
 df_platform_version: 0.0.1-SNAPSHOT
 
-docker_version: 1.6.0
+docker_version: 1.6.2
 
 hdfs_dfs_data_dir:
   - "{{ company_data_prefix }}/hadoop/datanode"

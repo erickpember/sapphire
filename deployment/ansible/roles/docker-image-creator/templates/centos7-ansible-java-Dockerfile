@@ -15,4 +15,5 @@ RUN ansible-playbook \
         --inventory-file=environment/local/hosts \
         --tags=image \
         java.yml && \
-    rm -rf {{ company_ansible_dir }} {{ company_package_dir }}
+    rm -rf {{ company_ansible_dir }} && \
+    find {{ company_package_dir }} -type f -delete

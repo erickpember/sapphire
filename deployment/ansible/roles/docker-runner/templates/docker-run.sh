@@ -11,7 +11,7 @@ containerId=$(docker run --name=$hostName {{ docker_run_options }} $*)
 
 ipAddress=$(docker inspect --format {{ "'{{ .NetworkSettings.IPAddress }}'" }} $containerId)
 
-echo "host-record=$hostName,$ipAddress" >{{ dnsmasq_conf_dir }}/$hostName
+echo "$ipAddress $hostName" >{{ dnsmasq_hosts_dir }}/$hostName
 service dnsmasq restart
 
 # Delay because systemd allows at most 5 start requests in 10 seconds.

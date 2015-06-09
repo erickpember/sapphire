@@ -1,6 +1,24 @@
 ---
+- name: Add Cloudera YUM repository
+  copy:
+    src: cloudera-cdh5.repo
+    dest: /etc/yum.repos.d/cloudera-cdh5.repo
+  tags:
+    - image
+
 - name: Install Hadoop
-  yum: name=hadoop-{{ hadoop_version }}
+  yum:
+    name: hadoop-{{ hadoop_version }}
+    disablerepo: epel
+  tags:
+    - image
+
+# Work around "su hdfs" command returning "cannot open session" error.
+# See https://github.com/docker/docker/issues/7056
+- name: Delete HDFS user limits
+  file:
+    path: /etc/security/limits.d/hdfs.conf
+    state: absent
   tags:
     - image
 
@@ -16,9 +34,9 @@
 
 - name: Copy configuration files
   template:
-      src={{ item }}
-      dest={{ hadoop_conf_dir }}/{{ item }}
-      mode=664
+    src: "{{ item }}"
+    dest: "{{ hadoop_conf_dir }}/{{ item }}"
+    mode: 0664
   with_items:
     - core-site.xml
     - hdfs-site.xml

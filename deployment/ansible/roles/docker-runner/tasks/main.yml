@@ -1,18 +1,27 @@
 ---
+- name: Create {{ dnsmasq_hosts_dir }} directory
+  file:
+    path: "{{ dnsmasq_hosts_dir }}"
+    state: directory
+
 - name: Install dnsmasq
   yum: name=dnsmasq
 
-- name: Create {{ company_data_prefix }} directory
-  file:
-    path: "{{ company_data_prefix }}"
-    state: directory
-    mode: 0755
+- name: Configure dnsmasq
+  lineinfile:
+    dest: /etc/dnsmasq.conf
+    line: addn-hosts={{ dnsmasq_hosts_dir }}
 
 - name: Copy Docker run script
   template:
     src: docker-run.sh
     dest: "{{ docker_run_command }}"
     mode: 0755
+
+- name: Stop df-api-server
+  shell: docker stop api1.local.datafascia.com && docker rm -v api1.local.datafascia.com
+  ignore_errors: True
+  when: copy_df_api_server.changed
 
 - name: List Docker containers
   shell: docker ps | awk '{ print $2 }'
@@ -31,11 +40,6 @@
           --volume={{ company_data_prefix }}:{{ company_data_prefix }}
           datafascia/zookeeper
   when: "'datafascia/zookeeper:latest' not in list_containers.stdout_lines"
-
-- name: Set vm.swappiness to Accumulo recommended value
-  sysctl:
-    name: vm.swappiness
-    value: 0
 
 - name: Run Accumulo master primary container
   command: >
@@ -141,10 +145,6 @@
           datafascia/kafka
   when: "'datafascia/kafka:latest' not in list_containers.stdout_lines"
 
-- name: Stop df-api-server
-  shell: docker stop api1.local.datafascia.com && docker rm api1.local.datafascia.com
-  ignore_errors: True
-  when: copy_df_api_server.changed
 
 - name: Run df-api-server
   command: >
@@ -156,4 +156,4 @@
           --publish=9090:9090
           --volume={{ company_data_prefix }}:{{ company_data_prefix }}
           datafascia/df-api-server
-  when: copy_df_api_server.changed
+  when: "'datafascia/df-api-server:latest' not in list_containers.stdout_lines"

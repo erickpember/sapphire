@@ -17,7 +17,7 @@ import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;
 
 /**
- * A containter for starting and stopping your application at the start and end of a test class.
+ * A container for starting and stopping your application at the start and end of a test class.
  *
  * <p>
  * By default, the {@link Application} will be constructed using reflection to invoke the nullary

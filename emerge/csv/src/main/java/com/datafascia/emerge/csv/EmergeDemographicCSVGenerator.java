@@ -108,7 +108,7 @@ public class EmergeDemographicCSVGenerator {
    * Take a patient object and entry number, and return a populated Demographic object.
    *
    * @param pat patient object.
-   * @param entry entry number (Patcome in the CSV)
+   * @param entry entry number (Patcom in the CSV)
    *
    * @return the Demographic object.
    */
@@ -173,7 +173,7 @@ public class EmergeDemographicCSVGenerator {
   }
 
   /**
-   * Returns the value for a given observation by it's code.
+   * Returns the value for a given observation by its code.
    *
    * @param encount
    * @param code

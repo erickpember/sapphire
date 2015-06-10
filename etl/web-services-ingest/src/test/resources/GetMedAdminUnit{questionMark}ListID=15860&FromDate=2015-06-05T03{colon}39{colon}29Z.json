@@ -1,0 +1,67 @@
+{
+  "Error": null, 
+  "ExtractDateTime": "/Date(1433501081000-0700)/", 
+  "Patient": [
+    {
+      "CSN": "5041113", 
+      "Medications": [
+        {
+          "AHFS": "28:12.08", 
+          "AdminInst": [
+            "2 mg, Oral, Every 12 Hours PRN, asdfasdf, Starting Fri 6/5/15 at 1021<br>asdfasdfasdfa<br>"
+          ], 
+          "DateTimeOrdered": "/Date(1433499692000-0700)/", 
+          "DrugID": "2404", 
+          "DrugName": "DIAZEPAM 2 MG TABLET", 
+          "FDB": null, 
+          "Frequency": "200528^Every 12 Hours PRN", 
+          "MedAdmin": [
+            {
+              "AdminAction": "1^Given", 
+              "DocumentationTime": "/Date(1433502000000-0700)/", 
+              "Dose": "2", 
+              "DoseUnit": "3^mg", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "TimeTaken": "/Date(-62135568000000-0800)/", 
+              "User": "IPRN^INPATIENT, NURSE"
+            }, 
+            {
+              "AdminAction": "1^Given", 
+              "DocumentationTime": "/Date(1433502000000-0700)/", 
+              "Dose": "2", 
+              "DoseUnit": "3^mg", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "TimeTaken": "/Date(-62135568000000-0800)/", 
+              "User": "IPRN^INPATIENT, NURSE"
+            }
+          ], 
+          "Mixture": null, 
+          "OrderID": "159301116", 
+          "OrderStatus": "10^Verified", 
+          "OrderedDose": "2", 
+          "OrigionalOrder": null, 
+          "PCA": "0", 
+          "PharamaClass": null, 
+          "PharamaSubClass": null, 
+          "Route": "15^Oral", 
+          "RxNorm": [
+            {
+              "Code": "3322", 
+              "CodeType": "MED_ONLY", 
+              "TermType": "1^Ingredient"
+            }, 
+            {
+              "Code": "197590", 
+              "CodeType": "MED_FORM_STRENGTH", 
+              "TermType": "9^Semantic Clinical Drug"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

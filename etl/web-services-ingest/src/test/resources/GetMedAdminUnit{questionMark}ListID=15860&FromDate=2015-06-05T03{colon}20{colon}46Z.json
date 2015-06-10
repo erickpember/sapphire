@@ -1,0 +1,10 @@
+{
+  "Error": null, 
+  "ExtractDateTime": "/Date(1433499655000-0700)/", 
+  "Patient": [
+    {
+      "CSN": "5041113", 
+      "Medications": []
+    }
+  ]
+}

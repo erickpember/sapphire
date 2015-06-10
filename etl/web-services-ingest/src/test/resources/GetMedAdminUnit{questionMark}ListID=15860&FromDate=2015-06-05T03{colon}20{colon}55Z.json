@@ -1,0 +1,77 @@
+{
+  "Error": null, 
+  "ExtractDateTime": "/Date(1433499716000-0700)/", 
+  "Patient": [
+    {
+      "CSN": "5041113", 
+      "Medications": [
+        {
+          "AHFS": "28:12.08", 
+          "AdminInst": [
+            "2 mg, Oral, Every 12 Hours PRN, asdfasdf, Starting Fri 6/5/15 at 1021<br>asdfasdfasdfa<br>"
+          ], 
+          "DateTimeOrdered": "/Date(1433499692000-0700)/", 
+          "DrugID": "2404", 
+          "DrugName": "DIAZEPAM 2 MG TABLET", 
+          "FDB": null, 
+          "Frequency": "200528^Every 12 Hours PRN", 
+          "MedAdmin": null, 
+          "Mixture": null, 
+          "OrderID": "159301116", 
+          "OrderStatus": "10^Verified", 
+          "OrderedDose": "2", 
+          "OrigionalOrder": null, 
+          "PCA": "0", 
+          "PharamaClass": null, 
+          "PharamaSubClass": null, 
+          "Route": "15^Oral", 
+          "RxNorm": [
+            {
+              "Code": "3322", 
+              "CodeType": "MED_ONLY", 
+              "TermType": "1^Ingredient"
+            }, 
+            {
+              "Code": "197590", 
+              "CodeType": "MED_FORM_STRENGTH", 
+              "TermType": "9^Semantic Clinical Drug"
+            }
+          ]
+        }, 
+        {
+          "AHFS": "28:12.08", 
+          "AdminInst": [
+            "10 mg, Oral, Every 12 Hours PRN, asdfasdf, Starting Fri 6/5/15 at 1019<br>asdfasdfasdfa<br>"
+          ], 
+          "DateTimeOrdered": "/Date(1433499567000-0700)/", 
+          "DrugID": "2405", 
+          "DrugName": "DIAZEPAM 5 MG TABLET", 
+          "FDB": null, 
+          "Frequency": "200528^Every 12 Hours PRN", 
+          "MedAdmin": null, 
+          "Mixture": null, 
+          "OrderID": "159301115", 
+          "OrderStatus": "9^Discontinued", 
+          "OrderedDose": "10", 
+          "OrigionalOrder": null, 
+          "PCA": "0", 
+          "PharamaClass": null, 
+          "PharamaSubClass": null, 
+          "Route": "15^Oral", 
+          "RxNorm": [
+            {
+              "Code": "3322", 
+              "CodeType": "MED_ONLY", 
+              "TermType": "1^Ingredient"
+            }, 
+            {
+              "Code": "197591", 
+              "CodeType": "MED_FORM_STRENGTH", 
+              "TermType": "9^Semantic Clinical Drug"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

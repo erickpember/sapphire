@@ -201,6 +201,12 @@
       </dependency>
 
       <dependency>
+        <groupId>com.googlecode.json-simple</groupId>
+        <artifactId>json-simple</artifactId>
+        <version>1.1.1</version>
+      </dependency>
+
+      <dependency>
         <groupId>com.neovisionaries</groupId>
         <artifactId>nv-i18n</artifactId>
         <version>${neovisionaries.version}</version>
@@ -364,6 +370,12 @@
       </dependency>
 
       <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpclient</artifactId>
+        <version>4.4.1</version>
+      </dependency>
+
+      <dependency>
         <groupId>org.apache.kafka</groupId>
         <artifactId>kafka_2.10</artifactId>
         <version>${kafka.version}</version>
@@ -382,6 +394,12 @@
       </dependency>
       <dependency>
         <groupId>org.apache.nifi</groupId>
+        <artifactId>nifi-mock</artifactId>
+        <version>${nifi.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.nifi</groupId>
         <artifactId>nifi-processor-utils</artifactId>
         <version>${nifi.version}</version>
         <exclusions>
@@ -390,6 +408,11 @@
             <artifactId>commons-lang3</artifactId>
           </exclusion>
         </exclusions>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.nifi</groupId>
+        <artifactId>nifi-ssl-context-service-api</artifactId>
+        <version>${nifi.version}</version>
       </dependency>
 
       <dependency>
@@ -480,12 +503,6 @@
         <groupId>org.eclipse.jetty.websocket</groupId>
         <artifactId>websocket-server</artifactId>
         <version>${jetty.version}</version>
-      </dependency>
-
-      <dependency>
-        <groupId>org.kie</groupId>
-        <artifactId>kie-api</artifactId>
-        <version>${drools.version}</version>
       </dependency>
 
       <dependency>

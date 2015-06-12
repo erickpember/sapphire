@@ -8,6 +8,8 @@ import com.datafascia.api.bundle.FhirBundle;
 import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.api.health.AccumuloHealthCheck;
 import com.datafascia.common.accumulo.AccumuloConfiguration;
+import com.datafascia.common.accumulo.AuthorizationsSupplier;
+import com.datafascia.common.accumulo.SubjectAuthorizationsSupplier;
 import com.datafascia.common.inject.Injectors;
 import com.datafascia.common.kafka.KafkaConfig;
 import com.datafascia.common.reflect.PackageUtils;
@@ -111,11 +113,12 @@ public class APIService extends Application<APIConfiguration> {
         new AbstractModule() {
           @Override
           protected void configure() {
-            bind(ObjectMapper.class).toInstance(environment.getObjectMapper());
             bind(APIConfiguration.class).toInstance(config);
             bind(AccumuloConfiguration.class).toInstance(config.getAccumuloConfiguration());
+            bind(AuthorizationsSupplier.class).to(SubjectAuthorizationsSupplier.class);
             bind(KafkaConfig.class).toInstance(config.getKafkaConfig());
             bind(MetricRegistry.class).toInstance(environment.metrics());
+            bind(ObjectMapper.class).toInstance(environment.getObjectMapper());
             bind(Realm.class).toInstance(realm);
             bind(RoleExposingRealm.class).toInstance(realm);
           }

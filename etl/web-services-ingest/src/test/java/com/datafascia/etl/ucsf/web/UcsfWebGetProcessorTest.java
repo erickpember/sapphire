@@ -16,11 +16,10 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.nifi.util.MockFlowFile;
 import org.apache.nifi.util.TestRunner;
 import org.apache.nifi.util.TestRunners;
-import org.testng.Reporter;
 import org.testng.annotations.Test;
 
 /**
- * A test class for the UcsfWebGetProcessor
+ * A test class for the {@link UcsfWebGetProcessor}
  */
 @Slf4j
 public class UcsfWebGetProcessorTest {
@@ -28,10 +27,12 @@ public class UcsfWebGetProcessorTest {
 
   @Test
   public void testOnTrigger() throws IOException, InterruptedException {
+    int webPort;
     // Find a random open port.
-    ServerSocket ss = new ServerSocket(0);
-    int webPort = ss.getLocalPort();
-    ss.close();
+    try (
+        ServerSocket serverSocket = new ServerSocket(0)) {
+      webPort = serverSocket.getLocalPort();
+    }
 
     HttpServer server = HttpServer.create(new InetSocketAddress(webPort), 0);
     server.createContext("/test", new TestHandler());
@@ -46,13 +47,13 @@ public class UcsfWebGetProcessorTest {
     runner.run();
 
     runner.assertAllFlowFilesTransferred(UcsfWebGetProcessor.SUCCESS, 1);
-    MockFlowFile mff = runner.getFlowFilesForRelationship(UcsfWebGetProcessor.SUCCESS).get(0);
+    MockFlowFile mockFile = runner.getFlowFilesForRelationship(UcsfWebGetProcessor.SUCCESS).get(0);
 
-    mff.assertContentEquals(getTestFile(lastUrl));
+    mockFile.assertContentEquals(getTestFile(lastUrl));
 
     runner.run();
-    mff = runner.getFlowFilesForRelationship(UcsfWebGetProcessor.SUCCESS).get(1);
-    mff.assertContentEquals(getTestFile(lastUrl));
+    mockFile = runner.getFlowFilesForRelationship(UcsfWebGetProcessor.SUCCESS).get(1);
+    mockFile.assertContentEquals(getTestFile(lastUrl));
     runner.shutdown();
     server.stop(0);
   }
@@ -60,17 +61,17 @@ public class UcsfWebGetProcessorTest {
   @Slf4j
   static class TestHandler implements HttpHandler {
     @Override
-    public void handle(HttpExchange t) throws IOException {
+    public void handle(HttpExchange httpExchange) throws IOException {
       try {
-        lastUrl = t.getRequestURI().toString();
-        Reporter.log("### Got url: " + lastUrl);
-        String response = getTestFile(t.getRequestURI().toString());
-        t.sendResponseHeaders(200, response.length());
-        OutputStream os = t.getResponseBody();
-        os.write(response.getBytes());
-        os.close();
+        lastUrl = httpExchange.getRequestURI().toString();
+        String response = getTestFile(httpExchange.getRequestURI().toString());
+        httpExchange.sendResponseHeaders(200, response.length());
+        OutputStream out = httpExchange.getResponseBody();
+        out.write(response.getBytes());
+        out.close();
       } catch (Exception e) {
-        Reporter.log("FAILURE: " + e.getMessage() + "\n\n" + e.getStackTrace());
+        log.error("FAILURE: " + e.getMessage(), e);
+        httpExchange.sendResponseHeaders(500, 0);
       }
     }
   }

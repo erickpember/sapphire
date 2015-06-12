@@ -4,14 +4,19 @@ package com.datafascia.api.resources.fhir;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.MedicationPrescription;
+import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.annotation.Create;
 import ca.uhn.fhir.rest.annotation.RequiredParam;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Search;
+import ca.uhn.fhir.rest.annotation.Update;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.param.StringParam;
+import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
+import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import com.datafascia.common.fhir.DependencyInjectingResourceProvider;
 import com.datafascia.common.persist.Id;
+import com.datafascia.domain.fhir.Ids;
 import com.datafascia.domain.persist.MedicationPrescriptionRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -99,5 +104,49 @@ public class MedicationPrescriptionResourceProvider extends DependencyInjectingR
     }
 
     return medicationPrescriptions;
+  }
+
+  /**
+   * Completely replaces the content of the MedicationPrescription resource with the content given
+   * in the request.
+   *
+   * @param medicationPrescription New MedicationPrescription value.
+   * @return Outcome of create method. Resource ID of MedicationPrescription.
+   */
+  @Update
+  public MethodOutcome update(@ResourceParam MedicationPrescription medicationPrescription) {
+    IdDt resourceId = medicationPrescription.getId();
+    if (resourceId == null) {
+      throw new UnprocessableEntityException("MedicationPrescription: no ID supplied. "
+          + "Can not update.");
+    }
+
+    checkForEncounterReference(medicationPrescription);
+
+    Id<Encounter> encounterId = Ids.toPrimaryKey(medicationPrescription.getEncounter().
+        getReference());
+
+    // Check if medicationprescription already exists.
+    Id<MedicationPrescription> medicationPrescriptionId = MedicationPrescriptionRepository.
+        generateId(medicationPrescription);
+    Optional<MedicationPrescription> optionalMedicationPrescription
+        = medicationPrescriptionRepository.read(encounterId, medicationPrescriptionId);
+    if (!optionalMedicationPrescription.isPresent()) {
+      throw new InvalidRequestException(String.format(
+          "MedicationPrescription ID [%s] did not already exist:",
+          medicationPrescriptionId));
+    }
+
+    medicationPrescriptionRepository.save(medicationPrescription);
+    return new MethodOutcome(medicationPrescription.getId());
+  }
+
+  private void checkForEncounterReference(MedicationPrescription prescription) throws
+      UnprocessableEntityException {
+    if (prescription.getEncounter() == null || prescription.getEncounter().isEmpty()) {
+      throw new UnprocessableEntityException("MedicationPrescription with identifier "
+          + prescription.getIdentifierFirstRep().getValue()
+          + " lacks the mandatory reference to encounter, can not be saved or updated.");
+    }
   }
 }

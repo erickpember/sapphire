@@ -19,6 +19,14 @@ public class CodingSystems {
   public static final String BODY_SITE =
       "http://datafascia.com/coding/BodySite";
 
+  /** dataFascia invented this coding system for UCSF medication group name */
+  public static final String UCSF_MEDICATION_GROUP_NAME =
+      "http://datafascia.com/coding/UcsfMedicationGroupName";
+
+  /** dataFascia invented this coding system for Semantic Clinical Drug */
+  public static final String SEMANTIC_CLINICAL_DRUG =
+      "http://datafascia.com/coding/SemanticClinicalDrug";
+
   // Private constructor disallows creating instances of this class.
   private CodingSystems() {
   }

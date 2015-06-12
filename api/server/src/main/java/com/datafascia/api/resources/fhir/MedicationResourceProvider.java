@@ -114,6 +114,11 @@ public class MedicationResourceProvider extends DependencyInjectingResourceProvi
   @Search()
   public Medication getResourceByCode(
       @RequiredParam(name = Medication.SP_CODE) StringParam medicationCode) {
-    return medicationRepository.read(Id.of(medicationCode.getValue())).get();
+    Optional<Medication> result = medicationRepository.read(Id.of(medicationCode.getValue()));
+    if (result.isPresent()) {
+      return result.get();
+    } else {
+      return null;
+    }
   }
 }

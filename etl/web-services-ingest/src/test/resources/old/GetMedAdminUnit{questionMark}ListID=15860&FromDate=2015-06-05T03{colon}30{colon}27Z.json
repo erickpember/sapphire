@@ -17,10 +17,11 @@
           "Frequency": "200526^Every 6 Hours PRN", 
           "MedAdmin": [
             {
+              "AdminID" : "1",
               "AdminAction": "1^Given", 
               "DocumentationTime": "/Date(1433499960000-0700)/", 
               "Dose": "4", 
-              "DoseUnit": "3^mg", 
+              "DoseUnit": "5^mg", 
               "Duration": null, 
               "Rate": "", 
               "RateUnit": "", 

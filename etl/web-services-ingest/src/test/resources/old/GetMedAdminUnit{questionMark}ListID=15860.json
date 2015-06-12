@@ -1,0 +1,477 @@
+{
+  "Error": null, 
+  "ExtractDateTime": "/Date(1433499646000-0700)/", 
+  "Patient": [
+    {
+      "CSN": "5041113", 
+      "Medications": [
+        {
+          "AHFS": "28:08.04", 
+          "AdminInst": [
+            "800 mg, Oral, Every 6 Hours PRN, Moderate Pain, pain, Starting Mon 6/1/15 at 0900, For 3 days<br>Here are teh admin instructions entered by Ajish<br>"
+          ], 
+          "DateTimeOrdered": "/Date(1433149283000-0700)/", 
+          "DrugID": "3845", 
+          "DrugName": "IBUPROFEN 800 MG TABLET", 
+          "FDB": null, 
+          "Frequency": "200526^Every 6 Hours PRN", 
+          "MedAdmin": [
+            {
+              "AdminAction": "1^Given", 
+              "AdminID" : "zxcv",
+              "DocumentationTime": "/Date(1433138400000-0700)/", 
+              "Dose": "800", 
+              "DoseUnit": "3^mg", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "TimeTaken": "/Date(-62135568000000-0800)/", 
+              "User": "4188^ANTONY, AJISH"
+            }
+          ], 
+          "Mixture": null, 
+          "OrderID": "159301111", 
+          "OrderStatus": "10^Verified", 
+          "OrderedDose": "800", 
+          "OrigionalOrder": null, 
+          "PCA": "0", 
+          "PharamaClass": null, 
+          "PharamaSubClass": null, 
+          "Route": "15^Oral", 
+          "RxNorm": [
+            {
+              "Code": "5640", 
+              "CodeType": "MED_ONLY", 
+              "TermType": "1^Ingredient"
+            }, 
+            {
+              "Code": "197807", 
+              "CodeType": "MED_FORM_STRENGTH", 
+              "TermType": "9^Semantic Clinical Drug"
+            }
+          ]
+        }, 
+        {
+          "AHFS": "28:08.08", 
+          "AdminInst": null, 
+          "DateTimeOrdered": "/Date(1433150574000-0700)/", 
+          "DrugID": "3037", 
+          "DrugName": "FENTANYL (PF) 50 MCG/ML INJECTION SOLUTION", 
+          "FDB": null, 
+          "Frequency": "200045^3 Times Daily", 
+          "MedAdmin": [
+            {
+              "AdminID" : "ghfda",
+              "AdminAction": "100^Due", 
+              "DocumentationTime": "/Date(1433151000000-0700)/", 
+              "Dose": "", 
+              "DoseUnit": "", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "TimeTaken": "/Date(-62135568000000-0800)/", 
+              "User": "^"
+            }, 
+            {
+              "AdminID" : "sgfnwsfg",
+              "AdminAction": "100^Due", 
+              "DocumentationTime": "/Date(1433170800000-0700)/", 
+              "Dose": "", 
+              "DoseUnit": "", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "TimeTaken": "/Date(-62135568000000-0800)/", 
+              "User": "^"
+            }, 
+            {
+              "AdminID" : "sdfhsd",
+              "AdminAction": "100^Due", 
+              "DocumentationTime": "/Date(1433192400000-0700)/", 
+              "Dose": "", 
+              "DoseUnit": "", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "TimeTaken": "/Date(-62135568000000-0800)/", 
+              "User": "^"
+            }, 
+            {
+              "AdminID" : "hdgjdgh",
+              "AdminAction": "100^Due", 
+              "DocumentationTime": "/Date(1433235600000-0700)/", 
+              "Dose": "", 
+              "DoseUnit": "", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "TimeTaken": "/Date(-62135568000000-0800)/", 
+              "User": "^"
+            }, 
+            {
+              "AdminID" : "ghjdgh",
+              "AdminAction": "100^Due", 
+              "DocumentationTime": "/Date(1433257200000-0700)/", 
+              "Dose": "", 
+              "DoseUnit": "", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "TimeTaken": "/Date(-62135568000000-0800)/", 
+              "User": "^"
+            }, 
+            {
+              "AdminID" : "rehaqe",
+              "AdminAction": "100^Due", 
+              "DocumentationTime": "/Date(1433278800000-0700)/", 
+              "Dose": "", 
+              "DoseUnit": "", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "TimeTaken": "/Date(-62135568000000-0800)/", 
+              "User": "^"
+            }, 
+            {
+              "AdminID" : "fdhsgfj",
+              "AdminAction": "100^Due", 
+              "DocumentationTime": "/Date(1433322000000-0700)/", 
+              "Dose": "", 
+              "DoseUnit": "", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "TimeTaken": "/Date(-62135568000000-0800)/", 
+              "User": "^"
+            }, 
+            {
+              "AdminID" : "ghjkghjk",
+              "AdminAction": "100^Due", 
+              "DocumentationTime": "/Date(1433343600000-0700)/", 
+              "Dose": "", 
+              "DoseUnit": "", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "TimeTaken": "/Date(-62135568000000-0800)/", 
+              "User": "^"
+            }, 
+            {
+              "AdminID" : "wuquafdsfd",
+              "AdminAction": "100^Due", 
+              "DocumentationTime": "/Date(1433365200000-0700)/", 
+              "Dose": "", 
+              "DoseUnit": "", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "TimeTaken": "/Date(-62135568000000-0800)/", 
+              "User": "^"
+            }, 
+            {
+              "AdminID" : "feajeafd",
+              "AdminAction": "100^Due", 
+              "DocumentationTime": "/Date(1433408400000-0700)/", 
+              "Dose": "", 
+              "DoseUnit": "", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "TimeTaken": "/Date(-62135568000000-0800)/", 
+              "User": "^"
+            }
+          ], 
+          "Mixture": null, 
+          "OrderID": "159301112", 
+          "OrderStatus": "10^Verified", 
+          "OrderedDose": "50", 
+          "OrigionalOrder": null, 
+          "PCA": "0", 
+          "PharamaClass": null, 
+          "PharamaSubClass": null, 
+          "Route": "11^Intravenous", 
+          "RxNorm": [
+            {
+              "Code": "4337", 
+              "CodeType": "MED_ONLY", 
+              "TermType": "1^Ingredient"
+            }, 
+            {
+              "Code": "142436", 
+              "CodeType": "MED_ONLY", 
+              "TermType": "2^Precise Ingredient"
+            }, 
+            {
+              "Code": "206977", 
+              "CodeType": "MED_FORM_STRENGTH", 
+              "TermType": "9^Semantic Clinical Drug"
+            }
+          ]
+        }, 
+        {
+          "AHFS": "28:12.08", 
+          "AdminInst": [
+            "2 mg, Intravenous, Every 6 Hours PRN, comments by ajish, Starting Fri 6/5/15 at 1012<br>Admin instructions by Ajish<br>"
+          ], 
+          "DateTimeOrdered": "/Date(1433499153000-0700)/", 
+          "DrugID": "106139", 
+          "DrugName": "DIAZEPAM 5 MG/ML INJECTION SYRINGE", 
+          "FDB": null, 
+          "Frequency": "200526^Every 6 Hours PRN", 
+          "MedAdmin": null, 
+          "Mixture": null, 
+          "OrderID": "159301113", 
+          "OrderStatus": "10^Verified", 
+          "OrderedDose": "2", 
+          "OrigionalOrder": null, 
+          "PCA": "0", 
+          "PharamaClass": null, 
+          "PharamaSubClass": null, 
+          "Route": "11^Intravenous", 
+          "RxNorm": [
+            {
+              "Code": "3322", 
+              "CodeType": "MED_ONLY", 
+              "TermType": "1^Ingredient"
+            }, 
+            {
+              "Code": "309845", 
+              "CodeType": "MED_FORM_STRENGTH", 
+              "TermType": "9^Semantic Clinical Drug"
+            }
+          ]
+        }, 
+        {
+          "AHFS": "28:12.08", 
+          "AdminInst": [
+            "5 mg, Oral, 3 Times Daily, First dose on Fri 6/5/15 at 1030<br>Some admin instruc by ajish<br>"
+          ], 
+          "DateTimeOrdered": "/Date(1433499300000-0700)/", 
+          "DrugID": "2402", 
+          "DrugName": "DIAZEPAM 5 MG/5 ML ORAL SOLUTION", 
+          "FDB": null, 
+          "Frequency": "200045^3 Times Daily", 
+          "MedAdmin": [
+            {
+              "AdminID" : "hjddddgf",
+              "AdminAction": "100^Due", 
+              "DocumentationTime": "/Date(1433500200000-0700)/", 
+              "Dose": "", 
+              "DoseUnit": "", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "TimeTaken": "/Date(-62135568000000-0800)/", 
+              "User": "^"
+            }, 
+            {
+              "AdminID" : "hydjty",
+              "AdminAction": "100^Due", 
+              "DocumentationTime": "/Date(1433516400000-0700)/", 
+              "Dose": "", 
+              "DoseUnit": "", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "TimeTaken": "/Date(-62135568000000-0800)/", 
+              "User": "^"
+            }, 
+            {
+              "AdminID" : "asfdghasdfh",
+              "AdminAction": "100^Due", 
+              "DocumentationTime": "/Date(1433538000000-0700)/", 
+              "Dose": "", 
+              "DoseUnit": "", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "TimeTaken": "/Date(-62135568000000-0800)/", 
+              "User": "^"
+            }, 
+            {
+              "AdminID" : "pyipgjkh",
+              "AdminAction": "100^Due", 
+              "DocumentationTime": "/Date(1433581200000-0700)/", 
+              "Dose": "", 
+              "DoseUnit": "", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "TimeTaken": "/Date(-62135568000000-0800)/", 
+              "User": "^"
+            }, 
+            {
+              "AdminID" : "hdkdgj",
+              "AdminAction": "100^Due", 
+              "DocumentationTime": "/Date(1433602800000-0700)/", 
+              "Dose": "", 
+              "DoseUnit": "", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "TimeTaken": "/Date(-62135568000000-0800)/", 
+              "User": "^"
+            }, 
+            {
+              "AdminID" : "jxgfcv",
+              "AdminAction": "100^Due", 
+              "DocumentationTime": "/Date(1433624400000-0700)/", 
+              "Dose": "", 
+              "DoseUnit": "", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "TimeTaken": "/Date(-62135568000000-0800)/", 
+              "User": "^"
+            }, 
+            {
+              "AdminID" : "ghsgjsrt",
+              "AdminAction": "100^Due", 
+              "DocumentationTime": "/Date(1433667600000-0700)/", 
+              "Dose": "", 
+              "DoseUnit": "", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "TimeTaken": "/Date(-62135568000000-0800)/", 
+              "User": "^"
+            }, 
+            {
+              "AdminID" : "qwter243",
+              "AdminAction": "100^Due", 
+              "DocumentationTime": "/Date(1433689200000-0700)/", 
+              "Dose": "", 
+              "DoseUnit": "", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "TimeTaken": "/Date(-62135568000000-0800)/", 
+              "User": "^"
+            }, 
+            {
+              "AdminID" : "5ba5eg",
+              "AdminAction": "100^Due", 
+              "DocumentationTime": "/Date(1433710800000-0700)/", 
+              "Dose": "", 
+              "DoseUnit": "", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "TimeTaken": "/Date(-62135568000000-0800)/", 
+              "User": "^"
+            }, 
+            {
+              "AdminID" : "twbrus6",
+              "AdminAction": "100^Due", 
+              "DocumentationTime": "/Date(1433754000000-0700)/", 
+              "Dose": "", 
+              "DoseUnit": "", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "TimeTaken": "/Date(-62135568000000-0800)/", 
+              "User": "^"
+            }
+          ], 
+          "Mixture": null, 
+          "OrderID": "159301114", 
+          "OrderStatus": "10^Verified", 
+          "OrderedDose": "5", 
+          "OrigionalOrder": null, 
+          "PCA": "0", 
+          "PharamaClass": null, 
+          "PharamaSubClass": null, 
+          "Route": "15^Oral", 
+          "RxNorm": [
+            {
+              "Code": "3322", 
+              "CodeType": "MED_ONLY", 
+              "TermType": "1^Ingredient"
+            }, 
+            {
+              "Code": "309843", 
+              "CodeType": "MED_FORM_STRENGTH", 
+              "TermType": "9^Semantic Clinical Drug"
+            }
+          ]
+        }, 
+        {
+          "AHFS": "28:12.08", 
+          "AdminInst": [
+            "10 mg, Oral, Every 12 Hours PRN, asdfasdf, Starting Fri 6/5/15 at 1019<br>asdfasdfasdfa<br>"
+          ], 
+          "DateTimeOrdered": "/Date(1433499567000-0700)/", 
+          "DrugID": "2405", 
+          "DrugName": "DIAZEPAM 5 MG TABLET", 
+          "FDB": null, 
+          "Frequency": "200528^Every 12 Hours PRN", 
+          "MedAdmin": null, 
+          "Mixture": null, 
+          "OrderID": "159301115", 
+          "OrderStatus": "10^Verified", 
+          "OrderedDose": "10", 
+          "OrigionalOrder": null, 
+          "PCA": "0", 
+          "PharamaClass": null, 
+          "PharamaSubClass": null, 
+          "Route": "15^Oral", 
+          "RxNorm": [
+            {
+              "Code": "3322", 
+              "CodeType": "MED_ONLY", 
+              "TermType": "1^Ingredient"
+            }, 
+            {
+              "Code": "197591", 
+              "CodeType": "MED_FORM_STRENGTH", 
+              "TermType": "9^Semantic Clinical Drug"
+            }
+          ]
+        }, 
+        {
+          "AHFS": "28:08.08", 
+          "AdminInst": [
+            "1 tablet, Oral, Every 4 Hours PRN, Moderate Pain, Some comment.  I dont think this will be sent in Web Service call., Starting Fri 5/29/15 at 1051<br>Refer to RxCommunciation tab in MAR for daily maximum.<br>"
+          ], 
+          "DateTimeOrdered": "/Date(1432896430000-0700)/", 
+          "DrugID": "19474", 
+          "DrugName": "ACETAMINOPHEN 300 MG-CODEINE 15 MG TABLET", 
+          "FDB": null, 
+          "Frequency": "200524^Every 4 Hours PRN", 
+          "MedAdmin": null, 
+          "Mixture": null, 
+          "OrderID": "159301110", 
+          "OrderStatus": "9^Discontinued", 
+          "OrderedDose": "1", 
+          "OrigionalOrder": null, 
+          "PCA": "0", 
+          "PharamaClass": null, 
+          "PharamaSubClass": null, 
+          "Route": "15^Oral", 
+          "RxNorm": [
+            {
+              "Code": "161", 
+              "CodeType": "MED_ONLY", 
+              "TermType": "1^Ingredient"
+            }, 
+            {
+              "Code": "2670", 
+              "CodeType": "MED_ONLY", 
+              "TermType": "1^Ingredient"
+            }, 
+            {
+              "Code": "2672", 
+              "CodeType": "MED_ONLY", 
+              "TermType": "2^Precise Ingredient"
+            }, 
+            {
+              "Code": "993770", 
+              "CodeType": "MED_FORM_STRENGTH", 
+              "TermType": "9^Semantic Clinical Drug"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

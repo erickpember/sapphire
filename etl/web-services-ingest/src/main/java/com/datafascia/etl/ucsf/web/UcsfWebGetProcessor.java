@@ -26,7 +26,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import javax.net.ssl.SSLContext;
-
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -41,11 +40,11 @@ import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContexts;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
+import org.apache.http.ssl.SSLContexts;
 import org.apache.nifi.annotation.behavior.WritesAttribute;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
@@ -212,20 +211,41 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
   }
 
   /**
-   * Translates the date format provided by the UCSF web services ("/Date(1234567890)/") and
-   * translates them to ISO8601 UTC.
+   * Translates the date format provided by the UCSF web services ("/Date(1234567890)/") to
+   * ISO8601 UTC.
    * @param epicDate The date in EPIC's odd format.
-   * @return
+   * @return The formatted string.
    */
-  private static String epicDateToISO8601(String epicDate) {
+  public static String epicDateToISO8601(String epicDate) {
+    Instant date = epicDateToInstant(epicDate);
+    return date.toString();
+  }
+
+  /**
+   * Translates the date format provided by the UCSF web services ("/Date(1234567890)/") to
+   * Java Instants
+   * @param epicDate The date in EPIC's odd format.
+   * @return An instant.
+   */
+  public static Instant epicDateToInstant(String epicDate) {
     String trimmed = epicDate.replace("/Date(", "").replace(")/", "");
     String[] parts = trimmed.split("-");
-    String milliseconds = parts[0];
-    char offsetChar = parts[1].toCharArray()[1];
+    String milliseconds;
+    char offsetChar;
+    // Offsets follow a dash, but we need to handle negatives, so the time and offset to shift.
+    if (trimmed.startsWith("-")) {
+      milliseconds = parts[1];
+      offsetChar = parts[2].toCharArray()[1];
+    } else {
+      milliseconds = parts[0];
+      offsetChar = parts[1].toCharArray()[1];
+    }
     int offset = Integer.parseInt(new String(new char[]{offsetChar})) * 60 * 60 * 1000;
+    if (milliseconds.equals("")) {
+      throw new RuntimeException("Epic date: " + trimmed);
+    }
     long utc = Long.parseLong(milliseconds) - offset;
-    Instant date = Instant.ofEpochMilli(utc);
-    return date.toString();
+    return Instant.ofEpochMilli(utc);
   }
 
   @Override
@@ -270,7 +290,7 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
 
       final SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext,
           new String[]{"TLSv1"}, null,
-          SSLConnectionSocketFactory.BROWSER_COMPATIBLE_HOSTNAME_VERIFIER);
+          SSLConnectionSocketFactory.getDefaultHostnameVerifier());
 
       final Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder
           .<ConnectionSocketFactory>create().register("https", sslsf).build();
@@ -354,7 +374,6 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
           JSONObject jsonObject = (JSONObject) new JSONParser().parse(jsonString);
           String extractDateTime = jsonObject.get("ExtractDateTime").toString();
           lastTimestamp = epicDateToISO8601(extractDateTime);
-          log.info("Got extract time of " + extractDateTime);
         } catch (ParseException e) {
           throw new ProcessException(e);
         }

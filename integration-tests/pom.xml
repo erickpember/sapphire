@@ -40,6 +40,11 @@
       <version>${project.version}</version>
     </dependency>
     <dependency>
+      <groupId>com.datafascia</groupId>
+      <artifactId>df-etl-web-services-ingest</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>df-api-server</artifactId>
       <version>${project.version}</version>
@@ -56,10 +61,6 @@
       <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.apache.storm</groupId>
-      <artifactId>storm-core</artifactId>
-    </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>
@@ -71,9 +72,22 @@
     </dependency>
 
     <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>1.4.187</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>log4j</groupId>
       <artifactId>log4j</artifactId>
       <!-- The integration tests run ZooKeeper, which references log4j specific classes. -->
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.nifi</groupId>
+      <artifactId>nifi-mock</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -126,10 +140,11 @@
           </execution>
         </executions>
       </plugin>
+
       <plugin>
         <groupId>org.apache.accumulo</groupId>
         <artifactId>accumulo-maven-plugin</artifactId>
-        <version>1.6.2</version>
+        <version>${accumulo.version}</version>
         <configuration>
           <instanceName>integration-test</instanceName>
           <rootPassword>secret</rootPassword>

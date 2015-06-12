@@ -2,10 +2,8 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.inject;
 
-import com.datafascia.common.accumulo.AuthorizationsSupplier;
 import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
-import com.datafascia.common.accumulo.SubjectAuthorizationsSupplier;
 import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
 import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
 import com.datafascia.common.configuration.guice.ConfigureModule;
@@ -22,7 +20,6 @@ public class ApplicationModule extends ConfigureModule {
 
   @Override
   protected void onConfigure() {
-    bind(AuthorizationsSupplier.class).to(SubjectAuthorizationsSupplier.class);
     bind(AvroSchemaRegistry.class).to(MemorySchemaRegistry.class).in(Singleton.class);
     bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
     bind(FhirEntityStore.class).to(AccumuloFhirEntityStore.class).in(Singleton.class);

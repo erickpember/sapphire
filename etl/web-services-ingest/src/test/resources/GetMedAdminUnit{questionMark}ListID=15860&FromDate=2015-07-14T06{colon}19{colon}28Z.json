@@ -1,0 +1,288 @@
+{
+  "Error": null, 
+  "ExtractDateTime": "/Date(1436880167000-0700)/", 
+  "Patient": [
+    {
+      "CSN": "5041113", 
+      "Medications": [
+        {
+          "AHFS": "40:20", 
+          "AdminInst": null, 
+          "Audit": [
+            {
+              "Action": "3^Signed", 
+              "DateTime": "/Date(1436879926000-0700)/", 
+              "ID": "1", 
+              "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
+            }
+          ], 
+          "DateTimeOrdered": "/Date(1436879925000-0700)/", 
+          "DrugID": "9814", 
+          "DrugName": "DEXTROSE 5 % AND 0.45 % SODIUM CHLORIDE INTRAVENOUS SOLUTION", 
+          "FDB": null, 
+          "Frequency": "200905^Continuous", 
+          "MedAdmin": [
+            {
+              "AdminAction": "6^New Bag", 
+              "AdminID": "1", 
+              "AdministrationTime": "/Date(1436880060000-0700)/", 
+              "DocumentedTime": "/Date(1436880083000-0700)/", 
+              "Dose": "50", 
+              "DoseUnit": "41^mL/hr", 
+              "Duration": null, 
+              "Rate": "50", 
+              "RateUnit": "41^mL/hr", 
+              "ScheduledDateTime": "/Date(1436881500000-0700)/", 
+              "User": "IPRN^INPATIENT, NURSE"
+            }
+          ], 
+          "Mixture": null, 
+          "OrderID": "159301150", 
+          "OrderStatus": "2^Sent", 
+          "OrderedDose": "50", 
+          "OrderedDoseUnit": "41^mL/hr", 
+          "OrigionalOrder": null, 
+          "PCA": "0", 
+          "PharamaClass": null, 
+          "PharamaSubClass": null, 
+          "Route": "11^Intravenous", 
+          "RxNorm": [
+            {
+              "Code": "309806", 
+              "CodeType": "MED_FORM_STRENGTH", 
+              "TermType": "9^Semantic Clinical Drug"
+            }
+          ]
+        }, 
+        {
+          "AHFS": "", 
+          "AdminInst": [
+            "1 g, Intravenous, Daily, First dose on Tue 7/14/15 at 1345, For 4 doses<br>RN to attach Pyxis/Pharmacy-supplied drug vial to Mini-Bag Plus or VialMate adapter.<br>"
+          ], 
+          "Audit": [
+            {
+              "Action": "3^Signed", 
+              "DateTime": "/Date(1436879926000-0700)/", 
+              "ID": "1", 
+              "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
+            }
+          ], 
+          "DateTimeOrdered": "/Date(1436879926000-0700)/", 
+          "DrugID": "191907", 
+          "DrugName": "CEFTRIAXONE 1 G IV (MINI-BAG PLUS)", 
+          "FDB": null, 
+          "Frequency": "200001^Daily", 
+          "MedAdmin": [
+            {
+              "AdminAction": "1^Given", 
+              "AdminID": "1", 
+              "AdministrationTime": "/Date(1436880060000-0700)/", 
+              "DocumentedTime": "/Date(1436880070000-0700)/", 
+              "Dose": "1", 
+              "DoseUnit": "4^g", 
+              "Duration": null, 
+              "Rate": "100", 
+              "RateUnit": "41^mL/hr", 
+              "ScheduledDateTime": "/Date(1436881500000-0700)/", 
+              "User": "IPRN^INPATIENT, NURSE"
+            }, 
+            {
+              "AdminAction": "100^Due", 
+              "AdminID": "2", 
+              "AdministrationTime": "/Date(-62135568000000-0800)/", 
+              "DocumentedTime": "/Date(-62135568000000-0800)/", 
+              "Dose": "", 
+              "DoseUnit": "4^g", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "41^mL/hr", 
+              "ScheduledDateTime": "/Date(1436950800000-0700)/", 
+              "User": "^"
+            }, 
+            {
+              "AdminAction": "100^Due", 
+              "AdminID": "3", 
+              "AdministrationTime": "/Date(-62135568000000-0800)/", 
+              "DocumentedTime": "/Date(-62135568000000-0800)/", 
+              "Dose": "", 
+              "DoseUnit": "4^g", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "41^mL/hr", 
+              "ScheduledDateTime": "/Date(1437037200000-0700)/", 
+              "User": "^"
+            }, 
+            {
+              "AdminAction": "100^Due", 
+              "AdminID": "4", 
+              "AdministrationTime": "/Date(-62135568000000-0800)/", 
+              "DocumentedTime": "/Date(-62135568000000-0800)/", 
+              "Dose": "", 
+              "DoseUnit": "4^g", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "41^mL/hr", 
+              "ScheduledDateTime": "/Date(1437123600000-0700)/", 
+              "User": "^"
+            }
+          ], 
+          "Mixture": [
+            {
+              "AHFS": "08:12.06", 
+              "MedID": "9487", 
+              "MedName": "CEFTRIAXONE 1 GRAM SOLUTION FOR INJECTION", 
+              "rxNormMix": [
+                {
+                  "Code": "309778", 
+                  "CodeType": "MED_FORM_STRENGTH", 
+                  "TermType": "9^Semantic Clinical Drug"
+                }
+              ]
+            }, 
+            {
+              "AHFS": "40:20", 
+              "MedID": "110390", 
+              "MedName": "DEXTROSE 5 % IN WATER (D5W) INTRAVENOUS PIGGYBACK", 
+              "rxNormMix": [
+                {
+                  "Code": "313002", 
+                  "CodeType": "MED_FORM_STRENGTH", 
+                  "TermType": "9^Semantic Clinical Drug"
+                }
+              ]
+            }, 
+            {
+              "AHFS": "40:12", 
+              "MedID": "110389", 
+              "MedName": "SODIUM CHLORIDE 0.9 % INTRAVENOUS PIGGYBACK", 
+              "rxNormMix": null
+            }
+          ], 
+          "OrderID": "159301151", 
+          "OrderStatus": "2^Sent", 
+          "OrderedDose": "1", 
+          "OrderedDoseUnit": "4^g", 
+          "OrigionalOrder": null, 
+          "PCA": "0", 
+          "PharamaClass": null, 
+          "PharamaSubClass": null, 
+          "Route": "11^Intravenous", 
+          "RxNorm": []
+        }, 
+        {
+          "AHFS": "12:12.08", 
+          "AdminInst": null, 
+          "Audit": [
+            {
+              "Action": "3^Signed", 
+              "DateTime": "/Date(1436879927000-0700)/", 
+              "ID": "1", 
+              "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
+            }
+          ], 
+          "DateTimeOrdered": "/Date(1436879926000-0700)/", 
+          "DrugID": "112990", 
+          "DrugName": "DOPAMINE 200 MG/250 ML (800 MCG/ML) IN 5 % DEXTROSE INTRAVENOUS SOLN", 
+          "FDB": null, 
+          "Frequency": "200905^Continuous", 
+          "MedAdmin": [
+            {
+              "AdminAction": "6^New Bag", 
+              "AdminID": "1", 
+              "AdministrationTime": "/Date(1436880060000-0700)/", 
+              "DocumentedTime": "/Date(1436880128000-0700)/", 
+              "Dose": "2", 
+              "DoseUnit": "1008^mcg/kg/min", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "ScheduledDateTime": "/Date(1436881500000-0700)/", 
+              "User": "IPRN^INPATIENT, NURSE"
+            }
+          ], 
+          "Mixture": null, 
+          "OrderID": "159301152", 
+          "OrderStatus": "2^Sent", 
+          "OrderedDose": "2", 
+          "OrderedDoseUnit": "1008^mcg/kg/min", 
+          "OrigionalOrder": null, 
+          "PCA": "0", 
+          "PharamaClass": null, 
+          "PharamaSubClass": null, 
+          "Route": "11^Intravenous", 
+          "RxNorm": [
+            {
+              "Code": "3628", 
+              "CodeType": "MED_ONLY", 
+              "TermType": "1^Ingredient"
+            }, 
+            {
+              "Code": "82010", 
+              "CodeType": "MED_ONLY", 
+              "TermType": "2^Precise Ingredient"
+            }, 
+            {
+              "Code": "1292740", 
+              "CodeType": "MED_FORM_STRENGTH", 
+              "TermType": "9^Semantic Clinical Drug"
+            }
+          ]
+        }, 
+        {
+          "AHFS": "", 
+          "AdminInst": null, 
+          "Audit": [
+            {
+              "Action": "3^Signed", 
+              "DateTime": "/Date(1436879927000-0700)/", 
+              "ID": "1", 
+              "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
+            }
+          ], 
+          "DateTimeOrdered": "/Date(1436879927000-0700)/", 
+          "DrugID": "400292", 
+          "DrugName": "SODIUM CHLORIDE 0.45 % IV BOLUS", 
+          "FDB": null, 
+          "Frequency": "200902^Once", 
+          "MedAdmin": [
+            {
+              "AdminAction": "6^New Bag", 
+              "AdminID": "1", 
+              "AdministrationTime": "/Date(1436880000000-0700)/", 
+              "DocumentedTime": "/Date(1436880054000-0700)/", 
+              "Dose": "500", 
+              "DoseUnit": "1^mL", 
+              "Duration": null, 
+              "Rate": "125", 
+              "RateUnit": "41^mL/hr", 
+              "ScheduledDateTime": "/Date(1436881500000-0700)/", 
+              "User": "IPRN^INPATIENT, NURSE"
+            }
+          ], 
+          "Mixture": null, 
+          "OrderID": "159301153", 
+          "OrderStatus": "5^Completed", 
+          "OrderedDose": "500", 
+          "OrderedDoseUnit": "1^mL", 
+          "OrigionalOrder": null, 
+          "PCA": "0", 
+          "PharamaClass": null, 
+          "PharamaSubClass": null, 
+          "Route": "11^Intravenous", 
+          "RxNorm": [
+            {
+              "Code": "9863", 
+              "CodeType": "MED_ONLY", 
+              "TermType": "1^Ingredient"
+            }, 
+            {
+              "Code": "316949", 
+              "CodeType": "MED_FORM", 
+              "TermType": "4^Dose Form"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

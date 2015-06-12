@@ -17,6 +17,7 @@
           "Frequency": "200528^Every 12 Hours PRN", 
           "MedAdmin": [
             {
+              "AdminID" : "2",
               "AdminAction": "1^Given", 
               "DocumentationTime": "/Date(1433502000000-0700)/", 
               "Dose": "2", 

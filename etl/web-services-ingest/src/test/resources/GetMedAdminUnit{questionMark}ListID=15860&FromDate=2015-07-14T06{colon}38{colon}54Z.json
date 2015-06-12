@@ -1,0 +1,83 @@
+{
+  "Error": null, 
+  "ExtractDateTime": "/Date(1436881230000-0700)/", 
+  "Patient": [
+    {
+      "CSN": "5041113", 
+      "Medications": [
+        {
+          "AHFS": "12:12.08", 
+          "AdminInst": null, 
+          "Audit": [
+            {
+              "Action": "3^Signed", 
+              "DateTime": "/Date(1436880679000-0700)/", 
+              "ID": "1", 
+              "User": "   IPRN^INPATIENT, NURSE"
+            }
+          ], 
+          "DateTimeOrdered": "/Date(1436880679000-0700)/", 
+          "DrugID": "112990", 
+          "DrugName": "DOPAMINE 200 MG/250 ML (800 MCG/ML) IN 5 % DEXTROSE INTRAVENOUS SOLN", 
+          "FDB": null, 
+          "Frequency": "200905^Continuous", 
+          "MedAdmin": [
+            {
+              "AdminAction": "6^New Bag", 
+              "AdminID": "1", 
+              "AdministrationTime": "/Date(1436881080000-0700)/", 
+              "DocumentedTime": "/Date(1436881102000-0700)/", 
+              "Dose": "1", 
+              "DoseUnit": "1008^mcg/kg/min", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "ScheduledDateTime": "/Date(1436882400000-0700)/", 
+              "User": "IPRN^INPATIENT, NURSE"
+            }, 
+            {
+              "AdminAction": "14^Rate Verify", 
+              "AdminID": "2", 
+              "AdministrationTime": "/Date(1436881200000-0700)/", 
+              "DocumentedTime": "/Date(1436881215000-0700)/", 
+              "Dose": "1", 
+              "DoseUnit": "1008^mcg/kg/min", 
+              "Duration": null, 
+              "Rate": "", 
+              "RateUnit": "", 
+              "ScheduledDateTime": "/Date(1436881200000-0700)/", 
+              "User": "IPRN^INPATIENT, NURSE"
+            }
+          ], 
+          "Mixture": null, 
+          "OrderID": "159301154", 
+          "OrderStatus": "2^Sent", 
+          "OrderedDose": "1", 
+          "OrderedDoseUnit": "1008^mcg/kg/min", 
+          "OrigionalOrder": null, 
+          "PCA": "0", 
+          "PharamaClass": null, 
+          "PharamaSubClass": null, 
+          "Route": "11^Intravenous", 
+          "RxNorm": [
+            {
+              "Code": "3628", 
+              "CodeType": "MED_ONLY", 
+              "TermType": "1^Ingredient"
+            }, 
+            {
+              "Code": "82010", 
+              "CodeType": "MED_ONLY", 
+              "TermType": "2^Precise Ingredient"
+            }, 
+            {
+              "Code": "1292740", 
+              "CodeType": "MED_FORM_STRENGTH", 
+              "TermType": "9^Semantic Clinical Drug"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

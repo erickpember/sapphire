@@ -86,6 +86,14 @@ public class EncounterResourceProvider extends DependencyInjectingResourceProvid
       throw new UnprocessableEntityException("No identifier supplied");
     }
 
+    // Check if encounter already exists.
+    Id<Encounter> encounterId = EncounterRepository.generateId(encounter);
+    Optional<Encounter> optionalEncounter = encounterRepository.read(encounterId);
+    if (!optionalEncounter.isPresent()) {
+      throw new InvalidRequestException(String.format("Encounter ID [%s] did not already exist:",
+          encounterId));
+    }
+
     encounterRepository.save(encounter);
     return new MethodOutcome(encounter.getId());
   }

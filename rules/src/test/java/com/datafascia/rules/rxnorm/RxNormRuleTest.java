@@ -876,6 +876,13 @@ public class RxNormRuleTest {
     assertEquals(ucsfa91.getMedsSets().get(0).getCode(), "UCSF_A91");
     assertEquals(ucsfa92.getMedsSets().get(0).getCode(), "UCSF_A92");
     assertEquals(ucsfa93.getMedsSets().get(0).getCode(), "UCSF_A93");
+    assertEquals(ucsfa94.getMedsSets().get(1).getCode(), "UCSF_A94");
+
+    // A2 should also have tripped A94
+    assertEquals(ucsfa2.getMedsSets().get(1).getCode(), "UCSF_A94",
+        ucsfa2.getMedsSets().toString());
+    assertEquals(ucsfa95.getMedsSets().get(1).getCode(), "UCSF_A95");
+    assertEquals(ucsfa96.getMedsSets().get(1).getCode(), "UCSF_A96");
 
     log.warn("RULES A26 A24 AND A50 HAVE KNOWN PROBLEMS. Duplicate firing detection has been"
         + " DISABLED.");

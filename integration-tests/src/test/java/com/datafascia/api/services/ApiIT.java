@@ -47,13 +47,14 @@ import org.testng.annotations.BeforeSuite;
  */
 @Slf4j
 public class ApiIT {
-  private static final String USERNAME = "testuser";
-  private static final String PASSWORD = "supersecret";
+  protected static final String FHIR_USERNAME = "testuser";
+  protected static final String FHIR_PASSWORD = "supersecret";
 
   public static final DropwizardTestApp<APIConfiguration> app = new DropwizardTestApp<>(
       APIService.class, apiConfiguration());
+  public static String fhirServer = null;
   private static final FhirContext ctx = FhirContext.forDstu2();
-  protected static IGenericClient client;
+  public static IGenericClient client;
 
   /**
    * Prepare the integration test to run.
@@ -67,22 +68,17 @@ public class ApiIT {
 
     app.start();
     log.info("Started Dropwizard application listening on port {}", app.getLocalPort());
+    fhirServer = "http://localhost:" + app.getLocalPort() + "/fhir";
 
     // Register the interceptor with the client
-    client = ctx.newRestfulGenericClient("http://localhost:" + app.getLocalPort() + "/fhir");
-    client.registerInterceptor(new BasicAuthInterceptor(USERNAME, PASSWORD));
+    client = ctx.newRestfulGenericClient(fhirServer);
+    client.registerInterceptor(new BasicAuthInterceptor(FHIR_USERNAME, FHIR_PASSWORD));
 
     addStaticData();
   }
 
-  /**
-   * Stop the test application.
-   *
-   * @throws Exception
-   */
   @AfterSuite
   public static void after() throws Exception {
-    app.stop();
   }
 
   private static String getZooKeepers() {

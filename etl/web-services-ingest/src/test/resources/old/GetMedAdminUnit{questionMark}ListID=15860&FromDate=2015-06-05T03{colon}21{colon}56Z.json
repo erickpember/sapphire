@@ -1,6 +1,6 @@
 {
   "Error": null, 
-  "ExtractDateTime": "/Date(1433500227000-0700)/", 
+  "ExtractDateTime": "/Date(1433500015000-0700)/", 
   "Patient": [
     {
       "CSN": "5041113", 
@@ -17,6 +17,7 @@
           "Frequency": "200526^Every 6 Hours PRN", 
           "MedAdmin": [
             {
+              "AdminID" : "1",
               "AdminAction": "1^Given", 
               "DocumentationTime": "/Date(1433499960000-0700)/", 
               "Dose": "2", 

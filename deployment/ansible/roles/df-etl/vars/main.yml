@@ -1,0 +1,2 @@
+---
+df_etl_nar: "df-etl-nar-{{ df_platform_version }}.nar"

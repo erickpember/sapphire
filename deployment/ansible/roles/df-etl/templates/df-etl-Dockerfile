@@ -1,0 +1,33 @@
+# Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
+# For license information, please contact http://datafascia.com/contact
+
+# Example run command:
+#
+#     docker run \
+#         --detach \
+#         --dns=172.17.42.1 \
+#         --publish=8080:8080 \
+#         --publish=9520:9520 \
+#         --volume=/var/dF:/var/dF \
+#         datafascia/df-etl
+
+FROM datafascia/centos7-ansible-java:latest
+MAINTAINER devops@datafascia.com
+
+# ADD instruction also extracts recognized archive formats.
+ADD ansible.tar.gz {{ company_install_prefix }}
+
+WORKDIR {{ company_ansible_dir }}
+RUN ansible-playbook \
+        --extra-vars="environment_name=local" \
+        --inventory-file=environment/local/hosts \
+        --tags=image \
+        df-etl.yml && \
+    rm -rf {{ company_package_dir }} && \
+    yum clean all
+
+COPY df-etl-nar-{{ df_platform_version }}.nar {{ company_install_prefix }}/nifi/lib/df-etl-nar-{{ df_platform_version }}.nar
+
+EXPOSE 8080 9520
+
+CMD ["{{ company_install_prefix }}/nifi/run.sh"]

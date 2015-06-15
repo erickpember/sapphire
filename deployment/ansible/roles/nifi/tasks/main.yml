@@ -1,0 +1,45 @@
+---
+- name: Download NiFi package
+  get_url:
+    url: http://s3-us-west-2.amazonaws.com/datafascia-packages/{{ nifi_package }}
+    dest: "{{ company_package_dir }}/{{ nifi_package }}"
+  tags:
+    - image
+
+- name: Extract NiFi
+  command: >
+      tar --no-same-owner -xzf {{ company_package_dir }}/{{ nifi_package }}
+      chdir={{ company_install_prefix }}
+      creates={{ nifi_install_dir }}
+  tags:
+    - image
+
+- name: Create symbolic link {{ nifi_home }} to install directory
+  file:
+    src: "{{ nifi_install_dir }}"
+    path: "{{ nifi_home }}"
+    state: link
+  tags:
+    - image
+
+- name: Copy configuration files
+  template:
+    src: "{{ item }}"
+    dest: "{{ nifi_home }}/conf/{{ item }}"
+  with_items:
+    - logback.xml
+    - nifi.properties
+  tags:
+    - image
+
+- name: Create data directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: 0755
+  with_items:
+    - "{{ nifi_conf_dir }}"
+    - "{{ nifi_data_dir }}"
+    - "{{ nifi_log_dir }}"
+  tags:
+    - run

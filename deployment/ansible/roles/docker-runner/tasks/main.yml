@@ -18,6 +18,17 @@
     dest: "{{ docker_run_command }}"
     mode: 0755
 
+- name: Check for changed NiFi flow configuration
+  copy:
+    src: "{{ playbook_dir }}/roles/df-etl/files/flow.xml.gz"
+    dest: "{{ company_package_dir }}/flow.xml.gz"
+  register: copy_flow_xml_gz
+
+- name: Stop df-etl
+  shell: docker stop etl1.local.datafascia.com && docker rm -v etl1.local.datafascia.com
+  ignore_errors: True
+  when: copy_df_etl_nar.changed or copy_flow_xml_gz.changed
+
 - name: Stop df-api-server
   shell: docker stop api1.local.datafascia.com && docker rm -v api1.local.datafascia.com
   ignore_errors: True
@@ -145,6 +156,21 @@
           datafascia/kafka
   when: "'datafascia/kafka:latest' not in list_containers.stdout_lines"
 
+- name: Copy NiFi flow configuration
+  copy:
+    src: "{{ playbook_dir }}/roles/df-etl/files/flow.xml.gz"
+    dest: "{{ company_data_prefix }}/nifi/conf/flow.xml.gz"
+
+- name: Run df-etl
+  command: >
+      {{ docker_run_command }}
+          etl1.local.datafascia.com
+          --detach
+          --publish=8080:8080
+          --publish=9520:9520
+          --volume={{ company_data_prefix }}:{{ company_data_prefix }}
+          datafascia/df-etl
+  when: "'datafascia/df-etl:latest' not in list_containers.stdout_lines"
 
 - name: Run df-api-server
   command: >

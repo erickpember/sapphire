@@ -108,6 +108,32 @@
       touch {{ docker_image_creator_home }}/kafka.created
       creates={{ docker_image_creator_home }}/kafka.created
 
+- name: Copy df-etl-nar package
+  copy:
+    src: "{{ playbook_dir }}/../../etl/nar/target/df-etl-nar-{{ df_platform_version }}.nar"
+    dest: "{{ company_package_dir }}/df-etl-nar-{{ df_platform_version }}.nar"
+  register: copy_df_etl_nar
+
+- name: Force creation of df-etl Docker image
+  file:
+    path: "{{ docker_image_creator_home }}/df-etl.created"
+    state: absent
+  when: copy_df_etl_nar.changed
+
+- name: Copy df-etl Dockerfile
+  template:
+    src: "{{ playbook_dir }}/roles/df-etl/templates/df-etl-Dockerfile"
+    dest: "{{ company_package_dir }}/df-etl-Dockerfile"
+
+- name: Create df-etl Docker image
+  shell: >
+      docker build
+      --file={{ company_package_dir }}/df-etl-Dockerfile
+      --tag=datafascia/df-etl
+      {{ company_package_dir }} &&
+      touch {{ docker_image_creator_home }}/df-etl.created
+      creates={{ docker_image_creator_home }}/df-etl.created
+
 - name: Copy df-api-server package
   copy:
     src: "{{ playbook_dir }}/../../api/server/target/df-api-server-{{ df_platform_version }}.jar"

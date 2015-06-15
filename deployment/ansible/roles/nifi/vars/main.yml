@@ -1,0 +1,9 @@
+---
+nifi_version: 0.1.0-incubating
+nifi_package: nifi-{{ nifi_version }}-bin.tar.gz
+nifi_install_dir: "{{ company_install_prefix }}/nifi-{{ nifi_version }}"
+nifi_home: "{{ company_install_prefix }}/nifi"
+nifi_data_prefix: "{{ company_data_prefix }}/nifi"
+nifi_conf_dir: "{{ nifi_data_prefix }}/conf"
+nifi_data_dir: "{{ nifi_data_prefix }}/data"
+nifi_log_dir: "{{ nifi_data_prefix }}/logs"

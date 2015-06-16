@@ -129,4 +129,9 @@ public class AccumuloReflectEntityStore implements ReflectEntityStore {
 
     return accumuloTemplate.stream(scanner, new ReflectRowMapper<>(entityType));
   }
+
+  @Override
+  public <E> void delete(EntityId parentId, Class<E> entityType) {
+    accumuloTemplate.delete(dataTableName, toRowIdPrefix(parentId, entityType));
+  }
 }

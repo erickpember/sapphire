@@ -65,4 +65,16 @@ public interface ReflectEntityStore {
    * @return entity stream
    */
   <E> Stream<E> stream(EntityId startEntityId);
+
+  /**
+   * Deletes entities and all of their children.
+   *
+   * @param parentId
+   *     containing parent entity ID
+   * @param entityType
+   *     entity type
+   * @param <E>
+   *     entity type
+   */
+  <E> void delete(EntityId parentId, Class<E> entityType);
 }

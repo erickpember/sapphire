@@ -47,11 +47,11 @@ public class EncounterDaoIT extends DaoIT {
     boolean foundHeight = false;
     boolean foundWeight = false;
     for (Observation ob : enco.getObservations()) {
-      if (ob.getName().getCodings().get(0).equals(EncounterDao.WEIGHT)) {
+      if (ob.getCode().getCodings().get(0).equals(EncounterDao.WEIGHT)) {
         foundWeight = true;
         assertEquals(ob.getValue().getQuantity().getValue(), weight);
         assertEquals(ob.getValue().getQuantity().getUnit(), UnitsSymbolMap.getUnit("kg"));
-      } else if (ob.getName().getCodings().get(0).equals(EncounterDao.HEIGHT)) {
+      } else if (ob.getCode().getCodings().get(0).equals(EncounterDao.HEIGHT)) {
         foundHeight = true;
         assertEquals(ob.getValue().getQuantity().getValue(), height);
         assertEquals(ob.getValue().getQuantity().getUnit(), UnitsSymbolMap.getUnit("in"));

@@ -183,9 +183,9 @@ public class EmergeDemographicCSVGenerator {
     List<Observation> observations = encount.getObservations();
     if (observations != null) {
       for (Observation observ : observations) {
-        if (observ.getName() != null && observ.getName().getCodings() != null
-            && observ.getName().getCodings().get(0) != null
-            && observ.getName().getCodings().get(0).equals(code)) {
+        if (observ.getCode() != null && observ.getCode().getCodings() != null
+            && observ.getCode().getCodings().get(0) != null
+            && observ.getCode().getCodings().get(0).equals(code)) {
           if (observ.getValue() != null && observ.getValue().getQuantity() != null) {
             return Optional.of(observ.getValue().getQuantity().getValue().toString());
           }

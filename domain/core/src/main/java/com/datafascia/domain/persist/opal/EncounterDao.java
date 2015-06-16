@@ -131,7 +131,7 @@ public class EncounterDao extends OpalDao {
     ovWeight.setQuantity(qWeight);
     Observation oWeight = new Observation();
     oWeight.setValue(ovWeight);
-    oWeight.setName(new CodeableConcept() {
+    oWeight.setCode(new CodeableConcept() {
       {
         setCodings(Arrays.asList(WEIGHT));
       }
@@ -165,7 +165,7 @@ public class EncounterDao extends OpalDao {
     ovHeight.setQuantity(qHeight);
     Observation oHeight = new Observation();
     oHeight.setValue(ovHeight);
-    oHeight.setName(new CodeableConcept() {
+    oHeight.setCode(new CodeableConcept() {
       {
         setCodings(Arrays.asList(HEIGHT));
       }

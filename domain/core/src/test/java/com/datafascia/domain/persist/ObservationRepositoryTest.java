@@ -84,7 +84,7 @@ public class ObservationRepositoryTest extends RepositoryTestSupport {
     observationValue.setString(value);
 
     Observation observation = new Observation();
-    observation.setName(new CodeableConcept(Arrays.asList(code), code));
+    observation.setCode(new CodeableConcept(Arrays.asList(code), code));
     observation.setValue(observationValue);
     observation.setIssued(Instant.now());
     return observation;
@@ -107,7 +107,7 @@ public class ObservationRepositoryTest extends RepositoryTestSupport {
     List<Observation> observations = observationRepository.list(patient.getId(), encounter.getId());
     assertEquals(observations.size(), 2);
     for (Observation observation : observations) {
-      switch (observation.getName().getCodings().get(0)) {
+      switch (observation.getCode().getCodings().get(0)) {
         case NUMERICAL_PAIN_LEVEL_LOW:
           assertEquals(observation, observation1);
           break;

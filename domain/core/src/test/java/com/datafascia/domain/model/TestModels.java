@@ -837,7 +837,6 @@ public class TestModels {
       setIdentifier(codeable);
       setInterpretation(codeable);
       setMethod(codeable);
-      setName(codeable);
       setBodySiteReferenceId(Id.of("BodySite"));
       setEncounterId(Id.of("Encounter"));
       setId(Id.of("Observation"));

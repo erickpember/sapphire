@@ -24,7 +24,6 @@ public class ObservationTest extends ModelTestBase {
     assertEquals(decoded.getIdentifier(), TestModels.codeable);
     assertEquals(decoded.getInterpretation(), TestModels.codeable);
     assertEquals(decoded.getMethod(), TestModels.codeable);
-    assertEquals(decoded.getName(), TestModels.codeable);
     assertEquals(decoded.getBodySiteReferenceId(), Id.of("BodySite"));
     assertEquals(decoded.getEncounterId(), Id.of("Encounter"));
     assertEquals(decoded.getId(), Id.of("Observation"));
@@ -60,7 +59,6 @@ public class ObservationTest extends ModelTestBase {
     jsonProperties.add("interpretation");
     jsonProperties.add("issued");
     jsonProperties.add("method");
-    jsonProperties.add("name");
     jsonProperties.add("performers");
     jsonProperties.add("referenceRanges");
     jsonProperties.add("related");

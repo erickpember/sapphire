@@ -127,10 +127,6 @@ public class Observation {
   @JsonProperty("referenceRanges")
   private List<ObservationReferenceRange> referenceRanges;
 
-  /** Describes what was observed. Sometimes this is called the observation "code". */
-  @JsonProperty("name")
-  private CodeableConcept name;
-
   /**
    * Related observations - either components, or previous observations, or statements of
    * derivation.

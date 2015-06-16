@@ -45,7 +45,7 @@ public class AddObservations implements Consumer<Event> {
 
     String code = fromObservation.getId();
     Observation observation = new Observation();
-    observation.setName(new CodeableConcept(Arrays.asList(code), code));
+    observation.setCode(new CodeableConcept(Arrays.asList(code), code));
     observation.setValue(observationValue);
     observation.setIssued(fromObservation.getObservationDateAndTime());
     return observation;

@@ -67,7 +67,7 @@ public class ObservationIT {
     assertEquals(observations.size(), 5);
 
     for (Observation observation : observations) {
-      switch (observation.getName().getCodings().get(0)) {
+      switch (observation.getCode().getCodings().get(0)) {
         case "%AS^ANTIBODY SCREEN^SQ_LABP^890-4^Bld gp Ab Scn SerPl Ql^LN":
           assertEquals(observation.getValue().getString(), "NEG");
           break;

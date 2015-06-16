@@ -90,7 +90,7 @@ public class ObservationDao extends OpalDao {
     observationValue.setString(decodeString(value));
 
     Observation observation = new Observation();
-    observation.setName(new CodeableConcept(Arrays.asList(field.getFieldName()),
+    observation.setCode(new CodeableConcept(Arrays.asList(field.getFieldName()),
         field.getDisplayName()));
     observation.setValue(observationValue);
     return observation;

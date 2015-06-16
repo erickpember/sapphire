@@ -89,6 +89,16 @@ public interface DatafasciaApi {
   Encounter lastvisit(@Path("patientId") String patientId);
 
   /**
+   * Deletes encounters and all of their children for a patient.
+   *
+   * @param patientId
+   *     patient ID
+   * @return HTTP response
+   */
+  @DELETE("/patient/{patientId}/encounter")
+  Response deleteEncounters(@Path("patientId") String patientId);
+
+  /**
    * @param packageName Specify the name of the package.
    *
    * @return version information for the package on the server.

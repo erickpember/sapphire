@@ -23,7 +23,7 @@ import static org.testng.Assert.assertEquals;
 public class ObservationIT {
 
   private static final String INGEST_HL7_COMMAND = "ingest-hl7-files";
-  private static final String PATIENT_ID = "urn:df-patientId-1:97552037";
+  private static final String PATIENT_ID = "urn:df-patientId-1:87552037";
 
   private static String mllpHost;
   private static String mllpPort;
@@ -55,6 +55,7 @@ public class ObservationIT {
   @Test
   public void should_save_observation() throws Exception {
     // Given a patient was admitted
+    apiClient.deleteEncounters(PATIENT_ID);
     apiClient.deletePatient(PATIENT_ID);
     ingestHL7Message("ADT_A01.hl7", 3);
 

@@ -95,4 +95,14 @@ public class EncounterRepository extends EntityStoreRepository {
     return entityStore.stream(PatientRepository.toEntityId(patientId), Encounter.class)
         .collect(Collectors.toList());
   }
+
+  /**
+   * Deletes encounters and all of their children for a patient.
+   *
+   * @param patientId
+   *     patient ID
+   */
+  public void delete(Id<Patient> patientId) {
+    entityStore.delete(PatientRepository.toEntityId(patientId), Encounter.class);
+  }
 }

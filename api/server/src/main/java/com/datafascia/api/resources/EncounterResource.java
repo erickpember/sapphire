@@ -10,6 +10,7 @@ import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import java.util.Optional;
 import javax.inject.Inject;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -75,5 +76,16 @@ public class EncounterResource {
     }
 
     return optionalEncounter.get();
+  }
+
+  /**
+   * Deletes encounters and all of their children for a patient.
+   *
+   * @param patientId
+   *     patient ID
+   */
+  @DELETE @Timed
+  public void delete(@PathParam("patientId") Id<Patient> patientId) {
+    encounterRepository.delete(patientId);
   }
 }

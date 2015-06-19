@@ -5,22 +5,7 @@ package com.datafascia.api.services;
 import com.datafascia.api.client.DatafasciaApi;
 import com.datafascia.api.client.DatafasciaApiBuilder;
 import com.datafascia.api.configurations.APIConfiguration;
-import com.datafascia.common.accumulo.AccumuloConfiguration;
-import com.datafascia.common.accumulo.AccumuloImport;
-import com.datafascia.common.accumulo.AccumuloModule;
-import com.datafascia.common.accumulo.AccumuloTemplate;
-import com.datafascia.common.accumulo.AuthorizationsSupplier;
-import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
-import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
-import com.datafascia.common.accumulo.SubjectAuthorizationsSupplier;
-import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
-import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
-import com.datafascia.common.kafka.KafkaConfig;
 import com.datafascia.common.persist.Id;
-import com.datafascia.common.persist.entity.AccumuloReflectEntityStore;
-import com.datafascia.common.persist.entity.ReflectEntityStore;
-import com.datafascia.common.shiro.FakeRealm;
-import com.datafascia.common.shiro.RoleExposingRealm;
 import com.datafascia.domain.model.CodeableConcept;
 import com.datafascia.domain.model.Gender;
 import com.datafascia.domain.model.HumanName;
@@ -29,38 +14,18 @@ import com.datafascia.domain.model.Patient;
 import com.datafascia.domain.model.PatientCommunication;
 import com.datafascia.domain.model.Race;
 import com.datafascia.domain.model.Version;
-import com.datafascia.domain.persist.Tables;
 import com.datafascia.dropwizard.testing.DropwizardTestApp;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
-import com.google.common.io.Files;
 import com.google.common.io.Resources;
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Provides;
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileNotFoundException;
 import java.net.URI;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
-import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Instance;
 import org.apache.accumulo.minicluster.MiniAccumuloInstance;
-import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.config.IniSecurityManagerFactory;
-import org.apache.shiro.mgt.RealmSecurityManager;
-import org.apache.shiro.mgt.SecurityManager;
-import org.apache.shiro.subject.SimplePrincipalCollection;
-import org.apache.shiro.subject.Subject;
-import org.apache.shiro.subject.support.SubjectThreadState;
-import org.apache.shiro.util.Factory;
-import org.apache.shiro.util.ThreadState;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 
@@ -70,17 +35,11 @@ import org.testng.annotations.BeforeSuite;
 @Slf4j
 public class ApiIT {
   protected static final String MODELS_PKG = Version.class.getPackage().getName();
-  protected static final String OPAL_TABLE = "opal_dF_data";
   protected static final DateTimeFormatter dateFormat
       = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss'Z'");
 
-  protected static AccumuloConfiguration accConfig;
-  protected static KafkaConfig kafkaConfig;
-  protected static Injector injector;
   public static DropwizardTestApp<APIConfiguration> app;
-  protected static Connector connect;
   protected static DatafasciaApi api;
-  protected static ThreadState threadState;
 
   /**
    * Prepare the integration test to run.
@@ -93,13 +52,10 @@ public class ApiIT {
     TimeUnit.SECONDS.sleep(3);
 
     String configFile = apiConfiguration();
-    setupGuice();
-    setupShiro();
-    connect = injector.getInstance(Connector.class);
 
-    log.info("Starting dropwizard app");
     app = new DropwizardTestApp<>(APIService.class, configFile);
     app.start();
+    log.info("Started Dropwizard application listening on port {}", app.getLocalPort());
 
     api = DatafasciaApiBuilder.endpoint(
         new URI("http://localhost:" + app.getLocalPort()), "testuser", "supersecret");
@@ -114,94 +70,29 @@ public class ApiIT {
   @AfterSuite
   public static void after() throws Exception {
     app.stop();
-    threadState.clear();
   }
 
-  /**
-   * @return the Accumulo configuration to use
-   */
-  private AccumuloConfiguration accumuloConfig() {
-    if (accConfig == null) {
-      // Keep the values here in sync with what is in the pom.xml
-      String instanceName = "integration-test";
-      try {
-        Instance instance = new MiniAccumuloInstance(instanceName,
-            new File("target/accumulo-maven-plugin/" + instanceName));
-        accConfig = new AccumuloConfiguration();
-        accConfig.setInstance(instanceName);
-        accConfig.setZooKeepers(instance.getZooKeepers());
-        accConfig.setUser("root");
-        accConfig.setPassword("secret");
-      } catch (Exception e) {
-        throw new RuntimeException("Error get Accumulo instance.", e);
-      }
+  private String getZooKeepers() {
+    String instanceName = "integration-test";
+    try {
+      Instance instance = new MiniAccumuloInstance(
+          instanceName,
+          new File("target/accumulo-maven-plugin/" + instanceName));
+      return instance.getZooKeepers();
+    } catch (FileNotFoundException e) {
+      throw new IllegalStateException("Cannot get Accumulo instance", e);
     }
-
-    return accConfig;
-  }
-
-  /**
-   * @return the Kafka configuration to use
-   */
-  private KafkaConfig kafkaConfig() {
-    if (kafkaConfig == null) {
-      kafkaConfig = new KafkaConfig();
-      kafkaConfig.setZookeeperConnect(accumuloConfig().getZooKeepers());
-    }
-
-    return kafkaConfig;
   }
 
   /**
    * @return the API configuration to use as a file
-   *
-   * @throws Exception should not happen
    */
-  private String apiConfiguration() throws Exception {
-    ObjectMapper mapper = new ObjectMapper(new YAMLFactory());
-    ObjectNode node = mapper.createObjectNode();
-    node.putPOJO("accumulo", accumuloConfig());
-    node.putPOJO("kafkaConfig", kafkaConfig());
-    String value = mapper.writeValueAsString(node);
+  private String apiConfiguration() {
+    String zooKeepers = getZooKeepers();
+    System.setProperty("dw.accumulo.zooKeepers", zooKeepers);
+    System.setProperty("dw.kafkaConfig.zookeeperConnect", zooKeepers);
 
-    String configFile = System.getProperty("java.io.tmpdir") + File.separatorChar + "test.yml";
-    FileWriter fw = new FileWriter(configFile);
-    fw.write(value, 0, value.length());
-    fw.close();
-
-    return configFile;
-  }
-
-  /**
-   * Set up Shiro
-   */
-  private void setupShiro() {
-    Factory<SecurityManager> factory = new IniSecurityManagerFactory("classpath:shiro.ini");
-    RealmSecurityManager securityManager = (RealmSecurityManager) factory.getInstance();
-    securityManager.setRealm(new FakeRealm());
-    SecurityUtils.setSecurityManager(securityManager);
-
-    Subject subject = new Subject.Builder()
-        .principals(new SimplePrincipalCollection("root", FakeRealm.class.getSimpleName()))
-        .buildSubject();
-    threadState = new SubjectThreadState(subject);
-    threadState.bind();
-  }
-
-  /**
-   * Import test data into accumulo
-   *
-   * @throws Exception from underling Accumulo or IO calls
-   */
-  private void importData() throws Exception {
-    // Find the accumulo data and populate it into our minicluster.
-    File failDir = Files.createTempDir();
-    String resourceFile = Resources.getResource("version.json").getPath();
-    String path = resourceFile.substring(0, resourceFile.lastIndexOf(File.separator));
-    AccumuloImport.importData(connect, OPAL_TABLE, path + "/accumulo_data", failDir.getPath());
-    failDir.delete();
-
-    connect.tableOperations().create("Patient");
+    return Resources.getResource("api-server.yml").getFile();
   }
 
   private void addStaticData() throws Exception {
@@ -397,35 +288,5 @@ public class ApiIT {
       }
     }
     );
-  }
-
-  /**
-   * Set up Guice modules
-   */
-  private void setupGuice() {
-    injector = Guice.createInjector(
-        new AbstractModule() {
-          @Override
-          protected void configure() {
-            bind(AccumuloConfiguration.class).toInstance(accumuloConfig());
-            bind(AuthorizationsSupplier.class).to(SubjectAuthorizationsSupplier.class);
-            bind(AvroSchemaRegistry.class).to(MemorySchemaRegistry.class).in(Singleton.class);
-            bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
-            bind(RoleExposingRealm.class).to(FakeRealm.class);
-          }
-
-          @Provides @Singleton
-          public ReflectEntityStore entityStore(
-              AvroSchemaRegistry schemaRegistry, AccumuloTemplate accumuloTemplate) {
-
-            return new AccumuloReflectEntityStore(
-                schemaRegistry, Tables.ENTITY_PREFIX, accumuloTemplate);
-          }
-        },
-        new AccumuloModule());
-  }
-
-  public static Injector getInjector() {
-    return injector;
   }
 }

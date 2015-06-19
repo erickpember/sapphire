@@ -1,0 +1,22 @@
+accumulo:
+  instance: integration-test
+  zooKeepers: localhost
+  user: root
+  password: secret
+
+kafkaConfig:
+  zookeeperConnect: localhost
+  groupId: group
+  autoOffsetReset: smallest
+  consumerTimeoutMs: -1
+
+logging:
+  level: INFO
+  loggers:
+    com.datafascia: DEBUG
+    io.dropwizard.jersey.jackson: DEBUG
+
+server:
+  applicationConnectors:
+  - type: http
+    port: 9090

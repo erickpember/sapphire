@@ -120,7 +120,8 @@ public class DropwizardTestApp<C extends Configuration> {
   }
 
   /**
-   * @return the port for the server
+   * @return actual port the server is listening on, or
+   * -1 if it has not been opened, or -2 if it has been closed.
    */
   public int getLocalPort() {
     return ((NetworkConnector) jetty.getConnectors()[0]).getLocalPort();

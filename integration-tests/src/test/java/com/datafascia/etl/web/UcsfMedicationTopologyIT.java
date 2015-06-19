@@ -91,13 +91,13 @@ public class UcsfMedicationTopologyIT {
 
     @Provides @Singleton
     public AccumuloConfiguration accumuloConfiguration() {
-      String instanceName = "plugin-it-instance";
+      String instanceName = "integration-test";
       try {
         Instance instance = new MiniAccumuloInstance(
             instanceName, new File("target/accumulo-maven-plugin/" + instanceName));
 
         return new AccumuloConfiguration(
-            instanceName, instance.getZooKeepers(), "root", "supersecret");
+            instanceName, instance.getZooKeepers(), "root", "secret");
       } catch (Exception e) {
         e.printStackTrace();
         throw new IllegalStateException("Cannot get Accumulo instance", e);

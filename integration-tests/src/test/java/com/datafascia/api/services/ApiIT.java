@@ -123,7 +123,7 @@ public class ApiIT {
   private AccumuloConfiguration accumuloConfig() {
     if (accConfig == null) {
       // Keep the values here in sync with what is in the pom.xml
-      String instanceName = "plugin-it-instance";
+      String instanceName = "integration-test";
       try {
         Instance instance = new MiniAccumuloInstance(instanceName,
             new File("target/accumulo-maven-plugin/" + instanceName));
@@ -131,7 +131,7 @@ public class ApiIT {
         accConfig.setInstance(instanceName);
         accConfig.setZooKeepers(instance.getZooKeepers());
         accConfig.setUser("root");
-        accConfig.setPassword("supersecret");
+        accConfig.setPassword("secret");
       } catch (Exception e) {
         throw new RuntimeException("Error get Accumulo instance.", e);
       }

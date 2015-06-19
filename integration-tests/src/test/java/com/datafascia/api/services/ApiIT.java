@@ -96,8 +96,6 @@ public class ApiIT {
     setupGuice();
     setupShiro();
     connect = injector.getInstance(Connector.class);
-    importData();
-    log.info("Accumulo populated and ready.");
 
     log.info("Starting dropwizard app");
     app = new DropwizardTestApp<>(APIService.class, configFile);

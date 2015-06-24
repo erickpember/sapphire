@@ -20,8 +20,11 @@ import static org.testng.Assert.fail;
  * generator, that would mean that mistakes in the transformation would happen the same way
  * in both places, and the test would erroneously pass. Here we have known good data, and
  * breaking changes in the transforms will cause a test failure.
+ *
+ * This integration test has been disabled from running, pending updates to the new API.
+ * To enable this class, simply rename it back to CsvIT.
  */
-public class CsvIT {
+public class CsvITDisabled {
 
   private static final String DEMOGRAPHIC_CSV_FILE = "/tmp/datafascia-test/emerge-demographic.csv";
   private static final String DAILY_PROCESS_CSV_FILE =

@@ -4,11 +4,11 @@ package com.datafascia.api.services;
 
 import com.codahale.metrics.MetricRegistry;
 import com.datafascia.api.bundle.AtmosphereBundle;
+import com.datafascia.api.bundle.FhirBundle;
 import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.api.health.AccumuloHealthCheck;
 import com.datafascia.common.accumulo.AccumuloConfiguration;
 import com.datafascia.common.accumulo.AccumuloModule;
-import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
 import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
@@ -16,8 +16,8 @@ import com.datafascia.common.accumulo.SubjectAuthorizationsSupplier;
 import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
 import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
 import com.datafascia.common.kafka.KafkaConfig;
-import com.datafascia.common.persist.entity.AccumuloReflectEntityStore;
-import com.datafascia.common.persist.entity.ReflectEntityStore;
+import com.datafascia.common.persist.entity.AccumuloFhirEntityStore;
+import com.datafascia.common.persist.entity.FhirEntityStore;
 import com.datafascia.common.reflect.PackageUtils;
 import com.datafascia.common.shiro.FakeRealm;
 import com.datafascia.common.shiro.RealmInjectingEnvironmentLoaderListener;
@@ -29,7 +29,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Provides;
+import com.google.inject.name.Names;
 import com.google.inject.servlet.GuiceServletContextListener;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
@@ -71,6 +71,7 @@ public class APIService extends Application<APIConfiguration> {
   @Override
   public void initialize(Bootstrap<APIConfiguration> bootstrap) {
     bootstrap.addBundle(new AtmosphereBundle());
+    bootstrap.addBundle(new FhirBundle());
   }
 
   @Override
@@ -129,14 +130,10 @@ public class APIService extends Application<APIConfiguration> {
             bind(MetricRegistry.class).toInstance(environment.metrics());
             bind(Realm.class).toInstance(realm);
             bind(RoleExposingRealm.class).toInstance(realm);
-          }
+            bind(FhirEntityStore.class).to(AccumuloFhirEntityStore.class).in(Singleton.class);
 
-          @Provides @Singleton
-          public ReflectEntityStore entityStore(
-              AvroSchemaRegistry schemaRegistry, AccumuloTemplate accumuloTemplate) {
-
-            return new AccumuloReflectEntityStore(
-                schemaRegistry, Tables.ENTITY_PREFIX, accumuloTemplate);
+            bindConstant().annotatedWith(Names.named("entityTableNamePrefix")).to(
+                    Tables.ENTITY_PREFIX);
           }
         },
         new AccumuloModule());

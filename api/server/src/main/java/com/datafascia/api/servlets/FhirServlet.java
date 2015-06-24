@@ -1,0 +1,33 @@
+// Copyright (C) 2014-2015 dataFascia Corporation - All Rights Reserved
+// For license information, please contact http://datafascia.com/contact
+package com.datafascia.api.servlets;
+
+import ca.uhn.fhir.rest.server.IResourceProvider;
+import ca.uhn.fhir.rest.server.RestfulServer;
+import com.datafascia.api.resources.fhir.PatientFhirResource;
+import java.util.ArrayList;
+import java.util.List;
+import javax.servlet.ServletException;
+
+/**
+ * Front controller that forwards FHIR resource requests to providers.
+ */
+public class FhirServlet extends RestfulServer {
+  /**
+   * The initialize method is automatically called when the servlet is starting up, so it can be
+   * used to configure the servlet to define resource providers, or set up configuration,
+   * interceptors, etc.
+   * @throws javax.servlet.ServletException
+   */
+  @Override
+  protected void initialize() throws ServletException {
+    /*
+     * The servlet defines any number of resource providers, and
+     * configures itself to use them by calling
+     * setResourceProviders()
+     */
+    List<IResourceProvider> resourceProviders = new ArrayList<>();
+    resourceProviders.add(new PatientFhirResource());
+    setResourceProviders(resourceProviders);
+  }
+}

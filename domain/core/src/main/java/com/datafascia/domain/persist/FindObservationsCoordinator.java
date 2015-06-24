@@ -4,9 +4,9 @@ package com.datafascia.domain.persist;
 
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.time.Interval;
+import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.model.Encounter;
 import com.datafascia.domain.model.Observation;
-import com.datafascia.domain.model.Patient;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +48,7 @@ public class FindObservationsCoordinator {
    * @return collection of observations, empty if none found
    */
   public List<Observation> findObservationsByPatientId(
-      Id<Patient> patientId, Optional<Interval<Instant>> captureTimeInterval) {
+      Id<UnitedStatesPatient> patientId, Optional<Interval<Instant>> captureTimeInterval) {
 
     Instant startIssued = null;
     Instant endIssued = null;

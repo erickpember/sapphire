@@ -5,8 +5,9 @@ package com.datafascia.domain.persist;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.persist.entity.EntityId;
 import com.datafascia.common.persist.entity.ReflectEntityStore;
+import com.datafascia.domain.fhir.Ids;
+import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.model.Encounter;
-import com.datafascia.domain.model.Patient;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -39,7 +40,7 @@ public class EncounterRepository extends EntityStoreRepository {
    *     encounter ID
    * @return entity ID
    */
-  static EntityId toEntityId(Id<Patient> patientId, Id<Encounter> encounterId) {
+  static EntityId toEntityId(Id<UnitedStatesPatient> patientId, Id<Encounter> encounterId) {
     return EntityId.builder()
         .path(PatientRepository.toEntityId(patientId))
         .path(Encounter.class, encounterId)
@@ -65,10 +66,11 @@ public class EncounterRepository extends EntityStoreRepository {
    * @param encounter
    *     to save
    */
-  public void save(Patient patient, Encounter encounter) {
+  public void save(UnitedStatesPatient patient, Encounter encounter) {
     encounter.setId(generateId(encounter));
 
-    entityStore.save(toEntityId(patient.getId(), encounter.getId()), encounter);
+    Id<UnitedStatesPatient> patientId = Ids.toPrimaryKey(patient.getId());
+    entityStore.save(toEntityId(patientId, encounter.getId()), encounter);
   }
 
   /**
@@ -80,7 +82,7 @@ public class EncounterRepository extends EntityStoreRepository {
    *     encounter ID
    * @return optional entity, empty if not found
    */
-  public Optional<Encounter> read(Id<Patient> patientId, Id<Encounter> encounterId) {
+  public Optional<Encounter> read(Id<UnitedStatesPatient> patientId, Id<Encounter> encounterId) {
     return entityStore.read(toEntityId(patientId, encounterId));
   }
 
@@ -91,7 +93,7 @@ public class EncounterRepository extends EntityStoreRepository {
    *     parent entity ID
    * @return encounters
    */
-  public List<Encounter> list(Id<Patient> patientId) {
+  public List<Encounter> list(Id<UnitedStatesPatient> patientId) {
     return entityStore.stream(PatientRepository.toEntityId(patientId), Encounter.class)
         .collect(Collectors.toList());
   }
@@ -102,7 +104,7 @@ public class EncounterRepository extends EntityStoreRepository {
    * @param patientId
    *     patient ID
    */
-  public void delete(Id<Patient> patientId) {
+  public void delete(Id<UnitedStatesPatient> patientId) {
     entityStore.delete(PatientRepository.toEntityId(patientId), Encounter.class);
   }
 }

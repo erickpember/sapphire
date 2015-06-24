@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.persist;
 
+import ca.uhn.fhir.context.FhirContext;
 import com.datafascia.common.accumulo.AccumuloConfiguration;
 import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
@@ -11,12 +12,15 @@ import com.datafascia.common.accumulo.FixedAuthorizationsSupplier;
 import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
 import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
 import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
+import com.datafascia.common.persist.entity.AccumuloFhirEntityStore;
 import com.datafascia.common.persist.entity.AccumuloReflectEntityStore;
+import com.datafascia.common.persist.entity.FhirEntityStore;
 import com.datafascia.common.persist.entity.ReflectEntityStore;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
+import com.google.inject.name.Names;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -40,7 +44,10 @@ public abstract class RepositoryTestSupport {
       bind(AuthorizationsSupplier.class).to(FixedAuthorizationsSupplier.class);
       bind(AvroSchemaRegistry.class).to(MemorySchemaRegistry.class).in(Singleton.class);
       bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
-      bind(ReflectEntityStore.class).to(AccumuloReflectEntityStore.class);
+      bind(FhirContext.class).in(Singleton.class);
+      bind(FhirEntityStore.class).to(AccumuloFhirEntityStore.class).in(Singleton.class);
+
+      bindConstant().annotatedWith(Names.named("entityTableNamePrefix")).to(Tables.ENTITY_PREFIX);
     }
 
     @Provides @Singleton
@@ -59,7 +66,7 @@ public abstract class RepositoryTestSupport {
     }
 
     @Provides @Singleton
-    public AccumuloReflectEntityStore entityStore(
+    public ReflectEntityStore reflectEntityStore(
         AvroSchemaRegistry schemaRegistry, AccumuloTemplate accumuloTemplate) {
 
       return new AccumuloReflectEntityStore(schemaRegistry, Tables.ENTITY_PREFIX, accumuloTemplate);

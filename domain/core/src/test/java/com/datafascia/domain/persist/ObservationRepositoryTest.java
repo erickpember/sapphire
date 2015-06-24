@@ -2,20 +2,24 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.persist;
 
+import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
+import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
+import ca.uhn.fhir.model.primitive.DateDt;
+import com.datafascia.common.persist.Id;
 import com.datafascia.common.time.Interval;
+import com.datafascia.domain.fhir.IdentifierSystems;
+import com.datafascia.domain.fhir.Ids;
+import com.datafascia.domain.fhir.Languages;
+import com.datafascia.domain.fhir.RaceEnum;
+import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.model.CodeableConcept;
 import com.datafascia.domain.model.Encounter;
-import com.datafascia.domain.model.Gender;
-import com.datafascia.domain.model.HumanName;
-import com.datafascia.domain.model.MaritalStatus;
 import com.datafascia.domain.model.Observation;
 import com.datafascia.domain.model.ObservationValue;
-import com.datafascia.domain.model.Patient;
-import com.datafascia.domain.model.PatientCommunication;
-import com.datafascia.domain.model.Race;
+import com.neovisionaries.i18n.LanguageCode;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
 import org.testng.annotations.Test;
@@ -39,33 +43,22 @@ public class ObservationRepositoryTest extends RepositoryTestSupport {
   @Inject
   private ObservationRepository observationRepository;
 
-  private Patient createPatient() {
-    Patient patient = new Patient();
-    patient.setInstitutionPatientId("UCSF-12345");
-    patient.setAccountNumber("12345");
-    patient.setNames(Arrays.asList(new HumanName() {
-      {
-        setFirstName("pat1firstname");
-        setMiddleName("pat1middlename");
-        setFamily(Arrays.asList("pat1lastname"));
-      }
-    }));
-    patient.setCommunication(new PatientCommunication() {
-      {
-        setPreferred(true);
-        setLanguage(new CodeableConcept() {
-          {
-            setCodings(Arrays.asList("English"));
-            setText("English");
-          }
-        });
-      }
-    });
-    patient.setGender(Gender.MALE);
-    patient.setBirthDate(LocalDate.now());
-    patient.setMaritalStatus(MaritalStatus.MARRIED);
-    patient.setRace(Race.ASIAN);
-    patient.setActive(true);
+  private UnitedStatesPatient createPatient() {
+    UnitedStatesPatient patient = new UnitedStatesPatient();
+    patient.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_PATIENT_IDENTIFIER).setValue("UCSF-12345");
+    patient.addIdentifier()
+        .setSystem(IdentifierSystems.ACCOUNT_NUMBER).setValue("12345");
+    patient.addName()
+        .addGiven("pat1firstname").addGiven("pat1middlename").addFamily("pat1lastname");
+    patient.addCommunication()
+        .setPreferred(true).setLanguage(Languages.createLanguage(LanguageCode.en));
+    patient
+        .setRace(RaceEnum.ASIAN)
+        .setMaritalStatus(MaritalStatusCodesEnum.M)
+        .setGender(AdministrativeGenderEnum.MALE)
+        .setBirthDate(new DateDt(new Date()))
+        .setActive(true);
     return patient;
   }
 
@@ -92,7 +85,7 @@ public class ObservationRepositoryTest extends RepositoryTestSupport {
 
   @Test
   public void should_list_observations() {
-    Patient patient = createPatient();
+    UnitedStatesPatient patient = createPatient();
     patientRepository.save(patient);
 
     Encounter encounter = createEncounter();
@@ -104,7 +97,8 @@ public class ObservationRepositoryTest extends RepositoryTestSupport {
     Observation observation2 = createObservation(NUMERICAL_PAIN_LEVEL_HIGH, "2");
     observationRepository.save(patient, encounter, observation2);
 
-    List<Observation> observations = observationRepository.list(patient.getId(), encounter.getId());
+    Id<UnitedStatesPatient> patientId = Ids.toPrimaryKey(patient.getId());
+    List<Observation> observations = observationRepository.list(patientId, encounter.getId());
     assertEquals(observations.size(), 2);
     for (Observation observation : observations) {
       switch (observation.getCode().getCodings().get(0)) {

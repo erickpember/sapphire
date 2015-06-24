@@ -5,9 +5,10 @@ package com.datafascia.domain.persist;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.persist.entity.EntityId;
 import com.datafascia.common.persist.entity.ReflectEntityStore;
+import com.datafascia.domain.fhir.Ids;
+import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.model.Encounter;
 import com.datafascia.domain.model.MedicationAdministration;
-import com.datafascia.domain.model.Patient;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -32,7 +33,7 @@ public class MedicationAdministrationRepository extends EntityStoreRepository {
   }
 
   private static EntityId toEntityId(
-      Id<Patient> patientId,
+      Id<UnitedStatesPatient> patientId,
       Id<Encounter> encounterId,
       Id<MedicationAdministration> administrationId) {
 
@@ -58,11 +59,14 @@ public class MedicationAdministrationRepository extends EntityStoreRepository {
    * @param administration
    *     to save
    */
-  public void save(Patient patient, Encounter encounter, MedicationAdministration administration) {
+  public void save(
+      UnitedStatesPatient patient, Encounter encounter, MedicationAdministration administration) {
+
     administration.setId(generateId(administration));
 
+    Id<UnitedStatesPatient> patientId = Ids.toPrimaryKey(patient.getId());
     entityStore.save(
-        toEntityId(patient.getId(), encounter.getId(), administration.getId()),
+        toEntityId(patientId, encounter.getId(), administration.getId()),
         administration);
   }
 
@@ -75,7 +79,9 @@ public class MedicationAdministrationRepository extends EntityStoreRepository {
    *     encounter ID
    * @return medication administrations
    */
-  public List<MedicationAdministration> list(Id<Patient> patientId, Id<Encounter> encounterId) {
+  public List<MedicationAdministration> list(
+      Id<UnitedStatesPatient> patientId, Id<Encounter> encounterId) {
+
     return entityStore
         .stream(
             EncounterRepository.toEntityId(patientId, encounterId), MedicationAdministration.class)

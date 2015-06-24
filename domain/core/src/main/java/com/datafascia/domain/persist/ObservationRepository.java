@@ -5,9 +5,10 @@ package com.datafascia.domain.persist;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.persist.entity.EntityId;
 import com.datafascia.common.persist.entity.ReflectEntityStore;
+import com.datafascia.domain.fhir.Ids;
+import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.model.Encounter;
 import com.datafascia.domain.model.Observation;
-import com.datafascia.domain.model.Patient;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -32,7 +33,7 @@ public class ObservationRepository extends EntityStoreRepository {
   }
 
   private static EntityId toEntityId(
-      Id<Patient> patientId, Id<Encounter> encounterId, Id<Observation> observationId) {
+      Id<UnitedStatesPatient> patientId, Id<Encounter> encounterId, Id<Observation> observationId) {
 
     return EntityId.builder()
         .path(EncounterRepository.toEntityId(patientId, encounterId))
@@ -56,11 +57,12 @@ public class ObservationRepository extends EntityStoreRepository {
    * @param observation
    *     to save
    */
-  public void save(Patient patient, Encounter encounter, Observation observation) {
+  public void save(UnitedStatesPatient patient, Encounter encounter, Observation observation) {
     observation.setId(generateId(observation));
 
+    Id<UnitedStatesPatient> patientId = Ids.toPrimaryKey(patient.getId());
     entityStore.save(
-        toEntityId(patient.getId(), encounter.getId(), observation.getId()),
+        toEntityId(patientId, encounter.getId(), observation.getId()),
         observation);
   }
 
@@ -73,7 +75,7 @@ public class ObservationRepository extends EntityStoreRepository {
    *     encounter ID
    * @return observations
    */
-  public List<Observation> list(Id<Patient> patientId, Id<Encounter> encounterId) {
+  public List<Observation> list(Id<UnitedStatesPatient> patientId, Id<Encounter> encounterId) {
     return entityStore
         .stream(EncounterRepository.toEntityId(patientId, encounterId), Observation.class)
         .collect(Collectors.toList());

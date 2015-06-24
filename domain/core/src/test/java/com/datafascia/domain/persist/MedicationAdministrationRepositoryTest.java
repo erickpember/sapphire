@@ -2,24 +2,27 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.persist;
 
+import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
+import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
+import ca.uhn.fhir.model.primitive.DateDt;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.time.Interval;
+import com.datafascia.domain.fhir.IdentifierSystems;
+import com.datafascia.domain.fhir.Ids;
+import com.datafascia.domain.fhir.Languages;
+import com.datafascia.domain.fhir.RaceEnum;
+import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.model.CodeableConcept;
 import com.datafascia.domain.model.Encounter;
-import com.datafascia.domain.model.Gender;
-import com.datafascia.domain.model.HumanName;
-import com.datafascia.domain.model.MaritalStatus;
 import com.datafascia.domain.model.MedicationAdministration;
 import com.datafascia.domain.model.MedicationAdministrationDosage;
 import com.datafascia.domain.model.MedicationAdministrationStatus;
 import com.datafascia.domain.model.NumericQuantity;
-import com.datafascia.domain.model.Patient;
-import com.datafascia.domain.model.PatientCommunication;
-import com.datafascia.domain.model.Race;
 import com.datafascia.domain.model.Ratio;
+import com.neovisionaries.i18n.LanguageCode;
 import java.time.Instant;
-import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
 import org.testng.annotations.Test;
@@ -40,24 +43,22 @@ public class MedicationAdministrationRepositoryTest extends RepositoryTestSuppor
   @Inject
   private MedicationAdministrationRepository medicationAdministrationRepository;
 
-  private Patient createPatient() {
-    Patient patient = Patient.builder()
-        .institutionPatientId("UCSF-12345")
-        .accountNumber("12345")
-        .maritalStatus(MaritalStatus.MARRIED)
-        .race(Race.ASIAN)
-        .active(true)
-        .build();
-    patient.setNames(Arrays.asList(HumanName.builder()
-        .given(Arrays.asList("pat1firstname", "pat1middlename"))
-        .family(Arrays.asList("pat1lastname"))
-        .build()));
-    patient.setCommunication(PatientCommunication.builder()
-        .preferred(true)
-        .language(new CodeableConcept("en", "English"))
-        .build());
-    patient.setGender(Gender.MALE);
-    patient.setBirthDate(LocalDate.now());
+  private UnitedStatesPatient createPatient() {
+    UnitedStatesPatient patient = new UnitedStatesPatient();
+    patient.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_PATIENT_IDENTIFIER).setValue("UCSF-12345");
+    patient.addIdentifier()
+        .setSystem(IdentifierSystems.ACCOUNT_NUMBER).setValue("12345");
+    patient.addName()
+        .addGiven("pat1firstname").addGiven("pat1middlename").addFamily("pat1lastname");
+    patient.addCommunication()
+        .setPreferred(true).setLanguage(Languages.createLanguage(LanguageCode.en));
+    patient
+        .setRace(RaceEnum.ASIAN)
+        .setMaritalStatus(MaritalStatusCodesEnum.M)
+        .setGender(AdministrativeGenderEnum.MALE)
+        .setBirthDate(new DateDt(new Date()))
+        .setActive(true);
     return patient;
   }
 
@@ -72,12 +73,11 @@ public class MedicationAdministrationRepositoryTest extends RepositoryTestSuppor
   }
 
   private MedicationAdministration createMedicationAdministration(
-      Patient patient, Encounter encounter) {
+      UnitedStatesPatient patient, Encounter encounter) {
 
     MedicationAdministration administration = new MedicationAdministration();
     administration.setStatus(MedicationAdministrationStatus.IN_PROGRESS);
     administration.setEffectiveTimePeriod(new Interval<>(Instant.now(), Instant.now()));
-    administration.setPatientId(patient.getId());
     administration.setEncounterId(encounter.getId());
     administration.setMedicationId(Id.of("medicationId"));
 
@@ -108,7 +108,7 @@ public class MedicationAdministrationRepositoryTest extends RepositoryTestSuppor
 
   @Test
   public void should_list_medication_administration() {
-    Patient patient = createPatient();
+    UnitedStatesPatient patient = createPatient();
     patientRepository.save(patient);
 
     Encounter encounter = createEncounter();
@@ -117,8 +117,9 @@ public class MedicationAdministrationRepositoryTest extends RepositoryTestSuppor
     MedicationAdministration administration = createMedicationAdministration(patient, encounter);
     medicationAdministrationRepository.save(patient, encounter, administration);
 
+    Id<UnitedStatesPatient> patientId = Ids.toPrimaryKey(patient.getId());
     List<MedicationAdministration> administrations =
-        medicationAdministrationRepository.list(patient.getId(), encounter.getId());
+        medicationAdministrationRepository.list(patientId, encounter.getId());
     assertEquals(administrations.get(0), administration);
   }
 }

@@ -2,11 +2,12 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.persist;
 
+import ca.uhn.fhir.model.dstu2.resource.Patient;
+import ca.uhn.fhir.model.primitive.IdDt;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.persist.entity.EntityId;
-import com.datafascia.common.persist.entity.ReflectEntityStore;
-import com.datafascia.common.urn.URNFactory;
-import com.datafascia.domain.model.Patient;
+import com.datafascia.common.persist.entity.FhirEntityStore;
+import com.datafascia.domain.fhir.UnitedStatesPatient;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
  * Patient data access.
  */
 @Slf4j
-public class PatientRepository extends EntityStoreRepository {
+public class PatientRepository extends FhirEntityStoreRepository {
 
   /**
    * Constructor
@@ -27,7 +28,7 @@ public class PatientRepository extends EntityStoreRepository {
    *     entity store
    */
   @Inject
-  public PatientRepository(ReflectEntityStore entityStore) {
+  public PatientRepository(FhirEntityStore entityStore) {
     super(entityStore);
   }
 
@@ -38,8 +39,8 @@ public class PatientRepository extends EntityStoreRepository {
    *     patient ID
    * @return entity ID
    */
-  static EntityId toEntityId(Id<Patient> patientId) {
-    return new EntityId(Patient.class, patientId);
+  static EntityId toEntityId(Id<UnitedStatesPatient> patientId) {
+    return new EntityId(UnitedStatesPatient.class, patientId);
   }
 
   /**
@@ -49,8 +50,9 @@ public class PatientRepository extends EntityStoreRepository {
    *     patient to read property from
    * @return primary key
    */
-  public static Id<Patient> generateId(Patient patient) {
-    return Id.of(URNFactory.urn(URNFactory.NS_PATIENT_ID, patient.getInstitutionPatientId()));
+  public static Id<UnitedStatesPatient> generateId(UnitedStatesPatient patient) {
+    String identifierValue = patient.getIdentifierFirstRep().getValue();
+    return Id.of(identifierValue);
   }
 
   /**
@@ -59,10 +61,11 @@ public class PatientRepository extends EntityStoreRepository {
    * @param patient
    *     to save
    */
-  public void save(Patient patient) {
-    patient.setId(generateId(patient));
+  public void save(UnitedStatesPatient patient) {
+    Id<UnitedStatesPatient> patientId = generateId(patient);
+    patient.setId(new IdDt(Patient.class.getSimpleName(), patientId.toString()));
 
-    entityStore.save(toEntityId(patient.getId()), patient);
+    entityStore.save(toEntityId(patientId), patient);
   }
 
   /**
@@ -72,7 +75,7 @@ public class PatientRepository extends EntityStoreRepository {
    *     patient ID
    * @return optional entity, empty if not found
    */
-  public Optional<Patient> read(Id<Patient> patientId) {
+  public Optional<UnitedStatesPatient> read(Id<UnitedStatesPatient> patientId) {
     return entityStore.read(toEntityId(patientId));
   }
 
@@ -87,19 +90,19 @@ public class PatientRepository extends EntityStoreRepository {
    *     maximum number of items to return in list
    * @return found patients
    */
-  public List<Patient> list(
-      Optional<Id<Patient>> optStartPatientId, Optional<Boolean> optActive, int limit) {
+  public List<UnitedStatesPatient> list(
+      Optional<Id<UnitedStatesPatient>> optStartPatientId, Optional<Boolean> optActive, int limit) {
 
-    Stream<Patient> stream;
+    Stream<UnitedStatesPatient> stream;
     if (optStartPatientId.isPresent()) {
       stream = entityStore.stream(toEntityId(optStartPatientId.get()));
     } else {
-      stream = entityStore.stream(Patient.class);
+      stream = entityStore.stream(UnitedStatesPatient.class);
     }
 
     if (optActive.isPresent()) {
-      boolean active = optActive.get();
-      stream = stream.filter(patient -> patient.isActive() == active);
+      Boolean active = optActive.get();
+      stream = stream.filter(patient -> patient.getActive().equals(active));
     }
 
     return stream.limit(limit)
@@ -112,7 +115,7 @@ public class PatientRepository extends EntityStoreRepository {
    * @param patientId
    *     patient ID
    */
-  public void delete(Id<Patient> patientId) {
+  public void delete(Id<UnitedStatesPatient> patientId) {
     read(patientId).ifPresent(patient -> {
         patient.setActive(false);
         save(patient);

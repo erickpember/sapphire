@@ -2,16 +2,16 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.persist;
 
+import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
+import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
+import ca.uhn.fhir.model.primitive.DateDt;
 import com.datafascia.common.persist.Id;
-import com.datafascia.domain.model.CodeableConcept;
-import com.datafascia.domain.model.Gender;
-import com.datafascia.domain.model.HumanName;
-import com.datafascia.domain.model.MaritalStatus;
-import com.datafascia.domain.model.Patient;
-import com.datafascia.domain.model.PatientCommunication;
-import com.datafascia.domain.model.Race;
-import java.time.LocalDate;
-import java.util.Arrays;
+import com.datafascia.domain.fhir.IdentifierSystems;
+import com.datafascia.domain.fhir.Languages;
+import com.datafascia.domain.fhir.RaceEnum;
+import com.datafascia.domain.fhir.UnitedStatesPatient;
+import com.neovisionaries.i18n.LanguageCode;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -27,20 +27,23 @@ public class PatientRepositoryTest extends RepositoryTestSupport {
   @Inject
   private PatientRepository patientRepository;
 
-  private Patient patient1;
-  private Patient inactivePatient;
-  private Patient patient3;
+  private UnitedStatesPatient patient1;
+  private UnitedStatesPatient inactivePatient;
+  private UnitedStatesPatient patient3;
 
   @Test(dependsOnGroups = "patients")
   public void should_list_inactive_patients() {
-    List<Patient> patients = patientRepository.list(Optional.empty(), Optional.of(false), 5);
+    List<UnitedStatesPatient> patients = patientRepository.list(
+        Optional.empty(), Optional.of(false), 5);
 
-    assertEquals(patients.get(0), inactivePatient);
+    assertEquals(patients.get(0).getId(), inactivePatient.getId());
   }
 
   @Test(dependsOnGroups = "patients")
   public void should_list_active_patients() {
-    assertEquals(patientRepository.list(Optional.empty(), Optional.of(true), 5).size(), 2);
+    List<UnitedStatesPatient> patients = patientRepository.list(
+        Optional.empty(), Optional.of(true), 5);
+    assertEquals(patients.size(), 2);
   }
 
   @Test(dependsOnGroups = "patients")
@@ -50,8 +53,8 @@ public class PatientRepositoryTest extends RepositoryTestSupport {
 
   @Test(dependsOnGroups = "patients")
   public void should_list_patients_starting_from_specified_patient() {
-    Id<Patient> startPatientId = PatientRepository.generateId(inactivePatient);
-    List<Patient> patients = patientRepository.list(
+    Id<UnitedStatesPatient> startPatientId = PatientRepository.generateId(inactivePatient);
+    List<UnitedStatesPatient> patients = patientRepository.list(
         Optional.of(startPatientId), Optional.empty(), 5);
 
     assertEquals(patients.size(), 2);
@@ -59,85 +62,79 @@ public class PatientRepositoryTest extends RepositoryTestSupport {
 
   @Test
   public void testNonExistentPatient() {
-    Optional<Patient> patNonExistent = patientRepository.read(Id.of("asdf"));
+    Optional<UnitedStatesPatient> patNonExistent = patientRepository.read(Id.of("asdf"));
     assertEquals(Optional.empty(), patNonExistent);
   }
 
   @Test(groups = "patients") @SuppressWarnings("serial")
   public void getActiveWithLanguages() {
-    patient1 = Patient.builder()
-        .institutionPatientId("UCSF-12345")
-        .accountNumber("12345")
-        .maritalStatus(MaritalStatus.MARRIED)
-        .race(Race.ASIAN)
-        .active(true)
-        .build();
-    patient1.setNames(Arrays.asList(HumanName.builder()
-        .given(Arrays.asList("pat1firstname", "pat1middlename"))
-        .family(Arrays.asList("pat1lastname"))
-        .build()));
-    patient1.setCommunication(PatientCommunication.builder()
-        .preferred(true)
-        .language(new CodeableConcept("en", "English"))
-        .build());
-    patient1.setGender(Gender.MALE);
-    patient1.setBirthDate(LocalDate.now());
+    patient1 = new UnitedStatesPatient();
+    patient1.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_PATIENT_IDENTIFIER).setValue("UCSF-12345");
+    patient1.addIdentifier()
+        .setSystem(IdentifierSystems.ACCOUNT_NUMBER).setValue("12345");
+    patient1.addName()
+        .addGiven("pat1firstname").addGiven("pat1middlename").addFamily("pat1lastname");
+    patient1.addCommunication()
+        .setPreferred(true).setLanguage(Languages.createLanguage(LanguageCode.en));
+    patient1
+        .setRace(RaceEnum.ASIAN)
+        .setMaritalStatus(MaritalStatusCodesEnum.M)
+        .setGender(AdministrativeGenderEnum.MALE)
+        .setBirthDate(new DateDt(new Date()))
+        .setActive(true);
 
     testPatientSet(patient1);
   }
 
   @Test(groups = "patients")
   public void getActiveWithoutLanguages() {
-    patient3 = Patient.builder()
-        .institutionPatientId("UCSF-67890")
-        .accountNumber("67890")
-        .maritalStatus(MaritalStatus.DIVORCED)
-        .race(Race.PACIFIC_ISLANDER)
-        .active(true)
-        .build();
-    patient3.setNames(Arrays.asList(HumanName.builder()
-        .given(Arrays.asList("pat3firstname", "pat3middlename"))
-        .family(Arrays.asList("pat2lastname"))
-        .build()));
-    patient3.setCommunication(PatientCommunication.builder()
-        .preferred(true)
-        .language(new CodeableConcept("en", "English"))
-        .build());
-    patient3.setGender(Gender.FEMALE);
-    patient3.setBirthDate(LocalDate.now());
+    patient3 = new UnitedStatesPatient();
+    patient3.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_PATIENT_IDENTIFIER).setValue("UCSF-67890");
+    patient3.addIdentifier()
+        .setSystem(IdentifierSystems.ACCOUNT_NUMBER).setValue("67890");
+    patient3.addName()
+        .addGiven("pat3firstname").addGiven("pat3middlename").addFamily("pat3lastname");
+    patient3.addCommunication()
+        .setPreferred(true).setLanguage(Languages.createLanguage(LanguageCode.en));
+    patient3
+        .setRace(RaceEnum.PACIFIC_ISLANDER)
+        .setMaritalStatus(MaritalStatusCodesEnum.D)
+        .setGender(AdministrativeGenderEnum.FEMALE)
+        .setBirthDate(new DateDt(new Date()))
+        .setActive(true);
 
     testPatientSet(patient3);
   }
 
   @Test(groups = "patients")
   public void getInactive() {
-    inactivePatient = Patient.builder()
-        .institutionPatientId("UCSF-13579")
-        .accountNumber("13579")
-        .maritalStatus(MaritalStatus.DOMESTIC_PARTNER)
-        .race(Race.BLACK)
-        .active(false)
-        .build();
-    inactivePatient.setNames(Arrays.asList(HumanName.builder()
-        .given(Arrays.asList("pat2firstname", "pat2middlename"))
-        .family(Arrays.asList("pat2lastname"))
-        .build()));
-    inactivePatient.setCommunication(PatientCommunication.builder()
-        .preferred(true)
-        .language(new CodeableConcept("en", "English"))
-        .build());
-    inactivePatient.setGender(Gender.UNKNOWN);
-    inactivePatient.setBirthDate(LocalDate.now());
+    inactivePatient = new UnitedStatesPatient();
+    inactivePatient.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_PATIENT_IDENTIFIER).setValue("UCSF-13579");
+    inactivePatient.addIdentifier()
+        .setSystem(IdentifierSystems.ACCOUNT_NUMBER).setValue("13579");
+    inactivePatient.addName()
+        .addGiven("pat2firstname").addGiven("pat2middlename").addFamily("pat2lastname");
+    inactivePatient.addCommunication()
+        .setPreferred(true).setLanguage(Languages.createLanguage(LanguageCode.en));
+    inactivePatient
+        .setRace(RaceEnum.BLACK)
+        .setMaritalStatus(MaritalStatusCodesEnum.P)
+        .setGender(AdministrativeGenderEnum.UNKNOWN)
+        .setBirthDate(new DateDt(new Date()))
+        .setActive(false);
 
     testPatientSet(inactivePatient);
   }
 
-  private void testPatientSet(Patient originalPatient) {
+  private void testPatientSet(UnitedStatesPatient originalPatient) {
     patientRepository.save(originalPatient);
 
-    // Not checking if the optional has data, as we *want* it to fail if it's empty.
-    Patient fetchedPatient = patientRepository.read(originalPatient.getId()).get();
+    Id<UnitedStatesPatient> patientId = Id.of(originalPatient.getId().getIdPart());
+    UnitedStatesPatient fetchedPatient = patientRepository.read(patientId).get();
 
-    assertEquals(fetchedPatient, originalPatient);
+    assertEquals(fetchedPatient.getId(), originalPatient.getId());
   }
 }

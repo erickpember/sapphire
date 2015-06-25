@@ -2,13 +2,14 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.persist;
 
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import ca.uhn.fhir.model.dstu2.resource.Observation;
+import ca.uhn.fhir.model.primitive.IdDt;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.persist.entity.EntityId;
-import com.datafascia.common.persist.entity.ReflectEntityStore;
+import com.datafascia.common.persist.entity.FhirEntityStore;
 import com.datafascia.domain.fhir.Ids;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
-import com.datafascia.domain.model.Encounter;
-import com.datafascia.domain.model.Observation;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -19,7 +20,7 @@ import lombok.extern.slf4j.Slf4j;
  * Observation data access.
  */
 @Slf4j
-public class ObservationRepository extends EntityStoreRepository {
+public class ObservationRepository extends FhirEntityStoreRepository {
 
   /**
    * Constructor
@@ -28,7 +29,7 @@ public class ObservationRepository extends EntityStoreRepository {
    *     entity store
    */
   @Inject
-  public ObservationRepository(ReflectEntityStore entityStore) {
+  public ObservationRepository(FhirEntityStore entityStore) {
     super(entityStore);
   }
 
@@ -42,9 +43,9 @@ public class ObservationRepository extends EntityStoreRepository {
   }
 
   private static Id<Observation> generateId(Observation observation) {
-    return (observation.getId() != null)
-        ? observation.getId()
-        : Id.of(UUID.randomUUID().toString());
+    String identifierValue = (observation.getId().isEmpty())
+        ? UUID.randomUUID().toString() : observation.getId().getIdPart();
+    return Id.of(identifierValue);
   }
 
   /**
@@ -58,11 +59,13 @@ public class ObservationRepository extends EntityStoreRepository {
    *     to save
    */
   public void save(UnitedStatesPatient patient, Encounter encounter, Observation observation) {
-    observation.setId(generateId(observation));
+    Id<Observation> observationId = generateId(observation);
+    observation.setId(new IdDt(Observation.class.getSimpleName(), observationId.toString()));
 
     Id<UnitedStatesPatient> patientId = Ids.toPrimaryKey(patient.getId());
+    Id<Encounter> encounterId = Ids.toPrimaryKey(encounter.getId());
     entityStore.save(
-        toEntityId(patientId, encounter.getId(), observation.getId()),
+        toEntityId(patientId, encounterId, observationId),
         observation);
   }
 

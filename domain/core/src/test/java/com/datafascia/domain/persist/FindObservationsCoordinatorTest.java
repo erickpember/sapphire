@@ -2,23 +2,22 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.persist;
 
+import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
+import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
+import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
 import ca.uhn.fhir.model.primitive.DateDt;
+import ca.uhn.fhir.model.primitive.StringDt;
 import com.datafascia.common.persist.Id;
-import com.datafascia.common.time.Interval;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.domain.fhir.Ids;
 import com.datafascia.domain.fhir.Languages;
 import com.datafascia.domain.fhir.RaceEnum;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
-import com.datafascia.domain.model.CodeableConcept;
-import com.datafascia.domain.model.Encounter;
-import com.datafascia.domain.model.Observation;
-import com.datafascia.domain.model.ObservationValue;
 import com.neovisionaries.i18n.LanguageCode;
-import java.time.Instant;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -64,23 +63,24 @@ public class FindObservationsCoordinatorTest extends RepositoryTestSupport {
   }
 
   private Encounter createEncounter() {
-    Interval<Instant> period = new Interval<>();
-    period.setStartInclusive(Instant.now());
+    PeriodDt period = new PeriodDt();
+    period.setStart(new Date(), TemporalPrecisionEnum.DAY);
 
     Encounter encounter = new Encounter();
-    encounter.setIdentifier("encounterIdentifier");
+    encounter.addIdentifier()
+        .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue("12345");
     encounter.setPeriod(period);
     return encounter;
   }
 
   private Observation createObservation(String code, String value) {
-    ObservationValue observationValue = new ObservationValue();
-    observationValue.setString(value);
+    StringDt observationValue = new StringDt();
+    observationValue.setValue(value);
 
     Observation observation = new Observation();
-    observation.setCode(new CodeableConcept(Arrays.asList(code), code));
+    observation.setCode(new CodeableConceptDt("system", code));
     observation.setValue(observationValue);
-    observation.setIssued(Instant.now());
+    observation.setIssued(new Date(), TemporalPrecisionEnum.SECOND);
     return observation;
   }
 
@@ -106,12 +106,12 @@ public class FindObservationsCoordinatorTest extends RepositoryTestSupport {
         findObservationsCoordinator.findObservationsByPatientId(patientId, Optional.empty());
     assertEquals(observations.size(), 2);
     for (Observation observation : observations) {
-      switch (observation.getCode().getCodings().get(0)) {
+      switch (observation.getCode().getCodingFirstRep().getCode()) {
         case NUMERICAL_PAIN_LEVEL_LOW:
-          assertEquals(observation, observation1);
+          assertEquals(observation.getId().getIdPart(), observation1.getId().getIdPart());
           break;
         case NUMERICAL_PAIN_LEVEL_HIGH:
-          assertEquals(observation, observation2);
+          assertEquals(observation.getId().getIdPart(), observation2.getId().getIdPart());
           break;
       }
     }

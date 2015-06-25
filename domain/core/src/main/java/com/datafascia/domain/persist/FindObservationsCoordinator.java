@@ -2,11 +2,12 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.persist;
 
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.time.Interval;
+import com.datafascia.domain.fhir.Ids;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
-import com.datafascia.domain.model.Encounter;
-import com.datafascia.domain.model.Observation;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -60,13 +61,14 @@ public class FindObservationsCoordinator {
     List<Observation> foundObservations = new ArrayList<>();
     List<Encounter> encounters = encounterRepository.list(patientId);
     for (Encounter encounter : encounters) {
-      List<Observation> candidateObservations =
-          observationRepository.list(patientId, encounter.getId());
+      Id<Encounter> encounterId = Ids.toPrimaryKey(encounter.getId());
+      List<Observation> candidateObservations = observationRepository.list(patientId, encounterId);
       for (Observation observation : candidateObservations) {
-        if (startIssued != null
-            && (observation.getIssued().isBefore(startIssued)
-            || !observation.getIssued().isBefore(endIssued))) {
-          continue;
+        if (startIssued != null) {
+          Instant issued = observation.getIssued().toInstant();
+          if (issued.isBefore(startIssued) || !issued.isBefore(endIssued)) {
+            continue;
+          }
         }
         foundObservations.add(observation);
       }

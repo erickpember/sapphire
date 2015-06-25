@@ -2,12 +2,13 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.persist;
 
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import ca.uhn.fhir.model.primitive.IdDt;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.persist.entity.EntityId;
-import com.datafascia.common.persist.entity.ReflectEntityStore;
+import com.datafascia.common.persist.entity.FhirEntityStore;
 import com.datafascia.domain.fhir.Ids;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
-import com.datafascia.domain.model.Encounter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -18,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
  * Encounter data access.
  */
 @Slf4j
-public class EncounterRepository extends EntityStoreRepository {
+public class EncounterRepository extends FhirEntityStoreRepository {
 
   /**
    * Constructor
@@ -27,7 +28,7 @@ public class EncounterRepository extends EntityStoreRepository {
    *     entity store
    */
   @Inject
-  public EncounterRepository(ReflectEntityStore entityStore) {
+  public EncounterRepository(FhirEntityStore entityStore) {
     super(entityStore);
   }
 
@@ -55,7 +56,8 @@ public class EncounterRepository extends EntityStoreRepository {
    * @return primary key
    */
   public static Id<Encounter> generateId(Encounter encounter) {
-    return Id.of(encounter.getIdentifier());
+    String identifierValue = encounter.getIdentifierFirstRep().getValue();
+    return Id.of(identifierValue);
   }
 
   /**
@@ -67,10 +69,11 @@ public class EncounterRepository extends EntityStoreRepository {
    *     to save
    */
   public void save(UnitedStatesPatient patient, Encounter encounter) {
-    encounter.setId(generateId(encounter));
+    Id<Encounter> encounterId = generateId(encounter);
+    encounter.setId(new IdDt(Encounter.class.getSimpleName(), encounterId.toString()));
 
     Id<UnitedStatesPatient> patientId = Ids.toPrimaryKey(patient.getId());
-    entityStore.save(toEntityId(patientId, encounter.getId()), encounter);
+    entityStore.save(toEntityId(patientId, encounterId), encounter);
   }
 
   /**

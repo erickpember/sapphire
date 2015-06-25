@@ -13,6 +13,9 @@ public class IdentifierSystems {
   public static final String ACCOUNT_NUMBER =
       "http://datafascia.com/identifier/AccountNumber";
 
+  public static final String ENCOUNTER_IDENTIFIER =
+      "http://datafascia.com/identifier/EncounterIdentifier";
+
   // Private constructor disallows creating instances of this class.
   private IdentifierSystems() {
   }

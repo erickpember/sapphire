@@ -2,12 +2,12 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.persist;
 
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.persist.entity.EntityId;
 import com.datafascia.common.persist.entity.ReflectEntityStore;
 import com.datafascia.domain.fhir.Ids;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
-import com.datafascia.domain.model.Encounter;
 import com.datafascia.domain.model.MedicationAdministration;
 import java.util.List;
 import java.util.UUID;
@@ -65,8 +65,9 @@ public class MedicationAdministrationRepository extends EntityStoreRepository {
     administration.setId(generateId(administration));
 
     Id<UnitedStatesPatient> patientId = Ids.toPrimaryKey(patient.getId());
+    Id<Encounter> encounterId = Ids.toPrimaryKey(encounter.getId());
     entityStore.save(
-        toEntityId(patientId, encounter.getId(), administration.getId()),
+        toEntityId(patientId, encounterId, administration.getId()),
         administration);
   }
 

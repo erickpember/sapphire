@@ -2,6 +2,9 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.persist;
 
+import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
+import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
 import ca.uhn.fhir.model.primitive.DateDt;
@@ -13,7 +16,6 @@ import com.datafascia.domain.fhir.Languages;
 import com.datafascia.domain.fhir.RaceEnum;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.model.CodeableConcept;
-import com.datafascia.domain.model.Encounter;
 import com.datafascia.domain.model.MedicationAdministration;
 import com.datafascia.domain.model.MedicationAdministrationDosage;
 import com.datafascia.domain.model.MedicationAdministrationStatus;
@@ -63,11 +65,12 @@ public class MedicationAdministrationRepositoryTest extends RepositoryTestSuppor
   }
 
   private Encounter createEncounter() {
-    Interval<Instant> period = new Interval<>();
-    period.setStartInclusive(Instant.now());
+    PeriodDt period = new PeriodDt();
+    period.setStart(new Date(), TemporalPrecisionEnum.DAY);
 
     Encounter encounter = new Encounter();
-    encounter.setIdentifier("encounterIdentifier");
+    encounter.addIdentifier()
+        .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue("12345");
     encounter.setPeriod(period);
     return encounter;
   }
@@ -78,7 +81,6 @@ public class MedicationAdministrationRepositoryTest extends RepositoryTestSuppor
     MedicationAdministration administration = new MedicationAdministration();
     administration.setStatus(MedicationAdministrationStatus.IN_PROGRESS);
     administration.setEffectiveTimePeriod(new Interval<>(Instant.now(), Instant.now()));
-    administration.setEncounterId(encounter.getId());
     administration.setMedicationId(Id.of("medicationId"));
 
     MedicationAdministrationDosage dosage = new MedicationAdministrationDosage();
@@ -118,8 +120,9 @@ public class MedicationAdministrationRepositoryTest extends RepositoryTestSuppor
     medicationAdministrationRepository.save(patient, encounter, administration);
 
     Id<UnitedStatesPatient> patientId = Ids.toPrimaryKey(patient.getId());
+    Id<Encounter> encounterId = Ids.toPrimaryKey(encounter.getId());
     List<MedicationAdministration> administrations =
-        medicationAdministrationRepository.list(patientId, encounter.getId());
+        medicationAdministrationRepository.list(patientId, encounterId);
     assertEquals(administrations.get(0), administration);
   }
 }

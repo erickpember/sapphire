@@ -2,12 +2,12 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.event;
 
+import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
+import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
 import com.datafascia.common.avro.Deserializer;
 import com.datafascia.common.avro.Serializer;
 import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
-import com.datafascia.domain.model.Gender;
-import com.datafascia.domain.model.MaritalStatus;
-import com.datafascia.domain.model.Race;
+import com.datafascia.domain.fhir.RaceEnum;
 import com.neovisionaries.i18n.LanguageCode;
 import java.net.URI;
 import java.time.Instant;
@@ -88,10 +88,10 @@ public class EventTest {
         .firstName("Wiley")
         .middleName("E")
         .lastName("Coyote")
-        .gender(Gender.MALE)
+        .gender(AdministrativeGenderEnum.MALE)
         .birthDate(LocalDate.now())
-        .maritalStatus(MaritalStatus.MARRIED)
-        .race(Race.WHITE)
+        .maritalStatus(MaritalStatusCodesEnum.M)
+        .race(RaceEnum.WHITE)
         .language(LanguageCode.en)
         .build();
     EncounterData originalEncounterData = EncounterData.builder()

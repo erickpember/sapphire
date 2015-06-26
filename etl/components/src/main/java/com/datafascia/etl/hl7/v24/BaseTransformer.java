@@ -2,6 +2,8 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.hl7.v24;
 
+import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
+import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Segment;
 import ca.uhn.hl7v2.model.Varies;
@@ -16,13 +18,11 @@ import ca.uhn.hl7v2.util.Terser;
 import com.datafascia.domain.event.AddObservationsData;
 import com.datafascia.domain.event.ObservationData;
 import com.datafascia.domain.event.ObservationType;
-import com.datafascia.domain.model.Gender;
-import com.datafascia.domain.model.MaritalStatus;
-import com.datafascia.domain.model.Race;
+import com.datafascia.domain.fhir.RaceEnum;
 import com.datafascia.etl.hl7.MessageToEventTransformer;
 import com.datafascia.etl.hl7.RaceMap;
+import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
-import com.neovisionaries.i18n.LanguageAlpha3Code;
 import com.neovisionaries.i18n.LanguageCode;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -225,28 +225,28 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
         .build();
   }
 
-  protected Gender toGender(String code) {
-    return Gender.of(code).orElse(Gender.UNKNOWN);
+  protected AdministrativeGenderEnum toGender(String code) {
+    AdministrativeGenderEnum gender = AdministrativeGenderEnum.UNKNOWN.forCode(code);
+    return MoreObjects.firstNonNull(gender, AdministrativeGenderEnum.UNKNOWN);
   }
 
   protected LocalDate toLocalDate(TSComponentOne fromDate) throws HL7Exception {
     return LocalDate.of(fromDate.getYear(), fromDate.getMonth(), fromDate.getDay());
   }
 
-  protected MaritalStatus toMaritalStatus(String code) {
-    return MaritalStatus.of(code).orElse(MaritalStatus.UNKNOWN);
+  protected MaritalStatusCodesEnum toMaritalStatus(String code) {
+    MaritalStatusCodesEnum maritalStatus = MaritalStatusCodesEnum.UNK.forCode(code);
+    return MoreObjects.firstNonNull(maritalStatus, MaritalStatusCodesEnum.UNK);
   }
 
-  protected Race toRace(String code) {
-    if (!RaceMap.raceMap.containsKey(code.toLowerCase())) {
-      return Race.UNKNOWN;
-    }
-    return RaceMap.raceMap.get(code.toLowerCase());
+  protected RaceEnum toRace(String code) {
+    RaceEnum race = RaceMap.raceMap.get(code.toLowerCase());
+    return MoreObjects.firstNonNull(race, RaceEnum.UNKNOWN);
   }
 
   protected LanguageCode toLanguage(String code) {
-    LanguageAlpha3Code language = LanguageAlpha3Code.getByCodeIgnoreCase(code);
-    return (language != null) ? language.getAlpha2() : null;
+    LanguageCode language = LanguageCode.getByCodeIgnoreCase(code);
+    return MoreObjects.firstNonNull(language, LanguageCode.undefined);
   }
 
   protected Instant toInstant(TSComponentOne fromTime) throws HL7Exception {

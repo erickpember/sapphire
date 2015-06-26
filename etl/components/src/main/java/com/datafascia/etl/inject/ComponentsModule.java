@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.inject;
 
+import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.parser.CanonicalModelClassFactory;
@@ -16,10 +17,13 @@ import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
 import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
 import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
 import com.datafascia.common.configuration.guice.ConfigureModule;
+import com.datafascia.common.persist.entity.AccumuloFhirEntityStore;
 import com.datafascia.common.persist.entity.AccumuloReflectEntityStore;
+import com.datafascia.common.persist.entity.FhirEntityStore;
 import com.datafascia.common.persist.entity.ReflectEntityStore;
 import com.datafascia.domain.persist.Tables;
 import com.google.inject.Provides;
+import com.google.inject.name.Names;
 import javax.inject.Singleton;
 import org.apache.accumulo.core.client.Connector;
 
@@ -33,19 +37,16 @@ public class ComponentsModule extends ConfigureModule {
     bind(AuthorizationsSupplier.class).to(FixedAuthorizationsSupplier.class);
     bind(AvroSchemaRegistry.class).to(MemorySchemaRegistry.class).in(Singleton.class);
     bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
+    bind(FhirContext.class).in(Singleton.class);
+    bind(FhirEntityStore.class).to(AccumuloFhirEntityStore.class).in(Singleton.class);
     bind(MetricRegistry.class).in(Singleton.class);
+
+    bindConstant().annotatedWith(Names.named("entityTableNamePrefix")).to(Tables.ENTITY_PREFIX);
   }
 
   @Provides @Singleton
   public Connector connector(ConnectorFactory connectorFactory) {
     return connectorFactory.getConnector();
-  }
-
-  @Provides @Singleton
-  public ReflectEntityStore entityStore(
-      AvroSchemaRegistry schemaRegistry, AccumuloTemplate accumuloTemplate) {
-
-    return new AccumuloReflectEntityStore(schemaRegistry, Tables.ENTITY_PREFIX, accumuloTemplate);
   }
 
   @Provides @Singleton
@@ -67,5 +68,12 @@ public class ComponentsModule extends ConfigureModule {
   @Provides @Singleton
   public Parser parser(HapiContext context) {
     return context.getPipeParser();
+  }
+
+  @Provides @Singleton
+  public ReflectEntityStore reflectEntityStore(
+      AvroSchemaRegistry schemaRegistry, AccumuloTemplate accumuloTemplate) {
+
+    return new AccumuloReflectEntityStore(schemaRegistry, Tables.ENTITY_PREFIX, accumuloTemplate);
   }
 }

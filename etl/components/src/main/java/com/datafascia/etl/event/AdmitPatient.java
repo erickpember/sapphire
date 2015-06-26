@@ -2,20 +2,20 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.event;
 
-import com.datafascia.common.time.Interval;
+import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
+import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import com.datafascia.domain.event.AdmitPatientData;
 import com.datafascia.domain.event.EncounterData;
 import com.datafascia.domain.event.Event;
 import com.datafascia.domain.event.PatientData;
-import com.datafascia.domain.model.CodeableConcept;
-import com.datafascia.domain.model.Encounter;
-import com.datafascia.domain.model.HumanName;
-import com.datafascia.domain.model.Patient;
-import com.datafascia.domain.model.PatientCommunication;
+import com.datafascia.domain.fhir.Dates;
+import com.datafascia.domain.fhir.IdentifierSystems;
+import com.datafascia.domain.fhir.Languages;
+import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.PatientRepository;
-import java.time.Instant;
-import java.util.Arrays;
+import java.util.Date;
 import java.util.function.Consumer;
 import javax.inject.Inject;
 
@@ -31,32 +31,35 @@ public class AdmitPatient implements Consumer<Event> {
   private transient EncounterRepository encounterRepository;
 
   private static Encounter createEncounter(EncounterData fromEncounter) {
-    Interval<Instant> period = new Interval<>();
-    period.setStartInclusive(fromEncounter.getAdmitTime());
+    PeriodDt period = new PeriodDt();
+    period.setStart(Date.from(fromEncounter.getAdmitTime()), TemporalPrecisionEnum.SECOND);
 
     Encounter encounter = new Encounter();
-    encounter.setIdentifier(fromEncounter.getIdentifier());
-    encounter.setId(EncounterRepository.generateId(encounter));
+    encounter.addIdentifier()
+        .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue(fromEncounter.getIdentifier());
     encounter.setPeriod(period);
     return encounter;
   }
 
-  private static Patient createPatient(PatientData patientData, Encounter encounter) {
-    Patient patient = new Patient();
-    patient.setInstitutionPatientId(patientData.getInstitutionPatientId());
-    patient.setAccountNumber(patientData.getAccountNumber());
-    patient.setNames(Arrays.asList(new HumanName()));
-    patient.getNames().get(0).setFirstName(patientData.getFirstName());
-    patient.getNames().get(0).setMiddleName(patientData.getMiddleName());
-    patient.getNames().get(0).setLastName(patientData.getLastName());
-    patient.setGender(patientData.getGender());
-    patient.setBirthDate(patientData.getBirthDate());
-    patient.setMaritalStatus(patientData.getMaritalStatus());
-    patient.setRace(patientData.getRace());
-    patient.setCommunication(new PatientCommunication(new CodeableConcept(Arrays.
-        asList(patientData.getLanguage().toString()), patientData.getLanguage().toString()),true));
-    patient.setLastEncounterId(encounter.getId());
-    patient.setActive(true);
+  private static UnitedStatesPatient createPatient(PatientData patientData, Encounter encounter) {
+    UnitedStatesPatient patient = new UnitedStatesPatient();
+    patient.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_PATIENT_IDENTIFIER)
+        .setValue(patientData.getInstitutionPatientId());
+    patient.addIdentifier()
+        .setSystem(IdentifierSystems.ACCOUNT_NUMBER).setValue(patientData.getAccountNumber());
+    patient.addName()
+        .addGiven(patientData.getFirstName())
+        .addGiven(patientData.getMiddleName())
+        .addFamily(patientData.getLastName());
+    patient.addCommunication()
+        .setPreferred(true).setLanguage(Languages.createLanguage(patientData.getLanguage()));
+    patient
+        .setRace(patientData.getRace())
+        .setGender(patientData.getGender())
+        .setBirthDate(Dates.toDate(patientData.getBirthDate()))
+        .setMaritalStatus(patientData.getMaritalStatus())
+        .setActive(true);
     return patient;
   }
 
@@ -64,7 +67,7 @@ public class AdmitPatient implements Consumer<Event> {
   public void accept(Event event) {
     AdmitPatientData admitPatientData = (AdmitPatientData) event.getData();
     Encounter encounter = createEncounter(admitPatientData.getEncounter());
-    Patient patient = createPatient(admitPatientData.getPatient(), encounter);
+    UnitedStatesPatient patient = createPatient(admitPatientData.getPatient(), encounter);
 
     patientRepository.save(patient);
     encounterRepository.save(patient, encounter);

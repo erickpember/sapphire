@@ -2,11 +2,11 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.event;
 
+import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
+import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
 import com.datafascia.common.avro.LanguageCodeEncoding;
 import com.datafascia.common.avro.LocalDateEncoding;
-import com.datafascia.domain.model.Gender;
-import com.datafascia.domain.model.MaritalStatus;
-import com.datafascia.domain.model.Race;
+import com.datafascia.domain.fhir.RaceEnum;
 import com.neovisionaries.i18n.LanguageCode;
 import java.time.LocalDate;
 import lombok.AllArgsConstructor;
@@ -27,17 +27,17 @@ public class PatientData {
   private String middleName;
   private String lastName;
 
-  @AvroEncode(using = GenderEncoding.class)
-  private Gender gender;
+  @AvroEncode(using = AdministrativeGenderEnumEncoding.class)
+  private AdministrativeGenderEnum gender;
 
   @AvroEncode(using = LocalDateEncoding.class)
   private LocalDate birthDate;
 
-  @AvroEncode(using = MaritalStatusEncoding.class)
-  private MaritalStatus maritalStatus;
+  @AvroEncode(using = MaritalStatusCodesEnumEncoding.class)
+  private MaritalStatusCodesEnum maritalStatus;
 
-  @AvroEncode(using = RaceEncoding.class)
-  private Race race;
+  @AvroEncode(using = RaceEnumEncoding.class)
+  private RaceEnum race;
 
   @AvroEncode(using = LanguageCodeEncoding.class)
   private LanguageCode language;

@@ -156,6 +156,11 @@
           datafascia/kafka
   when: "'datafascia/kafka:latest' not in list_containers.stdout_lines"
 
+- name: Create {{ company_data_prefix }}/nifi/conf directory
+  file:
+    path: "{{ company_data_prefix }}/nifi/conf"
+    state: directory
+
 - name: Copy NiFi flow configuration
   copy:
     src: "{{ playbook_dir }}/roles/df-etl/files/flow.xml.gz"

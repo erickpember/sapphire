@@ -59,10 +59,14 @@ public class FindObservationsCoordinator {
     }
 
     List<Observation> foundObservations = new ArrayList<>();
-    List<Encounter> encounters = encounterRepository.list(patientId);
+    List<Encounter> encounters = encounterRepository.list();
     for (Encounter encounter : encounters) {
+      if (!patientId.toString().equals(encounter.getPatient().getReference().getIdPart())) {
+        continue;
+      }
+
       Id<Encounter> encounterId = Ids.toPrimaryKey(encounter.getId());
-      List<Observation> candidateObservations = observationRepository.list(patientId, encounterId);
+      List<Observation> candidateObservations = observationRepository.list(encounterId);
       for (Observation observation : candidateObservations) {
         if (startIssued != null) {
           Instant issued = observation.getIssued().toInstant();

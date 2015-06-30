@@ -5,6 +5,7 @@ package com.datafascia.domain.persist;
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
+import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
@@ -61,14 +62,16 @@ public class ObservationRepositoryTest extends RepositoryTestSupport {
     return patient;
   }
 
-  private Encounter createEncounter() {
+  private Encounter createEncounter(UnitedStatesPatient patient) {
     PeriodDt period = new PeriodDt();
     period.setStart(new Date(), TemporalPrecisionEnum.DAY);
 
     Encounter encounter = new Encounter();
     encounter.addIdentifier()
         .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue("12345");
-    encounter.setPeriod(period);
+    encounter
+        .setPeriod(period)
+        .setPatient(new ResourceReferenceDt(patient.getId()));
     return encounter;
   }
 
@@ -88,18 +91,17 @@ public class ObservationRepositoryTest extends RepositoryTestSupport {
     UnitedStatesPatient patient = createPatient();
     patientRepository.save(patient);
 
-    Encounter encounter = createEncounter();
-    encounterRepository.save(patient, encounter);
+    Encounter encounter = createEncounter(patient);
+    encounterRepository.save(encounter);
 
     Observation observation1 = createObservation(NUMERICAL_PAIN_LEVEL_LOW, "1");
-    observationRepository.save(patient, encounter, observation1);
+    observationRepository.save(encounter, observation1);
 
     Observation observation2 = createObservation(NUMERICAL_PAIN_LEVEL_HIGH, "2");
-    observationRepository.save(patient, encounter, observation2);
+    observationRepository.save(encounter, observation2);
 
-    Id<UnitedStatesPatient> patientId = Ids.toPrimaryKey(patient.getId());
     Id<Encounter> encounterId = Ids.toPrimaryKey(encounter.getId());
-    List<Observation> observations = observationRepository.list(patientId, encounterId);
+    List<Observation> observations = observationRepository.list(encounterId);
     assertEquals(observations.size(), 2);
     for (Observation observation : observations) {
       switch (observation.getCode().getCodingFirstRep().getCode()) {

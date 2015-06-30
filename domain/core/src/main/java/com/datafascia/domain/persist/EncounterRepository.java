@@ -7,8 +7,6 @@ import ca.uhn.fhir.model.primitive.IdDt;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.persist.entity.EntityId;
 import com.datafascia.common.persist.entity.FhirEntityStore;
-import com.datafascia.domain.fhir.Ids;
-import com.datafascia.domain.fhir.UnitedStatesPatient;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -33,19 +31,14 @@ public class EncounterRepository extends FhirEntityStoreRepository {
   }
 
   /**
-   * Converts patient ID and encounter ID to entity ID.
+   * Converts encounter ID to entity ID.
    *
-   * @param patientId
-   *     patient ID
    * @param encounterId
    *     encounter ID
    * @return entity ID
    */
-  static EntityId toEntityId(Id<UnitedStatesPatient> patientId, Id<Encounter> encounterId) {
-    return EntityId.builder()
-        .path(PatientRepository.toEntityId(patientId))
-        .path(Encounter.class, encounterId)
-        .build();
+  static EntityId toEntityId(Id<Encounter> encounterId) {
+    return new EntityId(Encounter.class, encounterId);
   }
 
   /**
@@ -63,51 +56,45 @@ public class EncounterRepository extends FhirEntityStoreRepository {
   /**
    * Saves entity.
    *
-   * @param patient
-   *     parent entity
    * @param encounter
    *     to save
    */
-  public void save(UnitedStatesPatient patient, Encounter encounter) {
+  public void save(Encounter encounter) {
     Id<Encounter> encounterId = generateId(encounter);
     encounter.setId(new IdDt(Encounter.class.getSimpleName(), encounterId.toString()));
 
-    Id<UnitedStatesPatient> patientId = Ids.toPrimaryKey(patient.getId());
-    entityStore.save(toEntityId(patientId, encounterId), encounter);
+    entityStore.save(toEntityId(encounterId), encounter);
   }
 
   /**
    * Reads encounter.
    *
-   * @param patientId
-   *     parent entity ID
    * @param encounterId
    *     encounter ID
    * @return optional entity, empty if not found
    */
-  public Optional<Encounter> read(Id<UnitedStatesPatient> patientId, Id<Encounter> encounterId) {
-    return entityStore.read(toEntityId(patientId, encounterId));
+  public Optional<Encounter> read(Id<Encounter> encounterId) {
+    return entityStore.read(toEntityId(encounterId));
   }
 
   /**
-   * Finds encounters for a patient.
+   * Finds all encounters.
    *
-   * @param patientId
-   *     parent entity ID
    * @return encounters
    */
-  public List<Encounter> list(Id<UnitedStatesPatient> patientId) {
-    return entityStore.stream(PatientRepository.toEntityId(patientId), Encounter.class)
+  public List<Encounter> list() {
+    return entityStore
+        .stream(Encounter.class)
         .collect(Collectors.toList());
   }
 
   /**
-   * Deletes encounters and all of their children for a patient.
+   * Deletes encounter and all of its children.
    *
-   * @param patientId
-   *     patient ID
+   * @param encounterId
+   *     encounter ID
    */
-  public void delete(Id<UnitedStatesPatient> patientId) {
-    entityStore.delete(PatientRepository.toEntityId(patientId), Encounter.class);
+  public void delete(Id<Encounter> encounterId) {
+    entityStore.delete(toEntityId(encounterId));
   }
 }

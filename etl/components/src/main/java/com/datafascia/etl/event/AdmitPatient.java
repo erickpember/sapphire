@@ -4,7 +4,9 @@ package com.datafascia.etl.event;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
+import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import com.datafascia.domain.event.AdmitPatientData;
 import com.datafascia.domain.event.EncounterData;
 import com.datafascia.domain.event.Event;
@@ -30,18 +32,7 @@ public class AdmitPatient implements Consumer<Event> {
   @Inject
   private transient EncounterRepository encounterRepository;
 
-  private static Encounter createEncounter(EncounterData fromEncounter) {
-    PeriodDt period = new PeriodDt();
-    period.setStart(Date.from(fromEncounter.getAdmitTime()), TemporalPrecisionEnum.SECOND);
-
-    Encounter encounter = new Encounter();
-    encounter.addIdentifier()
-        .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue(fromEncounter.getIdentifier());
-    encounter.setPeriod(period);
-    return encounter;
-  }
-
-  private static UnitedStatesPatient createPatient(PatientData patientData, Encounter encounter) {
+  private static UnitedStatesPatient createPatient(PatientData patientData) {
     UnitedStatesPatient patient = new UnitedStatesPatient();
     patient.addIdentifier()
         .setSystem(IdentifierSystems.INSTITUTION_PATIENT_IDENTIFIER)
@@ -63,13 +54,29 @@ public class AdmitPatient implements Consumer<Event> {
     return patient;
   }
 
+  private static Encounter createEncounter(
+      EncounterData fromEncounter, UnitedStatesPatient patient) {
+
+    PeriodDt period = new PeriodDt();
+    period.setStart(Date.from(fromEncounter.getAdmitTime()), TemporalPrecisionEnum.SECOND);
+
+    Encounter encounter = new Encounter();
+    encounter.addIdentifier()
+        .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue(fromEncounter.getIdentifier());
+    encounter
+        .setStatus(EncounterStateEnum.IN_PROGRESS)
+        .setPeriod(period)
+        .setPatient(new ResourceReferenceDt(patient.getId()));
+    return encounter;
+  }
+
   @Override
   public void accept(Event event) {
     AdmitPatientData admitPatientData = (AdmitPatientData) event.getData();
-    Encounter encounter = createEncounter(admitPatientData.getEncounter());
-    UnitedStatesPatient patient = createPatient(admitPatientData.getPatient(), encounter);
+    UnitedStatesPatient patient = createPatient(admitPatientData.getPatient());
+    Encounter encounter = createEncounter(admitPatientData.getEncounter(), patient);
 
     patientRepository.save(patient);
-    encounterRepository.save(patient, encounter);
+    encounterRepository.save(encounter);
   }
 }

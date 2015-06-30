@@ -12,10 +12,8 @@ import com.datafascia.domain.event.Event;
 import com.datafascia.domain.event.ObservationData;
 import com.datafascia.domain.fhir.Dates;
 import com.datafascia.domain.fhir.IdentifierSystems;
-import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.ObservationRepository;
-import com.datafascia.domain.persist.PatientRepository;
 import java.util.function.Consumer;
 import javax.inject.Inject;
 
@@ -26,14 +24,6 @@ public class AddObservations implements Consumer<Event> {
 
   @Inject
   private transient ObservationRepository observationRepository;
-
-  private static UnitedStatesPatient getPatient(String institutionPatientId) {
-    UnitedStatesPatient patient = new UnitedStatesPatient();
-    patient.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_PATIENT_IDENTIFIER).setValue(institutionPatientId);
-    patient.setId(new IdDt(PatientRepository.generateId(patient).toString()));
-    return patient;
-  }
 
   private static Encounter getEncounter(String encounterIdentifier) {
     Encounter encounter = new Encounter();
@@ -58,12 +48,11 @@ public class AddObservations implements Consumer<Event> {
   @Override
   public void accept(Event event) {
     AddObservationsData addObservationsData = (AddObservationsData) event.getData();
-    UnitedStatesPatient patient = getPatient(addObservationsData.getInstitutionPatientId());
     Encounter encounter = getEncounter(addObservationsData.getEncounterIdentifier());
 
     for (ObservationData fromObservation : addObservationsData.getObservations()) {
       Observation observation = toObservation(fromObservation);
-      observationRepository.save(patient, encounter, observation);
+      observationRepository.save(encounter, observation);
     }
   }
 }

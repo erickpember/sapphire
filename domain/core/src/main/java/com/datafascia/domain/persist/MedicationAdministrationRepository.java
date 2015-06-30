@@ -7,7 +7,6 @@ import com.datafascia.common.persist.Id;
 import com.datafascia.common.persist.entity.EntityId;
 import com.datafascia.common.persist.entity.ReflectEntityStore;
 import com.datafascia.domain.fhir.Ids;
-import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.model.MedicationAdministration;
 import java.util.List;
 import java.util.UUID;
@@ -33,12 +32,10 @@ public class MedicationAdministrationRepository extends EntityStoreRepository {
   }
 
   private static EntityId toEntityId(
-      Id<UnitedStatesPatient> patientId,
-      Id<Encounter> encounterId,
-      Id<MedicationAdministration> administrationId) {
+      Id<Encounter> encounterId, Id<MedicationAdministration> administrationId) {
 
     return EntityId.builder()
-        .path(EncounterRepository.toEntityId(patientId, encounterId))
+        .path(EncounterRepository.toEntityId(encounterId))
         .path(MedicationAdministration.class, administrationId)
         .build();
   }
@@ -52,40 +49,29 @@ public class MedicationAdministrationRepository extends EntityStoreRepository {
   /**
    * Saves entity.
    *
-   * @param patient
-   *     parent entity
    * @param encounter
    *     parent entity
    * @param administration
    *     to save
    */
-  public void save(
-      UnitedStatesPatient patient, Encounter encounter, MedicationAdministration administration) {
+  public void save(Encounter encounter, MedicationAdministration administration) {
 
     administration.setId(generateId(administration));
 
-    Id<UnitedStatesPatient> patientId = Ids.toPrimaryKey(patient.getId());
     Id<Encounter> encounterId = Ids.toPrimaryKey(encounter.getId());
-    entityStore.save(
-        toEntityId(patientId, encounterId, administration.getId()),
-        administration);
+    entityStore.save(toEntityId(encounterId, administration.getId()), administration);
   }
 
   /**
    * Finds medication administrations for an encounter.
    *
-   * @param patientId
-   *     parent entity ID
    * @param encounterId
    *     encounter ID
    * @return medication administrations
    */
-  public List<MedicationAdministration> list(
-      Id<UnitedStatesPatient> patientId, Id<Encounter> encounterId) {
-
+  public List<MedicationAdministration> list(Id<Encounter> encounterId) {
     return entityStore
-        .stream(
-            EncounterRepository.toEntityId(patientId, encounterId), MedicationAdministration.class)
+        .stream(EncounterRepository.toEntityId(encounterId), MedicationAdministration.class)
         .collect(Collectors.toList());
   }
 }

@@ -4,6 +4,7 @@ package com.datafascia.domain.persist;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
+import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
@@ -64,14 +65,16 @@ public class MedicationAdministrationRepositoryTest extends RepositoryTestSuppor
     return patient;
   }
 
-  private Encounter createEncounter() {
+  private Encounter createEncounter(UnitedStatesPatient patient) {
     PeriodDt period = new PeriodDt();
     period.setStart(new Date(), TemporalPrecisionEnum.DAY);
 
     Encounter encounter = new Encounter();
     encounter.addIdentifier()
         .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue("12345");
-    encounter.setPeriod(period);
+    encounter
+        .setPeriod(period)
+        .setPatient(new ResourceReferenceDt(patient.getId()));
     return encounter;
   }
 
@@ -113,16 +116,15 @@ public class MedicationAdministrationRepositoryTest extends RepositoryTestSuppor
     UnitedStatesPatient patient = createPatient();
     patientRepository.save(patient);
 
-    Encounter encounter = createEncounter();
-    encounterRepository.save(patient, encounter);
+    Encounter encounter = createEncounter(patient);
+    encounterRepository.save(encounter);
 
     MedicationAdministration administration = createMedicationAdministration(patient, encounter);
-    medicationAdministrationRepository.save(patient, encounter, administration);
+    medicationAdministrationRepository.save(encounter, administration);
 
-    Id<UnitedStatesPatient> patientId = Ids.toPrimaryKey(patient.getId());
     Id<Encounter> encounterId = Ids.toPrimaryKey(encounter.getId());
     List<MedicationAdministration> administrations =
-        medicationAdministrationRepository.list(patientId, encounterId);
+        medicationAdministrationRepository.list(encounterId);
     assertEquals(administrations.get(0), administration);
   }
 }

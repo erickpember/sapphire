@@ -9,7 +9,6 @@ import com.datafascia.common.persist.Id;
 import com.datafascia.common.persist.entity.EntityId;
 import com.datafascia.common.persist.entity.FhirEntityStore;
 import com.datafascia.domain.fhir.Ids;
-import com.datafascia.domain.fhir.UnitedStatesPatient;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -33,11 +32,9 @@ public class ObservationRepository extends FhirEntityStoreRepository {
     super(entityStore);
   }
 
-  private static EntityId toEntityId(
-      Id<UnitedStatesPatient> patientId, Id<Encounter> encounterId, Id<Observation> observationId) {
-
+  private static EntityId toEntityId(Id<Encounter> encounterId, Id<Observation> observationId) {
     return EntityId.builder()
-        .path(EncounterRepository.toEntityId(patientId, encounterId))
+        .path(EncounterRepository.toEntityId(encounterId))
         .path(Observation.class, observationId)
         .build();
   }
@@ -51,36 +48,29 @@ public class ObservationRepository extends FhirEntityStoreRepository {
   /**
    * Saves entity.
    *
-   * @param patient
-   *     parent entity
    * @param encounter
    *     parent entity
    * @param observation
    *     to save
    */
-  public void save(UnitedStatesPatient patient, Encounter encounter, Observation observation) {
+  public void save(Encounter encounter, Observation observation) {
     Id<Observation> observationId = generateId(observation);
     observation.setId(new IdDt(Observation.class.getSimpleName(), observationId.toString()));
 
-    Id<UnitedStatesPatient> patientId = Ids.toPrimaryKey(patient.getId());
     Id<Encounter> encounterId = Ids.toPrimaryKey(encounter.getId());
-    entityStore.save(
-        toEntityId(patientId, encounterId, observationId),
-        observation);
+    entityStore.save(toEntityId(encounterId, observationId), observation);
   }
 
   /**
    * Finds observations for an encounter.
    *
-   * @param patientId
-   *     parent entity ID
    * @param encounterId
    *     encounter ID
    * @return observations
    */
-  public List<Observation> list(Id<UnitedStatesPatient> patientId, Id<Encounter> encounterId) {
+  public List<Observation> list(Id<Encounter> encounterId) {
     return entityStore
-        .stream(EncounterRepository.toEntityId(patientId, encounterId), Observation.class)
+        .stream(EncounterRepository.toEntityId(encounterId), Observation.class)
         .collect(Collectors.toList());
   }
 }

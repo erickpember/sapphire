@@ -68,6 +68,14 @@ public interface FhirEntityStore {
   <E extends IBaseResource> Stream<E> stream(EntityId startEntityId);
 
   /**
+   * Deletes entity and all of its children.
+   *
+   * @param entityId
+   *     entity ID
+   */
+  void delete(EntityId entityId);
+
+  /**
    * Deletes entities and all of their children.
    *
    * @param parentId

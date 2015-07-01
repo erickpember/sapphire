@@ -3,6 +3,7 @@
 package com.datafascia.etl.event;
 
 import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
+import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.primitive.IdDt;
@@ -33,15 +34,17 @@ public class AddObservations implements Consumer<Event> {
     return encounter;
   }
 
-  private static Observation toObservation(ObservationData fromObservation) {
+  private static Observation toObservation(ObservationData fromObservation, Encounter encounter) {
+    String observationCode = fromObservation.getId();
     StringDt observationValue = new StringDt();
-    observationValue.setValue(fromObservation.getValue().get(0));
 
-    String code = fromObservation.getId();
+    observationValue.setValue(fromObservation.getValue().get(0));
     Observation observation = new Observation();
-    observation.setCode(new CodeableConceptDt("system", code));
-    observation.setValue(observationValue);
-    observation.setIssued(Dates.toInstant(fromObservation.getObservationDateAndTime()));
+    observation
+        .setCode(new CodeableConceptDt("system", observationCode))
+        .setValue(observationValue)
+        .setIssued(Dates.toInstant(fromObservation.getObservationDateAndTime()))
+        .setEncounter(new ResourceReferenceDt(encounter.getId()));
     return observation;
   }
 
@@ -51,7 +54,7 @@ public class AddObservations implements Consumer<Event> {
     Encounter encounter = getEncounter(addObservationsData.getEncounterIdentifier());
 
     for (ObservationData fromObservation : addObservationsData.getObservations()) {
-      Observation observation = toObservation(fromObservation);
+      Observation observation = toObservation(fromObservation, encounter);
       observationRepository.save(encounter, observation);
     }
   }

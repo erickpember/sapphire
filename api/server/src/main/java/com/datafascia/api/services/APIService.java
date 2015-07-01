@@ -8,34 +8,22 @@ import com.datafascia.api.bundle.FhirBundle;
 import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.api.health.AccumuloHealthCheck;
 import com.datafascia.common.accumulo.AccumuloConfiguration;
-import com.datafascia.common.accumulo.AccumuloModule;
-import com.datafascia.common.accumulo.AuthorizationsSupplier;
-import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
-import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
-import com.datafascia.common.accumulo.SubjectAuthorizationsSupplier;
-import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
-import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
+import com.datafascia.common.inject.Injectors;
 import com.datafascia.common.kafka.KafkaConfig;
-import com.datafascia.common.persist.entity.AccumuloFhirEntityStore;
-import com.datafascia.common.persist.entity.FhirEntityStore;
 import com.datafascia.common.reflect.PackageUtils;
 import com.datafascia.common.shiro.FakeRealm;
 import com.datafascia.common.shiro.RealmInjectingEnvironmentLoaderListener;
 import com.datafascia.common.shiro.RoleExposingRealm;
 import com.datafascia.common.urn.URNMap;
 import com.datafascia.domain.model.Version;
-import com.datafascia.domain.persist.Tables;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.name.Names;
 import com.google.inject.servlet.GuiceServletContextListener;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import java.util.EnumSet;
-import javax.inject.Singleton;
 import javax.servlet.DispatcherType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.realm.Realm;
@@ -111,32 +99,28 @@ public class APIService extends Application<APIConfiguration> {
   /**
    * Create Guice injector with all modules registered
    *
-   * @param config the API configuration
+   * @param config
+   *     application configuration
+   * @param environment
+   *     Dropwizard environment
    */
   private Injector createInjector(APIConfiguration config, Environment environment) {
     final RoleExposingRealm realm = new FakeRealm();
 
-    return Guice.createInjector(
+    Injectors.overrideWith(
         new AbstractModule() {
           @Override
           protected void configure() {
             bind(ObjectMapper.class).toInstance(environment.getObjectMapper());
             bind(APIConfiguration.class).toInstance(config);
             bind(AccumuloConfiguration.class).toInstance(config.getAccumuloConfiguration());
-            bind(AuthorizationsSupplier.class).to(SubjectAuthorizationsSupplier.class);
-            bind(AvroSchemaRegistry.class).to(MemorySchemaRegistry.class).in(Singleton.class);
-            bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
             bind(KafkaConfig.class).toInstance(config.getKafkaConfig());
             bind(MetricRegistry.class).toInstance(environment.metrics());
             bind(Realm.class).toInstance(realm);
             bind(RoleExposingRealm.class).toInstance(realm);
-            bind(FhirEntityStore.class).to(AccumuloFhirEntityStore.class).in(Singleton.class);
-
-            bindConstant().annotatedWith(Names.named("entityTableNamePrefix")).to(
-                    Tables.ENTITY_PREFIX);
           }
-        },
-        new AccumuloModule());
+        });
+    return Injectors.getInjector();
   }
 
   /**

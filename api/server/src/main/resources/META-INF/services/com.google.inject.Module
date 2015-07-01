@@ -1,0 +1,2 @@
+com.datafascia.api.inject.ApplicationModule
+com.datafascia.common.accumulo.AccumuloModule

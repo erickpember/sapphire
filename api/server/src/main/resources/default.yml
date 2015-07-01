@@ -1,0 +1,6 @@
+---
+accumulo:
+  instance: operational
+  zooKeepers: zookeeper1.local.datafascia.com
+  user: root
+  password: secret

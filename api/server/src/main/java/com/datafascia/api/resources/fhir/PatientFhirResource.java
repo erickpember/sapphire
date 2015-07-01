@@ -16,32 +16,29 @@ import ca.uhn.fhir.rest.param.NumberParam;
 import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
-import ca.uhn.fhir.rest.server.IResourceProvider;
 import com.datafascia.common.api.ApiParams;
+import com.datafascia.common.fhir.DependencyInjectingResourceProvider;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.persist.PatientRepository;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
+import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * Patient resource endpoint
  */
-@Slf4j
-public class PatientFhirResource implements IResourceProvider {
+@NoArgsConstructor @Slf4j
+public class PatientFhirResource extends DependencyInjectingResourceProvider {
 
-  private final PatientRepository patientRepository;
-
-  /**
-   * Construct resource with the relevant data access object
-   *
-   * @param patientRepository the patient data access object (can be injected)
-   */
   @Inject
-  public PatientFhirResource(PatientRepository patientRepository) {
-    this.patientRepository = patientRepository;
+  private PatientRepository patientRepository;
+
+  @Override
+  protected void onInjected() {
+    log.info("patientRepository {}", patientRepository);
   }
 
   /**

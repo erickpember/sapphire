@@ -38,7 +38,7 @@ public class PatientIT extends ApiIT {
             .where(UnitedStatesPatient.ACTIVE.exactly().code("true"))
             .execute();
 
-    List<IResource> patients = extractBundle(results, UnitedStatesPatient.class);
+    List<IResource> patients = ApiUtil.extractBundle(results, UnitedStatesPatient.class);
 
     for (IResource resource : patients) {
       UnitedStatesPatient pat = (UnitedStatesPatient) resource;
@@ -105,23 +105,6 @@ public class PatientIT extends ApiIT {
             .withId("urn:df-institution-patientId-1:UCSF::96087004")
             .execute();
     assertFalse(patient.getActive(), "Patient was not deleted by being set to inactive.");
-  }
-
-  /**
-   * Extracts a bundle from a web API query
-   *
-   * @param bundle A result from the web API query.
-   * @param clazz Type of resource we're extracting.
-   * @return A list of resources that were in the bundle.
-   */
-  public List<IResource> extractBundle(Bundle bundle, Class clazz) {
-    List<IResource> resources = bundle.getResources(clazz);
-
-    while (bundle.getLinkNext().isEmpty() == false) {
-      bundle = client.loadPage().next(bundle).execute();
-      resources.addAll(bundle.getResources(clazz));
-    }
-    return resources;
   }
 
   /**

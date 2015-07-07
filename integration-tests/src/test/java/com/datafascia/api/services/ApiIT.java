@@ -3,7 +3,9 @@
 package com.datafascia.api.services;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
+import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
 import ca.uhn.fhir.model.primitive.DateDt;
 import ca.uhn.fhir.model.primitive.IdDt;
@@ -93,7 +95,35 @@ public class ApiIT {
     return Resources.getResource("api-server.yml").getFile();
   }
 
-  private void addStaticData() throws Exception {
+  private void addStaticData() {
+    addPatients();
+    addEncounters();
+  }
+
+  private void addEncounters() {
+    Encounter encounter1 = new Encounter();
+    encounter1.addIdentifier()
+            .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue("encounter1");
+    encounter1.setStatus(EncounterStateEnum.IN_PROGRESS);
+    MethodOutcome outcome = client.create().resource(encounter1)
+            .encodedJson().execute();
+
+    Encounter encounter2 = new Encounter();
+    encounter2.addIdentifier()
+            .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue("encounter2");
+    encounter2.setStatus(EncounterStateEnum.ARRIVED);
+    outcome = client.create().resource(encounter2)
+            .encodedJson().execute();
+
+    Encounter encounter3 = new Encounter();
+    encounter3.addIdentifier()
+            .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue("encounter3");
+    encounter3.setStatus(EncounterStateEnum.IN_PROGRESS);
+    outcome = client.create().resource(encounter3)
+            .encodedJson().execute();
+  }
+
+  private void addPatients() {
     UnitedStatesPatient patient1 = new UnitedStatesPatient();
     patient1.addIdentifier()
             .setSystem(IdentifierSystems.INSTITUTION_PATIENT)

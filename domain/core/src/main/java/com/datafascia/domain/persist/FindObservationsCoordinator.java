@@ -59,7 +59,7 @@ public class FindObservationsCoordinator {
     }
 
     List<Observation> foundObservations = new ArrayList<>();
-    List<Encounter> encounters = encounterRepository.list();
+    List<Encounter> encounters = encounterRepository.list(Optional.empty());
     for (Encounter encounter : encounters) {
       if (!patientId.toString().equals(encounter.getPatient().getReference().getIdPart())) {
         continue;

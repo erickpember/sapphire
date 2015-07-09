@@ -16,8 +16,10 @@ import com.datafascia.domain.event.Event;
 import com.datafascia.domain.event.ObservationData;
 import com.datafascia.domain.fhir.Dates;
 import com.datafascia.domain.fhir.IdentifierSystems;
+import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.ObservationRepository;
+import com.datafascia.domain.persist.PatientRepository;
 import java.util.function.Consumer;
 import javax.inject.Inject;
 
@@ -37,7 +39,17 @@ public class AddObservations implements Consumer<Event> {
     return encounter;
   }
 
-  private static Observation toObservation(ObservationData fromObservation, Encounter encounter) {
+  private static UnitedStatesPatient getPatient(String patientIdentifier) {
+    UnitedStatesPatient patient = new UnitedStatesPatient();
+    patient.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_PATIENT_IDENTIFIER).setValue(patientIdentifier);
+    patient.setId(new IdDt(PatientRepository.generateId(patient).toString()));
+    return patient;
+  }
+
+  private static Observation toObservation(
+      ObservationData fromObservation, Encounter encounter, UnitedStatesPatient patient) {
+
     String observationCode = fromObservation.getId();
 
     IDatatype observationValue;
@@ -53,7 +65,8 @@ public class AddObservations implements Consumer<Event> {
         .setCode(new CodeableConceptDt("system", observationCode))
         .setValue(observationValue)
         .setIssued(Dates.toInstant(fromObservation.getObservationDateAndTime()))
-        .setEncounter(new ResourceReferenceDt(encounter.getId()));
+        .setEncounter(new ResourceReferenceDt(encounter.getId()))
+        .setSubject(new ResourceReferenceDt(patient.getId()));
     return observation;
   }
 
@@ -61,9 +74,10 @@ public class AddObservations implements Consumer<Event> {
   public void accept(Event event) {
     AddObservationsData addObservationsData = (AddObservationsData) event.getData();
     Encounter encounter = getEncounter(addObservationsData.getEncounterIdentifier());
+    UnitedStatesPatient patient = getPatient(addObservationsData.getInstitutionPatientId());
 
     for (ObservationData fromObservation : addObservationsData.getObservations()) {
-      Observation observation = toObservation(fromObservation, encounter);
+      Observation observation = toObservation(fromObservation, encounter, patient);
       observationRepository.save(encounter, observation);
     }
   }

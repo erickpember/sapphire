@@ -121,7 +121,7 @@ public class PatientResourceProvider extends DependencyInjectingResourceProvider
    */
   @Search()
   public List<UnitedStatesPatient> list(
-          @OptionalParam(name = UnitedStatesPatient.SP_IDENTIFIER) StringParam startPatientId,
+          @OptionalParam(name = UnitedStatesPatient.SP_RES_ID) StringParam startPatientId,
           @OptionalParam(name = UnitedStatesPatient.SP_ACTIVE) StringParam isActive,
           @OptionalParam(name = ApiParams.COUNT) NumberParam count) {
     Optional<Id<UnitedStatesPatient>> optStartPatientId;

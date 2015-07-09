@@ -2,10 +2,13 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.event;
 
+import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
+import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
+import ca.uhn.fhir.model.primitive.DecimalDt;
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.model.primitive.StringDt;
 import com.datafascia.domain.event.AddObservationsData;
@@ -36,11 +39,17 @@ public class AddObservations implements Consumer<Event> {
 
   private static Observation toObservation(ObservationData fromObservation, Encounter encounter) {
     String observationCode = fromObservation.getId();
-    StringDt observationValue = new StringDt();
 
-    observationValue.setValue(fromObservation.getValue().get(0));
-    Observation observation = new Observation();
-    observation
+    IDatatype observationValue;
+    if ("NM".equals(fromObservation.getValueType())) {
+      observationValue = new QuantityDt()
+          .setValue(new DecimalDt(fromObservation.getValue().get(0)))
+          .setUnits(fromObservation.getValueUnits());
+    } else {
+      observationValue = new StringDt(fromObservation.getValue().get(0));
+    }
+
+    Observation observation = new Observation()
         .setCode(new CodeableConceptDt("system", observationCode))
         .setValue(observationValue)
         .setIssued(Dates.toInstant(fromObservation.getObservationDateAndTime()))

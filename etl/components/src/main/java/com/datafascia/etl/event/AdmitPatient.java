@@ -35,10 +35,11 @@ public class AdmitPatient implements Consumer<Event> {
   private static UnitedStatesPatient createPatient(PatientData patientData) {
     UnitedStatesPatient patient = new UnitedStatesPatient();
     patient.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_PATIENT_IDENTIFIER)
+        .setSystem(IdentifierSystems.INSTITUTION_PATIENT)
         .setValue(patientData.getInstitutionPatientId());
     patient.addIdentifier()
-        .setSystem(IdentifierSystems.ACCOUNT_NUMBER).setValue(patientData.getAccountNumber());
+        .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
+        .setValue(patientData.getAccountNumber());
     patient.addName()
         .addGiven(patientData.getFirstName())
         .addGiven(patientData.getMiddleName())
@@ -62,7 +63,7 @@ public class AdmitPatient implements Consumer<Event> {
 
     Encounter encounter = new Encounter();
     encounter.addIdentifier()
-        .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue(fromEncounter.getIdentifier());
+        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue(fromEncounter.getIdentifier());
     encounter
         .setStatus(EncounterStateEnum.IN_PROGRESS)
         .setPeriod(period)

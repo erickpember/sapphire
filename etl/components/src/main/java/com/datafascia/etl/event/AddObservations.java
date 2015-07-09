@@ -34,7 +34,7 @@ public class AddObservations implements Consumer<Event> {
   private static Encounter getEncounter(String encounterIdentifier) {
     Encounter encounter = new Encounter();
     encounter.addIdentifier()
-        .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue(encounterIdentifier);
+        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue(encounterIdentifier);
     encounter.setId(new IdDt(EncounterRepository.generateId(encounter).toString()));
     return encounter;
   }
@@ -42,7 +42,7 @@ public class AddObservations implements Consumer<Event> {
   private static UnitedStatesPatient getPatient(String patientIdentifier) {
     UnitedStatesPatient patient = new UnitedStatesPatient();
     patient.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_PATIENT_IDENTIFIER).setValue(patientIdentifier);
+        .setSystem(IdentifierSystems.INSTITUTION_PATIENT).setValue(patientIdentifier);
     patient.setId(new IdDt(PatientRepository.generateId(patient).toString()));
     return patient;
   }

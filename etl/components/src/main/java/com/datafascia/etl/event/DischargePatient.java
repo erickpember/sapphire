@@ -27,7 +27,7 @@ public class DischargePatient implements Consumer<Event> {
   private Id<Encounter> getEncounterId(AdmitPatientData admitPatientData) {
     Encounter encounter = new Encounter();
     encounter.addIdentifier()
-        .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER)
+        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER)
         .setValue(admitPatientData.getEncounter().getIdentifier());
     return EncounterRepository.generateId(encounter);
   }

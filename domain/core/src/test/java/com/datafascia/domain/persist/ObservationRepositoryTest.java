@@ -46,9 +46,9 @@ public class ObservationRepositoryTest extends RepositoryTestSupport {
   private UnitedStatesPatient createPatient() {
     UnitedStatesPatient patient = new UnitedStatesPatient();
     patient.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_PATIENT_IDENTIFIER).setValue("UCSF-12345");
+        .setSystem(IdentifierSystems.INSTITUTION_PATIENT).setValue("UCSF-12345");
     patient.addIdentifier()
-        .setSystem(IdentifierSystems.ACCOUNT_NUMBER).setValue("12345");
+        .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT).setValue("12345");
     patient.addName()
         .addGiven("pat1firstname").addGiven("pat1middlename").addFamily("pat1lastname");
     patient.addCommunication()
@@ -68,7 +68,7 @@ public class ObservationRepositoryTest extends RepositoryTestSupport {
 
     Encounter encounter = new Encounter();
     encounter.addIdentifier()
-        .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue("12345");
+        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("12345");
     encounter
         .setPeriod(period)
         .setPatient(new ResourceReferenceDt(patient.getId()));

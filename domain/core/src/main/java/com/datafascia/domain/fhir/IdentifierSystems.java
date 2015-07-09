@@ -7,14 +7,17 @@ package com.datafascia.domain.fhir;
  */
 public class IdentifierSystems {
 
-  public static final String INSTITUTION_PATIENT_IDENTIFIER =
-      "http://datafascia.com/identifier/InstitutionPatientIdentifier";
+  /** institution assigned patient identifier */
+  public static final String INSTITUTION_PATIENT =
+      "http://datafascia.com/identifier/InstitutionPatient";
 
-  public static final String ACCOUNT_NUMBER =
-      "http://datafascia.com/identifier/AccountNumber";
+  /** institution assigned billing account number */
+  public static final String INSTITUTION_BILLING_ACCOUNT =
+      "http://datafascia.com/identifier/InstitutionBillingAccount";
 
-  public static final String ENCOUNTER_IDENTIFIER =
-      "http://datafascia.com/identifier/EncounterIdentifier";
+  /** institution assigned encounter identifier */
+  public static final String INSTITUTION_ENCOUNTER =
+      "http://datafascia.com/identifier/InstitutionEncounter";
 
   // Private constructor disallows creating instances of this class.
   private IdentifierSystems() {

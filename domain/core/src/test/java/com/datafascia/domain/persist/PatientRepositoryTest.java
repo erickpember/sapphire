@@ -70,9 +70,9 @@ public class PatientRepositoryTest extends RepositoryTestSupport {
   public void getActiveWithLanguages() {
     patient1 = new UnitedStatesPatient();
     patient1.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_PATIENT_IDENTIFIER).setValue("UCSF-12345");
+        .setSystem(IdentifierSystems.INSTITUTION_PATIENT).setValue("UCSF-12345");
     patient1.addIdentifier()
-        .setSystem(IdentifierSystems.ACCOUNT_NUMBER).setValue("12345");
+        .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT).setValue("12345");
     patient1.addName()
         .addGiven("pat1firstname").addGiven("pat1middlename").addFamily("pat1lastname");
     patient1.addCommunication()
@@ -91,9 +91,9 @@ public class PatientRepositoryTest extends RepositoryTestSupport {
   public void getActiveWithoutLanguages() {
     patient3 = new UnitedStatesPatient();
     patient3.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_PATIENT_IDENTIFIER).setValue("UCSF-67890");
+        .setSystem(IdentifierSystems.INSTITUTION_PATIENT).setValue("UCSF-67890");
     patient3.addIdentifier()
-        .setSystem(IdentifierSystems.ACCOUNT_NUMBER).setValue("67890");
+        .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT).setValue("67890");
     patient3.addName()
         .addGiven("pat3firstname").addGiven("pat3middlename").addFamily("pat3lastname");
     patient3.addCommunication()
@@ -112,9 +112,9 @@ public class PatientRepositoryTest extends RepositoryTestSupport {
   public void getInactive() {
     inactivePatient = new UnitedStatesPatient();
     inactivePatient.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_PATIENT_IDENTIFIER).setValue("UCSF-13579");
+        .setSystem(IdentifierSystems.INSTITUTION_PATIENT).setValue("UCSF-13579");
     inactivePatient.addIdentifier()
-        .setSystem(IdentifierSystems.ACCOUNT_NUMBER).setValue("13579");
+        .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT).setValue("13579");
     inactivePatient.addName()
         .addGiven("pat2firstname").addGiven("pat2middlename").addFamily("pat2lastname");
     inactivePatient.addCommunication()

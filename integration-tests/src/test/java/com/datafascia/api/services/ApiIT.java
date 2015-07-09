@@ -3,6 +3,7 @@
 package com.datafascia.api.services;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
@@ -22,12 +23,15 @@ import com.google.common.io.Resources;
 import com.neovisionaries.i18n.LanguageCode;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.Instance;
 import org.apache.accumulo.minicluster.MiniAccumuloInstance;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
+
 
 /**
  * Integration test for the various API resources
@@ -96,38 +100,15 @@ public class ApiIT {
   }
 
   private void addStaticData() {
-    addPatients();
-    addEncounters();
+    List<UnitedStatesPatient> patients = addPatients();
+    addEncounters(patients);
   }
 
-  private void addEncounters() {
-    Encounter encounter1 = new Encounter();
-    encounter1.addIdentifier()
-            .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue("encounter1");
-    encounter1.setStatus(EncounterStateEnum.IN_PROGRESS);
-    MethodOutcome outcome = client.create().resource(encounter1)
-            .encodedJson().execute();
-
-    Encounter encounter2 = new Encounter();
-    encounter2.addIdentifier()
-            .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue("encounter2");
-    encounter2.setStatus(EncounterStateEnum.ARRIVED);
-    outcome = client.create().resource(encounter2)
-            .encodedJson().execute();
-
-    Encounter encounter3 = new Encounter();
-    encounter3.addIdentifier()
-            .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue("encounter3");
-    encounter3.setStatus(EncounterStateEnum.IN_PROGRESS);
-    outcome = client.create().resource(encounter3)
-            .encodedJson().execute();
-  }
-
-  private void addPatients() {
+  private List<UnitedStatesPatient> addPatients() {
     UnitedStatesPatient patient1 = new UnitedStatesPatient();
     patient1.addIdentifier()
             .setSystem(IdentifierSystems.INSTITUTION_PATIENT)
-            .setValue("urn:df-institution-patientId-1:UCSF::96087004");
+            .setValue("96087004");
     patient1.addIdentifier()
             .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
             .setValue("urn:df-patientId-196087004");
@@ -149,7 +130,7 @@ public class ApiIT {
     UnitedStatesPatient patient2 = new UnitedStatesPatient();
     patient2.addIdentifier()
             .setSystem(IdentifierSystems.INSTITUTION_PATIENT)
-            .setValue("urn:df-institution-patientId-1:UCSF::96087039");
+            .setValue("96087039");
     patient2.addIdentifier()
             .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
             .setValue("urn:df-patientId-196087039");
@@ -171,7 +152,7 @@ public class ApiIT {
     UnitedStatesPatient patient3 = new UnitedStatesPatient();
     patient3.addIdentifier()
             .setSystem(IdentifierSystems.INSTITUTION_PATIENT)
-            .setValue("urn:df-institution-patientId-1:UCSF:SICU:96087047");
+            .setValue("96087047");
     patient3.addIdentifier()
             .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
             .setValue("urn:df-patientId-196087047");
@@ -192,7 +173,7 @@ public class ApiIT {
     UnitedStatesPatient patient4 = new UnitedStatesPatient();
     patient4.addIdentifier()
             .setSystem(IdentifierSystems.INSTITUTION_PATIENT)
-            .setValue("urn:df-institution-patientId-1:UCSF::96087055");
+            .setValue("96087055");
     patient4.addIdentifier()
             .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
             .setValue("urn:df-patientId-196087055");
@@ -213,7 +194,7 @@ public class ApiIT {
     UnitedStatesPatient patient5 = new UnitedStatesPatient();
     patient5.addIdentifier()
             .setSystem(IdentifierSystems.INSTITUTION_PATIENT)
-            .setValue("urn:df-institution-patientId-1:UCSF::96087063");
+            .setValue("96087063");
     patient5.addIdentifier()
             .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
             .setValue("urn:df-patientId-196087063");
@@ -234,7 +215,7 @@ public class ApiIT {
     UnitedStatesPatient patient6 = new UnitedStatesPatient();
     patient6.addIdentifier()
             .setSystem(IdentifierSystems.INSTITUTION_PATIENT)
-            .setValue("urn:df-institution-patientId-1:UCSF:SICU:97534012");
+            .setValue("97534012");
     patient6.addIdentifier()
             .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
             .setValue("urn:df-patientId-197534012");
@@ -251,5 +232,36 @@ public class ApiIT {
             .encodedJson().execute();
     id = outcome.getId();
     System.out.println("Got ID: " + id.getValue());
+
+    return (Arrays.asList(patient1, patient2, patient3, patient4, patient5, patient6));
+  }
+
+  private void addEncounters(List<UnitedStatesPatient> patients) {
+    Encounter encounter1 = new Encounter();
+    encounter1.addIdentifier()
+            .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue("encounter1");
+    encounter1.setStatus(EncounterStateEnum.IN_PROGRESS)
+            .setPatient(new ResourceReferenceDt(patients.get(0)));
+    MethodOutcome outcome = client.create().resource(encounter1)
+            .encodedJson().execute();
+    encounter1.setId(outcome.getId());
+
+    Encounter encounter2 = new Encounter();
+    encounter2.addIdentifier()
+            .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue("encounter2");
+    encounter2.setStatus(EncounterStateEnum.ARRIVED)
+            .setPatient(new ResourceReferenceDt(patients.get(0)));
+    outcome = client.create().resource(encounter2)
+            .encodedJson().execute();
+    encounter2.setId(outcome.getId());
+
+    Encounter encounter3 = new Encounter();
+    encounter3.addIdentifier()
+            .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue("encounter3");
+    encounter3.setStatus(EncounterStateEnum.IN_PROGRESS)
+            .setPatient(new ResourceReferenceDt(patients.get(0)));
+    outcome = client.create().resource(encounter3)
+            .encodedJson().execute();
+    encounter3.setId(outcome.getId());
   }
 }

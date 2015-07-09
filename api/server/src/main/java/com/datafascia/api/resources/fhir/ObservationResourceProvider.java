@@ -4,21 +4,15 @@ package com.datafascia.api.resources.fhir;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
-import ca.uhn.fhir.model.primitive.IdDt;
-import ca.uhn.fhir.rest.annotation.Create;
-import ca.uhn.fhir.rest.annotation.Delete;
-import ca.uhn.fhir.rest.annotation.IdParam;
-import ca.uhn.fhir.rest.annotation.Read;
-import ca.uhn.fhir.rest.annotation.ResourceParam;
+import ca.uhn.fhir.rest.annotation.OptionalParam;
+import ca.uhn.fhir.rest.annotation.RequiredParam;
 import ca.uhn.fhir.rest.annotation.Search;
-import ca.uhn.fhir.rest.api.MethodOutcome;
-import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
+import ca.uhn.fhir.rest.param.StringParam;
 import com.datafascia.common.fhir.DependencyInjectingResourceProvider;
 import com.datafascia.common.persist.Id;
-import com.datafascia.domain.fhir.Ids;
 import com.datafascia.domain.persist.ObservationRepository;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import javax.inject.Inject;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -49,64 +43,31 @@ public class ObservationResourceProvider extends DependencyInjectingResourceProv
   }
 
   /**
-   * Store a new observation.
+   * Searches observations based on encounter. Returns list of Observations where
+   * Observation.encounter matches a given Encounter resource ID.
    *
-   * @param observation The new observation to store. Valid encounter reference required.
-   * @return Outcome of create method. Resource ID of Observation.
-   */
-  @Create
-  public MethodOutcome create(@ResourceParam Observation observation) {
-    // Check if observation already exists.
-    Id<Observation> observationId = ObservationRepository.generateId(observation);
-    Id<Encounter> encounterId = Ids.toPrimaryKey(observation.getEncounter().getReference());
-    Optional<Observation> optionalObservation = observationRepository.read(encounterId,
-            observationId);
-    if (optionalObservation.isPresent()) {
-      throw new InvalidRequestException(String.format("Observation ID [%s] already exists",
-              observationId));
-    }
-
-    observationRepository.save(encounterId, observation);
-    return new MethodOutcome(observation.getId());
-  }
-
-  /**
-   * Deletes observation.
-   *
-   * @param observationId ID of observation resource.
-   * @param encounterId ID of parent encounter resource.
-   */
-  @Delete()
-  public void deleteObservation(@IdParam IdDt observationId, @IdParam IdDt encounterId) {
-    Id<Encounter> encounterInternalId = Id.of(encounterId.getIdPart());
-    Id<Observation> observationInternalId = Id.of(observationId.getIdPart());
-    observationRepository.delete(encounterInternalId, observationInternalId);
-  }
-
-  /**
-   * Retrieves an observation using the ID.
-   *
-   * @param observationId ID of observation resource.
-   * @param encounterId ID of parent encounter resource.
-   * @return Returns a resource matching this identifier, or null if none exists.
-   */
-  @Read()
-  public Observation getResourceById(@IdParam IdDt observationId, @IdParam IdDt encounterId) {
-    Id<Encounter> encounterInternalId = Id.of(encounterId.getIdPart());
-    Id<Observation> observationInternalId = Id.of(observationId.getIdPart());
-    return observationRepository.read(encounterInternalId, observationInternalId).get();
-  }
-
-  /**
-   * Searches observations based on encounter.
-   *
-   * @param encounterId Encounter for which we want corresponding observations.
+   * @param encounterId Internal resource ID for the Encounter for which we want corresponding
+   *                    observations.
+   * @param code        Type of Observation, the code member of the first entry in the Observation
+   *                    CodeableConcept field Code.
    * @return Search results.
    */
   @Search()
-  public List<Observation> search(@IdParam IdDt encounterId) {
-    Id<Encounter> encounterInternalId = Id.of(encounterId.getIdPart());
+  public List<Observation> searchByEncounterId(
+          @RequiredParam(name = Observation.SP_ENCOUNTER) StringParam encounterId,
+          @OptionalParam(name = Observation.SP_CODE) StringParam code) {
+    Id<Encounter> encounterInternalId = Id.of(encounterId.getValue());
     List<Observation> observations = observationRepository.list(encounterInternalId);
+
+    if (code != null) {
+      List<Observation> filteredResults = new ArrayList<>();
+      for (Observation observation : observations) {
+        if (observation.getCode().getCodingFirstRep().getCode().equalsIgnoreCase(code.getValue())) {
+          filteredResults.add(observation);
+        }
+      }
+      observations = filteredResults;
+    }
     return observations;
   }
 }

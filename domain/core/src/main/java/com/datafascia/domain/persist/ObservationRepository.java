@@ -39,7 +39,15 @@ public class ObservationRepository extends FhirEntityStoreRepository {
         .build();
   }
 
-  private static Id<Observation> generateId(Observation observation) {
+  /**
+   * Generates primary key from institution observation identifier.
+   *
+   * @param observation
+   *      observation to read property from
+   * @return
+   *      primary key
+   */
+  public static Id<Observation> generateId(Observation observation) {
     String identifierValue = (observation.getId().isEmpty())
         ? UUID.randomUUID().toString() : observation.getId().getIdPart();
     return Id.of(identifierValue);
@@ -62,6 +70,21 @@ public class ObservationRepository extends FhirEntityStoreRepository {
   }
 
   /**
+   * Saves entity.
+   *
+   * @param encounterId
+   *     parent entity ID
+   * @param observation
+   *     to save
+   */
+  public void save(Id<Encounter> encounterId, Observation observation) {
+    Id<Observation> observationId = generateId(observation);
+    observation.setId(new IdDt(Observation.class.getSimpleName(), observationId.toString()));
+
+    entityStore.save(toEntityId(encounterId, observationId), observation);
+  }
+
+  /**
    * Finds observations for an encounter.
    *
    * @param encounterId
@@ -72,5 +95,17 @@ public class ObservationRepository extends FhirEntityStoreRepository {
     return entityStore
         .stream(EncounterRepository.toEntityId(encounterId), Observation.class)
         .collect(Collectors.toList());
+  }
+
+  /**
+   * Deletes encounter and all of its children.
+   *
+   * @param encounterId
+   *     parent encounter ID
+   * @param observationId
+   *     observation ID to delete
+   */
+  public void delete(Id<Encounter> encounterId, Id<Observation> observationId) {
+    entityStore.delete(toEntityId(encounterId, observationId));
   }
 }

@@ -25,6 +25,7 @@ import javax.inject.Inject;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 
 /**
  * {@link ObservationRepository} test
@@ -111,6 +112,9 @@ public class ObservationRepositoryTest extends RepositoryTestSupport {
         case NUMERICAL_PAIN_LEVEL_HIGH:
           assertEquals(observation.getId().getIdPart(), observation2.getId().getIdPart());
           break;
+        default:
+          fail("unexpected observation code:" +
+                  observation.getCode().getCodingFirstRep().getCode());
       }
     }
   }

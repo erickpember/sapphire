@@ -10,6 +10,7 @@ import ca.uhn.fhir.rest.annotation.Delete;
 import ca.uhn.fhir.rest.annotation.IdParam;
 import ca.uhn.fhir.rest.annotation.OptionalParam;
 import ca.uhn.fhir.rest.annotation.Read;
+import ca.uhn.fhir.rest.annotation.RequiredParam;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.annotation.Update;
@@ -104,12 +105,24 @@ public class EncounterResourceProvider extends DependencyInjectingResourceProvid
   /**
    * Retrieves a encounter using the ID.
    *
-   * @param resourceId ID of encounter resource.
+   * @param resourceId ID of Encounter resource.
    * @return Returns a resource matching this identifier, or null if none exists.
    */
   @Read()
   public Encounter getResourceById(@IdParam IdDt resourceId) {
     return encounterRepository.read(Id.of(resourceId.getIdPart())).get();
+  }
+
+  /**
+   * Retrieves a encounter using the external Encounter Identifier.
+   *
+   * @param encounterIdentifier Identifier of Encounter resource.
+   * @return Returns a resource matching this identifier, or null if none exists.
+   */
+  @Search()
+  public Encounter getResourceByIdentifier(
+          @RequiredParam(name = Encounter.SP_IDENTIFIER) StringParam encounterIdentifier) {
+    return encounterRepository.read(Id.of(encounterIdentifier.getValue())).get();
   }
 
   /**
@@ -119,7 +132,7 @@ public class EncounterResourceProvider extends DependencyInjectingResourceProvid
    * @return Search results.
    */
   @Search()
-  public List<Encounter> list(
+  public List<Encounter> listById(
           @OptionalParam(name = Encounter.SP_STATUS) StringParam status) {
     Optional<EncounterStateEnum> optStatus;
     if (status == null) {

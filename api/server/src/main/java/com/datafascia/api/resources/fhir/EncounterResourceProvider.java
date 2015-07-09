@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
  * Encounter resource endpoint
  */
 @NoArgsConstructor @Slf4j
-public class EncounterFhirResource extends DependencyInjectingResourceProvider {
+public class EncounterResourceProvider extends DependencyInjectingResourceProvider {
 
   @Inject
   private EncounterRepository encounterRepository;

@@ -31,7 +31,7 @@ import lombok.extern.slf4j.Slf4j;
  * Patient resource endpoint
  */
 @NoArgsConstructor @Slf4j
-public class PatientFhirResource extends DependencyInjectingResourceProvider {
+public class PatientResourceProvider extends DependencyInjectingResourceProvider {
 
   @Inject
   private PatientRepository patientRepository;
@@ -122,8 +122,7 @@ public class PatientFhirResource extends DependencyInjectingResourceProvider {
   @Search()
   public List<UnitedStatesPatient> list(
           @OptionalParam(name = UnitedStatesPatient.SP_IDENTIFIER) StringParam startPatientId,
-          @OptionalParam(name
-                  = UnitedStatesPatient.SP_ACTIVE) StringParam isActive,
+          @OptionalParam(name = UnitedStatesPatient.SP_ACTIVE) StringParam isActive,
           @OptionalParam(name = ApiParams.COUNT) NumberParam count) {
     Optional<Id<UnitedStatesPatient>> optStartPatientId;
     if (startPatientId == null) {

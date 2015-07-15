@@ -85,27 +85,4 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.accumulo</groupId>
-        <artifactId>accumulo-maven-plugin</artifactId>
-        <version>1.6.2</version>
-        <configuration>
-          <instanceName>plugin-it-instance</instanceName>
-          <rootPassword>supersecret</rootPassword>
-        </configuration>
-        <executions>
-          <execution>
-            <id>run-plugin</id>
-            <goals>
-              <goal>start</goal>
-              <goal>stop</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>

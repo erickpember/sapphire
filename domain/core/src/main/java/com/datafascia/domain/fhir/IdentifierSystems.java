@@ -19,6 +19,10 @@ public class IdentifierSystems {
   public static final String INSTITUTION_ENCOUNTER =
       "http://datafascia.com/identifier/InstitutionEncounter";
 
+  /** institution assigned location identifier */
+  public static final String INSTITUTION_LOCATION =
+      "http://datafascia.com/identifier/InstitutionLocation";
+
   // Private constructor disallows creating instances of this class.
   private IdentifierSystems() {
   }

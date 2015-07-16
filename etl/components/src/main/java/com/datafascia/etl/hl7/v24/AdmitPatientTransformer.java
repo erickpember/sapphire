@@ -56,6 +56,8 @@ public abstract class AdmitPatientTransformer extends BaseTransformer {
     return EncounterData.builder()
         .identifier(
             pv1.getVisitNumber().getID().getValue())
+        .location(
+            pv1.getAssignedPatientLocation().encode())
         .admitTime(
             toInstant(pv1.getAdmitDateTime().getTimeOfAnEvent()))
         .dischargeTime(

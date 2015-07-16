@@ -19,6 +19,9 @@ public class EncounterData {
   /** institution encounter identifier, for example, value from HL7 field PV1-19 */
   private String identifier;
 
+  /** institution assigned location identifier, for example, value from HL7 field PV1-3 */
+  private String location;
+
   @AvroEncode(using = InstantEncoding.class)
   private Instant admitTime;
 

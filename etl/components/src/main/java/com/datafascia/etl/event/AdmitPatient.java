@@ -6,6 +6,7 @@ import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import ca.uhn.fhir.model.dstu2.resource.Location;
 import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import com.datafascia.domain.event.AdmitPatientData;
 import com.datafascia.domain.event.EncounterData;
@@ -16,6 +17,7 @@ import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.domain.fhir.Languages;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.persist.EncounterRepository;
+import com.datafascia.domain.persist.LocationRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import java.util.Date;
 import java.util.function.Consumer;
@@ -28,6 +30,9 @@ public class AdmitPatient implements Consumer<Event> {
 
   @Inject
   private transient PatientRepository patientRepository;
+
+  @Inject
+  private transient LocationRepository locationRepository;
 
   @Inject
   private transient EncounterRepository encounterRepository;
@@ -55,8 +60,18 @@ public class AdmitPatient implements Consumer<Event> {
     return patient;
   }
 
+  private static Location createLocation(EncounterData fromEncounter) {
+    String identifier = fromEncounter.getLocation();
+    Location location = new Location()
+        .setName(identifier);
+    location.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_LOCATION)
+        .setValue(identifier);
+    return location;
+  }
+
   private static Encounter createEncounter(
-      EncounterData fromEncounter, UnitedStatesPatient patient) {
+      EncounterData fromEncounter, UnitedStatesPatient patient, Location location) {
 
     PeriodDt period = new PeriodDt();
     period.setStart(Date.from(fromEncounter.getAdmitTime()), TemporalPrecisionEnum.SECOND);
@@ -67,17 +82,22 @@ public class AdmitPatient implements Consumer<Event> {
     encounter
         .setStatus(EncounterStateEnum.IN_PROGRESS)
         .setPeriod(period)
-        .setPatient(new ResourceReferenceDt(patient.getId()));
+        .setPatient(new ResourceReferenceDt(patient.getId()))
+        .addLocation().setLocation(new ResourceReferenceDt(location.getId()));
     return encounter;
   }
 
   @Override
   public void accept(Event event) {
     AdmitPatientData admitPatientData = (AdmitPatientData) event.getData();
-    UnitedStatesPatient patient = createPatient(admitPatientData.getPatient());
-    Encounter encounter = createEncounter(admitPatientData.getEncounter(), patient);
 
+    UnitedStatesPatient patient = createPatient(admitPatientData.getPatient());
     patientRepository.save(patient);
+
+    Location location = createLocation(admitPatientData.getEncounter());
+    locationRepository.save(location);
+
+    Encounter encounter = createEncounter(admitPatientData.getEncounter(), patient, location);
     encounterRepository.save(encounter);
   }
 }

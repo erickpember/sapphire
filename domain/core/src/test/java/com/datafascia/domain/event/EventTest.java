@@ -96,6 +96,7 @@ public class EventTest {
         .build();
     EncounterData originalEncounterData = EncounterData.builder()
         .identifier("encounterIdentifier")
+        .location("locationIdentifier")
         .admitTime(Instant.now())
         .build();
     AdmitPatientData originalAdmitPatientData = AdmitPatientData.builder()

@@ -7,6 +7,8 @@ import ca.uhn.fhir.model.primitive.IdDt;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.persist.entity.EntityId;
 import com.datafascia.common.persist.entity.FhirEntityStore;
+import com.google.common.io.BaseEncoding;
+import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,8 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class LocationRepository extends FhirEntityStoreRepository {
+
+  private static final BaseEncoding ENCODING = BaseEncoding.base64Url().omitPadding();
 
   /**
    * Constructor
@@ -48,7 +52,7 @@ public class LocationRepository extends FhirEntityStoreRepository {
    */
   public static Id<Location> generateId(Location location) {
     String identifierValue = location.getIdentifierFirstRep().getValue();
-    return Id.of(identifierValue);
+    return Id.of(ENCODING.encode(identifierValue.getBytes(StandardCharsets.UTF_8)));
   }
 
   /**

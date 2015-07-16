@@ -239,7 +239,7 @@ public class ApiIT {
   private void addEncounters(List<UnitedStatesPatient> patients) {
     Encounter encounter1 = new Encounter();
     encounter1.addIdentifier()
-        .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue("encounter1");
+        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("encounter1");
     encounter1.setStatus(EncounterStateEnum.IN_PROGRESS)
         .setPatient(new ResourceReferenceDt(patients.get(0)));
     MethodOutcome outcome = client.create().resource(encounter1)
@@ -248,7 +248,7 @@ public class ApiIT {
 
     Encounter encounter2 = new Encounter();
     encounter2.addIdentifier()
-        .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue("encounter2");
+        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("encounter2");
     encounter2.setStatus(EncounterStateEnum.ARRIVED)
         .setPatient(new ResourceReferenceDt(patients.get(0)));
     outcome = client.create().resource(encounter2)
@@ -257,7 +257,7 @@ public class ApiIT {
 
     Encounter encounter3 = new Encounter();
     encounter3.addIdentifier()
-        .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue("encounter3");
+        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("encounter3");
     encounter3.setStatus(EncounterStateEnum.IN_PROGRESS)
         .setPatient(new ResourceReferenceDt(patients.get(0)));
     outcome = client.create().resource(encounter3)

@@ -107,11 +107,11 @@ public class ApiIT {
   private List<UnitedStatesPatient> addPatients() {
     UnitedStatesPatient patient1 = new UnitedStatesPatient();
     patient1.addIdentifier()
-            .setSystem(IdentifierSystems.INSTITUTION_PATIENT)
-            .setValue("96087004");
+        .setSystem(IdentifierSystems.INSTITUTION_PATIENT)
+        .setValue("96087004");
     patient1.addIdentifier()
-            .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
-            .setValue("urn:df-patientId-196087004");
+        .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
+        .setValue("urn:df-patientId-196087004");
     patient1.addName()
         .addGiven("ECMNOTES").addFamily("TEST");
     patient1.addCommunication()
@@ -129,11 +129,11 @@ public class ApiIT {
 
     UnitedStatesPatient patient2 = new UnitedStatesPatient();
     patient2.addIdentifier()
-            .setSystem(IdentifierSystems.INSTITUTION_PATIENT)
-            .setValue("96087039");
+        .setSystem(IdentifierSystems.INSTITUTION_PATIENT)
+        .setValue("96087039");
     patient2.addIdentifier()
-            .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
-            .setValue("urn:df-patientId-196087039");
+        .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
+        .setValue("urn:df-patientId-196087039");
     patient2.addName()
         .addGiven("ONE").addGiven("A").addFamily("ECM-MSSGE");
     patient2.addCommunication()
@@ -151,11 +151,11 @@ public class ApiIT {
 
     UnitedStatesPatient patient3 = new UnitedStatesPatient();
     patient3.addIdentifier()
-            .setSystem(IdentifierSystems.INSTITUTION_PATIENT)
-            .setValue("96087047");
+        .setSystem(IdentifierSystems.INSTITUTION_PATIENT)
+        .setValue("96087047");
     patient3.addIdentifier()
-            .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
-            .setValue("urn:df-patientId-196087047");
+        .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
+        .setValue("urn:df-patientId-196087047");
     patient3.addName()
         .addGiven("ONE").addGiven("B").addFamily("ECM-MSSGE");
     patient3.addCommunication()
@@ -172,11 +172,11 @@ public class ApiIT {
 
     UnitedStatesPatient patient4 = new UnitedStatesPatient();
     patient4.addIdentifier()
-            .setSystem(IdentifierSystems.INSTITUTION_PATIENT)
-            .setValue("96087055");
+        .setSystem(IdentifierSystems.INSTITUTION_PATIENT)
+        .setValue("96087055");
     patient4.addIdentifier()
-            .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
-            .setValue("urn:df-patientId-196087055");
+        .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
+        .setValue("urn:df-patientId-196087055");
     patient4.addName()
         .addGiven("ONE").addGiven("C").addFamily("ECM-MSSGE");
     patient4.addCommunication()
@@ -193,11 +193,11 @@ public class ApiIT {
 
     UnitedStatesPatient patient5 = new UnitedStatesPatient();
     patient5.addIdentifier()
-            .setSystem(IdentifierSystems.INSTITUTION_PATIENT)
-            .setValue("96087063");
+        .setSystem(IdentifierSystems.INSTITUTION_PATIENT)
+        .setValue("96087063");
     patient5.addIdentifier()
-            .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
-            .setValue("urn:df-patientId-196087063");
+        .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
+        .setValue("urn:df-patientId-196087063");
     patient5.addName()
         .addGiven("ONE").addGiven("D").addFamily("ECM-MSSGE");
     patient5.addCommunication()
@@ -214,11 +214,11 @@ public class ApiIT {
 
     UnitedStatesPatient patient6 = new UnitedStatesPatient();
     patient6.addIdentifier()
-            .setSystem(IdentifierSystems.INSTITUTION_PATIENT)
-            .setValue("97534012");
+        .setSystem(IdentifierSystems.INSTITUTION_PATIENT)
+        .setValue("97534012");
     patient6.addIdentifier()
-            .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
-            .setValue("urn:df-patientId-197534012");
+        .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
+        .setValue("urn:df-patientId-197534012");
     patient6.addName()
         .addGiven("ONEFIVE").addGiven("C").addFamily("MB-CHILD");
     patient6.addCommunication()

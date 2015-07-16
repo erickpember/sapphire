@@ -54,8 +54,8 @@ public class ObservationResourceProvider extends DependencyInjectingResourceProv
    */
   @Search()
   public List<Observation> searchByEncounterId(
-          @RequiredParam(name = Observation.SP_ENCOUNTER) StringParam encounterId,
-          @OptionalParam(name = Observation.SP_CODE) StringParam code) {
+      @RequiredParam(name = Observation.SP_ENCOUNTER) StringParam encounterId,
+      @OptionalParam(name = Observation.SP_CODE) StringParam code) {
     Id<Encounter> encounterInternalId = Id.of(encounterId.getValue());
     List<Observation> observations = observationRepository.list(encounterInternalId);
 

@@ -40,19 +40,19 @@ public class EncounterRepositoryTest extends RepositoryTestSupport {
   private UnitedStatesPatient createPatient() {
     UnitedStatesPatient patient = new UnitedStatesPatient();
     patient.addIdentifier()
-            .setSystem(IdentifierSystems.INSTITUTION_PATIENT_IDENTIFIER).setValue("UCSF-12345");
+        .setSystem(IdentifierSystems.INSTITUTION_PATIENT_IDENTIFIER).setValue("UCSF-12345");
     patient.addIdentifier()
-            .setSystem(IdentifierSystems.ACCOUNT_NUMBER).setValue("12345");
+        .setSystem(IdentifierSystems.ACCOUNT_NUMBER).setValue("12345");
     patient.addName()
-            .addGiven("pat1firstname").addGiven("pat1middlename").addFamily("pat1lastname");
+        .addGiven("pat1firstname").addGiven("pat1middlename").addFamily("pat1lastname");
     patient.addCommunication()
-            .setPreferred(true).setLanguage(Languages.createLanguage(LanguageCode.en));
+        .setPreferred(true).setLanguage(Languages.createLanguage(LanguageCode.en));
     patient
-            .setRace(RaceEnum.ASIAN)
-            .setMaritalStatus(MaritalStatusCodesEnum.M)
-            .setGender(AdministrativeGenderEnum.MALE)
-            .setBirthDate(new DateDt(new Date()))
-            .setActive(true);
+        .setRace(RaceEnum.ASIAN)
+        .setMaritalStatus(MaritalStatusCodesEnum.M)
+        .setGender(AdministrativeGenderEnum.MALE)
+        .setBirthDate(new DateDt(new Date()))
+        .setActive(true);
     return patient;
   }
 
@@ -62,11 +62,11 @@ public class EncounterRepositoryTest extends RepositoryTestSupport {
 
     Encounter encounter = new Encounter();
     encounter.addIdentifier()
-            .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue("12345");
+        .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue("12345");
     encounter
-            .setPeriod(period)
-            .setStatus(EncounterStateEnum.IN_PROGRESS)
-            .setPatient(new ResourceReferenceDt(patient.getId()));
+        .setPeriod(period)
+        .setStatus(EncounterStateEnum.IN_PROGRESS)
+        .setPatient(new ResourceReferenceDt(patient.getId()));
     return encounter;
   }
 
@@ -92,7 +92,7 @@ public class EncounterRepositoryTest extends RepositoryTestSupport {
     assertEquals(result.get().getId().getValue(), encounter.getId().getValue());
 
     Optional<UnitedStatesPatient> patientResult = patientRepository.read(Id.of(encounter.
-            getPatient().getReference().getIdPart()));
+        getPatient().getReference().getIdPart()));
     assertEquals(patientResult.get().getId().getIdPart(), patient.getId().getIdPart());
 
     encounterRepository.delete(encounterId);

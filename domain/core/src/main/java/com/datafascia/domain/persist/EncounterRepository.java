@@ -84,7 +84,7 @@ public class EncounterRepository extends FhirEntityStoreRepository {
     Stream<Encounter> stream = entityStore.stream(Encounter.class);
     if (optStatus.isPresent()) {
       stream = stream.filter(encounter -> encounter.getStatusElement().getValueAsEnum()
-              .equals(optStatus.get()));
+          .equals(optStatus.get()));
     }
 
     return stream.collect(Collectors.toList());

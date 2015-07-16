@@ -113,8 +113,8 @@ public class ObservationRepositoryTest extends RepositoryTestSupport {
           assertEquals(observation.getId().getIdPart(), observation2.getId().getIdPart());
           break;
         default:
-          fail("unexpected observation code:" +
-                  observation.getCode().getCodingFirstRep().getCode());
+          fail("unexpected observation code:" + observation.getCode().getCodingFirstRep()
+              .getCode());
       }
     }
   }

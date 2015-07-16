@@ -75,12 +75,12 @@ public class PatientResourceProvider extends DependencyInjectingResourceProvider
    * Completely replaces the content of the patient resource with the content given in the request.
    *
    * @param resourceId Id of resource to update.
-   * @param patient New patient value.
+   * @param patient    New patient value.
    * @return Outcome of create method. Resource ID of Patient.
    */
   @Update
   public MethodOutcome update(@IdParam IdDt resourceId,
-          @ResourceParam UnitedStatesPatient patient) {
+      @ResourceParam UnitedStatesPatient patient) {
     if (resourceId == null) {
       throw new UnprocessableEntityException("No identifier supplied");
     }
@@ -115,15 +115,15 @@ public class PatientResourceProvider extends DependencyInjectingResourceProvider
    * Searches patients based on whether or not they are active.
    *
    * @param startPatientId If present, start the scan from this patient ID.
-   * @param isActive Whether to search for active or inactive patients.
-   * @param count Maximum number of patients to return in page.
+   * @param isActive       Whether to search for active or inactive patients.
+   * @param count          Maximum number of patients to return in page.
    * @return Search results.
    */
   @Search()
   public List<UnitedStatesPatient> list(
-          @OptionalParam(name = UnitedStatesPatient.SP_RES_ID) StringParam startPatientId,
-          @OptionalParam(name = UnitedStatesPatient.SP_ACTIVE) StringParam isActive,
-          @OptionalParam(name = ApiParams.COUNT) NumberParam count) {
+      @OptionalParam(name = UnitedStatesPatient.SP_RES_ID) StringParam startPatientId,
+      @OptionalParam(name = UnitedStatesPatient.SP_ACTIVE) StringParam isActive,
+      @OptionalParam(name = ApiParams.COUNT) NumberParam count) {
     Optional<Id<UnitedStatesPatient>> optStartPatientId;
     if (startPatientId == null) {
       optStartPatientId = Optional.empty();
@@ -143,7 +143,7 @@ public class PatientResourceProvider extends DependencyInjectingResourceProvider
     }
 
     List<UnitedStatesPatient> patients = patientRepository.list(
-            optStartPatientId, optActive, count.getValue().intValueExact());
+        optStartPatientId, optActive, count.getValue().intValueExact());
     return patients;
   }
 }

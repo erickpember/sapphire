@@ -27,17 +27,17 @@ public class EncounterIT extends ApiIT {
   public void testEncounter() throws Exception {
     // Test filtering by an encounter state code.
     Bundle results = client.search()
-            .forResource(Encounter.class)
-            .where(Encounter.STATUS.exactly().code(EncounterStateEnum.IN_PROGRESS.name()))
-            .execute();
+        .forResource(Encounter.class)
+        .where(Encounter.STATUS.exactly().code(EncounterStateEnum.IN_PROGRESS.name()))
+        .execute();
 
     List<IResource> encounters = ApiUtil.extractBundle(results, Encounter.class);
 
     assertEquals(encounters.size(), 2);
 
     results = client.search()
-            .forResource(Encounter.class)
-            .execute();
+        .forResource(Encounter.class)
+        .execute();
     encounters = ApiUtil.extractBundle(results, Encounter.class);
     assertEquals(encounters.size(), 3);
   }

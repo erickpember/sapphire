@@ -65,7 +65,7 @@ public class EncounterResourceProvider extends DependencyInjectingResourceProvid
     Optional<Encounter> optionalEncounter = encounterRepository.read(encounterId);
     if (optionalEncounter.isPresent()) {
       throw new InvalidRequestException(String.format("Encounter ID [%s] already exists",
-              encounterId));
+          encounterId));
     }
 
     encounterRepository.save(encounter);
@@ -81,8 +81,7 @@ public class EncounterResourceProvider extends DependencyInjectingResourceProvid
    * @return Outcome of create method. Resource ID of Encounter.
    */
   @Update
-  public MethodOutcome update(@IdParam IdDt resourceId,
-          @ResourceParam Encounter encounter) {
+  public MethodOutcome update(@IdParam IdDt resourceId, @ResourceParam Encounter encounter) {
     if (resourceId == null) {
       throw new UnprocessableEntityException("No identifier supplied");
     }
@@ -121,7 +120,7 @@ public class EncounterResourceProvider extends DependencyInjectingResourceProvid
    */
   @Search()
   public Encounter getResourceByIdentifier(
-          @RequiredParam(name = Encounter.SP_IDENTIFIER) StringParam encounterIdentifier) {
+      @RequiredParam(name = Encounter.SP_IDENTIFIER) StringParam encounterIdentifier) {
     return encounterRepository.read(Id.of(encounterIdentifier.getValue())).get();
   }
 
@@ -132,8 +131,7 @@ public class EncounterResourceProvider extends DependencyInjectingResourceProvid
    * @return Search results.
    */
   @Search()
-  public List<Encounter> listById(
-          @OptionalParam(name = Encounter.SP_STATUS) StringParam status) {
+  public List<Encounter> listById(@OptionalParam(name = Encounter.SP_STATUS) StringParam status) {
     Optional<EncounterStateEnum> optStatus;
     if (status == null) {
       optStatus = Optional.empty();

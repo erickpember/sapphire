@@ -41,8 +41,8 @@ public class ApiIT {
   private static final String USERNAME = "testuser";
   private static final String PASSWORD = "supersecret";
 
-  public static final DropwizardTestApp<APIConfiguration> app =
-          new DropwizardTestApp<>(APIService.class, apiConfiguration());
+  public static final DropwizardTestApp<APIConfiguration> app = new DropwizardTestApp<>(
+      APIService.class, apiConfiguration());
   private static final FhirContext ctx = FhirContext.forDstu2();
   protected static IGenericClient client;
 
@@ -80,8 +80,8 @@ public class ApiIT {
     String instanceName = "integration-test";
     try {
       Instance instance = new MiniAccumuloInstance(
-              instanceName,
-              new File("target/accumulo-maven-plugin/" + instanceName));
+          instanceName,
+          new File("target/accumulo-maven-plugin/" + instanceName));
       return instance.getZooKeepers();
     } catch (FileNotFoundException e) {
       throw new IllegalStateException("Cannot get Accumulo instance", e);
@@ -113,17 +113,17 @@ public class ApiIT {
             .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
             .setValue("urn:df-patientId-196087004");
     patient1.addName()
-            .addGiven("ECMNOTES").addFamily("TEST");
+        .addGiven("ECMNOTES").addFamily("TEST");
     patient1.addCommunication()
-            .setPreferred(true).setLanguage(Languages.createLanguage(LanguageCode.en));
+        .setPreferred(true).setLanguage(Languages.createLanguage(LanguageCode.en));
     patient1
-            .setRace(RaceEnum.AMERICAN_INDIAN)
-            .setMaritalStatus(MaritalStatusCodesEnum.A)
-            .setGender(AdministrativeGenderEnum.FEMALE)
-            .setBirthDate(new DateDt("1977-01-01"))
-            .setActive(true);
+        .setRace(RaceEnum.AMERICAN_INDIAN)
+        .setMaritalStatus(MaritalStatusCodesEnum.A)
+        .setGender(AdministrativeGenderEnum.FEMALE)
+        .setBirthDate(new DateDt("1977-01-01"))
+        .setActive(true);
     MethodOutcome outcome = client.create().resource(patient1)
-            .encodedJson().execute();
+        .encodedJson().execute();
     IdDt id = outcome.getId();
     System.out.println("Got ID: " + id.getValue());
 
@@ -135,17 +135,17 @@ public class ApiIT {
             .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
             .setValue("urn:df-patientId-196087039");
     patient2.addName()
-            .addGiven("ONE").addGiven("A").addFamily("ECM-MSSGE");
+        .addGiven("ONE").addGiven("A").addFamily("ECM-MSSGE");
     patient2.addCommunication()
-            .setPreferred(true).setLanguage(Languages.createLanguage(LanguageCode.en));
+        .setPreferred(true).setLanguage(Languages.createLanguage(LanguageCode.en));
     patient2
-            .setRace(RaceEnum.ASIAN)
-            .setMaritalStatus(MaritalStatusCodesEnum.D)
-            .setGender(AdministrativeGenderEnum.FEMALE)
-            .setBirthDate(new DateDt("1960-06-06"))
-            .setActive(true);
+        .setRace(RaceEnum.ASIAN)
+        .setMaritalStatus(MaritalStatusCodesEnum.D)
+        .setGender(AdministrativeGenderEnum.FEMALE)
+        .setBirthDate(new DateDt("1960-06-06"))
+        .setActive(true);
     outcome = client.create().resource(patient2)
-            .encodedJson().execute();
+        .encodedJson().execute();
     id = outcome.getId();
     System.out.println("Got ID: " + id.getValue());
 
@@ -157,16 +157,16 @@ public class ApiIT {
             .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
             .setValue("urn:df-patientId-196087047");
     patient3.addName()
-            .addGiven("ONE").addGiven("B").addFamily("ECM-MSSGE");
+        .addGiven("ONE").addGiven("B").addFamily("ECM-MSSGE");
     patient3.addCommunication()
-            .setPreferred(true).setLanguage(Languages.createLanguage(LanguageCode.en));
+        .setPreferred(true).setLanguage(Languages.createLanguage(LanguageCode.en));
     patient3.setRace(RaceEnum.BLACK)
-            .setMaritalStatus(MaritalStatusCodesEnum.D)
-            .setGender(AdministrativeGenderEnum.FEMALE)
-            .setBirthDate(new DateDt("1954-10-29"))
-            .setActive(true);
+        .setMaritalStatus(MaritalStatusCodesEnum.D)
+        .setGender(AdministrativeGenderEnum.FEMALE)
+        .setBirthDate(new DateDt("1954-10-29"))
+        .setActive(true);
     outcome = client.create().resource(patient3)
-            .encodedJson().execute();
+        .encodedJson().execute();
     id = outcome.getId();
     System.out.println("Got ID: " + id.getValue());
 
@@ -178,16 +178,16 @@ public class ApiIT {
             .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
             .setValue("urn:df-patientId-196087055");
     patient4.addName()
-            .addGiven("ONE").addGiven("C").addFamily("ECM-MSSGE");
+        .addGiven("ONE").addGiven("C").addFamily("ECM-MSSGE");
     patient4.addCommunication()
-            .setPreferred(true).setLanguage(Languages.createLanguage(LanguageCode.en));
+        .setPreferred(true).setLanguage(Languages.createLanguage(LanguageCode.en));
     patient4.setRace(RaceEnum.OTHER)
-            .setMaritalStatus(MaritalStatusCodesEnum.I)
-            .setGender(AdministrativeGenderEnum.FEMALE)
-            .setBirthDate(new DateDt("1996-07-29"))
-            .setActive(true);
+        .setMaritalStatus(MaritalStatusCodesEnum.I)
+        .setGender(AdministrativeGenderEnum.FEMALE)
+        .setBirthDate(new DateDt("1996-07-29"))
+        .setActive(true);
     outcome = client.create().resource(patient4)
-            .encodedJson().execute();
+        .encodedJson().execute();
     id = outcome.getId();
     System.out.println("Got ID: " + id.getValue());
 
@@ -199,16 +199,16 @@ public class ApiIT {
             .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
             .setValue("urn:df-patientId-196087063");
     patient5.addName()
-            .addGiven("ONE").addGiven("D").addFamily("ECM-MSSGE");
+        .addGiven("ONE").addGiven("D").addFamily("ECM-MSSGE");
     patient5.addCommunication()
-            .setPreferred(true).setLanguage(Languages.createLanguage(LanguageCode.en));
+        .setPreferred(true).setLanguage(Languages.createLanguage(LanguageCode.en));
     patient5.setRace(RaceEnum.WHITE)
-            .setMaritalStatus(MaritalStatusCodesEnum.UNMARRIED)
-            .setGender(AdministrativeGenderEnum.MALE)
-            .setBirthDate(new DateDt("1977-10-29"))
-            .setActive(true);
+        .setMaritalStatus(MaritalStatusCodesEnum.UNMARRIED)
+        .setGender(AdministrativeGenderEnum.MALE)
+        .setBirthDate(new DateDt("1977-10-29"))
+        .setActive(true);
     outcome = client.create().resource(patient5)
-            .encodedJson().execute();
+        .encodedJson().execute();
     id = outcome.getId();
     System.out.println("Got ID: " + id.getValue());
 
@@ -220,16 +220,16 @@ public class ApiIT {
             .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
             .setValue("urn:df-patientId-197534012");
     patient6.addName()
-            .addGiven("ONEFIVE").addGiven("C").addFamily("MB-CHILD");
+        .addGiven("ONEFIVE").addGiven("C").addFamily("MB-CHILD");
     patient6.addCommunication()
-            .setPreferred(true).setLanguage(Languages.createLanguage(LanguageCode.en));
+        .setPreferred(true).setLanguage(Languages.createLanguage(LanguageCode.en));
     patient6.setRace(RaceEnum.PACIFIC_ISLANDER)
-            .setMaritalStatus(MaritalStatusCodesEnum.UNMARRIED)
-            .setGender(AdministrativeGenderEnum.MALE)
-            .setBirthDate(new DateDt("1999-02-20"))
-            .setActive(true);
+        .setMaritalStatus(MaritalStatusCodesEnum.UNMARRIED)
+        .setGender(AdministrativeGenderEnum.MALE)
+        .setBirthDate(new DateDt("1999-02-20"))
+        .setActive(true);
     outcome = client.create().resource(patient6)
-            .encodedJson().execute();
+        .encodedJson().execute();
     id = outcome.getId();
     System.out.println("Got ID: " + id.getValue());
 
@@ -239,29 +239,29 @@ public class ApiIT {
   private void addEncounters(List<UnitedStatesPatient> patients) {
     Encounter encounter1 = new Encounter();
     encounter1.addIdentifier()
-            .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue("encounter1");
+        .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue("encounter1");
     encounter1.setStatus(EncounterStateEnum.IN_PROGRESS)
-            .setPatient(new ResourceReferenceDt(patients.get(0)));
+        .setPatient(new ResourceReferenceDt(patients.get(0)));
     MethodOutcome outcome = client.create().resource(encounter1)
-            .encodedJson().execute();
+        .encodedJson().execute();
     encounter1.setId(outcome.getId());
 
     Encounter encounter2 = new Encounter();
     encounter2.addIdentifier()
-            .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue("encounter2");
+        .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue("encounter2");
     encounter2.setStatus(EncounterStateEnum.ARRIVED)
-            .setPatient(new ResourceReferenceDt(patients.get(0)));
+        .setPatient(new ResourceReferenceDt(patients.get(0)));
     outcome = client.create().resource(encounter2)
-            .encodedJson().execute();
+        .encodedJson().execute();
     encounter2.setId(outcome.getId());
 
     Encounter encounter3 = new Encounter();
     encounter3.addIdentifier()
-            .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue("encounter3");
+        .setSystem(IdentifierSystems.ENCOUNTER_IDENTIFIER).setValue("encounter3");
     encounter3.setStatus(EncounterStateEnum.IN_PROGRESS)
-            .setPatient(new ResourceReferenceDt(patients.get(0)));
+        .setPatient(new ResourceReferenceDt(patients.get(0)));
     outcome = client.create().resource(encounter3)
-            .encodedJson().execute();
+        .encodedJson().execute();
     encounter3.setId(outcome.getId());
   }
 }

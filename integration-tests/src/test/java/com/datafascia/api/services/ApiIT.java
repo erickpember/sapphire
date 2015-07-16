@@ -5,6 +5,7 @@ package com.datafascia.api.services;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import ca.uhn.fhir.model.dstu2.resource.Location;
 import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
@@ -102,6 +103,7 @@ public class ApiIT {
   private void addStaticData() {
     List<UnitedStatesPatient> patients = addPatients();
     addEncounters(patients);
+    addLocation();
   }
 
   private List<UnitedStatesPatient> addPatients() {
@@ -263,5 +265,18 @@ public class ApiIT {
     outcome = client.create().resource(encounter3)
         .encodedJson().execute();
     encounter3.setId(outcome.getId());
+  }
+
+  private Location createLocation(String identifier) {
+    Location location = new Location()
+        .setName(identifier);
+    location.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_LOCATION).setValue(identifier);
+    return location;
+  }
+
+  private void addLocation() {
+    Location originalLocation = createLocation("point-of-care^room^bed");
+    client.create().resource(originalLocation).execute();
   }
 }

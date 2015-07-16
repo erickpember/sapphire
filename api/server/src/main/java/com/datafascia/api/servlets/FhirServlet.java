@@ -5,6 +5,7 @@ package com.datafascia.api.servlets;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import com.datafascia.api.resources.fhir.EncounterResourceProvider;
+import com.datafascia.api.resources.fhir.LocationResourceProvider;
 import com.datafascia.api.resources.fhir.ObservationResourceProvider;
 import com.datafascia.api.resources.fhir.PatientResourceProvider;
 import java.util.ArrayList;
@@ -32,6 +33,7 @@ public class FhirServlet extends RestfulServer {
     resourceProviders.add(new PatientResourceProvider());
     resourceProviders.add(new EncounterResourceProvider());
     resourceProviders.add(new ObservationResourceProvider());
+    resourceProviders.add(new LocationResourceProvider());
     setResourceProviders(resourceProviders);
   }
 }

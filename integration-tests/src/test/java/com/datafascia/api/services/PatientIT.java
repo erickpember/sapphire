@@ -56,26 +56,13 @@ public class PatientIT extends ApiIT {
           validatePatient(pat, "ONE", "B", "ECM-MSSGE", new DateDt("1954-10-29"),
               "urn:df-patientId-1:96087047", "96087047");
           break;
-        case "96087055":
-          validatePatient(pat, "ONE", "C", "ECM-MSSGE", new DateDt("1996-07-29"),
-              "urn:df-patientId-1:96087055", "96087055");
-          break;
-        case "96087063":
-          validatePatient(pat, "ONE", "D", "ECM-MSSGE", new DateDt("1977-10-29"),
-              "urn:df-patientId-1:96087063", "96087063");
-          break;
-        case "97534012":
-          validatePatient(pat, "ONEFIVE", "C", "MB-CHILD",
-              new DateDt("1999-02-20"), "urn:df-patientId-1:97534012",
-              "97534012");
-          break;
         default:
           fail("Did not recognize ID: " + id);
           break;
       }
       count++;
     }
-    assertEquals(count, 6, "testPatient did not find its expected patients!");
+    assertEquals(count, 3, "testPatient did not find its expected patients!");
 
     // test read
     UnitedStatesPatient patient = client.read()

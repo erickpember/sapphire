@@ -2,17 +2,13 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.csv;
 
-import com.datafascia.api.client.DatafasciaApi;
-import com.datafascia.api.client.DatafasciaApiBuilder;
-import com.datafascia.common.api.ApiParams;
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
+import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.common.jackson.CSVMapper;
-import com.datafascia.common.persist.Id;
-import com.datafascia.domain.model.Encounter;
-import com.datafascia.domain.model.PagedCollection;
-import com.datafascia.domain.model.Patient;
+import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.emerge.models.DailyProcess;
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableMap;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -20,9 +16,9 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
+import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
-import retrofit.RetrofitError;
 
 /**
  * The main application class for the Emerge CSV generator.
@@ -37,6 +33,11 @@ public class EmergeDailyProcessCSVGenerator {
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
 
   private static CSVMapper<DailyProcess> mapper;
+  private static FhirClient client;
+
+  // Private constructor disallows creating instances of this class
+  private EmergeDailyProcessCSVGenerator() {
+  }
 
   /**
    * Generates Emerge CSV file.
@@ -55,42 +56,20 @@ public class EmergeDailyProcessCSVGenerator {
       throws IOException {
 
     mapper = new CSVMapper<>(DailyProcess.class);
+    client = new FhirClient(apiEndpoint.toString(), user, password);
 
     try (PrintWriter pw = new PrintWriter(new FileWriter(csvFile))) {
-      DatafasciaApi api = DatafasciaApiBuilder.endpoint(apiEndpoint, user, password);
       pw.println(Joiner.on(",").join(mapper.getHeaders()));
 
-      int entry = 0;
-      Map<String, String> params = ImmutableMap.of(
-          ApiParams.ACTIVE, "true", ApiParams.COUNT, "100");
-      while (params != null) {
-        PagedCollection<Patient> page = api.patients(params);
-        for (Patient pat : page.getCollection()) {
-          Encounter encount = lastVisit(api, pat.getId());
-
-          pw.println(mapper.asCSV(getDailyProcess(pat, encount, entry)));
+      List<Encounter> encounters = client.getInProgressEncounters();
+      int entry = 1;
+      for (Encounter encounter: encounters) {
+        UnitedStatesPatient patient = client.getPatientFromEncounter(encounter);
+        if (null != patient) {
+          pw.println(mapper.asCSV(getDailyProcess(patient, encounter, entry)));
           entry++;
         }
-        params = page.getNext();
       }
-    }
-  }
-
-  /**
-   * Gets last encounter for the patient.
-   *
-   * @param api
-   *     the API end-point
-   * @param patientId
-   *     the patientId
-   * @return the last patient encounter information
-   */
-  private static Encounter lastVisit(DatafasciaApi api, Id<Patient> patientId) {
-    try {
-      return api.lastvisit(patientId.toString());
-    } catch (RetrofitError rf) {
-      log.error("No last encounter found for patient {}", patientId);
-      return null;
     }
   }
 
@@ -105,7 +84,8 @@ public class EmergeDailyProcessCSVGenerator {
    *     entry number (Patcom in the CSV)
    * @return the DailyProcess object.
    */
-  private static DailyProcess getDailyProcess(Patient patient, Encounter encounter, int entry) {
+  private static DailyProcess getDailyProcess(
+      UnitedStatesPatient patient, Encounter encounter, int entry) {
     DailyProcess dailyProcess = new DailyProcess();
     dailyProcess.setEntry(Integer.toString(entry));
 
@@ -113,24 +93,44 @@ public class EmergeDailyProcessCSVGenerator {
     dailyProcess.setDateCreated(DATE_TIME_FORMATTER.format(now));
     dailyProcess.setDataCollectionDate(DATE_FORMATTER.format(now));
 
-    addPatientData(dailyProcess, patient);
+    addPatientData(dailyProcess, patient, encounter);
+    // TODO: addObservationData(dailyProcess, encounter);
     return dailyProcess;
   }
 
   /**
-   * Populate the daily process data with the patient object.
+   * Populate the daily process data with patient data.
    *
    * @param dailyProcess
    *     daily process data
    * @param patient
-   *     patient
+   *     the patient resource
+   * @param encounter
+   *     the current patient encounter resource
    */
-  private static void addPatientData(DailyProcess dailyProcess, Patient patient) {
-    dailyProcess.setSubjectId(patient.getInstitutionPatientId());
-    dailyProcess.setSubjectPatcom(patient.getAccountNumber());
+  private static void addPatientData(
+      DailyProcess dailyProcess, UnitedStatesPatient patient, Encounter encounter) {
+    dailyProcess.setSubjectId(client.getInstitutionPatientId(patient));
+    dailyProcess.setSubjectPatcom(client.getEncounterIdentifier(encounter));
+    Optional<String> room = client.getPatientRoom(encounter);
+    if (room.isPresent()) {
+      dailyProcess.setRoomNumber(room.get());
+    }
   }
 
-  // Private constructor disallows creating instances of this class
-  private EmergeDailyProcessCSVGenerator() {
+  /**
+   * Populate the daily process data with observation data.
+   *
+   * @param dailyProcess
+   *     daily process data
+   * @param encounter
+   *     the current patient encounter resource
+   */
+  private static void addObservationData(DailyProcess dailyProcess, Encounter encounter) {
+    // Get a list of all resources for this encounter
+    List<Observation> observations = client.getObservations(encounter);
+    List<MedicationAdministration> medAdmins = client.getMedicationAdministrations(encounter);
+
+    // Loop over the CSV fields and look for the code in the observations
   }
 }

@@ -25,11 +25,13 @@ public class LocationIT extends ApiIT {
    */
   @Test
   public void testLocation() throws Exception {
+    String identifier = "POC-ER^Room-2^Bed-B";
+    String id = ENCODING.encode(identifier.getBytes(StandardCharsets.UTF_8));
     Location location = client.read()
         .resource(Location.class)
-        .withId(ENCODING.encode("point-of-care^room^bed".getBytes(StandardCharsets.UTF_8)))
+        .withId(id)
         .execute();
 
-    assertEquals(location.getName(), "point-of-care^room^bed");
+    assertEquals(location.getIdentifierFirstRep().getValue(), identifier);
   }
 }

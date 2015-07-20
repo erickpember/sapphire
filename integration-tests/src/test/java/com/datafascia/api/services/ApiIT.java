@@ -3,13 +3,19 @@
 package com.datafascia.api.services;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
+import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
+import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
+import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Location;
+import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
 import ca.uhn.fhir.model.primitive.DateDt;
+import ca.uhn.fhir.model.primitive.DecimalDt;
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.IGenericClient;
@@ -25,6 +31,7 @@ import com.neovisionaries.i18n.LanguageCode;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
@@ -32,7 +39,6 @@ import org.apache.accumulo.core.client.Instance;
 import org.apache.accumulo.minicluster.MiniAccumuloInstance;
 import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
-
 
 /**
  * Integration test for the various API resources
@@ -100,10 +106,15 @@ public class ApiIT {
     return Resources.getResource("api-server.yml").getFile();
   }
 
+  /**
+   * Loads static data for the API tests
+   */
   private void addStaticData() {
     List<UnitedStatesPatient> patients = addPatients();
-    addEncounters(patients);
-    addLocation();
+    List<Location> locations = addLocations();
+    List<Encounter> encounters = addEncounters(patients, locations);
+    // TODO: Determine the best way to deal with the observation _id field
+    //List<Observation> observations = addObservations(patients, encounters);
   }
 
   private List<UnitedStatesPatient> addPatients() {
@@ -127,7 +138,8 @@ public class ApiIT {
     MethodOutcome outcome = client.create().resource(patient1)
         .encodedJson().execute();
     IdDt id = outcome.getId();
-    System.out.println("Got ID: " + id.getValue());
+    patient1.setId(id);
+    log.info("patient 1 ID: {}", id.getValue());
 
     UnitedStatesPatient patient2 = new UnitedStatesPatient();
     patient2.addIdentifier()
@@ -149,7 +161,8 @@ public class ApiIT {
     outcome = client.create().resource(patient2)
         .encodedJson().execute();
     id = outcome.getId();
-    System.out.println("Got ID: " + id.getValue());
+    patient2.setId(id);
+    log.info("patient 2 ID: {}", id.getValue());
 
     UnitedStatesPatient patient3 = new UnitedStatesPatient();
     patient3.addIdentifier()
@@ -164,107 +177,165 @@ public class ApiIT {
         .setPreferred(true).setLanguage(Languages.createLanguage(LanguageCode.en));
     patient3.setRace(RaceEnum.BLACK)
         .setMaritalStatus(MaritalStatusCodesEnum.D)
-        .setGender(AdministrativeGenderEnum.FEMALE)
+        .setGender(AdministrativeGenderEnum.MALE)
         .setBirthDate(new DateDt("1954-10-29"))
         .setActive(true);
     outcome = client.create().resource(patient3)
         .encodedJson().execute();
     id = outcome.getId();
-    System.out.println("Got ID: " + id.getValue());
+    patient3.setId(id);
+    log.info("patient 3 ID: {}", id.getValue());
 
-    UnitedStatesPatient patient4 = new UnitedStatesPatient();
-    patient4.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_PATIENT)
-        .setValue("96087055");
-    patient4.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
-        .setValue("urn:df-patientId-196087055");
-    patient4.addName()
-        .addGiven("ONE").addGiven("C").addFamily("ECM-MSSGE");
-    patient4.addCommunication()
-        .setPreferred(true).setLanguage(Languages.createLanguage(LanguageCode.en));
-    patient4.setRace(RaceEnum.OTHER)
-        .setMaritalStatus(MaritalStatusCodesEnum.I)
-        .setGender(AdministrativeGenderEnum.FEMALE)
-        .setBirthDate(new DateDt("1996-07-29"))
-        .setActive(true);
-    outcome = client.create().resource(patient4)
-        .encodedJson().execute();
-    id = outcome.getId();
-    System.out.println("Got ID: " + id.getValue());
-
-    UnitedStatesPatient patient5 = new UnitedStatesPatient();
-    patient5.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_PATIENT)
-        .setValue("96087063");
-    patient5.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
-        .setValue("urn:df-patientId-196087063");
-    patient5.addName()
-        .addGiven("ONE").addGiven("D").addFamily("ECM-MSSGE");
-    patient5.addCommunication()
-        .setPreferred(true).setLanguage(Languages.createLanguage(LanguageCode.en));
-    patient5.setRace(RaceEnum.WHITE)
-        .setMaritalStatus(MaritalStatusCodesEnum.UNMARRIED)
-        .setGender(AdministrativeGenderEnum.MALE)
-        .setBirthDate(new DateDt("1977-10-29"))
-        .setActive(true);
-    outcome = client.create().resource(patient5)
-        .encodedJson().execute();
-    id = outcome.getId();
-    System.out.println("Got ID: " + id.getValue());
-
-    UnitedStatesPatient patient6 = new UnitedStatesPatient();
-    patient6.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_PATIENT)
-        .setValue("97534012");
-    patient6.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
-        .setValue("urn:df-patientId-197534012");
-    patient6.addName()
-        .addGiven("ONEFIVE").addGiven("C").addFamily("MB-CHILD");
-    patient6.addCommunication()
-        .setPreferred(true).setLanguage(Languages.createLanguage(LanguageCode.en));
-    patient6.setRace(RaceEnum.PACIFIC_ISLANDER)
-        .setMaritalStatus(MaritalStatusCodesEnum.UNMARRIED)
-        .setGender(AdministrativeGenderEnum.MALE)
-        .setBirthDate(new DateDt("1999-02-20"))
-        .setActive(true);
-    outcome = client.create().resource(patient6)
-        .encodedJson().execute();
-    id = outcome.getId();
-    System.out.println("Got ID: " + id.getValue());
-
-    return (Arrays.asList(patient1, patient2, patient3, patient4, patient5, patient6));
+    return Arrays.asList(patient1, patient2, patient3);
   }
 
-  private void addEncounters(List<UnitedStatesPatient> patients) {
+  private List<Encounter> addEncounters(List<UnitedStatesPatient> patients,
+      List<Location> locations) {
+    PeriodDt period = new PeriodDt();
+    period.setStart(new Date(), TemporalPrecisionEnum.DAY);
+
     Encounter encounter1 = new Encounter();
     encounter1.addIdentifier()
         .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("encounter1");
-    encounter1.setStatus(EncounterStateEnum.IN_PROGRESS)
-        .setPatient(new ResourceReferenceDt(patients.get(0)));
+    encounter1.setPeriod(period);
+    encounter1.setStatus(EncounterStateEnum.IN_PROGRESS);
+    encounter1.setPatient(new ResourceReferenceDt(patients.get(0)));
+    encounter1.addLocation().setLocation(new ResourceReferenceDt(locations.get(0)));
     MethodOutcome outcome = client.create().resource(encounter1)
         .encodedJson().execute();
-    encounter1.setId(outcome.getId());
+    IdDt id = outcome.getId();
+    encounter1.setId(id);
+    log.info("encounter 1 ID: {}", id.getValue());
 
     Encounter encounter2 = new Encounter();
     encounter2.addIdentifier()
         .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("encounter2");
-    encounter2.setStatus(EncounterStateEnum.ARRIVED)
-        .setPatient(new ResourceReferenceDt(patients.get(0)));
+    encounter2.setPeriod(period);
+    encounter2.setStatus(EncounterStateEnum.ARRIVED);
+    encounter2.setPatient(new ResourceReferenceDt(patients.get(1)));
+    encounter2.addLocation().setLocation(new ResourceReferenceDt(locations.get(1)));
     outcome = client.create().resource(encounter2)
         .encodedJson().execute();
-    encounter2.setId(outcome.getId());
+    id = outcome.getId();
+    encounter2.setId(id);
+    log.info("encounter 2 ID: {}", id.getValue());
 
     Encounter encounter3 = new Encounter();
     encounter3.addIdentifier()
         .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("encounter3");
-    encounter3.setStatus(EncounterStateEnum.IN_PROGRESS)
-        .setPatient(new ResourceReferenceDt(patients.get(0)));
+    encounter3.setPeriod(period);
+    encounter3.setStatus(EncounterStateEnum.IN_PROGRESS);
+    encounter3.setPatient(new ResourceReferenceDt(patients.get(2)));
+    encounter3.addLocation().setLocation(new ResourceReferenceDt(locations.get(2)));
     outcome = client.create().resource(encounter3)
         .encodedJson().execute();
-    encounter3.setId(outcome.getId());
+    id = outcome.getId();
+    encounter3.setId(id);
+    log.info("encounter 3 ID: {}", id.getValue());
+
+    return Arrays.asList(encounter1, encounter2, encounter3);
+  }
+
+  private List<Observation> addObservations(List<UnitedStatesPatient> patients,
+      List<Encounter> encounters) {
+    Observation observation1 = new Observation();
+    QuantityDt observationValue = new QuantityDt()
+        .setValue(new DecimalDt("170"))
+        .setUnits("cm");
+    observation1.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("observation1");
+    observation1.setCode(new CodeableConceptDt("system", "HEIGHT"));
+    observation1.setValue(observationValue);
+    observation1.setSubject(new ResourceReferenceDt(patients.get(0)));
+    observation1.setEncounter(new ResourceReferenceDt(encounters.get(0)));
+    MethodOutcome outcome = client.create().resource(observation1)
+        .encodedJson().execute();
+    IdDt id = outcome.getId();
+    observation1.setId(id);
+    log.info("observation 1 ID: {}", id.getValue());
+
+    Observation observation2 = new Observation();
+    observationValue = new QuantityDt()
+        .setValue(new DecimalDt("70"))
+        .setUnits("kg");
+    observation2.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("observation2");
+    observation2.setCode(new CodeableConceptDt("system", "WEIGHT"));
+    observation2.setValue(observationValue);
+    observation2.setSubject(new ResourceReferenceDt(patients.get(0)));
+    observation2.setEncounter(new ResourceReferenceDt(encounters.get(0)));
+    outcome = client.create().resource(observation2)
+        .encodedJson().execute();
+    id = outcome.getId();
+    observation2.setId(id);
+    log.info("observation 2 ID: {}", id.getValue());
+
+    Observation observation3 = new Observation();
+    observation3.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("observation3");
+    observationValue = new QuantityDt()
+        .setValue(new DecimalDt("144"))
+        .setUnits("cm");
+    observation3.setCode(new CodeableConceptDt("system", "HEIGHT"));
+    observation3.setValue(observationValue);
+    observation3.setSubject(new ResourceReferenceDt(patients.get(1)));
+    observation3.setEncounter(new ResourceReferenceDt(encounters.get(1)));
+    outcome = client.create().resource(observation3)
+        .encodedJson().execute();
+    id = outcome.getId();
+    observation3.setId(id);
+    log.info("observation 3 ID: {}", id.getValue());
+
+    Observation observation4 = new Observation();
+    observationValue = new QuantityDt()
+        .setValue(new DecimalDt("50"))
+        .setUnits("kg");
+    observation4.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("observation4");
+    observation4.setCode(new CodeableConceptDt("system", "WEIGHT"));
+    observation4.setValue(observationValue);
+    observation4.setSubject(new ResourceReferenceDt(patients.get(1)));
+    observation4.setEncounter(new ResourceReferenceDt(encounters.get(1)));
+    outcome = client.create().resource(observation4)
+        .encodedJson().execute();
+    id = outcome.getId();
+    observation4.setId(id);
+    log.info("observation 4 ID: {}", id.getValue());
+
+    Observation observation5 = new Observation();
+    observation5.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("observation5");
+    observationValue = new QuantityDt()
+        .setValue(new DecimalDt("50"))
+        .setUnits("cm");
+    observation5.setCode(new CodeableConceptDt("system", "HEIGHT"));
+    observation5.setValue(observationValue);
+    observation5.setSubject(new ResourceReferenceDt(patients.get(2)));
+    observation5.setEncounter(new ResourceReferenceDt(encounters.get(2)));
+    outcome = client.create().resource(observation5)
+        .encodedJson().execute();
+    id = outcome.getId();
+    observation5.setId(id);
+    log.info("observation 5 ID: {}", id.getValue());
+
+    Observation observation6 = new Observation();
+    observationValue = new QuantityDt()
+        .setValue(new DecimalDt("50"))
+        .setUnits("kg");
+    observation6.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("observation4");
+    observation6.setCode(new CodeableConceptDt("system", "WEIGHT"));
+    observation6.setValue(observationValue);
+    observation6.setSubject(new ResourceReferenceDt(patients.get(2)));
+    observation6.setEncounter(new ResourceReferenceDt(encounters.get(2)));
+    outcome = client.create().resource(observation6)
+        .encodedJson().execute();
+    id = outcome.getId();
+    observation6.setId(id);
+    log.info("observation 6 ID: {}", id.getValue());
+
+    return Arrays.asList(
+        observation1, observation2, observation3, observation4, observation5, observation6);
   }
 
   private Location createLocation(String identifier) {
@@ -275,8 +346,25 @@ public class ApiIT {
     return location;
   }
 
-  private void addLocation() {
-    Location originalLocation = createLocation("point-of-care^room^bed");
-    client.create().resource(originalLocation).execute();
+  private List<Location> addLocations() {
+    Location location1 = createLocation("POC-ER^Room-1^Bed-A");
+    MethodOutcome outcome = client.create().resource(location1).execute();
+    IdDt id = outcome.getId();
+    location1.setId(id);
+    log.info("location 1 ID: {}", id.getValue());
+
+    Location location2 = createLocation("POC-ER^Room-2^Bed-B");
+    outcome = client.create().resource(location2).execute();
+    id = outcome.getId();
+    location2.setId(id);
+    log.info("location 2 ID: {}", id.getValue());
+
+    Location location3 = createLocation("POC-ER^Room-3^Bed-A");
+    outcome = client.create().resource(location3).execute();
+    id = outcome.getId();
+    location3.setId(id);
+    log.info("location 3 ID: {}", id.getValue());
+
+    return Arrays.asList(location1, location2, location3);
   }
 }

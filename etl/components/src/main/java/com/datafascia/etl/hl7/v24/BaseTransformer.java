@@ -240,6 +240,10 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
   }
 
   protected RaceEnum toRace(String code) {
+    if (code == null) {
+      return RaceEnum.UNKNOWN;
+    }
+
     RaceEnum race = RaceMap.raceMap.get(code.toLowerCase());
     return MoreObjects.firstNonNull(race, RaceEnum.UNKNOWN);
   }

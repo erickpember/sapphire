@@ -55,6 +55,10 @@ public class Dates {
    * @return FHIR date
    */
   public static InstantDt toInstant(Instant instant) {
+    if (instant == null) {
+      return null;
+    }
+
     return new InstantDt(Date.from(instant), TemporalPrecisionEnum.SECOND);
   }
 }

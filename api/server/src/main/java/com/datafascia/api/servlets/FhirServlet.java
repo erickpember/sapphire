@@ -2,14 +2,14 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.servlets;
 
-import ca.uhn.fhir.rest.server.IResourceProvider;
+import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.server.EncodingEnum;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import com.datafascia.api.resources.fhir.EncounterResourceProvider;
 import com.datafascia.api.resources.fhir.LocationResourceProvider;
 import com.datafascia.api.resources.fhir.ObservationResourceProvider;
 import com.datafascia.api.resources.fhir.PatientResourceProvider;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Arrays;
 import javax.servlet.ServletException;
 
 /**
@@ -17,23 +17,36 @@ import javax.servlet.ServletException;
  */
 public class FhirServlet extends RestfulServer {
   /**
+   * Constructor
+   */
+  public FhirServlet() {
+    super(FhirContext.forDstu2());
+  }
+
+  /**
    * The initialize method is automatically called when the servlet is starting up, so it can be
    * used to configure the servlet to define resource providers, or set up configuration,
    * interceptors, etc.
-   * @throws javax.servlet.ServletException
+   *
+   * @throws javax.servlet.ServletException if error occurred
    */
   @Override
   protected void initialize() throws ServletException {
+    // Configure resource providers.
+    setResourceProviders(Arrays.asList(
+        new EncounterResourceProvider(),
+        new LocationResourceProvider(),
+        new ObservationResourceProvider(),
+        new PatientResourceProvider()));
+
     /*
-     * The servlet defines any number of resource providers, and
-     * configures itself to use them by calling
-     * setResourceProviders()
+     * Tells HAPI to use content types which are not technically FHIR compliant when a browser is
+     * detected as the requesting client. This prevents browsers from trying to download resource
+     * responses instead of displaying them inline which can be handy for troubleshooting.
      */
-    List<IResourceProvider> resourceProviders = new ArrayList<>();
-    resourceProviders.add(new PatientResourceProvider());
-    resourceProviders.add(new EncounterResourceProvider());
-    resourceProviders.add(new ObservationResourceProvider());
-    resourceProviders.add(new LocationResourceProvider());
-    setResourceProviders(resourceProviders);
+    setUseBrowserFriendlyContentTypes(true);
+
+    setDefaultResponseEncoding(EncodingEnum.JSON);
+    setDefaultPrettyPrint(true);
   }
 }

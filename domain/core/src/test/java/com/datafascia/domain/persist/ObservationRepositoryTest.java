@@ -99,7 +99,8 @@ public class ObservationRepositoryTest extends RepositoryTestSupport {
     observationRepository.save(encounter, observation1);
 
     Observation observation2 = createObservation(NUMERICAL_PAIN_LEVEL_HIGH, "2");
-    observationRepository.save(encounter, observation2);
+    observation2.setEncounter(new ResourceReferenceDt(encounter));
+    observationRepository.save(observation2);
 
     Id<Encounter> encounterId = Ids.toPrimaryKey(encounter.getId());
     List<Observation> observations = observationRepository.list(encounterId);
@@ -110,7 +111,8 @@ public class ObservationRepositoryTest extends RepositoryTestSupport {
           assertEquals(observation.getId().getIdPart(), observation1.getId().getIdPart());
           break;
         case NUMERICAL_PAIN_LEVEL_HIGH:
-          assertEquals(observation.getId().getIdPart(), observation2.getId().getIdPart());
+          assertEquals(observation.getId().getIdPart(), observation2.getId().getIdPart(),
+              "Single argument save failed.");
           break;
         default:
           fail("unexpected observation code:" + observation.getCode().getCodingFirstRep()

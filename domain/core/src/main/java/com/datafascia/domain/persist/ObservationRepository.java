@@ -85,6 +85,19 @@ public class ObservationRepository extends FhirEntityStoreRepository {
   }
 
   /**
+   * Saves entity.
+   *
+   * @param observation to save
+   */
+  public void save(Observation observation) {
+    Id<Observation> observationId = generateId(observation);
+    observation.setId(new IdDt(Observation.class.getSimpleName(), observationId.toString()));
+
+    Id<Encounter> encounterId = Ids.toPrimaryKey(observation.getEncounter().getReference());
+    entityStore.save(toEntityId(encounterId, observationId), observation);
+  }
+
+  /**
    * Finds observations for an encounter.
    *
    * @param encounterId

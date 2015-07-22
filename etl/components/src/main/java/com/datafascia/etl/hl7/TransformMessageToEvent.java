@@ -47,14 +47,17 @@ public class TransformMessageToEvent extends DependencyInjectingProcessor {
   private static final String SUBJECT = "event";
   private static final URI UNKNOWN = URI.create("UNKNOWN");
 
+  public static final Relationship EVENT = new Relationship.Builder()
+      .name("event")
+      .description("Transformed output FlowFiles")
+      .build();
+  public static final Relationship FAILURE = new Relationship.Builder()
+      .name("failure")
+      .description("Input FlowFiles that could not be transformed")
+      .build();
   public static final Relationship ORIGINAL = new Relationship.Builder()
       .name("original")
-      .description("Original FlowFile containing HL7 message")
-      .build();
-
-  public static final Relationship SUCCESS = new Relationship.Builder()
-      .name("success")
-      .description("Successfully processed FlowFiles")
+      .description("Input FlowFiles that were successfully transformed")
       .build();
 
   private Set<Relationship> relationships;
@@ -73,7 +76,7 @@ public class TransformMessageToEvent extends DependencyInjectingProcessor {
 
   @Override
   protected void init(ProcessorInitializationContext context) {
-    relationships = ImmutableSet.of(ORIGINAL, SUCCESS);
+    relationships = ImmutableSet.of(EVENT, FAILURE, ORIGINAL);
   }
 
   @Override
@@ -132,26 +135,32 @@ public class TransformMessageToEvent extends DependencyInjectingProcessor {
       return;
     }
 
-    AtomicReference<Message> messageReference = new AtomicReference<>();
-    session.read(messageFlowFile, input -> {
-        byte[] content = ByteStreams.toByteArray(input);
-        messageReference.set(parseHL7(content));
-      });
-    Message message = messageReference.get();
-
-    List<Event> events = toEvents(message);
-
-    List<FlowFile> eventFlowFiles = new ArrayList<>();
-    for (Event event : events) {
-      byte[] content = serializer.encodeReflect(SUBJECT, event);
-      FlowFile eventFlowFile = session.create(messageFlowFile);
-      eventFlowFile = session.write(eventFlowFile, output -> {
-          output.write(content);
+    try {
+      AtomicReference<Message> messageReference = new AtomicReference<>();
+      session.read(messageFlowFile, input -> {
+          byte[] content = ByteStreams.toByteArray(input);
+          messageReference.set(parseHL7(content));
         });
-      eventFlowFiles.add(eventFlowFile);
-    }
+      Message message = messageReference.get();
 
-    session.transfer(eventFlowFiles, SUCCESS);
-    session.transfer(messageFlowFile, ORIGINAL);
+      List<Event> events = toEvents(message);
+
+      List<FlowFile> eventFlowFiles = new ArrayList<>();
+      for (Event event : events) {
+        byte[] content = serializer.encodeReflect(SUBJECT, event);
+        FlowFile eventFlowFile = session.create(messageFlowFile);
+        eventFlowFile = session.write(eventFlowFile, output -> {
+            output.write(content);
+          });
+        eventFlowFiles.add(eventFlowFile);
+      }
+
+      session.transfer(eventFlowFiles, EVENT);
+      session.transfer(messageFlowFile, ORIGINAL);
+    } catch (NullPointerException e) {
+      log.error("Cannot transform {}", new Object[] { messageFlowFile }, e);
+      messageFlowFile = session.penalize(messageFlowFile);
+      session.transfer(messageFlowFile, FAILURE);
+    }
   }
 }

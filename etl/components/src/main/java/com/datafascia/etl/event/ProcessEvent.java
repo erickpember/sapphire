@@ -36,9 +36,13 @@ public class ProcessEvent extends DependencyInjectingProcessor {
 
   private static final String SUBJECT = "event";
 
+  public static final Relationship FAILURE = new Relationship.Builder()
+      .name("failure")
+      .description("Input FlowFiles that could not be processed")
+      .build();
   public static final Relationship SUCCESS = new Relationship.Builder()
       .name("success")
-      .description("Successfully processed FlowFiles")
+      .description("Input FlowFiles that were successfully processed")
       .build();
 
   private Set<Relationship> relationships;
@@ -60,7 +64,7 @@ public class ProcessEvent extends DependencyInjectingProcessor {
 
   @Override
   protected void init(ProcessorInitializationContext context) {
-    relationships = ImmutableSet.of(SUCCESS);
+    relationships = ImmutableSet.of(FAILURE, SUCCESS);
   }
 
   @Override
@@ -86,27 +90,33 @@ public class ProcessEvent extends DependencyInjectingProcessor {
       return;
     }
 
-    AtomicReference<Event> eventReference = new AtomicReference<>();
-    session.read(flowFile, input -> {
-        byte[] content = ByteStreams.toByteArray(input);
-        eventReference.set(deserializer.decodeReflect(SUBJECT, content, Event.class));
-      });
-    Event event = eventReference.get();
+    try {
+      AtomicReference<Event> eventReference = new AtomicReference<>();
+      session.read(flowFile, input -> {
+          byte[] content = ByteStreams.toByteArray(input);
+          eventReference.set(deserializer.decodeReflect(SUBJECT, content, Event.class));
+        });
+      Event event = eventReference.get();
 
-    switch (event.getType()) {
-      case PATIENT_ADMIT:
-        admitPatient.accept(event);
-        break;
-      case PATIENT_DISCHARGE:
-        dischargePatient.accept(event);
-        break;
-      case OBSERVATIONS_ADD:
-        addObservations.accept(event);
-        break;
-      default:
-        getLogger().debug("Ignored event type {}", new Object[] { event.getType() });
+      switch (event.getType()) {
+        case PATIENT_ADMIT:
+          admitPatient.accept(event);
+          break;
+        case PATIENT_DISCHARGE:
+          dischargePatient.accept(event);
+          break;
+        case OBSERVATIONS_ADD:
+          addObservations.accept(event);
+          break;
+        default:
+          log.debug("Ignored event type {}", new Object[] { event.getType() });
+      }
+
+      session.transfer(flowFile, SUCCESS);
+    } catch (NullPointerException e) {
+      log.error("Cannot transform {}", new Object[] { flowFile }, e);
+      flowFile = session.penalize(flowFile);
+      session.transfer(flowFile, FAILURE);
     }
-
-    session.transfer(flowFile, SUCCESS);
   }
 }

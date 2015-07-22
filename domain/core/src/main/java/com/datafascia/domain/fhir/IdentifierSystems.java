@@ -27,6 +27,10 @@ public class IdentifierSystems {
   public static final String INSTITUTION_MEDICATION_ADMINISTRATION =
       "http://datafascia.com/identifier/InstitutionMedicationAdministration";
 
+  /** institution assigned medication prescription identifier */
+  public static final String INSTITUTION_MEDICATION_PRESCRIPTION =
+      "http://datafascia.com/identifier/InstitutionMedicationPrescription";
+
   // Private constructor disallows creating instances of this class.
   private IdentifierSystems() {
   }

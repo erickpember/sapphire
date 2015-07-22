@@ -3,28 +3,25 @@
 package com.datafascia.domain.persist;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
+import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
+import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
+import ca.uhn.fhir.model.dstu2.composite.RatioDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
+import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration.Dosage;
 import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
+import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
 import ca.uhn.fhir.model.primitive.DateDt;
 import com.datafascia.common.persist.Id;
-import com.datafascia.common.time.Interval;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.domain.fhir.Ids;
 import com.datafascia.domain.fhir.Languages;
 import com.datafascia.domain.fhir.RaceEnum;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
-import com.datafascia.domain.model.CodeableConcept;
-import com.datafascia.domain.model.MedicationAdministration;
-import com.datafascia.domain.model.MedicationAdministrationDosage;
-import com.datafascia.domain.model.MedicationAdministrationStatus;
-import com.datafascia.domain.model.NumericQuantity;
-import com.datafascia.domain.model.Ratio;
 import com.neovisionaries.i18n.LanguageCode;
-import java.time.Instant;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
@@ -82,32 +79,21 @@ public class MedicationAdministrationRepositoryTest extends RepositoryTestSuppor
       UnitedStatesPatient patient, Encounter encounter) {
 
     MedicationAdministration administration = new MedicationAdministration();
-    administration.setStatus(MedicationAdministrationStatus.IN_PROGRESS);
-    administration.setEffectiveTimePeriod(new Interval<>(Instant.now(), Instant.now()));
-    administration.setMedicationId(Id.of("medicationId"));
+    administration.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_MEDICATION_ADMINISTRATION)
+        .setValue("medicationAdministrationId");
+    administration.setStatus(MedicationAdministrationStatusEnum.IN_PROGRESS);
+    administration.setMedication(new ResourceReferenceDt("medicationID"));
+    Dosage dosage = new Dosage();
+    dosage.setSite(new CodeableConceptDt("site", "site"));
+    dosage.setRoute(new CodeableConceptDt("route", "route"));
+    dosage.setMethod(new CodeableConceptDt("method", "method"));
 
-    MedicationAdministrationDosage dosage = new MedicationAdministrationDosage();
-    dosage.setSite(new CodeableConcept() {
-      {
-        setCodings(Arrays.asList("site"));
-        setText("site");
-      }
-    });
-    dosage.setRoute(new CodeableConcept() {
-      {
-        setCodings(Arrays.asList("route"));
-        setText("route");
-      }
-    });
-    dosage.setMethod(new CodeableConcept() {
-      {
-        setCodings(Arrays.asList("method"));
-        setText("method");
-      }
-    });
-    dosage.setQuantity(new NumericQuantity());
-    dosage.setRate(new Ratio(new NumericQuantity(), new NumericQuantity()));
+    dosage.setQuantity(new QuantityDt(9000));
+    dosage.setRate(new RatioDt());
     administration.setDosage(dosage);
+    administration.setPatient(new ResourceReferenceDt(patient));
+    administration.setEncounter(new ResourceReferenceDt(encounter));
     return administration;
   }
 
@@ -120,11 +106,11 @@ public class MedicationAdministrationRepositoryTest extends RepositoryTestSuppor
     encounterRepository.save(encounter);
 
     MedicationAdministration administration = createMedicationAdministration(patient, encounter);
-    medicationAdministrationRepository.save(encounter, administration);
+    medicationAdministrationRepository.save(administration);
 
     Id<Encounter> encounterId = Ids.toPrimaryKey(encounter.getId());
-    List<MedicationAdministration> administrations =
-        medicationAdministrationRepository.list(encounterId);
-    assertEquals(administrations.get(0), administration);
+    List<MedicationAdministration> administrations = medicationAdministrationRepository.list(
+        encounterId);
+    assertEquals(administrations.get(0).getId().getIdPart(), administration.getId().getIdPart());
   }
 }

@@ -3,13 +3,13 @@
 package com.datafascia.domain.persist;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
+import ca.uhn.fhir.model.primitive.IdDt;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.persist.entity.EntityId;
-import com.datafascia.common.persist.entity.ReflectEntityStore;
+import com.datafascia.common.persist.entity.FhirEntityStore;
 import com.datafascia.domain.fhir.Ids;
-import com.datafascia.domain.model.MedicationAdministration;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
  * Medication administration data access.
  */
 @Slf4j
-public class MedicationAdministrationRepository extends EntityStoreRepository {
+public class MedicationAdministrationRepository extends FhirEntityStoreRepository {
 
   /**
    * Constructor
@@ -27,7 +27,7 @@ public class MedicationAdministrationRepository extends EntityStoreRepository {
    *     entity store
    */
   @Inject
-  public MedicationAdministrationRepository(ReflectEntityStore entityStore) {
+  public MedicationAdministrationRepository(FhirEntityStore entityStore) {
     super(entityStore);
   }
 
@@ -40,26 +40,59 @@ public class MedicationAdministrationRepository extends EntityStoreRepository {
         .build();
   }
 
-  private static Id<MedicationAdministration> generateId(MedicationAdministration administration) {
-    return (administration.getId() != null)
-        ? administration.getId()
-        : Id.of(UUID.randomUUID().toString());
+  /**
+   * Generates primary key from institution medication administration identifier.
+   *
+   * @param administration medication administration from which to read the identifier
+   * @return primary key
+   */
+  public static Id<MedicationAdministration> generateId(MedicationAdministration administration) {
+    String identifierValue = administration.getIdentifierFirstRep().getValue();
+    return Id.of(identifierValue);
   }
 
   /**
    * Saves entity.
    *
-   * @param encounter
-   *     parent entity
-   * @param administration
-   *     to save
+   * @param encounter parent entity
+   * @param administration to save
    */
   public void save(Encounter encounter, MedicationAdministration administration) {
-
-    administration.setId(generateId(administration));
+    Id<MedicationAdministration> administrationId = generateId(administration);
+    administration.setId(new IdDt(MedicationAdministration.class.getSimpleName(), administrationId.
+        toString()));
 
     Id<Encounter> encounterId = Ids.toPrimaryKey(encounter.getId());
-    entityStore.save(toEntityId(encounterId, administration.getId()), administration);
+    entityStore.save(toEntityId(encounterId, administrationId), administration);
+  }
+
+  /**
+   * Saves entity.
+   *
+   * @param encounterId    parent entity ID
+   * @param administration to save
+   */
+  public void save(Id<Encounter> encounterId, MedicationAdministration administration) {
+    Id<MedicationAdministration> medicationadministrationId = generateId(administration);
+    administration.setId(new IdDt(MedicationAdministration.class.getSimpleName(),
+        medicationadministrationId.toString()));
+
+    entityStore.save(toEntityId(encounterId, medicationadministrationId), administration);
+  }
+
+  /**
+   * Saves entity.
+   *
+   * @param administration to save
+   */
+  public void save(MedicationAdministration administration) {
+    Id<MedicationAdministration> medicationadministrationId = generateId(administration);
+    administration.setId(new IdDt(MedicationAdministration.class.getSimpleName(),
+        medicationadministrationId.toString()));
+
+    Id<Encounter> encounterId = Ids.toPrimaryKey(administration.getEncounter().getReference());
+
+    entityStore.save(toEntityId(encounterId, medicationadministrationId), administration);
   }
 
   /**

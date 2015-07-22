@@ -2,12 +2,14 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.persist;
 
+import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
+import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
+import ca.uhn.fhir.model.dstu2.resource.Medication;
+import ca.uhn.fhir.model.dstu2.resource.Medication.Package;
+import ca.uhn.fhir.model.dstu2.resource.Medication.Product;
+import ca.uhn.fhir.model.dstu2.valueset.MedicationKindEnum;
 import com.datafascia.common.persist.Id;
-import com.datafascia.domain.model.CodeableConcept;
-import com.datafascia.domain.model.Medication;
-import com.datafascia.domain.model.MedicationPackage;
-import com.datafascia.domain.model.Product;
-import java.util.Arrays;
+import com.datafascia.domain.fhir.Ids;
 import java.util.Optional;
 import javax.inject.Inject;
 import org.testng.annotations.Test;
@@ -25,32 +27,17 @@ public class MedicationRepositoryTest extends RepositoryTestSupport {
   private Medication createMedication() {
     Medication medication = new Medication();
     medication.setName("name");
-    medication.setCode(new CodeableConcept() {
-      {
-        setCodings(Arrays.asList("code"));
-        setText("code");
-      }
-    });
+    medication.setCode(new CodeableConceptDt("code", "code"));
     medication.setIsBrand(Boolean.TRUE);
-    medication.setManufacturerId(Id.of("manufacturerId"));
-    medication.setKind("kind");
+    medication.setManufacturer(new ResourceReferenceDt("manufacturerId"));
+    medication.setKind(MedicationKindEnum.PRODUCT);
 
     Product product = new Product();
-    product.setForm(new CodeableConcept() {
-      {
-        setCodings(Arrays.asList("formCode"));
-        setText("formCode");
-      }
-    });
+    product.setForm(new CodeableConceptDt("formCode", "formCode"));
     medication.setProduct(product);
 
-    MedicationPackage aPackage = new MedicationPackage();
-    aPackage.setContainer(new CodeableConcept() {
-      {
-        setCodings(Arrays.asList("containerCode"));
-        setText("containerCode");
-      }
-    });
+    Package aPackage = new Package();
+    aPackage.setContainer(new CodeableConceptDt("containerCode", "containerCode"));
     medication.setPackage(aPackage);
     return medication;
   }
@@ -60,7 +47,8 @@ public class MedicationRepositoryTest extends RepositoryTestSupport {
     Medication medication = createMedication();
     medicationRepository.save(medication);
 
-    Optional<Medication> optionalMedication = medicationRepository.read(medication.getId());
-    assertEquals(optionalMedication.get(), medication);
+    Id<Medication> medicationId = Ids.toPrimaryKey(medication.getId());
+    Optional<Medication> optionalMedication = medicationRepository.read(medicationId);
+    assertEquals(optionalMedication.get().getId(), medication.getId());
   }
 }

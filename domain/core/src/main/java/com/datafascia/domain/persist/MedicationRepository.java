@@ -2,12 +2,12 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.persist;
 
+import ca.uhn.fhir.model.dstu2.resource.Medication;
+import ca.uhn.fhir.model.primitive.IdDt;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.persist.entity.EntityId;
-import com.datafascia.common.persist.entity.ReflectEntityStore;
-import com.datafascia.domain.model.Medication;
+import com.datafascia.common.persist.entity.FhirEntityStore;
 import java.util.Optional;
-import java.util.UUID;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
@@ -15,7 +15,7 @@ import lombok.extern.slf4j.Slf4j;
  * Medication data access.
  */
 @Slf4j
-public class MedicationRepository extends EntityStoreRepository {
+public class MedicationRepository extends FhirEntityStoreRepository {
 
   /**
    * Constructor
@@ -24,7 +24,7 @@ public class MedicationRepository extends EntityStoreRepository {
    *     entity store
    */
   @Inject
-  public MedicationRepository(ReflectEntityStore entityStore) {
+  public MedicationRepository(FhirEntityStore entityStore) {
     super(entityStore);
   }
 
@@ -32,22 +32,29 @@ public class MedicationRepository extends EntityStoreRepository {
     return new EntityId(Medication.class, medicationId);
   }
 
-  private static Id<Medication> generateId(Medication medication) {
-    return (medication.getId() != null)
-        ? medication.getId()
-        : Id.of(UUID.randomUUID().toString());
+  /**
+   * Generates primary key from Medication instance.
+   * Unlike other models, Medication uses Medication.code as the ID field.
+   *
+   * @param medication medication from which to read the identifier
+   * @return primary key
+   */
+  public static Id<Medication> generateId(Medication medication) {
+    String identifierValue = medication.getCode().getCodingFirstRep().getCode();
+    return Id.of(identifierValue);
   }
 
   /**
    * Saves entity.
    *
    * @param medication
-   *     to save
+   *     instance to save
    */
   public void save(Medication medication) {
-    medication.setId(generateId(medication));
+    Id<Medication> medicationId = generateId(medication);
+    medication.setId(new IdDt(Medication.class.getSimpleName(), medicationId.toString()));
 
-    entityStore.save(toEntityId(medication.getId()), medication);
+    entityStore.save(toEntityId(medicationId), medication);
   }
 
   /**

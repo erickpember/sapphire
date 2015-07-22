@@ -7,6 +7,7 @@ import ca.uhn.fhir.rest.server.EncodingEnum;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import com.datafascia.api.resources.fhir.EncounterResourceProvider;
 import com.datafascia.api.resources.fhir.LocationResourceProvider;
+import com.datafascia.api.resources.fhir.MedicationResourceProvider;
 import com.datafascia.api.resources.fhir.ObservationResourceProvider;
 import com.datafascia.api.resources.fhir.PatientResourceProvider;
 import java.util.Arrays;
@@ -36,6 +37,7 @@ public class FhirServlet extends RestfulServer {
     setResourceProviders(Arrays.asList(
         new EncounterResourceProvider(),
         new LocationResourceProvider(),
+        new MedicationResourceProvider(),
         new ObservationResourceProvider(),
         new PatientResourceProvider()));
 

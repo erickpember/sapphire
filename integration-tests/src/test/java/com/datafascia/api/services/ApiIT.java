@@ -10,10 +10,12 @@ import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Location;
+import ca.uhn.fhir.model.dstu2.resource.Medication;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
+import ca.uhn.fhir.model.dstu2.valueset.MedicationKindEnum;
 import ca.uhn.fhir.model.primitive.DateDt;
 import ca.uhn.fhir.model.primitive.DecimalDt;
 import ca.uhn.fhir.model.primitive.IdDt;
@@ -113,6 +115,8 @@ public class ApiIT {
     List<UnitedStatesPatient> patients = addPatients();
     List<Location> locations = addLocations();
     List<Encounter> encounters = addEncounters(patients, locations);
+    Medication medication = addMedication();
+
     // TODO: Determine the best way to deal with the observation _id field
     //List<Observation> observations = addObservations(patients, encounters);
   }
@@ -366,5 +370,33 @@ public class ApiIT {
     log.info("location 3 ID: {}", id.getValue());
 
     return Arrays.asList(location1, location2, location3);
+  }
+
+  private Medication createMedication() {
+    Medication medication = new Medication();
+    medication.setName("name");
+    medication.setCode(new CodeableConceptDt("code", "code"));
+    medication.setIsBrand(Boolean.TRUE);
+    medication.setManufacturer(new ResourceReferenceDt("manufacturerId"));
+    medication.setKind(MedicationKindEnum.PRODUCT);
+
+    Medication.Product product = new Medication.Product();
+    product.setForm(new CodeableConceptDt("formCode", "formCode"));
+    medication.setProduct(product);
+
+    Medication.Package aPackage = new Medication.Package();
+    aPackage.setContainer(new CodeableConceptDt("containerCode", "containerCode"));
+    medication.setPackage(aPackage);
+    return medication;
+  }
+
+  private Medication addMedication() {
+    Medication medication = createMedication();
+    MethodOutcome outcome = client.create().resource(medication).execute();
+    IdDt id = outcome.getId();
+    medication.setId(id);
+    log.info("medication ID: {}", id.getValue());
+
+    return medication;
   }
 }

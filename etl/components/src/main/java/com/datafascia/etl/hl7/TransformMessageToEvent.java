@@ -157,7 +157,7 @@ public class TransformMessageToEvent extends DependencyInjectingProcessor {
 
       session.transfer(eventFlowFiles, EVENT);
       session.transfer(messageFlowFile, ORIGINAL);
-    } catch (NullPointerException e) {
+    } catch (IllegalStateException | NullPointerException e) {
       log.error("Cannot transform {}", new Object[] { messageFlowFile }, e);
       messageFlowFile = session.penalize(messageFlowFile);
       session.transfer(messageFlowFile, FAILURE);

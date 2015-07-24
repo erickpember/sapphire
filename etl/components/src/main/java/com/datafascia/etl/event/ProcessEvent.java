@@ -113,8 +113,8 @@ public class ProcessEvent extends DependencyInjectingProcessor {
       }
 
       session.transfer(flowFile, SUCCESS);
-    } catch (NullPointerException e) {
-      log.error("Cannot transform {}", new Object[] { flowFile }, e);
+    } catch (IllegalStateException | NullPointerException e) {
+      log.error("Cannot process {}", new Object[] { flowFile }, e);
       flowFile = session.penalize(flowFile);
       session.transfer(flowFile, FAILURE);
     }

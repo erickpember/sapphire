@@ -216,11 +216,19 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
       currentObxPath = obxRootPath.replace(SUBSCRIPT_PLACEHOLDER, obxSubscript);
     }
 
+    String patientIdentifier = pid.getPatientIdentifierList(0).getID().getValue();
+    if (Strings.isNullOrEmpty(patientIdentifier)) {
+      throw new IllegalStateException("Field PID-3 does not contain patient identifier");
+    }
+
+    String encounterIdentifier = pv1.getVisitNumber().getID().getValue();
+    if (Strings.isNullOrEmpty(encounterIdentifier)) {
+      throw new IllegalStateException("Field PV1-19 does not contain visit number");
+    }
+
     return AddObservationsData.builder()
-        .institutionPatientId(
-            pid.getPatientIdentifierList(0).getID().getValue())
-        .encounterIdentifier(
-            pv1.getVisitNumber().getID().getValue())
+        .institutionPatientId(patientIdentifier)
+        .encounterIdentifier(encounterIdentifier)
         .observations(observations)
         .build();
   }

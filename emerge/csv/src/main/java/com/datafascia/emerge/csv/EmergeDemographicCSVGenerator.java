@@ -64,6 +64,12 @@ public class EmergeDemographicCSVGenerator {
   public static void generate(URI apiEndpoint, String user, String password, String csvFile)
       throws IOException {
 
+    log.info("Command parameters:");
+    log.info("API Endpoint: {}", apiEndpoint);
+    log.info("CSV File: {}", csvFile);
+    log.info("Username: {}", user);
+    log.info("Password: {}", password);
+
     mapper = new CSVMapper<>(Demographic.class);
     client = new FhirClient(apiEndpoint.toString(), user, password);
 

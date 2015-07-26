@@ -1,1 +1,2 @@
+com.datafascia.emerge.csv.EmergeDailyProcessCSVCommand
 com.datafascia.emerge.csv.EmergeDemographicCSVCommand

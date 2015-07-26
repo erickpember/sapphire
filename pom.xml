@@ -215,6 +215,12 @@
         <version>${retrofit.version}</version>
       </dependency>
 
+      <dependency>
+        <groupId>commons-codec</groupId>
+        <artifactId>commons-codec</artifactId>
+        <version>1.10</version>
+      </dependency>
+
       <!--
       So we don't have to explicitly exclude every transitive dependency on
       commons-logging. At runtime, the application will call the jcl-over-slf4j

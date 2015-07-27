@@ -13,7 +13,9 @@ import ca.uhn.fhir.rest.param.StringParam;
 import com.datafascia.common.fhir.DependencyInjectingResourceProvider;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.persist.MedicationAdministrationRepository;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.inject.Inject;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,6 +71,32 @@ public class MedicationAdministrationResourceProvider extends DependencyInjectin
     Id<Encounter> encounterInternalId = Id.of(encounterId.getValue());
     List<MedicationAdministration> medicationAdministrations = medicationAdministrationRepository.
         list(encounterInternalId);
+
+    return medicationAdministrations;
+  }
+
+  /**
+   * Because the MedicationAdministrationRepository does not support single-argument reads, a
+   * double-argument read method that requires the Encounter ID as well as the Medication
+   * Administration ID is implemented here in the API as a search method.
+   *
+   * @param encounterId    Resource ID for the Encounter used in looking up a Administration.
+   * @param administrationId Resource ID of the MedicationAdministration we want to retrieve.
+   * @return A list containing up to 1 MedicationAdministration, matching this query.
+   */
+  @Search()
+  public List<MedicationAdministration> searchByEncounterIdAndMedAdministrationId(
+      @RequiredParam(name = MedicationAdministration.SP_ENCOUNTER) StringParam encounterId,
+      @RequiredParam(name = MedicationAdministration.SP_RES_ID) StringParam administrationId) {
+    Id<Encounter> encounterInternalId = Id.of(encounterId.getValue());
+    Id<MedicationAdministration> administrationInternalId = Id.of(administrationId.getValue());
+    List<MedicationAdministration> medicationAdministrations = new ArrayList<>();
+    Optional<MedicationAdministration> result = medicationAdministrationRepository.
+        read(encounterInternalId, administrationInternalId);
+
+    if (result.isPresent()) {
+      medicationAdministrations.add(result.get());
+    }
 
     return medicationAdministrations;
   }

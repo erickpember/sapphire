@@ -91,6 +91,20 @@ public class MedicationPrescriptionIT extends ApiIT {
       }
     }
 
+    results = client.search().forResource(MedicationPrescription.class)
+        .where(new StringClientParam(MedicationPrescription.SP_ENCOUNTER)
+            .matches()
+            .value(encounter.getId().getIdPart()))
+        .where(new StringClientParam(MedicationPrescription.SP_RES_ID)
+            .matches()
+            .value(medicationPrescription1.getId().getIdPart()))
+        .execute();
+    medicationPrescriptions = ApiUtil.extractBundle(results,
+        MedicationPrescription.class);
+    assertEquals(medicationPrescriptions.size(), 1, "Two argument read/search failed.");
+    assertEquals(medicationPrescriptions.get(0).getId().getIdPart(),
+        medicationPrescription1.getId().getIdPart(), "Two argument read/search failed.");
+
     // Get rid of this particular encounter and patient so it doesn't mess up other tests.
     client.delete().resourceById(encounter.getId()).execute();
     client.delete().resourceById(patient.getId()).execute();

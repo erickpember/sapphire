@@ -13,7 +13,9 @@ import ca.uhn.fhir.rest.param.StringParam;
 import com.datafascia.common.fhir.DependencyInjectingResourceProvider;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.persist.MedicationPrescriptionRepository;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.inject.Inject;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,6 +71,32 @@ public class MedicationPrescriptionResourceProvider extends DependencyInjectingR
     Id<Encounter> encounterInternalId = Id.of(encounterId.getValue());
     List<MedicationPrescription> medicationPrescriptions = medicationPrescriptionRepository.
         list(encounterInternalId);
+
+    return medicationPrescriptions;
+  }
+
+  /**
+   * Because the MedicationPrescriptionRepository does not support single-argument reads, a
+   * double-argument read method that requires the Encounter ID as well as the Medication
+   * Prescription ID is implemented here in the API as a search method.
+   *
+   * @param encounterId    Internal resource ID for the Encounter used in looking up a Prescription.
+   * @param prescriptionId Resource ID of the specific MedicationPrescription we want to retrieve.
+   * @return A list containing up to 1 MedicationPrescription, matching this query.
+   */
+  @Search()
+  public List<MedicationPrescription> searchByEncounterIdAndMedPrescriptionId(
+      @RequiredParam(name = MedicationPrescription.SP_ENCOUNTER) StringParam encounterId,
+      @RequiredParam(name = MedicationPrescription.SP_RES_ID) StringParam prescriptionId) {
+    Id<Encounter> encounterInternalId = Id.of(encounterId.getValue());
+    Id<MedicationPrescription> prescriptionInternalId = Id.of(prescriptionId.getValue());
+    List<MedicationPrescription> medicationPrescriptions = new ArrayList<>();
+    Optional<MedicationPrescription> result = medicationPrescriptionRepository.
+        read(encounterInternalId, prescriptionInternalId);
+
+    if (result.isPresent()) {
+      medicationPrescriptions.add(result.get());
+    }
 
     return medicationPrescriptions;
   }

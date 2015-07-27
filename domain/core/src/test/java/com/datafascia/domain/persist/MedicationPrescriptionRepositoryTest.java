@@ -19,10 +19,12 @@ import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.neovisionaries.i18n.LanguageCode;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import javax.inject.Inject;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * {@link MedicationPrescriptionRepository} test
@@ -84,7 +86,7 @@ public class MedicationPrescriptionRepositoryTest extends RepositoryTestSupport 
   }
 
   @Test
-  public void should_list_medication_prescriptions() {
+  public void should_list_and_read_medication_prescriptions() {
     UnitedStatesPatient patient = createPatient();
     patientRepository.save(patient);
 
@@ -98,5 +100,13 @@ public class MedicationPrescriptionRepositoryTest extends RepositoryTestSupport 
     List<MedicationPrescription> prescriptions = medicationPrescriptionRepository.list(
         encounterId);
     assertEquals(prescriptions.get(0).getId().getIdPart(), prescription.getId().getIdPart());
+
+    Id<MedicationPrescription> adminId = MedicationPrescriptionRepository.generateId(
+        prescription);
+    Optional<MedicationPrescription> resultPrescription = medicationPrescriptionRepository.
+        read(encounterId, adminId);
+    assertTrue(resultPrescription.isPresent(), "Read operation failed.");
+    assertEquals(resultPrescription.get().getId().getIdPart(),
+        prescription.getId().getIdPart(), "Read operation failed.");
   }
 }

@@ -10,6 +10,7 @@ import com.datafascia.common.persist.entity.EntityId;
 import com.datafascia.common.persist.entity.FhirEntityStore;
 import com.datafascia.domain.fhir.Ids;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -93,6 +94,18 @@ public class MedicationPrescriptionRepository extends FhirEntityStoreRepository 
     Id<Encounter> encounterId = Ids.toPrimaryKey(prescription.getEncounter().getReference());
 
     entityStore.save(toEntityId(encounterId, medicationprescriptionId), prescription);
+  }
+
+  /**
+   * Reads entity.
+   *
+   * @param encounterId      parent entity ID
+   * @param medicationPrescriptionId to read
+   * @return Optional entity, empty if not found.
+   */
+  public Optional<MedicationPrescription> read(Id<Encounter> encounterId,
+      Id<MedicationPrescription> medicationPrescriptionId) {
+    return entityStore.read(toEntityId(encounterId, medicationPrescriptionId));
   }
 
   /**

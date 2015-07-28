@@ -37,6 +37,20 @@ public class Dates {
   }
 
   /**
+   * Converts Java {@link LocalDate} and {@link LocalTime} to FHIR date time with second precision.
+   *
+   * @param localDate
+   *     convert from
+   * @param localTime
+   *     convert from
+   * @return FHIR date
+   */
+  public static DateTimeDt toDateTime(LocalDate localDate, LocalTime localTime) {
+    ZonedDateTime dateTime = ZonedDateTime.of(localDate, localTime, TIME_ZONE);
+    return new DateTimeDt(Date.from(dateTime.toInstant()), TemporalPrecisionEnum.SECOND);
+  }
+
+  /**
    * Converts Java {@link Instant} to FHIR date time with second precision.
    *
    * @param instant

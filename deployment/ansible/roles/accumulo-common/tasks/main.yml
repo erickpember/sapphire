@@ -1,7 +1,7 @@
 ---
 - name: Download Accumulo package
   get_url:
-      url=http://mirrors.ibiblio.org/apache/accumulo/{{ accumulo_version }}/{{ accumulo_package }}
+      url=https://s3-us-west-2.amazonaws.com/datafascia-packages/{{ accumulo_package }}
       dest={{ company_package_dir }}/{{ accumulo_package }}
   tags:
     - image

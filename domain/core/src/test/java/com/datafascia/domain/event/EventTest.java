@@ -34,7 +34,8 @@ public class EventTest {
         .abnormalFlags(Arrays.asList("flag1", "flag2"))
         .comments(Arrays.asList("comment1", "comment2"))
         .effectiveDateOfLastNormalObservation(Instant.now())
-        .id("id")
+        .identifierCode("identifierCode")
+        .identifierText("identifierText")
         .natureOfAbnormalTest("natureOfAbnormalTest")
         .observationDateAndTime(Instant.now())
         .observationMethod(Arrays.asList("method1", "method2"))
@@ -58,7 +59,8 @@ public class EventTest {
   @Test
   public void observationDataTestNoOptionalFields() {
     ObservationData originalObservationData = ObservationData.builder()
-        .id("id")
+        .identifierCode("identifierCode")
+        .identifierText("identifierText")
         .observationType(ObservationType.A01)
         .resultStatus("resultStatus")
         .value(Arrays.asList("value"))

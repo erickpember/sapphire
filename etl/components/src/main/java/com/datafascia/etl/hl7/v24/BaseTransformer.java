@@ -140,8 +140,10 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
             obx.getObservationSubId().getValueOrEmpty())
         .value(
             observationValue)
-        .id(
-            obx.getObservationIdentifier().encode())
+        .identifierCode(
+            obx.getObservationIdentifier().getIdentifier().getValue())
+        .identifierText(
+            obx.getObservationIdentifier().getText().getValueOrEmpty())
         .referenceRange(
             obx.getReferencesRange().encode())
         .observationType(

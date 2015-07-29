@@ -14,6 +14,7 @@ import ca.uhn.fhir.model.primitive.StringDt;
 import com.datafascia.domain.event.AddObservationsData;
 import com.datafascia.domain.event.Event;
 import com.datafascia.domain.event.ObservationData;
+import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.domain.fhir.Dates;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
@@ -50,7 +51,9 @@ public class AddObservations implements Consumer<Event> {
   private static Observation toObservation(
       ObservationData fromObservation, Encounter encounter, UnitedStatesPatient patient) {
 
-    String observationCode = fromObservation.getId();
+    CodeableConceptDt observationCode =
+        new CodeableConceptDt(CodingSystems.OBSERVATION, fromObservation.getIdentifierCode())
+        .setText(fromObservation.getIdentifierText());
 
     IDatatype observationValue;
     if ("NM".equals(fromObservation.getValueType())) {
@@ -62,7 +65,7 @@ public class AddObservations implements Consumer<Event> {
     }
 
     Observation observation = new Observation()
-        .setCode(new CodeableConceptDt("system", observationCode))
+        .setCode(observationCode)
         .setValue(observationValue)
         .setIssued(Dates.toInstant(fromObservation.getObservationDateAndTime()))
         .setEncounter(new ResourceReferenceDt(encounter.getId()))

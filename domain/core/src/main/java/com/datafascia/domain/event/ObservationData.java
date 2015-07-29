@@ -14,7 +14,7 @@ import org.apache.avro.reflect.Nullable;
 
 /**
  * Avro-friendly POJO for OBX data.
- * Elements are Marked as @Nullable where the cardinality for the segment starts with 0..
+ * Elements are Marked as @Nullable where the cardinality for the segment starts with 0.
  */
 @AllArgsConstructor @Builder @Data @NoArgsConstructor
 public class ObservationData {
@@ -35,9 +35,14 @@ public class ObservationData {
   private String valueType;
 
   /**
-   * OBX.3
+   * OBX-3.1
    */
-  private String id;
+  private String identifierCode;
+
+  /**
+   * OBX-3.2
+   */
+  private String identifierText;
 
   /**
    * OBX.4

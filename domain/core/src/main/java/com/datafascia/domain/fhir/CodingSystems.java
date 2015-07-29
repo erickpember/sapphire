@@ -7,11 +7,15 @@ package com.datafascia.domain.fhir;
  */
 public class CodingSystems {
 
-  /** We invented this coding system for procedure type */
+  /** dataFascia invented this coding system for observation */
+  public static final String OBSERVATION =
+      "http://datafascia.com/coding/Observation";
+
+  /** dataFascia invented this coding system for procedure type */
   public static final String PROCEDURE_TYPE =
       "http://datafascia.com/coding/ProcedureType";
 
-  /** We invented this coding system for body site */
+  /** dataFascia invented this coding system for body site */
   public static final String BODY_SITE =
       "http://datafascia.com/coding/BodySite";
 

@@ -34,7 +34,7 @@ rule "Intermittent Cisatracurium IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A2");
     result.setName("Intermittent Cisatracurium IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Vecuronium IV"
@@ -44,7 +44,7 @@ rule "Intermittent Vecuronium IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A3");
     result.setName("Intermittent Vecuronium IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Rocuronium IV"
@@ -54,7 +54,7 @@ rule "Intermittent Rocuronium IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A4");
     result.setName("Intermittent Rocuronium IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Pancuronium IV"
@@ -64,7 +64,7 @@ rule "Intermittent Pancuronium IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A5");
     result.setName("Intermittent Pancuronium IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Continuous Infusion Cisatracurium IV"
@@ -74,7 +74,7 @@ rule "Continuous Infusion Cisatracurium IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A6");
     result.setName("Continuous Infusion Cisatracurium IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Continuous Infusion Vecuronium IV"
@@ -84,7 +84,7 @@ rule "Continuous Infusion Vecuronium IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A7");
     result.setName("Continuous Infusion Vecuronium IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Epidural"
@@ -99,7 +99,7 @@ rule "Epidural"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A8");
     result.setName("Epidural");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Peripheral Nerve Infusion"
@@ -114,7 +114,7 @@ rule "Peripheral Nerve Infusion"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A9");
     result.setName("Peripheral Nerve Infusion");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Fentanyl PCA"
@@ -125,7 +125,7 @@ rule "Fentanyl PCA"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A10");
     result.setName("Fentanyl PCA");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Hydromorphone PCA"
@@ -136,7 +136,7 @@ rule "Hydromorphone PCA"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A11");
     result.setName("Hydromorphone PCA");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Morphine PCA"
@@ -147,7 +147,7 @@ rule "Morphine PCA"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A12");
     result.setName("Morphine PCA");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Fentanyl IV"
@@ -158,7 +158,7 @@ rule "Intermittent Fentanyl IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A13");
     result.setName("Intermittent Fentanyl IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Continuous Infusion Fentanyl IV"
@@ -169,7 +169,7 @@ rule "Continuous Infusion Fentanyl IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A14");
     result.setName("Continuous Infusion Fentanyl IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Fentanyl Transdermal"
@@ -179,7 +179,7 @@ rule "Fentanyl Transdermal"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A15");
     result.setName("Fentanyl Transdermal");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Hydromorphone IV"
@@ -190,7 +190,7 @@ rule "Intermittent Hydromorphone IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A16");
     result.setName("Intermittent Hydromorphone IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Continuous Infusion Hydromorphone IV"
@@ -201,7 +201,7 @@ rule "Continuous Infusion Hydromorphone IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A17");
     result.setName("Continuous Infusion Hydromorphone IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Hydromorphone Enteral"
@@ -211,7 +211,7 @@ rule "Intermittent Hydromorphone Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A18");
     result.setName("Intermittent Hydromorphone Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Continuous Infusion Remifentanil IV"
@@ -222,7 +222,7 @@ rule "Continuous Infusion Remifentanil IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A19");
     result.setName("Continuous Infusion Remifentanil IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Morphine IV"
@@ -233,7 +233,7 @@ rule "Intermittent Morphine IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A20");
     result.setName("Intermittent Morphine IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Continuous Infusion Morphine IV"
@@ -245,7 +245,7 @@ rule "Continuous Infusion Morphine IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A21");
     result.setName("Continuous Infusion Morphine IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Morphine (IR) Enteral"
@@ -257,7 +257,7 @@ rule "Intermittent Morphine (IR) Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A22");
     result.setName("Intermittent Morphine (IR) Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Morphine (SR) Enteral"
@@ -268,7 +268,7 @@ rule "Intermittent Morphine (SR) Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A23");
     result.setName("Intermittent Morphine (SR) Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Oxycodone (IR) Enteral"
@@ -278,7 +278,7 @@ rule "Intermittent Oxycodone (IR) Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A24");
     result.setName("Intermittent Oxycodone (IR) Enteral"); 
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Oxycodone (SR) Enteral"
@@ -288,7 +288,7 @@ rule "Intermittent Oxycodone (SR) Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A25");
     result.setName("Intermittent Oxycodone (SR) Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Oxycodone-acetaminophen Enteral"
@@ -299,7 +299,7 @@ rule "Intermittent Oxycodone-acetaminophen Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A26");
     result.setName("Intermittent Oxycodone-acetaminophen Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Hydrocodone-acetaminophen Enteral"
@@ -309,7 +309,7 @@ rule "Intermittent Hydrocodone-acetaminophen Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A27");
     result.setName("Intermittent Hydrocodone-acetaminophen Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Methadone IV"
@@ -319,7 +319,7 @@ rule "Intermittent Methadone IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A28");
     result.setName("Intermittent Methadone IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Methadone Enteral"
@@ -329,7 +329,7 @@ rule "Intermittent Methadone Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A29");
     result.setName("Intermittent Methadone Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Tramadol Enteral"
@@ -341,7 +341,7 @@ rule "Intermittent Tramadol Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A30");
     result.setName("Intermittent Tramadol Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Ibuprofen Enteral"
@@ -360,7 +360,7 @@ rule "Intermittent Ibuprofen Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A31");
     result.setName("Intermittent Ibuprofen Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Celecoxib Enteral"
@@ -370,7 +370,7 @@ rule "Intermittent Celecoxib Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A32");
     result.setName("Intermittent Celecoxib Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Ketorolac IV"
@@ -380,7 +380,7 @@ rule "Intermittent Ketorolac IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A33");
     result.setName("Intermittent Ketorolac IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Acetaminophen with Codeine Enteral"
@@ -406,7 +406,7 @@ rule "Intermittent Acetaminophen with Codeine Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A34");
     result.setName("Intermittent Acetaminophen with Codeine Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Acetaminophen Enteral"
@@ -438,7 +438,7 @@ rule "Intermittent Acetaminophen Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A35");
     result.setName("Intermittent Acetaminophen Enteral"); 
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Acetaminophen IV"
@@ -448,7 +448,7 @@ rule "Intermittent Acetaminophen IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A36");
     result.setName("Intermittent Acetaminophen IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Acetaminophen PR"
@@ -458,7 +458,7 @@ rule "Intermittent Acetaminophen PR"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A37");
     result.setName("Intermittent Acetaminophen PR");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Gabapentin Enteral"
@@ -468,7 +468,7 @@ rule "Intermittent Gabapentin Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A38");
     result.setName("Intermittent Gabapentin Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Pregabalin Enteral"
@@ -478,7 +478,7 @@ rule "Intermittent Pregabalin Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A39");
     result.setName("Intermittent Pregabalin Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Ketamine Enteral"
@@ -488,7 +488,7 @@ rule "Intermittent Ketamine Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A40");
     result.setName("Intermittent Ketamine Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Continuous Infusion Ketamine IV"
@@ -499,7 +499,7 @@ rule "Continuous Infusion Ketamine IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A41");
     result.setName("Continuous Infusion Ketamine IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Ketamine IV"
@@ -510,7 +510,7 @@ rule "Intermittent Ketamine IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A42");
     result.setName("Intermittent Ketamine IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Lidocaine 5% Transdermal"
@@ -520,7 +520,7 @@ rule "Lidocaine 5% Transdermal"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A43");
     result.setName("Lidocaine 5% Transdermal");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Morphine Intrathecal"
@@ -531,7 +531,7 @@ rule "Intermittent Morphine Intrathecal"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A44");
     result.setName("Intermittent Morphine Intrathecal");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Continuous Infusion Intrathecal"
@@ -541,7 +541,7 @@ rule "Continuous Infusion Intrathecal"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A45");
     result.setName("Continuous Infusion Intrathecal");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Headache Analgesics (Miscellaneous) Enteral"
@@ -564,7 +564,7 @@ rule "Headache Analgesics (Miscellaneous) Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A46");
     result.setName("Headache Analgesics (Miscellaneous) Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Continuous Infusion Propofol IV"
@@ -574,7 +574,7 @@ rule "Continuous Infusion Propofol IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A47");
     result.setName("Continuous Infusion Propofol IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Continuous Infusion Dexmedetomidine IV"
@@ -584,7 +584,7 @@ rule "Continuous Infusion Dexmedetomidine IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A48");
     result.setName("Continuous Infusion Dexmedetomidine IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Lorazepam IV"
@@ -595,7 +595,7 @@ rule "Intermittent Lorazepam IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A49");
     result.setName("Intermittent Lorazepam IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Lorazepam Enteral"
@@ -605,7 +605,7 @@ rule "Intermittent Lorazepam Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A50");
     result.setName("Intermittent Lorazepam Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Continuous Infusion Lorazepam IV"
@@ -616,7 +616,7 @@ rule "Continuous Infusion Lorazepam IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A51");
     result.setName("Continuous Infusion Lorazepam IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Midazolam IV"
@@ -627,7 +627,7 @@ rule "Intermittent Midazolam IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A52");
     result.setName("Intermittent Midazolam IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Continuous Infusion Midazolam IV"
@@ -638,7 +638,7 @@ rule "Continuous Infusion Midazolam IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A53");
     result.setName("Continuous Infusion Midazolam IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Clonazepam Enteral"
@@ -648,7 +648,7 @@ rule "Intermittent Clonazepam Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A54");
     result.setName("Intermittent Clonazepam Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Diazepam IV"
@@ -658,7 +658,7 @@ rule "Intermittent Diazepam IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A55");
     result.setName("Intermittent Diazepam IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Diazepam Enteral"
@@ -668,7 +668,7 @@ rule "Intermittent Diazepam Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A56");
     result.setName("Intermittent Diazepam Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Chloradiazepoxide Enteral"
@@ -682,7 +682,7 @@ rule "Intermittent Chloradiazepoxide Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A57");
     result.setName("Intermittent Chloradiazepoxide Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Alprazalom Enteral"
@@ -692,7 +692,7 @@ rule "Intermittent Alprazalom Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A58");
     result.setName("Intermittent Alprazalom Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Warfarin Enteral"
@@ -702,7 +702,7 @@ rule "Intermittent Warfarin Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A59");
     result.setName("Intermittent Warfarin Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Continuous Infusion Argatroban IV"
@@ -712,7 +712,7 @@ rule "Continuous Infusion Argatroban IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A60");
     result.setName("Continuous Infusion Argatroban IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Continuous Infusion Bivalirudin IV"
@@ -722,7 +722,7 @@ rule "Continuous Infusion Bivalirudin IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A61");
     result.setName("Continuous Infusion Bivalirudin IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Dabigatran Enteral"
@@ -732,7 +732,7 @@ rule "Intermittent Dabigatran Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A62");
     result.setName("Intermittent Dabigatran Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Apixaban Enteral"
@@ -742,7 +742,7 @@ rule "Intermittent Apixaban Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A63");
     result.setName("Intermittent Apixaban Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Rivaroxaban Enteral"
@@ -752,7 +752,7 @@ rule "Intermittent Rivaroxaban Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A64");
     result.setName("Intermittent Rivaroxaban Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Edoxaban Enteral"
@@ -762,7 +762,7 @@ rule "Intermittent Edoxaban Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A65");
     result.setName("Intermittent Edoxaban Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Fondaparinux SC"
@@ -772,7 +772,7 @@ rule "Intermittent Fondaparinux SC"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A66");
     result.setName("Intermittent Fondaparinux SC");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Enoxaparin"
@@ -782,7 +782,7 @@ rule "Intermittent Enoxaparin"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A67");
     result.setName("Intermittent Enoxaparin");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Continuous Infusion Heparin IV"
@@ -793,7 +793,7 @@ rule "Continuous Infusion Heparin IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A68");
     result.setName("Continuous Infusion Heparin IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Heparin SC"
@@ -803,7 +803,7 @@ rule "Intermittent Heparin SC"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A69");
     result.setName("Intermittent Heparin SC");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Stress Ulcer Prophylactics"
@@ -816,7 +816,7 @@ rule "Stress Ulcer Prophylactics"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A70");
     result.setName("Stress Ulcer Prophylactics");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Continuous Infusion Dopamine IV"
@@ -826,7 +826,7 @@ rule "Continuous Infusion Dopamine IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A71");
     result.setName("Continuous Infusion Dopamine IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Continuous Infusion Epinephrine IV"
@@ -837,7 +837,7 @@ rule "Continuous Infusion Epinephrine IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A72");
     result.setName("Continuous Infusion Epinephrine IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Continuous Infusion Norepinephrine IV"
@@ -847,7 +847,7 @@ rule "Continuous Infusion Norepinephrine IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A73");
     result.setName("Continuous Infusion Norepinephrine IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Continuous Infusion Phenylephrine IV"
@@ -858,7 +858,7 @@ rule "Continuous Infusion Phenylephrine IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A74");
     result.setName("Continuous Infusion Phenylephrine IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Continuous Infusion Vasopressin IV"
@@ -868,7 +868,7 @@ rule "Continuous Infusion Vasopressin IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A75");
     result.setName("Continuous Infusion Vasopressin IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Continuous Infusion Dobutamine IV"
@@ -878,7 +878,7 @@ rule "Continuous Infusion Dobutamine IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A76");
     result.setName("Continuous Infusion Dobutamine IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Continuous Infusion Milrinone IV"
@@ -888,7 +888,7 @@ rule "Continuous Infusion Milrinone IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A77");
     result.setName("Continuous Infusion Milrinone IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Continuous Infusion Isoproterenol IV"
@@ -899,7 +899,7 @@ rule "Continuous Infusion Isoproterenol IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A78");
     result.setName("Continuous Infusion Isoproterenol IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Chemotherapy IV"
@@ -909,7 +909,7 @@ rule "Chemotherapy IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A79");
     result.setName("Chemotherapy IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Total Parenteral Nutrition (TPN)"
@@ -919,7 +919,7 @@ rule "Total Parenteral Nutrition (TPN)"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A80");
     result.setName("Total Parenteral Nutrition (TPN)");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Continuous Infusion Epoprostenol  IV"
@@ -929,7 +929,7 @@ rule "Continuous Infusion Epoprostenol  IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A81");
     result.setName("Continuous Infusion Epoprostenol  IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Continuous Infusion Treprostinil IV"
@@ -940,7 +940,7 @@ rule "Continuous Infusion Treprostinil IV"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A82");
     result.setName("Continuous Infusion Treprostinil IV");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Non-Enteric Coated Pancrelipase Enteral"
@@ -951,7 +951,7 @@ rule "Intermittent Non-Enteric Coated Pancrelipase Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A83");
     result.setName("Intermittent Non-Enteric Coated Pancrelipase Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Clopidogrel Enteral"
@@ -961,7 +961,7 @@ rule "Intermittent Clopidogrel Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A84");
     result.setName("Intermittent Clopidogrel Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Prasugrel Enteral"
@@ -971,7 +971,7 @@ rule "Intermittent Prasugrel Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A85");
     result.setName("Intermittent Prasugrel Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Ticagrelor Enteral"
@@ -981,7 +981,7 @@ rule "Intermittent Ticagrelor Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A86");
     result.setName("Intermittent Ticagrelor Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Aspirin Enteral"
@@ -992,7 +992,7 @@ rule "Intermittent Aspirin Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A87");
     result.setName("Intermittent Aspirin Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Hydrocortisone"
@@ -1010,7 +1010,7 @@ rule "Hydrocortisone"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A88");
     result.setName("Hydrocortisone");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Prednisone Enteral"
@@ -1020,7 +1020,7 @@ rule "Intermittent Prednisone Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A89");
     result.setName("Intermittent Prednisone Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Methylprednisolone"
@@ -1031,7 +1031,7 @@ rule "Intermittent Methylprednisolone"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A90");
     result.setName("Intermittent Methylprednisolone");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Dexamethasone"
@@ -1042,7 +1042,7 @@ rule "Intermittent Dexamethasone"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A91");
     result.setName("Intermittent Dexamethasone");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Cortisone Enteral"
@@ -1052,7 +1052,7 @@ rule "Intermittent Cortisone Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A92");
     result.setName("Intermittent Cortisone Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end
 
 rule "Intermittent Prednisolone Enteral"
@@ -1062,5 +1062,5 @@ rule "Intermittent Prednisolone Enteral"
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A93");
     result.setName("Intermittent Prednisolone Enteral");
-    $p.setMedsSet(result);
+    $p.getMedsSets().add(result);
 end

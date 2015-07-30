@@ -3,6 +3,8 @@
 package com.datafascia.rules.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -15,8 +17,8 @@ import lombok.NoArgsConstructor;
 @Data @NoArgsConstructor
 public class RxNorm {
   /** dF-internal group name and code. */
-  @JsonProperty("medsSet")
-  private MedsSet medsSet;
+  @JsonProperty("medsSets")
+  private List<MedsSet> medsSets = new ArrayList();
 
   /** Maps to MedicationPrescription.route. */
   @JsonProperty("route")

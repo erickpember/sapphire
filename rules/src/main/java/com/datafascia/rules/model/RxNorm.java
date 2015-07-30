@@ -8,16 +8,18 @@ import lombok.NoArgsConstructor;
 
 /**
  * Represents a first pass at representing RxNorm data for matching.
+ *
+ * Output fields are medsSetCode and medsSetName.
  */
 @Data @NoArgsConstructor
 public class RxNorm {
   /** dF-internal group name. */
-  @JsonProperty("medsGroup")
-  private String medsGroup;
+  @JsonProperty("medsSetCode")
+  private String medsSetCode;
 
   /** Human-readable name of the group. */
-  @JsonProperty("groupName")
-  private String groupName;
+  @JsonProperty("medsSetName")
+  private String medsSetName;
 
   /** Maps to MedicationPrescription.route. */
   @JsonProperty("route")

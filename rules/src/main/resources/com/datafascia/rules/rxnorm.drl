@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.rules;
 
+import com.datafascia.rules.model.MedsSet;
 import com.datafascia.rules.model.RxNorm;
 import com.datafascia.rules.rxnorm.FrequencyLookup;
 import com.datafascia.rules.rxnorm.RouteLookup;
@@ -30,48 +31,60 @@ rule "Intermittent Cisatracurium IV"
   when
     $p:RxNorm(rxcuiIn == "319864" && FrequencyLookup.isIntermittent(frequency))
   then
-    $p.setMedsSetCode("UCSF_A2");
-    $p.setMedsSetName("Intermittent Cisatracurium IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A2");
+    result.setName("Intermittent Cisatracurium IV");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Vecuronium IV"
   when
     $p:RxNorm(rxcuiIn == "71535" && FrequencyLookup.isIntermittent(frequency))
   then
-    $p.setMedsSetCode("UCSF_A3");
-    $p.setMedsSetName("Intermittent Vecuronium IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A3");
+    result.setName("Intermittent Vecuronium IV");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Rocuronium IV"
   when
     $p:RxNorm(rxcuiIn == "68139" && FrequencyLookup.isIntermittent(frequency))
   then
-    $p.setMedsSetCode("UCSF_A4");
-    $p.setMedsSetName("Intermittent Rocuronium IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A4");
+    result.setName("Intermittent Rocuronium IV");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Pancuronium IV"
   when
     $p:RxNorm(rxcuiIn == "7883" && FrequencyLookup.isIntermittent(frequency))
   then
-    $p.setMedsSetCode("UCSF_A5");
-    $p.setMedsSetName("Intermittent Pancuronium IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A5");
+    result.setName("Intermittent Pancuronium IV");
+    $p.setMedsSet(result);
 end
 
 rule "Continuous Infusion Cisatracurium IV"
   when
     $p:RxNorm(rxcuiIn == "319864" && FrequencyLookup.isContinuous(frequency))
   then
-    $p.setMedsSetCode("UCSF_A6");
-    $p.setMedsSetName("Continuous Infusion Cisatracurium IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A6");
+    result.setName("Continuous Infusion Cisatracurium IV");
+    $p.setMedsSet(result);
 end
 
 rule "Continuous Infusion Vecuronium IV"
   when
     $p:RxNorm(rxcuiIn == "71535" && FrequencyLookup.isContinuous(frequency))
   then
-    $p.setMedsSetCode("UCSF_A7");
-    $p.setMedsSetName("Continuous Infusion Vecuronium IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A7");
+    result.setName("Continuous Infusion Vecuronium IV");
+    $p.setMedsSet(result);
 end
 
 rule "Epidural"
@@ -83,8 +96,10 @@ rule "Epidural"
                rxcuiIn ==   "7052")
                && FrequencyLookup.isContinuous(frequency) &&  route == "50")   
   then
-    $p.setMedsSetCode("UCSF_A8");
-    $p.setMedsSetName("Epidural");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A8");
+    result.setName("Epidural");
+    $p.setMedsSet(result);
 end
 
 rule "Peripheral Nerve Infusion"
@@ -96,8 +111,10 @@ rule "Peripheral Nerve Infusion"
                 rxcuiIn == "7052")
                 && FrequencyLookup.isContinuous(frequency) && route == "157")
   then
-    $p.setMedsSetCode("UCSF_A9");
-    $p.setMedsSetName("Peripheral Nerve Infusion");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A9");
+    result.setName("Peripheral Nerve Infusion");
+    $p.setMedsSet(result);
 end
 
 rule "Fentanyl PCA"
@@ -105,8 +122,10 @@ rule "Fentanyl PCA"
     $p:RxNorm(rxcuiIn == "4337" && FrequencyLookup.isContinuous(frequency) &&
               RouteLookup.isIV(route) && pca == "yes")
   then
-    $p.setMedsSetCode("UCSF_A10");
-    $p.setMedsSetName("Fentanyl PCA");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A10");
+    result.setName("Fentanyl PCA");
+    $p.setMedsSet(result);
 end
 
 rule "Hydromorphone PCA"
@@ -114,8 +133,10 @@ rule "Hydromorphone PCA"
     $p:RxNorm(rxcuiIn == "3423" && FrequencyLookup.isContinuous(frequency) &&
               RouteLookup.isIV(route) && pca == "yes")
   then
-    $p.setMedsSetCode("UCSF_A11");
-    $p.setMedsSetName("Hydromorphone PCA");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A11");
+    result.setName("Hydromorphone PCA");
+    $p.setMedsSet(result);
 end
 
 rule "Morphine PCA"
@@ -123,8 +144,10 @@ rule "Morphine PCA"
     $p:RxNorm(rxcuiIn == "7052" && FrequencyLookup.isContinuous(frequency) &&
               RouteLookup.isIV(route) && pca == "yes")
   then
-    $p.setMedsSetCode("UCSF_A12");
-    $p.setMedsSetName("Morphine PCA");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A12");
+    result.setName("Morphine PCA");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Fentanyl IV"
@@ -132,8 +155,10 @@ rule "Intermittent Fentanyl IV"
     $p:RxNorm(rxcuiIn == "4337" && FrequencyLookup.isIntermittent(frequency) &&
               (RouteLookup.isIV(route) || route == "6"))
   then
-    $p.setMedsSetCode("UCSF_A13");
-    $p.setMedsSetName("Intermittent Fentanyl IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A13");
+    result.setName("Intermittent Fentanyl IV");
+    $p.setMedsSet(result);
 end
 
 rule "Continuous Infusion Fentanyl IV"
@@ -141,16 +166,20 @@ rule "Continuous Infusion Fentanyl IV"
     $p:RxNorm(rxcuiIn == "4337" && FrequencyLookup.isContinuous(frequency) &&
               RouteLookup.isIV(route) && pca == "no")
   then
-    $p.setMedsSetCode("UCSF_A14");
-    $p.setMedsSetName("Continuous Infusion Fentanyl IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A14");
+    result.setName("Continuous Infusion Fentanyl IV");
+    $p.setMedsSet(result);
 end
 
 rule "Fentanyl Transdermal"
   when
     $p:RxNorm(rxcuiIn == "4337" && route == "20")
   then
-    $p.setMedsSetCode("UCSF_A15");
-    $p.setMedsSetName("Fentanyl Transdermal");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A15");
+    result.setName("Fentanyl Transdermal");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Hydromorphone IV"
@@ -158,8 +187,10 @@ rule "Intermittent Hydromorphone IV"
     $p:RxNorm(rxcuiIn == "3423" && FrequencyLookup.isIntermittent(frequency)
               && RouteLookup.isIV(route))
   then
-    $p.setMedsSetCode("UCSF_A16");
-    $p.setMedsSetName("Intermittent Hydromorphone IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A16");
+    result.setName("Intermittent Hydromorphone IV");
+    $p.setMedsSet(result);
 end
 
 rule "Continuous Infusion Hydromorphone IV"
@@ -167,16 +198,20 @@ rule "Continuous Infusion Hydromorphone IV"
     $p:RxNorm(rxcuiIn == "3423" && FrequencyLookup.isContinuous(frequency) &&
               RouteLookup.isIV(route) && pca == "no")
   then
-    $p.setMedsSetCode("UCSF_A17");
-    $p.setMedsSetName("Continuous Infusion Hydromorphone IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A17");
+    result.setName("Continuous Infusion Hydromorphone IV");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Hydromorphone Enteral"
   when
     $p:RxNorm(rxcuiIn == "3423" && RouteLookup.isNonRectalEnteral(route))
   then
-    $p.setMedsSetCode("UCSF_A18");
-    $p.setMedsSetName("Intermittent Hydromorphone Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A18");
+    result.setName("Intermittent Hydromorphone Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Continuous Infusion Remifentanil IV"
@@ -184,8 +219,10 @@ rule "Continuous Infusion Remifentanil IV"
     $p:RxNorm(rxcuiIn == "73032" && FrequencyLookup.isContinuous(frequency)
               && RouteLookup.isIV(route) && pca == "no")
   then
-    $p.setMedsSetCode("UCSF_A19");
-    $p.setMedsSetName("Continuous Infusion Remifentanil IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A19");
+    result.setName("Continuous Infusion Remifentanil IV");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Morphine IV"
@@ -193,8 +230,10 @@ rule "Intermittent Morphine IV"
     $p:RxNorm(rxcuiIn == "7052" && FrequencyLookup.isIntermittent(frequency)
               && (RouteLookup.isIV(route) || route == "6"))
   then
-    $p.setMedsSetCode("UCSF_A20");
-    $p.setMedsSetName("Intermittent Morphine IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A20");
+    result.setName("Intermittent Morphine IV");
+    $p.setMedsSet(result);
 end
 
 rule "Continuous Infusion Morphine IV"
@@ -203,8 +242,10 @@ rule "Continuous Infusion Morphine IV"
               && RouteLookup.isIV(route)
               && pca == "no")
   then
-    $p.setMedsSetCode("UCSF_A21");
-    $p.setMedsSetName("Continuous Infusion Morphine IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A21");
+    result.setName("Continuous Infusion Morphine IV");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Morphine (IR) Enteral"
@@ -213,8 +254,10 @@ rule "Intermittent Morphine (IR) Enteral"
               brand != "MS Contin" && brand != "Kadian" && brand != "Avinza" &&
               RouteLookup.isNonRectalEnteral(route))
   then
-    $p.setMedsSetCode("UCSF_A22");
-    $p.setMedsSetName("Intermittent Morphine (IR) Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A22");
+    result.setName("Intermittent Morphine (IR) Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Morphine (SR) Enteral"
@@ -222,24 +265,30 @@ rule "Intermittent Morphine (SR) Enteral"
     $p:RxNorm(rxcuiIn == "7052" && route == "15" &&
                (brand == "MS Contin" || brand == "Kadian" || brand == "Avinza"))
   then
-    $p.setMedsSetCode("UCSF_A23");
-    $p.setMedsSetName("Intermittent Morphine (SR) Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A23");
+    result.setName("Intermittent Morphine (SR) Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Oxycodone (IR) Enteral"
   when
     $p:RxNorm(rxcuiIn == "7804" && rxcuiIn != "161" && brand != "OxyContin")
   then
-    $p.setMedsSetCode("UCSF_A24");
-    $p.setMedsSetName("Intermittent Oxycodone (IR) Enteral"); 
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A24");
+    result.setName("Intermittent Oxycodone (IR) Enteral"); 
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Oxycodone (SR) Enteral"
   when
     $p:RxNorm(rxcuiIn == "7804" && brand == "OxyContin")
   then
-    $p.setMedsSetCode("UCSF_A25");
-    $p.setMedsSetName("Intermittent Oxycodone (SR) Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A25");
+    result.setName("Intermittent Oxycodone (SR) Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Oxycodone-acetaminophen Enteral"
@@ -247,32 +296,40 @@ rule "Intermittent Oxycodone-acetaminophen Enteral"
     // Problem! Brand name in "ID Clues sheet": "n/a"! I am guessing the brand is Percocet!
     $p:RxNorm((rxcuiIn == "7804" || rxcuiIn == "161") && brand == "Percocet")
   then
-    $p.setMedsSetCode("UCSF_A26");
-    $p.setMedsSetName("Intermittent Oxycodone-acetaminophen Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A26");
+    result.setName("Intermittent Oxycodone-acetaminophen Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Hydrocodone-acetaminophen Enteral"
   when
     $p:RxNorm(rxcuiIn == "5489" || rxcuiIn =="161")
   then
-    $p.setMedsSetCode("UCSF_A27");
-    $p.setMedsSetName("Intermittent Hydrocodone-acetaminophen Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A27");
+    result.setName("Intermittent Hydrocodone-acetaminophen Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Methadone IV"
   when
     $p:RxNorm(rxcuiIn == "6813" && RouteLookup.isIV(route))
   then
-    $p.setMedsSetCode("UCSF_A28");
-    $p.setMedsSetName("Intermittent Methadone IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A28");
+    result.setName("Intermittent Methadone IV");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Methadone Enteral"
   when
     $p:RxNorm(rxcuiIn == "6813" && RouteLookup.isNonRectalEnteral(route))
   then
-    $p.setMedsSetCode("UCSF_A29");
-    $p.setMedsSetName("Intermittent Methadone Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A29");
+    result.setName("Intermittent Methadone Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Tramadol Enteral"
@@ -281,8 +338,10 @@ rule "Intermittent Tramadol Enteral"
               rxcuiSCD == "835603" ||
               rxcuiSCD == "849566")
   then
-    $p.setMedsSetCode("UCSF_A30");
-    $p.setMedsSetName("Intermittent Tramadol Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A30");
+    result.setName("Intermittent Tramadol Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Ibuprofen Enteral"
@@ -298,24 +357,30 @@ rule "Intermittent Ibuprofen Enteral"
               rxcuiSCD == "197806" ||
               rxcuiSCD == "197807")
   then
-    $p.setMedsSetCode("UCSF_A31");
-    $p.setMedsSetName("Intermittent Ibuprofen Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A31");
+    result.setName("Intermittent Ibuprofen Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Celecoxib Enteral"
   when
     $p:RxNorm(rxcuiIn == "140587")
   then
-    $p.setMedsSetCode("UCSF_A32");
-    $p.setMedsSetName("Intermittent Celecoxib Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A32");
+    result.setName("Intermittent Celecoxib Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Ketorolac IV"
   when
     $p:RxNorm(rxcuiIn == "35827" && (RouteLookup.isIV(route) || route == "6"))
   then
-    $p.setMedsSetCode("UCSF_A33");
-    $p.setMedsSetName("Intermittent Ketorolac IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A33");
+    result.setName("Intermittent Ketorolac IV");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Acetaminophen with Codeine Enteral"
@@ -338,8 +403,10 @@ rule "Intermittent Acetaminophen with Codeine Enteral"
               rxcuiSCD == "994059" || 
               rxcuiSCD == "996983")
   then
-    $p.setMedsSetCode("UCSF_A34");
-    $p.setMedsSetName("Intermittent Acetaminophen with Codeine Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A34");
+    result.setName("Intermittent Acetaminophen with Codeine Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Acetaminophen Enteral"
@@ -368,48 +435,60 @@ rule "Intermittent Acetaminophen Enteral"
               rxcuiSCD == "307695" ||
               rxcuiSCD == "247661")
   then
-    $p.setMedsSetCode("UCSF_A35");
-    $p.setMedsSetName("Intermittent Acetaminophen Enteral"); 
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A35");
+    result.setName("Intermittent Acetaminophen Enteral"); 
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Acetaminophen IV"
   when
     $p:RxNorm(rxcuiIn == "161" && RouteLookup.isIV(route))
   then
-    $p.setMedsSetCode("UCSF_A36");
-    $p.setMedsSetName("Intermittent Acetaminophen IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A36");
+    result.setName("Intermittent Acetaminophen IV");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Acetaminophen PR"
   when
     $p:RxNorm(rxcuiIn == "161" && route == "17")
   then
-    $p.setMedsSetCode("UCSF_A37");
-    $p.setMedsSetName("Intermittent Acetaminophen PR");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A37");
+    result.setName("Intermittent Acetaminophen PR");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Gabapentin Enteral"
   when
     $p:RxNorm(rxcuiIn == "25480" && RouteLookup.isNonRectalEnteral(route))
   then
-    $p.setMedsSetCode("UCSF_A38");
-    $p.setMedsSetName("Intermittent Gabapentin Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A38");
+    result.setName("Intermittent Gabapentin Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Pregabalin Enteral"
   when
     $p:RxNorm(rxcuiIn == "187832")
   then
-    $p.setMedsSetCode("UCSF_A39");
-    $p.setMedsSetName("Intermittent Pregabalin Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A39");
+    result.setName("Intermittent Pregabalin Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Ketamine Enteral"
   when
     $p:RxNorm(rxcuiIn == "6130" && RouteLookup.isNonRectalEnteral(route))
   then
-    $p.setMedsSetCode("UCSF_A40");
-    $p.setMedsSetName("Intermittent Ketamine Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A40");
+    result.setName("Intermittent Ketamine Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Continuous Infusion Ketamine IV"
@@ -417,8 +496,10 @@ rule "Continuous Infusion Ketamine IV"
     $p:RxNorm(rxcuiIn == "6130" && FrequencyLookup.isContinuous(frequency) &&
               RouteLookup.isIV(route) && pca == "no")
   then
-    $p.setMedsSetCode("UCSF_A41");
-    $p.setMedsSetName("Continuous Infusion Ketamine IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A41");
+    result.setName("Continuous Infusion Ketamine IV");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Ketamine IV"
@@ -426,16 +507,20 @@ rule "Intermittent Ketamine IV"
     $p:RxNorm(rxcuiIn == "6130" && FrequencyLookup.isIntermittent(frequency) &&
               (RouteLookup.isIV(route) || route == "6"))
   then
-    $p.setMedsSetCode("UCSF_A42");
-    $p.setMedsSetName("Intermittent Ketamine IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A42");
+    result.setName("Intermittent Ketamine IV");
+    $p.setMedsSet(result);
 end
 
 rule "Lidocaine 5% Transdermal"
   when
     $p:RxNorm(rxcuiSCD == "1009464")
   then
-    $p.setMedsSetCode("UCSF_A43");
-    $p.setMedsSetName("Lidocaine 5% Transdermal");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A43");
+    result.setName("Lidocaine 5% Transdermal");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Morphine Intrathecal"
@@ -443,16 +528,20 @@ rule "Intermittent Morphine Intrathecal"
     $p:RxNorm(FrequencyLookup.isIntermittent(frequency) && 
               (rxcuiSCD == "892477" || rxcuiSCD =="892365"))
   then
-    $p.setMedsSetCode("UCSF_A44");
-    $p.setMedsSetName("Intermittent Morphine Intrathecal");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A44");
+    result.setName("Intermittent Morphine Intrathecal");
+    $p.setMedsSet(result);
 end
 
 rule "Continuous Infusion Intrathecal"
   when
     $p:RxNorm(FrequencyLookup.isContinuous(frequency) && route == "9")
   then
-    $p.setMedsSetCode("UCSF_A45");
-    $p.setMedsSetName("Continuous Infusion Intrathecal");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A45");
+    result.setName("Continuous Infusion Intrathecal");
+    $p.setMedsSet(result);
 end
 
 rule "Headache Analgesics (Miscellaneous) Enteral"
@@ -472,24 +561,30 @@ rule "Headache Analgesics (Miscellaneous) Enteral"
               rxcuiSCD == "763116" ||
               rxcuiSCD == "692836")
   then
-    $p.setMedsSetCode("UCSF_A46");
-    $p.setMedsSetName("Headache Analgesics (Miscellaneous) Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A46");
+    result.setName("Headache Analgesics (Miscellaneous) Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Continuous Infusion Propofol IV"
   when
     $p:RxNorm(rxcuiIn == "8782" && FrequencyLookup.isContinuous(frequency))
   then
-    $p.setMedsSetCode("UCSF_A47");
-    $p.setMedsSetName("Continuous Infusion Propofol IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A47");
+    result.setName("Continuous Infusion Propofol IV");
+    $p.setMedsSet(result);
 end
 
 rule "Continuous Infusion Dexmedetomidine IV"
   when
     $p:RxNorm(rxcuiIn == "48937" && FrequencyLookup.isContinuous(frequency))
   then
-    $p.setMedsSetCode("UCSF_A48");
-    $p.setMedsSetName("Continuous Infusion Dexmedetomidine IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A48");
+    result.setName("Continuous Infusion Dexmedetomidine IV");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Lorazepam IV"
@@ -497,16 +592,20 @@ rule "Intermittent Lorazepam IV"
     $p:RxNorm(rxcuiIn == "6470" && FrequencyLookup.isIntermittent(frequency) &&
                (RouteLookup.isIV(route) || route == "6"))
   then
-    $p.setMedsSetCode("UCSF_A49");
-    $p.setMedsSetName("Intermittent Lorazepam IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A49");
+    result.setName("Intermittent Lorazepam IV");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Lorazepam Enteral"
   when
     $p:RxNorm(rxcuiIn == "6470" && frequency == "n/a" && RouteLookup.isNonRectalEnteral(route))
   then
-    $p.setMedsSetCode("UCSF_A50");
-    $p.setMedsSetName("Intermittent Lorazepam Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A50");
+    result.setName("Intermittent Lorazepam Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Continuous Infusion Lorazepam IV"
@@ -514,8 +613,10 @@ rule "Continuous Infusion Lorazepam IV"
     $p:RxNorm(rxcuiIn == "6470" && FrequencyLookup.isContinuous(frequency) &&
               RouteLookup.isIV(route))
   then
-    $p.setMedsSetCode("UCSF_A51");
-    $p.setMedsSetName("Continuous Infusion Lorazepam IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A51");
+    result.setName("Continuous Infusion Lorazepam IV");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Midazolam IV"
@@ -523,8 +624,10 @@ rule "Intermittent Midazolam IV"
     $p:RxNorm(rxcuiIn == "6960" && FrequencyLookup.isIntermittent(frequency) &&
                (RouteLookup.isIV(route) || route == "6"))
   then
-    $p.setMedsSetCode("UCSF_A52");
-    $p.setMedsSetName("Intermittent Midazolam IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A52");
+    result.setName("Intermittent Midazolam IV");
+    $p.setMedsSet(result);
 end
 
 rule "Continuous Infusion Midazolam IV"
@@ -532,32 +635,40 @@ rule "Continuous Infusion Midazolam IV"
     $p:RxNorm(rxcuiIn == "6960" && FrequencyLookup.isContinuous(frequency) &&
               RouteLookup.isIV(route))
   then
-    $p.setMedsSetCode("UCSF_A53");
-    $p.setMedsSetName("Continuous Infusion Midazolam IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A53");
+    result.setName("Continuous Infusion Midazolam IV");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Clonazepam Enteral"
   when
     $p:RxNorm(rxcuiIn == "2598")
   then
-    $p.setMedsSetCode("UCSF_A54");
-    $p.setMedsSetName("Intermittent Clonazepam Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A54");
+    result.setName("Intermittent Clonazepam Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Diazepam IV"
   when
     $p:RxNorm(rxcuiIn == "3322" && (RouteLookup.isIV(route) || route == "6"))
   then
-    $p.setMedsSetCode("UCSF_A55");
-    $p.setMedsSetName("Intermittent Diazepam IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A55");
+    result.setName("Intermittent Diazepam IV");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Diazepam Enteral"
   when
     $p:RxNorm(rxcuiIn == "3322" && (RouteLookup.isNonRectalEnteral(route) || route == "17"))
   then
-    $p.setMedsSetCode("UCSF_A56");
-    $p.setMedsSetName("Intermittent Diazepam Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A56");
+    result.setName("Intermittent Diazepam Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Chloradiazepoxide Enteral"
@@ -568,88 +679,110 @@ rule "Intermittent Chloradiazepoxide Enteral"
               rxcuiSCD == "905505" ||
               rxcuiSCD == "905516")
   then
-    $p.setMedsSetCode("UCSF_A57");
-    $p.setMedsSetName("Intermittent Chloradiazepoxide Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A57");
+    result.setName("Intermittent Chloradiazepoxide Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Alprazalom Enteral"
   when
     $p:RxNorm(rxcuiIn == "596")
   then
-    $p.setMedsSetCode("UCSF_A58");
-    $p.setMedsSetName("Intermittent Alprazalom Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A58");
+    result.setName("Intermittent Alprazalom Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Warfarin Enteral"
   when
     $p:RxNorm(rxcuiIn == "11289")
   then
-    $p.setMedsSetCode("UCSF_A59");
-    $p.setMedsSetName("Intermittent Warfarin Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A59");
+    result.setName("Intermittent Warfarin Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Continuous Infusion Argatroban IV"
   when
     $p:RxNorm(rxcuiIn == "15202" && FrequencyLookup.isContinuous(frequency))
   then
-    $p.setMedsSetCode("UCSF_A60");
-    $p.setMedsSetName("Continuous Infusion Argatroban IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A60");
+    result.setName("Continuous Infusion Argatroban IV");
+    $p.setMedsSet(result);
 end
 
 rule "Continuous Infusion Bivalirudin IV"
   when
     $p:RxNorm(rxcuiIn == "60819" && FrequencyLookup.isContinuous(frequency))
   then
-    $p.setMedsSetCode("UCSF_A61");
-    $p.setMedsSetName("Continuous Infusion Bivalirudin IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A61");
+    result.setName("Continuous Infusion Bivalirudin IV");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Dabigatran Enteral"
   when
     $p:RxNorm(rxcuiIn == "1546356")
   then
-    $p.setMedsSetCode("UCSF_A62");
-    $p.setMedsSetName("Intermittent Dabigatran Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A62");
+    result.setName("Intermittent Dabigatran Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Apixaban Enteral"
   when
     $p:RxNorm(rxcuiIn == "1364430")
   then
-    $p.setMedsSetCode("UCSF_A63");
-    $p.setMedsSetName("Intermittent Apixaban Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A63");
+    result.setName("Intermittent Apixaban Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Rivaroxaban Enteral"
   when
     $p:RxNorm(rxcuiIn == "1114195")
   then
-    $p.setMedsSetCode("UCSF_A64");
-    $p.setMedsSetName("Intermittent Rivaroxaban Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A64");
+    result.setName("Intermittent Rivaroxaban Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Edoxaban Enteral"
   when
     $p:RxNorm(rxcuiIn == "1599538")
   then
-    $p.setMedsSetCode("UCSF_A65");
-    $p.setMedsSetName("Intermittent Edoxaban Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A65");
+    result.setName("Intermittent Edoxaban Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Fondaparinux SC"
   when
     $p:RxNorm(rxcuiIn == "321208")
   then
-    $p.setMedsSetCode("UCSF_A66");
-    $p.setMedsSetName("Intermittent Fondaparinux SC");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A66");
+    result.setName("Intermittent Fondaparinux SC");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Enoxaparin"
   when
     $p:RxNorm(rxcuiIn == "67108" && (frequency == "q12h" || frequency =="q24h"))
   then
-    $p.setMedsSetCode("UCSF_A67");
-    $p.setMedsSetName("Intermittent Enoxaparin");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A67");
+    result.setName("Intermittent Enoxaparin");
+    $p.setMedsSet(result);
 end
 
 rule "Continuous Infusion Heparin IV"
@@ -657,16 +790,20 @@ rule "Continuous Infusion Heparin IV"
     $p:RxNorm(drugId == "206328" ||
               drugId == "15846")
   then
-    $p.setMedsSetCode("UCSF_A68");
-    $p.setMedsSetName("Continuous Infusion Heparin IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A68");
+    result.setName("Continuous Infusion Heparin IV");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Heparin SC"
   when
     $p:RxNorm(rxcuiIn == "235473" && route == "subcutaneous")
   then
-    $p.setMedsSetCode("UCSF_A69");
-    $p.setMedsSetName("Intermittent Heparin SC");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A69");
+    result.setName("Intermittent Heparin SC");
+    $p.setMedsSet(result);
 end
 
 rule "Stress Ulcer Prophylactics"
@@ -676,16 +813,20 @@ rule "Stress Ulcer Prophylactics"
               ahfs == "56:28.12" ||
               ahfs == "56:28.36")
   then
-    $p.setMedsSetCode("UCSF_A70");
-    $p.setMedsSetName("Stress Ulcer Prophylactics");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A70");
+    result.setName("Stress Ulcer Prophylactics");
+    $p.setMedsSet(result);
 end
 
 rule "Continuous Infusion Dopamine IV"
   when
     $p:RxNorm(rxcuiIn == "3628" && FrequencyLookup.isContinuous(frequency))
   then
-    $p.setMedsSetCode("UCSF_A71");
-    $p.setMedsSetName("Continuous Infusion Dopamine IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A71");
+    result.setName("Continuous Infusion Dopamine IV");
+    $p.setMedsSet(result);
 end
 
 rule "Continuous Infusion Epinephrine IV"
@@ -693,16 +834,20 @@ rule "Continuous Infusion Epinephrine IV"
     $p:RxNorm(rxcuiIn == "3992" && FrequencyLookup.isContinuous(frequency) &&
               RouteLookup.isIV(route))
   then
-    $p.setMedsSetCode("UCSF_A72");
-    $p.setMedsSetName("Continuous Infusion Epinephrine IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A72");
+    result.setName("Continuous Infusion Epinephrine IV");
+    $p.setMedsSet(result);
 end
 
 rule "Continuous Infusion Norepinephrine IV"
   when
     $p:RxNorm(rxcuiIn == "7512" && FrequencyLookup.isContinuous(frequency))
   then
-    $p.setMedsSetCode("UCSF_A73");
-    $p.setMedsSetName("Continuous Infusion Norepinephrine IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A73");
+    result.setName("Continuous Infusion Norepinephrine IV");
+    $p.setMedsSet(result);
 end
 
 rule "Continuous Infusion Phenylephrine IV"
@@ -710,32 +855,40 @@ rule "Continuous Infusion Phenylephrine IV"
     $p:RxNorm(rxcuiIn == "8163" && FrequencyLookup.isContinuous(frequency) &&
               RouteLookup.isIV(route))
   then
-    $p.setMedsSetCode("UCSF_A74");
-    $p.setMedsSetName("Continuous Infusion Phenylephrine IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A74");
+    result.setName("Continuous Infusion Phenylephrine IV");
+    $p.setMedsSet(result);
 end
 
 rule "Continuous Infusion Vasopressin IV"
   when
     $p:RxNorm(rxcuiIn == "11149" && FrequencyLookup.isContinuous(frequency))
   then
-    $p.setMedsSetCode("UCSF_A75");
-    $p.setMedsSetName("Continuous Infusion Vasopressin IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A75");
+    result.setName("Continuous Infusion Vasopressin IV");
+    $p.setMedsSet(result);
 end
 
 rule "Continuous Infusion Dobutamine IV"
   when
     $p:RxNorm(rxcuiIn == "3616" && FrequencyLookup.isContinuous(frequency))
   then
-    $p.setMedsSetCode("UCSF_A76");
-    $p.setMedsSetName("Continuous Infusion Dobutamine IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A76");
+    result.setName("Continuous Infusion Dobutamine IV");
+    $p.setMedsSet(result);
 end
 
 rule "Continuous Infusion Milrinone IV"
   when
     $p:RxNorm(rxcuiIn == "52769" && FrequencyLookup.isContinuous(frequency))
   then
-    $p.setMedsSetCode("UCSF_A77");
-    $p.setMedsSetName("Continuous Infusion Milrinone IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A77");
+    result.setName("Continuous Infusion Milrinone IV");
+    $p.setMedsSet(result);
 end
 
 rule "Continuous Infusion Isoproterenol IV"
@@ -743,32 +896,40 @@ rule "Continuous Infusion Isoproterenol IV"
     $p:RxNorm(rxcuiIn == "6054" && FrequencyLookup.isContinuous(frequency) &&
               RouteLookup.isIV(route))
   then
-    $p.setMedsSetCode("UCSF_A78");
-    $p.setMedsSetName("Continuous Infusion Isoproterenol IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A78");
+    result.setName("Continuous Infusion Isoproterenol IV");
+    $p.setMedsSet(result);
 end
 
 rule "Chemotherapy IV"
   when
     $p:RxNorm(ahfs == "10:00.00" && RouteLookup.isIV(route))
   then
-    $p.setMedsSetCode("UCSF_A79");
-    $p.setMedsSetName("Chemotherapy IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A79");
+    result.setName("Chemotherapy IV");
+    $p.setMedsSet(result);
 end
 
 rule "Total Parenteral Nutrition (TPN)"
   when
     $p:RxNorm(drugId == "40801561")
   then
-    $p.setMedsSetCode("UCSF_A80");
-    $p.setMedsSetName("Total Parenteral Nutrition (TPN)");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A80");
+    result.setName("Total Parenteral Nutrition (TPN)");
+    $p.setMedsSet(result);
 end
 
 rule "Continuous Infusion Epoprostenol  IV"
   when
     $p:RxNorm(rxcuiIn == "8814" && FrequencyLookup.isContinuous(frequency))
   then
-    $p.setMedsSetCode("UCSF_A81");
-    $p.setMedsSetName("Continuous Infusion Epoprostenol  IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A81");
+    result.setName("Continuous Infusion Epoprostenol  IV");
+    $p.setMedsSet(result);
 end
 
 rule "Continuous Infusion Treprostinil IV"
@@ -776,8 +937,10 @@ rule "Continuous Infusion Treprostinil IV"
     $p:RxNorm(rxcuiIn == "343048" && FrequencyLookup.isContinuous(frequency) &&
               RouteLookup.isIV(route))
   then
-    $p.setMedsSetCode("UCSF_A82");
-    $p.setMedsSetName("Continuous Infusion Treprostinil IV");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A82");
+    result.setName("Continuous Infusion Treprostinil IV");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Non-Enteric Coated Pancrelipase Enteral"
@@ -785,32 +948,40 @@ rule "Intermittent Non-Enteric Coated Pancrelipase Enteral"
     $p:RxNorm(RouteLookup.isNonJejunalEnteral(route) &&
                (rxcuiSCD == "1247386" || rxcuiSCD == "1247379"))
   then
-    $p.setMedsSetCode("UCSF_A83");
-    $p.setMedsSetName("Intermittent Non-Enteric Coated Pancrelipase Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A83");
+    result.setName("Intermittent Non-Enteric Coated Pancrelipase Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Clopidogrel Enteral"
   when
     $p:RxNorm(rxcuiIn == "32968")
   then
-    $p.setMedsSetCode("UCSF_A84");
-    $p.setMedsSetName("Intermittent Clopidogrel Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A84");
+    result.setName("Intermittent Clopidogrel Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Prasugrel Enteral"
   when
     $p:RxNorm(rxcuiIn == "613391")
   then
-    $p.setMedsSetCode("UCSF_A85");
-    $p.setMedsSetName("Intermittent Prasugrel Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A85");
+    result.setName("Intermittent Prasugrel Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Ticagrelor Enteral"
   when
     $p:RxNorm(rxcuiIn == "1116632")
   then
-    $p.setMedsSetCode("UCSF_A86");
-    $p.setMedsSetName("Intermittent Ticagrelor Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A86");
+    result.setName("Intermittent Ticagrelor Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Aspirin Enteral"
@@ -818,8 +989,10 @@ rule "Intermittent Aspirin Enteral"
     $p:RxNorm(rxcuiIn == "1191" && 
                (RouteLookup.isNonRectalEnteral(route) || route == "17"))
   then
-    $p.setMedsSetCode("UCSF_A87");
-    $p.setMedsSetName("Intermittent Aspirin Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A87");
+    result.setName("Intermittent Aspirin Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Hydrocortisone"
@@ -834,16 +1007,20 @@ rule "Hydrocortisone"
                rxcuiSCD == "199320" || 
                rxcuiSCD == "197787"))
   then
-    $p.setMedsSetCode("UCSF_A88");
-    $p.setMedsSetName("Hydrocortisone");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A88");
+    result.setName("Hydrocortisone");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Prednisone Enteral"
   when
     $p:RxNorm(rxcuiIn == "8640")
   then
-    $p.setMedsSetCode("UCSF_A89");
-    $p.setMedsSetName("Intermittent Prednisone Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A89");
+    result.setName("Intermittent Prednisone Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Methylprednisolone"
@@ -851,8 +1028,10 @@ rule "Intermittent Methylprednisolone"
     $p:RxNorm(rxcuiIn == "6902" && 
               (RouteLookup.isNonRectalEnteral(route) || RouteLookup.isIV(route)  || route == "6"))
   then
-    $p.setMedsSetCode("UCSF_A90");
-    $p.setMedsSetName("Intermittent Methylprednisolone");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A90");
+    result.setName("Intermittent Methylprednisolone");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Dexamethasone"
@@ -860,22 +1039,28 @@ rule "Intermittent Dexamethasone"
     $p:RxNorm(rxcuiIn == "3264" &&
                (RouteLookup.isNonRectalEnteral(route) || RouteLookup.isIV(route)))
   then
-    $p.setMedsSetCode("UCSF_A91");
-    $p.setMedsSetName("Intermittent Dexamethasone");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A91");
+    result.setName("Intermittent Dexamethasone");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Cortisone Enteral"
   when
     $p:RxNorm(rxcuiIn == "2878")
   then
-    $p.setMedsSetCode("UCSF_A92");
-    $p.setMedsSetName("Intermittent Cortisone Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A92");
+    result.setName("Intermittent Cortisone Enteral");
+    $p.setMedsSet(result);
 end
 
 rule "Intermittent Prednisolone Enteral"
   when
     $p:RxNorm(rxcuiIn == "8638" && RouteLookup.isNonRectalEnteral(route))
   then
-    $p.setMedsSetCode("UCSF_A93");
-    $p.setMedsSetName("Intermittent Prednisolone Enteral");
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A93");
+    result.setName("Intermittent Prednisolone Enteral");
+    $p.setMedsSet(result);
 end

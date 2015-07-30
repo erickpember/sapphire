@@ -50,5 +50,5 @@ public class RxNorm {
 
   /** RxNorm (RXCUI for TTY = IN). */
   @JsonProperty("rxcuiIn")
-  private String rxcuiIn;
+  private List<String> rxcuiIn = new ArrayList();
 }

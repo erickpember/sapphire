@@ -47,14 +47,14 @@ public class RxNormRuleTest {
 
     RxNorm intermittentHydromorphoneEnteral = new RxNorm() {
       {
-        setRxcuiIn("3423");
+        getRxcuiIn().add("3423");
         setRoute("15");
       }
     };
 
     RxNorm epidural = new RxNorm() {
       {
-        setRxcuiIn("35780");
+        getRxcuiIn().add("35780");
         setRoute("50");
         setFrequency("200905");
       }
@@ -62,14 +62,14 @@ public class RxNormRuleTest {
 
     RxNorm oxycodone = new RxNorm() {
       {
-        setRxcuiIn("7804");
+        getRxcuiIn().add("7804");
         setBrand("Oxycodone");
       }
     };
 
     RxNorm oxycontin = new RxNorm() {
       {
-        setRxcuiIn("161");
+        getRxcuiIn().add("161");
         setBrand("Oxycontin");
       }
     };
@@ -115,49 +115,49 @@ public class RxNormRuleTest {
     ArrayList<RxNorm> meds = new ArrayList<>();
     RxNorm ucsfa2 = new RxNorm() {
       {
-        setRxcuiIn("319864");
+        getRxcuiIn().add("319864");
         setFrequency("200553");
       }
     };
     meds.add(ucsfa2);
     RxNorm ucsfa3 = new RxNorm() {
       {
-        setRxcuiIn("71535");
+        getRxcuiIn().add("71535");
         setFrequency("200553");
       }
     };
     meds.add(ucsfa3);
     RxNorm ucsfa4 = new RxNorm() {
       {
-        setRxcuiIn("68139");
+        getRxcuiIn().add("68139");
         setFrequency("200553");
       }
     };
     meds.add(ucsfa4);
     RxNorm ucsfa5 = new RxNorm() {
       {
-        setRxcuiIn("7883");
+        getRxcuiIn().add("7883");
         setFrequency("200553");
       }
     };
     meds.add(ucsfa5);
     RxNorm ucsfa6 = new RxNorm() {
       {
-        setRxcuiIn("319864");
+        getRxcuiIn().add("319864");
         setFrequency("200905");
       }
     };
     meds.add(ucsfa6);
     RxNorm ucsfa7 = new RxNorm() {
       {
-        setRxcuiIn("71535");
+        getRxcuiIn().add("71535");
         setFrequency("200905");
       }
     };
     meds.add(ucsfa7);
     RxNorm ucsfa8 = new RxNorm() {
       {
-        setRxcuiIn("1815");
+        getRxcuiIn().add("1815");
         setFrequency("200905");
         setRoute("50");
       }
@@ -165,7 +165,7 @@ public class RxNormRuleTest {
     meds.add(ucsfa8);
     RxNorm ucsfa9 = new RxNorm() {
       {
-        setRxcuiIn("1815");
+        getRxcuiIn().add("1815");
         setFrequency("200905");
         setRoute("157");
       }
@@ -173,7 +173,7 @@ public class RxNormRuleTest {
     meds.add(ucsfa9);
     RxNorm ucsfa10 = new RxNorm() {
       {
-        setRxcuiIn("4337");
+        getRxcuiIn().add("4337");
         setFrequency("200905");
         setRoute("11");
         setPca("yes");
@@ -182,7 +182,7 @@ public class RxNormRuleTest {
     meds.add(ucsfa10);
     RxNorm ucsfa11 = new RxNorm() {
       {
-        setRxcuiIn("3423");
+        getRxcuiIn().add("3423");
         setFrequency("200905");
         setRoute("11");
         setPca("yes");
@@ -191,7 +191,7 @@ public class RxNormRuleTest {
     meds.add(ucsfa11);
     RxNorm ucsfa12 = new RxNorm() {
       {
-        setRxcuiIn("7052");
+        getRxcuiIn().add("7052");
         setFrequency("200905");
         setRoute("11");
         setPca("yes");
@@ -200,7 +200,7 @@ public class RxNormRuleTest {
     meds.add(ucsfa12);
     RxNorm ucsfa13 = new RxNorm() {
       {
-        setRxcuiIn("4337");
+        getRxcuiIn().add("4337");
         setFrequency("200553");
         setRoute("11");
       }
@@ -208,7 +208,7 @@ public class RxNormRuleTest {
     meds.add(ucsfa13);
     RxNorm ucsfa14 = new RxNorm() {
       {
-        setRxcuiIn("4337");
+        getRxcuiIn().add("4337");
         setFrequency("200905");
         setRoute("11");
         setPca("no");
@@ -217,14 +217,14 @@ public class RxNormRuleTest {
     meds.add(ucsfa14);
     RxNorm ucsfa15 = new RxNorm() {
       {
-        setRxcuiIn("4337");
+        getRxcuiIn().add("4337");
         setRoute("20");
       }
     };
     meds.add(ucsfa15);
     RxNorm ucsfa16 = new RxNorm() {
       {
-        setRxcuiIn("3423");
+        getRxcuiIn().add("3423");
         setFrequency("200553");
         setRoute("11");
       }
@@ -232,7 +232,7 @@ public class RxNormRuleTest {
     meds.add(ucsfa16);
     RxNorm ucsfa17 = new RxNorm() {
       {
-        setRxcuiIn("3423");
+        getRxcuiIn().add("3423");
         setFrequency("200905");
         setRoute("11");
         setPca("no");
@@ -241,14 +241,14 @@ public class RxNormRuleTest {
     meds.add(ucsfa17);
     RxNorm ucsfa18 = new RxNorm() {
       {
-        setRxcuiIn("3423");
+        getRxcuiIn().add("3423");
         setRoute("15");
       }
     };
     meds.add(ucsfa18);
     RxNorm ucsfa19 = new RxNorm() {
       {
-        setRxcuiIn("73032");
+        getRxcuiIn().add("73032");
         setFrequency("200905");
         setRoute("11");
         setPca("no");
@@ -257,7 +257,7 @@ public class RxNormRuleTest {
     meds.add(ucsfa19);
     RxNorm ucsfa20 = new RxNorm() {
       {
-        setRxcuiIn("7052");
+        getRxcuiIn().add("7052");
         setFrequency("200553");
         setRoute("11");
       }
@@ -265,7 +265,7 @@ public class RxNormRuleTest {
     meds.add(ucsfa20);
     RxNorm ucsfa21 = new RxNorm() {
       {
-        setRxcuiIn("7052");
+        getRxcuiIn().add("7052");
         setFrequency("200905");
         setRoute("11");
         setPca("no");
@@ -274,7 +274,7 @@ public class RxNormRuleTest {
     meds.add(ucsfa21);
     RxNorm ucsfa22 = new RxNorm() {
       {
-        setRxcuiIn("7052");
+        getRxcuiIn().add("7052");
         setBrand("Made-up");
         setRoute("15");
       }
@@ -284,7 +284,7 @@ public class RxNormRuleTest {
     // A22 specifies "verify in testing" on brand name, which when assigned Kadian trips rule 23.
     RxNorm ucsfa23 = new RxNorm() {
       {
-        setRxcuiIn("7052");
+        getRxcuiIn().add("7052");
         setRoute("15");
         setBrand("Kadian");
       }
@@ -292,7 +292,7 @@ public class RxNormRuleTest {
     meds.add(ucsfa23);
     RxNorm ucsfa24 = new RxNorm() {
       {
-        setRxcuiIn("7804");
+        getRxcuiIn().add("7804");
         setBrand("Oxycodone");
       }
     };
@@ -301,14 +301,14 @@ public class RxNormRuleTest {
     // Rule 24 specifies "verify in testing" to exclude brand OxyContin, which trips rule 25.
     RxNorm ucsfa25 = new RxNorm() {
       {
-        setRxcuiIn("7804");
+        getRxcuiIn().add("7804");
         setBrand("OxyContin");
       }
     };
     meds.add(ucsfa25);
     RxNorm ucsfa26 = new RxNorm() {
       {
-        setRxcuiIn("7804");
+        getRxcuiIn().add("7804");
         // We need to be provided a brand here! Guessing Percocet!
         setBrand("Percocet");
       }
@@ -316,20 +316,20 @@ public class RxNormRuleTest {
     meds.add(ucsfa26);
     RxNorm ucsfa27 = new RxNorm() {
       {
-        setRxcuiIn("5489");
+        getRxcuiIn().add("5489");
       }
     };
     meds.add(ucsfa27);
     RxNorm ucsfa28 = new RxNorm() {
       {
-        setRxcuiIn("6813");
+        getRxcuiIn().add("6813");
         setRoute("11");
       }
     };
     meds.add(ucsfa28);
     RxNorm ucsfa29 = new RxNorm() {
       {
-        setRxcuiIn("6813");
+        getRxcuiIn().add("6813");
         setRoute("15");
       }
     };
@@ -348,13 +348,13 @@ public class RxNormRuleTest {
     meds.add(ucsfa31);
     RxNorm ucsfa32 = new RxNorm() {
       {
-        setRxcuiIn("140587");
+        getRxcuiIn().add("140587");
       }
     };
     meds.add(ucsfa32);
     RxNorm ucsfa33 = new RxNorm() {
       {
-        setRxcuiIn("35827");
+        getRxcuiIn().add("35827");
         setRoute("11");
       }
     };
@@ -373,41 +373,41 @@ public class RxNormRuleTest {
     meds.add(ucsfa35);
     RxNorm ucsfa36 = new RxNorm() {
       {
-        setRxcuiIn("161");
+        getRxcuiIn().add("161");
         setRoute("11");
       }
     };
     meds.add(ucsfa36);
     RxNorm ucsfa37 = new RxNorm() {
       {
-        setRxcuiIn("161");
+        getRxcuiIn().add("161");
         setRoute("17");
       }
     };
     meds.add(ucsfa37);
     RxNorm ucsfa38 = new RxNorm() {
       {
-        setRxcuiIn("25480");
+        getRxcuiIn().add("25480");
         setRoute("15");
       }
     };
     meds.add(ucsfa38);
     RxNorm ucsfa39 = new RxNorm() {
       {
-        setRxcuiIn("187832");
+        getRxcuiIn().add("187832");
       }
     };
     meds.add(ucsfa39);
     RxNorm ucsfa40 = new RxNorm() {
       {
-        setRxcuiIn("6130");
+        getRxcuiIn().add("6130");
         setRoute("15");
       }
     };
     meds.add(ucsfa40);
     RxNorm ucsfa41 = new RxNorm() {
       {
-        setRxcuiIn("6130");
+        getRxcuiIn().add("6130");
         setFrequency("200905");
         setRoute("11");
         setPca("no");
@@ -416,7 +416,7 @@ public class RxNormRuleTest {
     meds.add(ucsfa41);
     RxNorm ucsfa42 = new RxNorm() {
       {
-        setRxcuiIn("6130");
+        getRxcuiIn().add("6130");
         setFrequency("200553");
         setRoute("11");
       }
@@ -450,21 +450,21 @@ public class RxNormRuleTest {
     meds.add(ucsfa46);
     RxNorm ucsfa47 = new RxNorm() {
       {
-        setRxcuiIn("8782");
+        getRxcuiIn().add("8782");
         setFrequency("200905");
       }
     };
     meds.add(ucsfa47);
     RxNorm ucsfa48 = new RxNorm() {
       {
-        setRxcuiIn("48937");
+        getRxcuiIn().add("48937");
         setFrequency("200905");
       }
     };
     meds.add(ucsfa48);
     RxNorm ucsfa49 = new RxNorm() {
       {
-        setRxcuiIn("6470");
+        getRxcuiIn().add("6470");
         setFrequency("200553");
         setRoute("11");
       }
@@ -472,7 +472,7 @@ public class RxNormRuleTest {
     meds.add(ucsfa49);
     RxNorm ucsfa50 = new RxNorm() {
       {
-        setRxcuiIn("6470");
+        getRxcuiIn().add("6470");
         setFrequency("n/a");
         setRoute("15");
       }
@@ -480,7 +480,7 @@ public class RxNormRuleTest {
     meds.add(ucsfa50);
     RxNorm ucsfa51 = new RxNorm() {
       {
-        setRxcuiIn("6470");
+        getRxcuiIn().add("6470");
         setFrequency("200905");
         setRoute("11");
       }
@@ -488,7 +488,7 @@ public class RxNormRuleTest {
     meds.add(ucsfa51);
     RxNorm ucsfa52 = new RxNorm() {
       {
-        setRxcuiIn("6960");
+        getRxcuiIn().add("6960");
         setFrequency("200553");
         setRoute("11");
       }
@@ -496,7 +496,7 @@ public class RxNormRuleTest {
     meds.add(ucsfa52);
     RxNorm ucsfa53 = new RxNorm() {
       {
-        setRxcuiIn("6960");
+        getRxcuiIn().add("6960");
         setFrequency("200905");
         setRoute("11");
       }
@@ -504,20 +504,20 @@ public class RxNormRuleTest {
     meds.add(ucsfa53);
     RxNorm ucsfa54 = new RxNorm() {
       {
-        setRxcuiIn("2598");
+        getRxcuiIn().add("2598");
       }
     };
     meds.add(ucsfa54);
     RxNorm ucsfa55 = new RxNorm() {
       {
-        setRxcuiIn("3322");
+        getRxcuiIn().add("3322");
         setRoute("11");
       }
     };
     meds.add(ucsfa55);
     RxNorm ucsfa56 = new RxNorm() {
       {
-        setRxcuiIn("3322");
+        getRxcuiIn().add("3322");
         setRoute("17");
       }
     };
@@ -530,63 +530,63 @@ public class RxNormRuleTest {
     meds.add(ucsfa57);
     RxNorm ucsfa58 = new RxNorm() {
       {
-        setRxcuiIn("596");
+        getRxcuiIn().add("596");
       }
     };
     meds.add(ucsfa58);
     RxNorm ucsfa59 = new RxNorm() {
       {
-        setRxcuiIn("11289");
+        getRxcuiIn().add("11289");
       }
     };
     meds.add(ucsfa59);
     RxNorm ucsfa60 = new RxNorm() {
       {
-        setRxcuiIn("15202");
+        getRxcuiIn().add("15202");
         setFrequency("200905");
       }
     };
     meds.add(ucsfa60);
     RxNorm ucsfa61 = new RxNorm() {
       {
-        setRxcuiIn("60819");
+        getRxcuiIn().add("60819");
         setFrequency("200905");
       }
     };
     meds.add(ucsfa61);
     RxNorm ucsfa62 = new RxNorm() {
       {
-        setRxcuiIn("1546356");
+        getRxcuiIn().add("1546356");
       }
     };
     meds.add(ucsfa62);
     RxNorm ucsfa63 = new RxNorm() {
       {
-        setRxcuiIn("1364430");
+        getRxcuiIn().add("1364430");
       }
     };
     meds.add(ucsfa63);
     RxNorm ucsfa64 = new RxNorm() {
       {
-        setRxcuiIn("1114195");
+        getRxcuiIn().add("1114195");
       }
     };
     meds.add(ucsfa64);
     RxNorm ucsfa65 = new RxNorm() {
       {
-        setRxcuiIn("1599538");
+        getRxcuiIn().add("1599538");
       }
     };
     meds.add(ucsfa65);
     RxNorm ucsfa66 = new RxNorm() {
       {
-        setRxcuiIn("321208");
+        getRxcuiIn().add("321208");
       }
     };
     meds.add(ucsfa66);
     RxNorm ucsfa67 = new RxNorm() {
       {
-        setRxcuiIn("67108");
+        getRxcuiIn().add("67108");
         setFrequency("q12h");
       }
     };
@@ -599,7 +599,7 @@ public class RxNormRuleTest {
     meds.add(ucsfa68);
     RxNorm ucsfa69 = new RxNorm() {
       {
-        setRxcuiIn("235473");
+        getRxcuiIn().add("235473");
         setRoute("subcutaneous");
       }
     };
@@ -612,14 +612,14 @@ public class RxNormRuleTest {
     meds.add(ucsfa70);
     RxNorm ucsfa71 = new RxNorm() {
       {
-        setRxcuiIn("3628");
+        getRxcuiIn().add("3628");
         setFrequency("200905");
       }
     };
     meds.add(ucsfa71);
     RxNorm ucsfa72 = new RxNorm() {
       {
-        setRxcuiIn("3992");
+        getRxcuiIn().add("3992");
         setFrequency("200905");
         setRoute("11");
       }
@@ -627,14 +627,14 @@ public class RxNormRuleTest {
     meds.add(ucsfa72);
     RxNorm ucsfa73 = new RxNorm() {
       {
-        setRxcuiIn("7512");
+        getRxcuiIn().add("7512");
         setFrequency("200905");
       }
     };
     meds.add(ucsfa73);
     RxNorm ucsfa74 = new RxNorm() {
       {
-        setRxcuiIn("8163");
+        getRxcuiIn().add("8163");
         setFrequency("200905");
         setRoute("11");
       }
@@ -642,28 +642,28 @@ public class RxNormRuleTest {
     meds.add(ucsfa74);
     RxNorm ucsfa75 = new RxNorm() {
       {
-        setRxcuiIn("11149");
+        getRxcuiIn().add("11149");
         setFrequency("200905");
       }
     };
     meds.add(ucsfa75);
     RxNorm ucsfa76 = new RxNorm() {
       {
-        setRxcuiIn("3616");
+        getRxcuiIn().add("3616");
         setFrequency("200905");
       }
     };
     meds.add(ucsfa76);
     RxNorm ucsfa77 = new RxNorm() {
       {
-        setRxcuiIn("52769");
+        getRxcuiIn().add("52769");
         setFrequency("200905");
       }
     };
     meds.add(ucsfa77);
     RxNorm ucsfa78 = new RxNorm() {
       {
-        setRxcuiIn("6054");
+        getRxcuiIn().add("6054");
         setFrequency("200905");
         setRoute("11");
       }
@@ -684,14 +684,14 @@ public class RxNormRuleTest {
     meds.add(ucsfa80);
     RxNorm ucsfa81 = new RxNorm() {
       {
-        setRxcuiIn("8814");
+        getRxcuiIn().add("8814");
         setFrequency("200905");
       }
     };
     meds.add(ucsfa81);
     RxNorm ucsfa82 = new RxNorm() {
       {
-        setRxcuiIn("343048");
+        getRxcuiIn().add("343048");
         setFrequency("200905");
         setRoute("11");
       }
@@ -706,25 +706,25 @@ public class RxNormRuleTest {
     meds.add(ucsfa83);
     RxNorm ucsfa84 = new RxNorm() {
       {
-        setRxcuiIn("32968");
+        getRxcuiIn().add("32968");
       }
     };
     meds.add(ucsfa84);
     RxNorm ucsfa85 = new RxNorm() {
       {
-        setRxcuiIn("613391");
+        getRxcuiIn().add("613391");
       }
     };
     meds.add(ucsfa85);
     RxNorm ucsfa86 = new RxNorm() {
       {
-        setRxcuiIn("1116632");
+        getRxcuiIn().add("1116632");
       }
     };
     meds.add(ucsfa86);
     RxNorm ucsfa87 = new RxNorm() {
       {
-        setRxcuiIn("1191");
+        getRxcuiIn().add("1191");
         setRoute("17");
       }
     };
@@ -738,33 +738,33 @@ public class RxNormRuleTest {
     meds.add(ucsfa88);
     RxNorm ucsfa89 = new RxNorm() {
       {
-        setRxcuiIn("8640");
+        getRxcuiIn().add("8640");
       }
     };
     meds.add(ucsfa89);
     RxNorm ucsfa90 = new RxNorm() {
       {
-        setRxcuiIn("6902");
+        getRxcuiIn().add("6902");
         setRoute("11");
       }
     };
     meds.add(ucsfa90);
     RxNorm ucsfa91 = new RxNorm() {
       {
-        setRxcuiIn("3264");
+        getRxcuiIn().add("3264");
         setRoute("11");
       }
     };
     meds.add(ucsfa91);
     RxNorm ucsfa92 = new RxNorm() {
       {
-        setRxcuiIn("2878");
+        getRxcuiIn().add("2878");
       }
     };
     meds.add(ucsfa92);
     RxNorm ucsfa93 = new RxNorm() {
       {
-        setRxcuiIn("8638");
+        getRxcuiIn().add("8638");
         setRoute("15");
       }
     };

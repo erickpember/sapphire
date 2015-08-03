@@ -15,6 +15,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
 import org.apache.avro.Schema;
 import org.apache.avro.reflect.ReflectData;
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.apache.nifi.annotation.behavior.EventDriven;
 import org.apache.nifi.annotation.behavior.SupportsBatching;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
@@ -115,7 +116,7 @@ public class ProcessEvent extends DependencyInjectingProcessor {
       session.transfer(flowFile, SUCCESS);
     } catch (IllegalStateException | NullPointerException e) {
       log.error("Cannot process {}", new Object[] { flowFile }, e);
-      flowFile = session.penalize(flowFile);
+      log.error("Stack trace {}", new Object[] { ExceptionUtils.getStackTrace(e) });
       session.transfer(flowFile, FAILURE);
     }
   }

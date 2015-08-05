@@ -1,6 +1,6 @@
 // Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.rules.util;
+package com.datafascia.etl.ucsf.web.rules.util;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -9,7 +9,7 @@ import org.kie.api.definition.rule.Rule;
 import org.kie.api.event.rule.AfterMatchFiredEvent;
 import org.kie.api.event.rule.DefaultAgendaEventListener;
 
-import static com.datafascia.rules.util.TestUtil.findDuplicates;
+import static com.datafascia.etl.ucsf.web.rules.util.TestUtil.findDuplicates;
 
 /**
  * This serves as a way of logging, tracking, counting rule activations in test code.

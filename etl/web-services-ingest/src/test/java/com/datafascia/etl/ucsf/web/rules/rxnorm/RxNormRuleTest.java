@@ -1,10 +1,11 @@
 // Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.rules.rxnorm;
+package com.datafascia.etl.ucsf.web.rules.rxnorm;
 
-import com.datafascia.rules.model.RxNorm;
-import com.datafascia.rules.util.RuleTrackingEventListener;
-import com.datafascia.rules.util.TestUtil;
+import com.datafascia.etl.ucsf.web.rules.model.MedsSet;
+import com.datafascia.etl.ucsf.web.rules.model.RxNorm;
+import com.datafascia.etl.ucsf.web.rules.util.RuleTrackingEventListener;
+import com.datafascia.etl.ucsf.web.rules.util.TestUtil;
 import java.util.ArrayList;
 import java.util.Arrays;
 import lombok.extern.slf4j.Slf4j;
@@ -20,8 +21,7 @@ import static org.testng.Assert.assertTrue;
  */
 @Slf4j
 public class RxNormRuleTest {
-
-  private static final String DRL_PATH = "com/datafascia/rules//rxnorm.drl";
+  private static final String DRL_PATH = "com/datafascia/etl/ucsf/web/rules/rxnorm.drl";
 
   /**
    * Tests against a stateless instance of Drools.
@@ -769,6 +769,30 @@ public class RxNormRuleTest {
       }
     };
     meds.add(ucsfa93);
+    RxNorm ucsfa94 = new RxNorm() {
+      {
+        MedsSet result = new MedsSet();
+        result.setName("Intermittent Cisatracurium IV");
+        getMedsSets().add(result);
+      }
+    };
+    meds.add(ucsfa94);
+    RxNorm ucsfa95 = new RxNorm() {
+      {
+        MedsSet result = new MedsSet();
+        result.setName("Continuous Infusion Vecuronium IV");
+        getMedsSets().add(result);
+      }
+    };
+    meds.add(ucsfa95);
+    RxNorm ucsfa96 = new RxNorm() {
+      {
+        MedsSet result = new MedsSet();
+        result.setName("Continuous Infusion Lorazepam IV");
+        getMedsSets().add(result);
+      }
+    };
+    meds.add(ucsfa96);
 
     // Insert objects into the working memory
     for (RxNorm med : meds) {

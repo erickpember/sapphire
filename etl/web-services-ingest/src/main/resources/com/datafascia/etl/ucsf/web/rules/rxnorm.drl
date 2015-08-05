@@ -1,22 +1,40 @@
 // Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.rules;
+package com.datafascia.etl.ucsf.web.rules;
 
-import com.datafascia.rules.model.MedsSet;
-import com.datafascia.rules.model.RxNorm;
-import com.datafascia.rules.rxnorm.FrequencyLookup;
-import com.datafascia.rules.rxnorm.RouteLookup;
+import com.datafascia.etl.ucsf.web.rules.model.MedsSet;
+import com.datafascia.etl.ucsf.web.rules.model.RxNorm;
+import com.datafascia.etl.ucsf.web.rules.rxnorm.FrequencyLookup;
+import com.datafascia.etl.ucsf.web.rules.rxnorm.RouteLookup;
+import java.util.List;
 
 global org.slf4j.Logger log;
  
 dialect "mvel"
 
-/** 
- *  These rules take a RxNorm model as input ($p) and read the fields
+/**
+ *  This file contains rules that process "events" as they come. When an event matches a rule,
+ *  the rule appends information.
+ *
+ *  These rules take a RxNorm model "event" as input ($p) and read the fields
  *  route, freuqency, pca, brand, rxcuiSCD, ahfs, drugID and rxcuiIN.
  *  Based on their content, if an event matches a rule the rule will write fields
  *  medsSetCode and medsSetName.
- *  
+ *
+ *  Basic boolean algebra operands these rules use to evaluate events:
+ *  && - and                ex: (true and true) result: true    ex: (false && true)  result: false
+ *  || - or                 ex: (true or false) result: true    ex: (false || false) result: false
+ *  == - test for equality  ex: (true is true)  result: true    ex: (false == true)  result: false
+ *  = - assignment          ex: foo = true;  foo == false                            result: false
+ *
+ *  Expressions are nested inside expressions using parentheses:
+ *  ((true OR false) AND (true AND true))  result: true
+ *  ((true || false) && (true && false))   result: false
+ *
+ *  FrequencyLookup.isIntermittent(frequency) - Use an external function to look up frequency,
+ *  true if it is intermittent.
+ *
+ *  Open issues:
  *  Rule A26 "Intermittent Oxycodone-acetaminophen Enteral"
  *  	We need to be provided a brand name.
  *
@@ -27,13 +45,22 @@ dialect "mvel"
  *  Rule A50 "Intermittent Lorazepam Enteral" needs to be provided a frequency.
  */
 
+// Rule name
 rule "Intermittent Cisatracurium IV"
   when
+    // When the list of rxcuiIn in this event contains 319864 AND the frequency is intermittent.
     $p:RxNorm($rxcuiIn : rxcuiIn contains "319864" && FrequencyLookup.isIntermittent(frequency))
   then
+    // Create a new result
     MedsSet result = new MedsSet();
+
+    // Give it a dF tracking code to identify the rule.
     result.setCode("UCSF_A2");
+
+    // Identify the incoming event with this name
     result.setName("Intermittent Cisatracurium IV");
+
+    // Add this to the list of results for this dataset. One event can trip multiple rules.
     $p.getMedsSets().add(result);
 end
 
@@ -89,6 +116,7 @@ end
 
 rule "Epidural"
   when
+    // When the event has any of these rxcuiIns AND the frequency is continuous AND the route is 50.
     $p:RxNorm(($rxcuiIn : rxcuiIn contains "1815" ||
                rxcuiIn contains  "35780" ||
                rxcuiIn contains  "4337" ||
@@ -119,6 +147,7 @@ end
 
 rule "Fentanyl PCA"
   when
+    // RouteLookup is used here to match the route against a list of IV codes: 11, 75, 167, 169
     $p:RxNorm($rxcuiIn : rxcuiIn contains "4337" && FrequencyLookup.isContinuous(frequency) &&
               RouteLookup.isIV(route) && pca == "yes")
   then
@@ -1029,7 +1058,7 @@ end
 rule "Intermittent Methylprednisolone"
   when
     $p:RxNorm($rxcuiIn : rxcuiIn contains "6902" && 
-              (RouteLookup.isNonRectalEnteral(route) || RouteLookup.isIV(route)  || route == "6"))
+              (RouteLookup.isNonRectalEnteral(route) || RouteLookup.isIV(route) || route == "6"))
   then
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A90");
@@ -1067,3 +1096,46 @@ rule "Intermittent Prednisolone Enteral"
     result.setName("Intermittent Prednisolone Enteral");
     $p.getMedsSets().add(result);
 end
+
+// This rule depends on results from rules A2, A3, A4, A5.
+rule "Any bolus NMBA"
+  when
+    $p:RxNorm()
+    // If the results of fired rules contain any of these names
+    MedsSet(name == "Intermittent Vecuronium IV") from $p.medsSets or
+    MedsSet(name == "Intermittent Rocuronium IV") from $p.medsSets or
+    MedsSet(name == "Intermittent Cisatracurium IV") from $p.medsSets or
+    MedsSet(name == "Intermittent Pancuronium IV") from $p.medsSets
+  then
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A94");
+    result.setName("Any bolus NMBA");
+    $p.getMedsSets().add(result);
+end
+
+rule "Any infusion NMBA"
+  when
+    $p:RxNorm()
+    MedsSet(name == "Continuous Infusion Cisatracurium IV") from $p.medsSets or
+    MedsSet(name == "Continuous Infusion Vecuronium IV") from $p.medsSets
+  then
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A95");
+    result.setName("Any infusion NMBA");
+    $p.getMedsSets().add(result);
+end
+
+rule "Any sedative infusion"
+  when
+    $p:RxNorm()
+    MedsSet(name == "Continuous Infusion Dexmedetomidine IV") from $p.medsSets or
+    MedsSet(name == "Continuous Infusion Lorazepam IV") from $p.medsSets or
+    MedsSet(name == "Continuous Infusion Midazolam IV") from $p.medsSets or
+    MedsSet(name == "Continuous Infusion Propofol IV") from $p.medsSets
+  then
+    MedsSet result = new MedsSet();
+    result.setCode("UCSF_A96");
+    result.setName("Any sedative infusion");
+    $p.getMedsSets().add(result);
+end
+

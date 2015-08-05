@@ -21,7 +21,7 @@ import ca.uhn.fhir.rest.gclient.StringClientParam;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.domain.fhir.IdentifierSystems;
-import com.datafascia.rules.model.MedsSet;
+import com.datafascia.etl.ucsf.web.rules.model.MedsSet;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.Instant;

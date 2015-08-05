@@ -1,9 +1,9 @@
 // Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.rules.rxnorm;
+package com.datafascia.etl.ucsf.web.rules.rxnorm;
 
 import com.datafascia.common.jackson.CSVMapper;
-import com.datafascia.rules.model.IntermittentFrequency;
+import com.datafascia.etl.ucsf.web.rules.model.IntermittentFrequency;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -17,7 +17,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class FrequencyLookup {
   private static final HashMap<String, IntermittentFrequency> frequencies = new HashMap<>();
-  private static final String csvFile = "/lookups/frequencies.csv";
+  private static final String csvFile
+      = "/com/datafascia/etl/ucsf/web/rules/lookups/frequencies.csv";
   private static final CSVMapper<IntermittentFrequency> mapper = new CSVMapper<>(
           IntermittentFrequency.class);
 

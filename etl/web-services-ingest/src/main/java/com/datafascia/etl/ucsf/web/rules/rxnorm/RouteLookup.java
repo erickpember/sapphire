@@ -1,6 +1,6 @@
 // Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.rules.rxnorm;
+package com.datafascia.etl.ucsf.web.rules.rxnorm;
 
 import java.util.Arrays;
 import java.util.List;

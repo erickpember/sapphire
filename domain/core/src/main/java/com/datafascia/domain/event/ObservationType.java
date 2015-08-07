@@ -12,6 +12,7 @@ public enum ObservationType {
   A06,
   A08,
   A13,
+  MDM,
   ORU,
   OTHER
 }

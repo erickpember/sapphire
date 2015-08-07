@@ -19,6 +19,7 @@ import com.datafascia.domain.fhir.Dates;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.persist.EncounterRepository;
+import com.datafascia.domain.persist.FlagRepository;
 import com.datafascia.domain.persist.ObservationRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.domain.persist.ProcedureRepository;
@@ -32,6 +33,9 @@ public class AddObservations implements Consumer<Event> {
 
   @Inject
   private transient ObservationRepository observationRepository;
+
+  @Inject
+  private transient FlagRepository flagRepository;
 
   @Inject
   private transient ProcedureRepository procedureRepository;
@@ -83,16 +87,21 @@ public class AddObservations implements Consumer<Event> {
     Encounter encounter = getEncounter(addObservationsData.getEncounterIdentifier());
     UnitedStatesPatient patient = getPatient(addObservationsData.getInstitutionPatientId());
 
+    FlagBuilder flagBuilder = new FlagBuilder(patient);
     ProcedureBuilder procedureBuilder = new ProcedureBuilder(encounter);
+
     for (ObservationData fromObservation : addObservationsData.getObservations()) {
       Observation observation = toObservation(fromObservation, encounter, patient);
       observationRepository.save(encounter, observation);
 
+      flagBuilder.add(observation);
       procedureBuilder.add(observation);
     }
 
-    procedureBuilder.build().ifPresent(procedure -> {
-        procedureRepository.save(procedure);
-      });
+    flagBuilder.build()
+        .forEach(flag -> flagRepository.save(flag));
+
+    procedureBuilder.build()
+        .ifPresent(procedure -> procedureRepository.save(procedure));
   }
 }

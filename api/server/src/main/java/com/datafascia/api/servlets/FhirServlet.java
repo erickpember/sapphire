@@ -6,6 +6,7 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.server.EncodingEnum;
 import ca.uhn.fhir.rest.server.RestfulServer;
 import com.datafascia.api.resources.fhir.EncounterResourceProvider;
+import com.datafascia.api.resources.fhir.FlagResourceProvider;
 import com.datafascia.api.resources.fhir.LocationResourceProvider;
 import com.datafascia.api.resources.fhir.MedicationAdministrationResourceProvider;
 import com.datafascia.api.resources.fhir.MedicationPrescriptionResourceProvider;
@@ -39,10 +40,11 @@ public class FhirServlet extends RestfulServer {
     // Configure resource providers.
     setResourceProviders(Arrays.asList(
         new EncounterResourceProvider(),
+        new FlagResourceProvider(),
         new LocationResourceProvider(),
-        new MedicationResourceProvider(),
         new MedicationAdministrationResourceProvider(),
         new MedicationPrescriptionResourceProvider(),
+        new MedicationResourceProvider(),
         new ObservationResourceProvider(),
         new ProcedureResourceProvider(),
         new PatientResourceProvider()));

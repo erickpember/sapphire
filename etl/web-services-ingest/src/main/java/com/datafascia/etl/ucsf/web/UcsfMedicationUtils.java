@@ -230,13 +230,14 @@ public class UcsfMedicationUtils {
    * @param medication  The medication.
    * @param encounterId The ID of the associated encounter.
    * @param orderId     The id of the order.
+   * @param medsSet     The medsset codes and names.
    * @param client      The FHIR client.
    * @return The populated prescription.
    * @throws java.sql.SQLException When there is a problem communicating with SQL.
    */
   public static MedicationPrescription populatePrescription(JSONObject orderJson,
-      Medication medication, String encounterId, String orderId, IGenericClient client)
-      throws SQLException {
+      Medication medication, String encounterId, String orderId, List<MedsSet> medsSet,
+      IGenericClient client) throws SQLException {
     MedicationPrescription prescription = new MedicationPrescription();
     prescription.addIdentifier()
         .setSystem(IdentifierSystems.INSTITUTION_MEDICATION_PRESCRIPTION)
@@ -302,6 +303,12 @@ public class UcsfMedicationUtils {
         log.error("Dose value of '" + orderedDose + "' for order " + orderId
             + " is not a valid number.");
       }
+    }
+
+    for (MedsSet medsSetInst : medsSet) {
+      IdentifierDt groupIdent = prescription.addIdentifier();
+      groupIdent.setSystem(CodingSystems.UCSF_MEDICATION_GROUP_NAME);
+      groupIdent.setValue(medsSetInst.getName());
     }
 
     return prescription;

@@ -347,13 +347,13 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
 
       // Recreate the prescription based on the new data.
       MedicationPrescription medpresc = UcsfMedicationUtils.populatePrescription(orderJson,
-          medication, encounterId, prescriptionId, client);
+          medication, encounterId, prescriptionId, droolNorm.getMedsSets(), client);
       medpresc.setId(UcsfMedicationUtils.getMedicationPrescription(prescriptionId, encounterId,
           client).getId());
       client.update().resource(medpresc).execute();
     } else {
       MedicationPrescription prescription = UcsfMedicationUtils.populatePrescription
-          (orderJson, medication, encounterId, prescriptionId, client);
+          (orderJson, medication, encounterId, prescriptionId, droolNorm.getMedsSets(), client);
       prescription = UcsfMedicationUtils.savePrescription(prescription, client);
       diffListener.newOrder(prescription);
     }

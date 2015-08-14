@@ -2,7 +2,6 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.hl7.v24;
 
-import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Segment;
@@ -233,11 +232,6 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
         .encounterIdentifier(encounterIdentifier)
         .observations(observations)
         .build();
-  }
-
-  protected AdministrativeGenderEnum toGender(String code) {
-    AdministrativeGenderEnum gender = AdministrativeGenderEnum.UNKNOWN.forCode(code);
-    return MoreObjects.firstNonNull(gender, AdministrativeGenderEnum.UNKNOWN);
   }
 
   protected LocalDate toLocalDate(TSComponentOne fromDate) throws HL7Exception {

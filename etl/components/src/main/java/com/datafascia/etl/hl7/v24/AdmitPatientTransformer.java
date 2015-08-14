@@ -15,6 +15,7 @@ import com.datafascia.domain.event.Event;
 import com.datafascia.domain.event.EventType;
 import com.datafascia.domain.event.ObservationType;
 import com.datafascia.domain.event.PatientData;
+import com.datafascia.etl.hl7.GenderFormatter;
 import com.google.common.base.Strings;
 import java.net.URI;
 import java.util.Optional;
@@ -40,7 +41,7 @@ public abstract class AdmitPatientTransformer extends BaseTransformer {
         .lastName(
             patientName.getFamilyName().getSurname().getValueOrEmpty())
         .gender(
-            toGender(pid.getAdministrativeSex().getValue()))
+            GenderFormatter.parse(pid.getAdministrativeSex().getValue()))
         .birthDate(
             toLocalDate(pid.getDateTimeOfBirth().getTimeOfAnEvent()))
         .maritalStatus(

@@ -30,6 +30,11 @@
       <artifactId>df-etl-components</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>df-etl-web-services-ingest</artifactId>
+      <version>${project.version}</version>
+    </dependency>
   </dependencies>
 
   <build>

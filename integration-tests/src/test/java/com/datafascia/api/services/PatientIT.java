@@ -85,6 +85,12 @@ public class PatientIT extends ApiIT {
         .execute();
     assertEquals(patient.getGenderElement().getValueAsEnum(), AdministrativeGenderEnum.MALE);
 
+    // restore patient's gender
+    patient.setGender(AdministrativeGenderEnum.FEMALE);
+    updateResults = client.update()
+        .resource(patient)
+        .execute();
+
     client.delete().resourceById(patient.getId()).execute();
     patient = client.read()
         .resource(UnitedStatesPatient.class)

@@ -117,8 +117,7 @@ public class ApiIT {
     List<Encounter> encounters = addEncounters(patients, locations);
     Medication medication = addMedication();
 
-    // TODO: Determine the best way to deal with the observation _id field
-    //List<Observation> observations = addObservations(patients, encounters);
+    List<Observation> observations = addObservations(patients, encounters);
   }
 
   private List<UnitedStatesPatient> addPatients() {
@@ -248,7 +247,7 @@ public class ApiIT {
         .setUnits("cm");
     observation1.addIdentifier()
         .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("observation1");
-    observation1.setCode(new CodeableConceptDt("system", "HEIGHT"));
+    observation1.setCode(new CodeableConceptDt("system", "304894102"));
     observation1.setValue(observationValue);
     observation1.setSubject(new ResourceReferenceDt(patients.get(0)));
     observation1.setEncounter(new ResourceReferenceDt(encounters.get(0)));
@@ -278,9 +277,9 @@ public class ApiIT {
     observation3.addIdentifier()
         .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("observation3");
     observationValue = new QuantityDt()
-        .setValue(new DecimalDt("144"))
-        .setUnits("cm");
-    observation3.setCode(new CodeableConceptDt("system", "HEIGHT"));
+        .setValue(new DecimalDt("72"))
+        .setUnits("in");
+    observation3.setCode(new CodeableConceptDt("system", "304894102"));
     observation3.setValue(observationValue);
     observation3.setSubject(new ResourceReferenceDt(patients.get(1)));
     observation3.setEncounter(new ResourceReferenceDt(encounters.get(1)));
@@ -310,9 +309,9 @@ public class ApiIT {
     observation5.addIdentifier()
         .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("observation5");
     observationValue = new QuantityDt()
-        .setValue(new DecimalDt("50"))
-        .setUnits("cm");
-    observation5.setCode(new CodeableConceptDt("system", "HEIGHT"));
+        .setValue(new DecimalDt("71"))
+        .setUnits("in");
+    observation5.setCode(new CodeableConceptDt("system", "304894102"));
     observation5.setValue(observationValue);
     observation5.setSubject(new ResourceReferenceDt(patients.get(2)));
     observation5.setEncounter(new ResourceReferenceDt(encounters.get(2)));

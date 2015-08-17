@@ -78,7 +78,8 @@ public class FhirClient {
   public List<Observation> getObservations(Encounter encounter) {
     log.info("observations for: {}", encounter.getId().getValue());
     Bundle bundle = client.search().forResource(Observation.class)
-        .where(new StringClientParam("encounter._id").matches()
+        .where(new StringClientParam("encounter")
+            .matches()
             .value(encounter.getId().getIdPart()))
         .execute();
 
@@ -259,6 +260,20 @@ public class FhirClient {
     }
 
     return Optional.empty();
+  }
+
+  /**
+   * Get the observation units of measure
+   *
+   * @param observation
+   *     the observation to search
+   * @return value
+   *     the units of measure for the observation
+   */
+  public String getObservationUnits(Observation observation) {
+    QuantityDt quantity = (QuantityDt) observation.getValue();
+    log.info("observation units: {}", quantity.getUnits());
+    return quantity.getUnits();
   }
 
   /**

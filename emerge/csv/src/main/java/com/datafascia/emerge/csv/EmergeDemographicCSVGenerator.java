@@ -9,6 +9,7 @@ import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.model.HumanName;
 import com.datafascia.emerge.models.Demographic;
 import com.google.common.base.Joiner;
+import com.google.common.base.Strings;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -36,7 +37,7 @@ public class EmergeDemographicCSVGenerator {
   private static final String NAME_FMT =
       "<[" + HumanName.GIVEN + "," + HumanName.FAMILY + "]; separator=\" \">";
 
-  private static final String HEIGHT = "HEIGHT";
+  private static final String HEIGHT = "304894102";
   private static final String WEIGHT = "WEIGHT";
   private static final BigDecimal CENTIMETER_PER_INCH = new BigDecimal("2.54");
 
@@ -175,13 +176,27 @@ public class EmergeDemographicCSVGenerator {
     log.info("number of observations: {}", observations.size());
     for (Observation observation: observations) {
       Optional<String> height = client.getObservationValue(observation, HEIGHT);
-      Optional<String> weight = client.getObservationValue(observation, WEIGHT);
-
       if (height.isPresent()) {
-        // UCSF stores height in inches, but the CSV expects centimeters.
-        BigDecimal heightInch = new BigDecimal(height.get());
-        demo.setPatientAdmissionHeightCm(heightInch.multiply(CENTIMETER_PER_INCH).toString());
+        String units = client.getObservationUnits(observation);
+        if (!Strings.isNullOrEmpty(units)) {
+          if (units.equals("in")) {
+            // UCSF stores height in inches, but the CSV expects centimeters.
+            BigDecimal heightInch = new BigDecimal(height.get());
+            Integer heightCm = heightInch.multiply(CENTIMETER_PER_INCH).intValue();
+            demo.setPatientAdmissionHeightCm(heightCm.toString());
+          } else if (units.equals("cm")) {
+            demo.setPatientAdmissionHeightCm(height.get());
+          } else {
+            log.debug("unknown units for height: {}", units);
+            demo.setPatientAdmissionHeightCm("0");
+          }
+        } else {
+          log.debug("unspecified units for height");
+          demo.setPatientAdmissionHeightCm("0");
+        }
       }
+
+      Optional<String> weight = client.getObservationValue(observation, WEIGHT);
       if (weight.isPresent()) {
         demo.setPatientAdmissionWeightKg(weight.get());
       }

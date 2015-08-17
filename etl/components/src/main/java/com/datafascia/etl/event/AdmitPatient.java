@@ -24,7 +24,7 @@ import java.util.function.Consumer;
 import javax.inject.Inject;
 
 /**
- * Processes admin patient event.
+ * Processes admit patient event.
  */
 public class AdmitPatient implements Consumer<Event> {
 

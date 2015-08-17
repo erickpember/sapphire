@@ -81,7 +81,7 @@ public abstract class AdmitPatientTransformer extends BaseTransformer {
    * @param pid
    *     PID segment
    * @param pv1
-   *     PV1 segement
+   *     PV1 segment
    * @param institutionId
    *     institution ID
    * @param facilityId

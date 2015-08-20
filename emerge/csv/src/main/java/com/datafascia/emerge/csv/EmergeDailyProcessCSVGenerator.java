@@ -3,7 +3,6 @@
 package com.datafascia.emerge.csv;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
-import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.common.jackson.CSVMapper;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
@@ -100,7 +99,7 @@ public class EmergeDailyProcessCSVGenerator {
     dailyProcess.setDataCollectionDate(DATE_FORMATTER.format(now));
 
     addPatientData(dailyProcess, patient, encounter);
-    // TODO: addObservationData(dailyProcess, encounter);
+    addObservationData(dailyProcess, encounter);
     return dailyProcess;
   }
 
@@ -133,10 +132,23 @@ public class EmergeDailyProcessCSVGenerator {
    *     the current patient encounter resource
    */
   private static void addObservationData(DailyProcess dailyProcess, Encounter encounter) {
-    // Get a list of all resources for this encounter
+    // Get all Observation resources for this encounter
     List<Observation> observations = client.getObservations(encounter);
-    List<MedicationAdministration> medAdmins = client.getMedicationAdministrations(encounter);
-
-    // Loop over the CSV fields and look for the code in the observations
+    log.info("number of observations: {}", observations.size());
+    for (Observation observation: observations) {
+      Optional<String> observationCode = client.getObservationCode(observation);
+      if (observationCode.isPresent()) {
+        switch (observationCode.get()) {
+          case "3045000021":
+            Optional<String> value = client.getObservationStringValue(observation);
+            if (value.isPresent()) {
+              dailyProcess.setRassLevelLow(value.get());
+            }
+            break;
+          default:
+            break;
+        }
+      }
+    }
   }
 }

@@ -11,11 +11,13 @@ import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import ca.uhn.fhir.model.primitive.IdDt;
+import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.fhir.rest.client.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor;
 import ca.uhn.fhir.rest.gclient.StringClientParam;
 import com.datafascia.domain.fhir.RaceEnum;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
+import com.google.common.base.Strings;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
@@ -241,22 +243,46 @@ public class FhirClient {
   }
 
   /**
-   * Get the observation value for the code
+   * Gets the observation value.
+   *
+   * @param observation
+   *     the observation to read
+   * @return the quantity value
+   */
+  public Optional<String> getObservationQuantityValue(Observation observation) {
+    QuantityDt quantity = (QuantityDt) observation.getValue();
+    if (quantity != null && quantity.getValue() != null) {
+      return Optional.of(quantity.getValue().toString());
+    }
+
+    return Optional.empty();
+  }
+
+  /**
+   * Gets the observation value.
+   *
+   * @param observation
+   *     the observation to read
+   * @return the string value
+   */
+  public Optional<String> getObservationStringValue(Observation observation) {
+    StringDt stringDt = (StringDt) observation.getValue();
+    String value = stringDt.getValue();
+    return Strings.isNullOrEmpty(value) ? Optional.empty() : Optional.of(value);
+  }
+
+  /**
+   * Get the observation code
    *
    * @param observation
    *     the observation to search
-   * @param code
+   * @return code
    *     the code for which to search
-   * @return value
-   *     the value associated with the code
    */
-  public Optional<String> getObservationValue(Observation observation, String code) {
-    log.info("found code: {}", observation.getCode().getCoding().get(0).getCode());
-    if (observation.getCode().getCoding().get(0).getCode().equals(code)) {
-      QuantityDt quantity = (QuantityDt) observation.getValue();
-      if (quantity != null && quantity.getValue() != null) {
-        return Optional.of(quantity.getValue().toString());
-      }
+  public Optional<String> getObservationCode(Observation observation) {
+    String code = observation.getCode().getCoding().get(0).getCode();
+    if (!code.equals("")) {
+      return Optional.of(code);
     }
 
     return Optional.empty();

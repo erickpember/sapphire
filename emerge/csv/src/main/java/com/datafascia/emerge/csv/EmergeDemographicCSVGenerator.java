@@ -38,7 +38,7 @@ public class EmergeDemographicCSVGenerator {
       "<[" + HumanName.GIVEN + "," + HumanName.FAMILY + "]; separator=\" \">";
 
   private static final String HEIGHT = "304894102";
-  private static final String WEIGHT = "WEIGHT";
+  private static final String WEIGHT = "WT";
   private static final BigDecimal CENTIMETER_PER_INCH = new BigDecimal("2.54");
 
   private static CSVMapper<Demographic> mapper;
@@ -175,30 +175,42 @@ public class EmergeDemographicCSVGenerator {
     List<Observation> observations = client.getObservations(encounter);
     log.info("number of observations: {}", observations.size());
     for (Observation observation: observations) {
-      Optional<String> height = client.getObservationValue(observation, HEIGHT);
-      if (height.isPresent()) {
-        String units = client.getObservationUnits(observation);
-        if (!Strings.isNullOrEmpty(units)) {
-          if (units.equals("in")) {
-            // UCSF stores height in inches, but the CSV expects centimeters.
-            BigDecimal heightInch = new BigDecimal(height.get());
-            Integer heightCm = heightInch.multiply(CENTIMETER_PER_INCH).intValue();
-            demo.setPatientAdmissionHeightCm(heightCm.toString());
-          } else if (units.equals("cm")) {
-            demo.setPatientAdmissionHeightCm(height.get());
-          } else {
-            log.debug("unknown units for height: {}", units);
-            demo.setPatientAdmissionHeightCm("0");
-          }
-        } else {
-          log.debug("unspecified units for height");
-          demo.setPatientAdmissionHeightCm("0");
-        }
-      }
+      Optional<String> observationCode = client.getObservationCode(observation);
+      if (observationCode.isPresent()) {
+        switch (observationCode.get()) {
+          case HEIGHT:
+            Optional<String> height = client.getObservationQuantityValue(observation);
+            if (height.isPresent()) {
+              String units = client.getObservationUnits(observation);
+              if (!Strings.isNullOrEmpty(units)) {
+                if (units.equals("in")) {
+                  // UCSF stores height in inches, but the CSV expects centimeters.
+                  BigDecimal heightInch = new BigDecimal(height.get());
+                  Integer heightCm = heightInch.multiply(CENTIMETER_PER_INCH).intValue();
+                  demo.setPatientAdmissionHeightCm(heightCm.toString());
+                } else if (units.equals("cm")) {
+                  demo.setPatientAdmissionHeightCm(height.get());
+                } else {
+                  log.debug("unknown units for height: {}", units);
+                  demo.setPatientAdmissionHeightCm("0");
+                }
+              } else {
+                log.debug("unspecified units for height");
+                demo.setPatientAdmissionHeightCm("0");
+              }
+            }
+            break;
 
-      Optional<String> weight = client.getObservationValue(observation, WEIGHT);
-      if (weight.isPresent()) {
-        demo.setPatientAdmissionWeightKg(weight.get());
+          case WEIGHT:
+            Optional<String> weight = client.getObservationQuantityValue(observation);
+            if (weight.isPresent()) {
+              demo.setPatientAdmissionWeightKg(weight.get());
+            }
+            break;
+
+          default:
+            // Do nothing
+        }
       }
     }
   }

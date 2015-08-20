@@ -259,7 +259,7 @@ public class ApiIT {
         .setUnits("kg");
     observation2.addIdentifier()
         .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("observation2");
-    observation2.setCode(new CodeableConceptDt("system", "WEIGHT"));
+    observation2.setCode(new CodeableConceptDt("system", "WT"));
     observation2.setValue(observationValue);
     observation2.setSubject(new ResourceReferenceDt(patients.get(0)));
     observation2.setEncounter(new ResourceReferenceDt(encounters.get(0)));
@@ -291,7 +291,7 @@ public class ApiIT {
         .setUnits("kg");
     observation4.addIdentifier()
         .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("observation4");
-    observation4.setCode(new CodeableConceptDt("system", "WEIGHT"));
+    observation4.setCode(new CodeableConceptDt("system", "WT"));
     observation4.setValue(observationValue);
     observation4.setSubject(new ResourceReferenceDt(patients.get(1)));
     observation4.setEncounter(new ResourceReferenceDt(encounters.get(1)));
@@ -323,7 +323,7 @@ public class ApiIT {
         .setUnits("kg");
     observation6.addIdentifier()
         .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("observation4");
-    observation6.setCode(new CodeableConceptDt("system", "WEIGHT"));
+    observation6.setCode(new CodeableConceptDt("system", "WT"));
     observation6.setValue(observationValue);
     observation6.setSubject(new ResourceReferenceDt(patients.get(2)));
     observation6.setEncounter(new ResourceReferenceDt(encounters.get(2)));

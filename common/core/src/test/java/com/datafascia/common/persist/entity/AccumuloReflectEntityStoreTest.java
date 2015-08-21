@@ -7,8 +7,8 @@ import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
 import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.ConnectorFactory;
-import com.datafascia.common.accumulo.FixedAuthorizationsSupplier;
-import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
+import com.datafascia.common.accumulo.EmptyAuthorizationsSupplier;
+import com.datafascia.common.accumulo.EmptyColumnVisibilityPolicy;
 import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
 import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
 import com.datafascia.common.persist.Id;
@@ -48,9 +48,9 @@ public class AccumuloReflectEntityStoreTest {
   private static class TestModule extends AbstractModule {
     @Override
     protected void configure() {
-      bind(AuthorizationsSupplier.class).to(FixedAuthorizationsSupplier.class);
+      bind(AuthorizationsSupplier.class).to(EmptyAuthorizationsSupplier.class);
       bind(AvroSchemaRegistry.class).to(MemorySchemaRegistry.class);
-      bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
+      bind(ColumnVisibilityPolicy.class).to(EmptyColumnVisibilityPolicy.class);
     }
 
     @Provides @Singleton

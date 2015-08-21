@@ -6,12 +6,12 @@ import lombok.NoArgsConstructor;
 import org.apache.accumulo.core.security.ColumnVisibility;
 
 /**
- * Supplies the same visibility expression throughout the lifetime of the application.
+ * Supplies empty Accumulo visibility expression always.
  */
 @NoArgsConstructor
-public class FixedColumnVisibilityPolicy implements ColumnVisibilityPolicy {
+public class EmptyColumnVisibilityPolicy implements ColumnVisibilityPolicy {
 
-  private static final ColumnVisibility COLUMN_VISIBILITY = new ColumnVisibility("System");
+  private static final ColumnVisibility COLUMN_VISIBILITY = new ColumnVisibility();
 
   @Override
   public ColumnVisibility getColumnVisibility(String tableName, String columnQualifier) {

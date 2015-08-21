@@ -12,8 +12,8 @@ import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
 import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.ConnectorFactory;
-import com.datafascia.common.accumulo.FixedAuthorizationsSupplier;
-import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
+import com.datafascia.common.accumulo.EmptyAuthorizationsSupplier;
+import com.datafascia.common.accumulo.EmptyColumnVisibilityPolicy;
 import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
 import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
 import com.datafascia.common.configuration.guice.ConfigureModule;
@@ -34,9 +34,9 @@ public class ComponentsModule extends ConfigureModule {
 
   @Override
   protected void onConfigure() {
-    bind(AuthorizationsSupplier.class).to(FixedAuthorizationsSupplier.class);
+    bind(AuthorizationsSupplier.class).to(EmptyAuthorizationsSupplier.class);
     bind(AvroSchemaRegistry.class).to(MemorySchemaRegistry.class).in(Singleton.class);
-    bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
+    bind(ColumnVisibilityPolicy.class).to(EmptyColumnVisibilityPolicy.class);
     bind(FhirContext.class).in(Singleton.class);
     bind(FhirEntityStore.class).to(AccumuloFhirEntityStore.class).in(Singleton.class);
     bind(MetricRegistry.class).in(Singleton.class);

@@ -32,6 +32,11 @@ public class RxNormLookup {
    */
   public RxNormLookup(String jdbcUrl, String table, String username, String password) throws
       SQLException {
+    try {
+      Class.forName("com.mysql.jdbc.Driver");
+    } catch (ClassNotFoundException e) {
+      throw new IllegalStateException("JDBC driver not found", e);
+    }
     connection = DriverManager.getConnection(jdbcUrl, username, password);
     statement = connection.createStatement();
     this.table = table;

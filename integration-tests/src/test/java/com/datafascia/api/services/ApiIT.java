@@ -25,7 +25,6 @@ import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.IGenericClient;
-import ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor;
 import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.domain.fhir.Languages;
@@ -74,9 +73,7 @@ public class ApiIT {
     log.info("Started Dropwizard application listening on port {}", app.getLocalPort());
     fhirServer = "http://localhost:" + app.getLocalPort() + "/fhir";
 
-    // Register the interceptor with the client
     client = ctx.newRestfulGenericClient(fhirServer);
-    client.registerInterceptor(new BasicAuthInterceptor(FHIR_USERNAME, FHIR_PASSWORD));
 
     addStaticData();
   }

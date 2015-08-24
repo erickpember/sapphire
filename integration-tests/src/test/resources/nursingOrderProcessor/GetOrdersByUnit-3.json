@@ -1,0 +1,148 @@
+{
+  "Error": "", 
+  "ExtractDateTime": "/Date(1439552320000-0700)/", 
+  "Patient": [
+    {
+      "CSN": "2085202", 
+      "Orders": [
+        {
+          "Audit": null, 
+          "DiscontinuedDate": "/Date(-62135568000000-0800)/", 
+          "OrderDesc": "Maintain sequential compression device", 
+          "OrderID": "1689484", 
+          "OrderStatus": "2^Sent", 
+          "OrderedDate": "/Date(1439552151000-0700)/", 
+          "ProcID": "7936", 
+          "Questions": null, 
+          "StartDate": "/Date(1439510400000-0700)/"
+        }, 
+        {
+          "Audit": null, 
+          "DiscontinuedDate": "/Date(-62135568000000-0800)/", 
+          "OrderDesc": "Place sequential compression device", 
+          "OrderID": "1689485", 
+          "OrderStatus": "2^Sent", 
+          "OrderedDate": "/Date(1439552151000-0700)/", 
+          "ProcID": "7820", 
+          "Questions": null, 
+          "StartDate": "/Date(1439510400000-0700)/"
+        }, 
+        {
+          "Audit": null, 
+          "DiscontinuedDate": "/Date(-62135568000000-0800)/", 
+          "OrderDesc": "Remove sequential compression device", 
+          "OrderID": "1689486", 
+          "OrderStatus": "2^Sent", 
+          "OrderedDate": "/Date(1439552151000-0700)/", 
+          "ProcID": "40999", 
+          "Questions": null, 
+          "StartDate": "/Date(1439510400000-0700)/"
+        }, 
+        {
+          "Audit": null, 
+          "DiscontinuedDate": "/Date(-62135568000000-0800)/", 
+          "OrderDesc": "Head of bed flat", 
+          "OrderID": "1689487", 
+          "OrderStatus": "2^Sent", 
+          "OrderedDate": "/Date(1439552151000-0700)/", 
+          "ProcID": "40739", 
+          "Questions": null, 
+          "StartDate": "/Date(1439510400000-0700)/"
+        }, 
+        {
+          "Audit": null, 
+          "DiscontinuedDate": "/Date(-62135568000000-0800)/", 
+          "OrderDesc": "Keep prone", 
+          "OrderID": "1689488", 
+          "OrderStatus": "2^Sent", 
+          "OrderedDate": "/Date(1439552151000-0700)/", 
+          "ProcID": "57652", 
+          "Questions": null, 
+          "StartDate": "/Date(1439510400000-0700)/"
+        }, 
+        {
+          "Audit": [
+            {
+              "Action": "3^Signed", 
+              "DateTime": "/Date(1439552316000-0700)/", 
+              "ID": "1", 
+              "User": "       ^"
+            }
+          ], 
+          "DiscontinuedDate": "/Date(-62135568000000-0800)/", 
+          "OrderDesc": "RASS = Target RASS -3: Moderate Sedation (acceptable range -4 to -2)", 
+          "OrderID": "1689490", 
+          "OrderStatus": "2^Sent", 
+          "OrderedDate": "/Date(1439552316000-0700)/", 
+          "ProcID": "124838", 
+          "Questions": [
+            {
+              "Answer": "Target RASS -3: Moderate Sedation (acceptable range -4 to -2)", 
+              "Description": "UCSF NUR RASS TARGET", 
+              "ID": "103429"
+            }
+          ], 
+          "StartDate": "/Date(1439510400000-0700)/"
+        }, 
+        {
+          "Audit": [
+            {
+              "Action": "3^Signed", 
+              "DateTime": "/Date(1439552079000-0700)/", 
+              "ID": "1", 
+              "User": "       ^"
+            }
+          ], 
+          "DiscontinuedDate": "/Date(-62135568000000-0800)/", 
+          "OrderDesc": "No VTE Prevention Indicated", 
+          "OrderID": "1689478", 
+          "OrderStatus": "2^Sent", 
+          "OrderedDate": "/Date(1439552079000-0700)/", 
+          "ProcID": "87881", 
+          "Questions": [
+            {
+              "Answer": "No additional mechanical/pharmacologic VTEP because patient is already therapeutically anticoagulated (e.g., warfarin, heparin, etc.)", 
+              "Description": "VTE PREVENTION VERY LOW RISK PATIENT ORDER", 
+              "ID": "102524"
+            }
+          ], 
+          "StartDate": "/Date(1439510400000-0700)/"
+        }, 
+        {
+          "Audit": [
+            {
+              "Action": "3^Signed", 
+              "DateTime": "/Date(1439552079000-0700)/", 
+              "ID": "1", 
+              "User": "       ^"
+            }
+          ], 
+          "DiscontinuedDate": "/Date(-62135568000000-0800)/", 
+          "OrderDesc": "Bed Rest with HOB <= 30 Degrees Continuous", 
+          "OrderID": "1689477", 
+          "OrderStatus": "2^Sent", 
+          "OrderedDate": "/Date(1439552079000-0700)/", 
+          "ProcID": "143391", 
+          "Questions": [
+            {
+              "Answer": "Bathroom Privileges", 
+              "Description": "UCSF NUR ADL INSTRUCTIONS", 
+              "ID": "100315"
+            }, 
+            {
+              "Answer": "May stand to void", 
+              "Description": "UCSF NUR ADL INSTRUCTIONS", 
+              "ID": "100315"
+            }, 
+            {
+              "Answer": "Other (specify)", 
+              "Description": "UCSF NUR ADL INSTRUCTIONS", 
+              "ID": "100315"
+            }
+          ], 
+          "StartDate": "/Date(1439510400000-0700)/"
+        }
+      ]
+    }
+  ]
+}

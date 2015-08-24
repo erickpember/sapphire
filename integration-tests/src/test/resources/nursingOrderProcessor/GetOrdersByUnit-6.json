@@ -1,0 +1,95 @@
+{
+  "Error": "", 
+  "ExtractDateTime": "/Date(1439552635000-0700)/", 
+  "Patient": [
+    {
+      "CSN": "2085202", 
+      "Orders": [
+        {
+          "Audit": [
+            {
+              "Action": "3^Signed", 
+              "DateTime": "/Date(1439552079000-0700)/", 
+              "ID": "1", 
+              "User": "       ^"
+            }, 
+            {
+              "Action": "4^Canceled", 
+              "DateTime": "/Date(1439552624000-0700)/", 
+              "ID": "2", 
+              "User": "  18060^SANSOM, DAVID"
+            }
+          ], 
+          "DiscontinuedDate": "/Date(1439552624000-0700)/", 
+          "OrderDesc": "Bed Rest with HOB <= 30 Degrees Continuous", 
+          "OrderID": "1689477", 
+          "OrderStatus": "4^Canceled", 
+          "OrderedDate": "/Date(1439552079000-0700)/", 
+          "ProcID": "143391", 
+          "Questions": [
+            {
+              "Answer": "Bathroom Privileges", 
+              "Description": "UCSF NUR ADL INSTRUCTIONS", 
+              "ID": "100315"
+            }, 
+            {
+              "Answer": "May stand to void", 
+              "Description": "UCSF NUR ADL INSTRUCTIONS", 
+              "ID": "100315"
+            }, 
+            {
+              "Answer": "Other (specify)", 
+              "Description": "UCSF NUR ADL INSTRUCTIONS", 
+              "ID": "100315"
+            }
+          ], 
+          "StartDate": "/Date(1439510400000-0700)/"
+        }, 
+        {
+          "Audit": [
+            {
+              "Action": "3^Signed", 
+              "DateTime": "/Date(1439552628000-0700)/", 
+              "ID": "1", 
+              "User": "       ^"
+            }
+          ], 
+          "DiscontinuedDate": "/Date(-62135568000000-0800)/", 
+          "OrderDesc": "Bed Rest with HOB <= 30 Degrees Once", 
+          "OrderID": "1691295", 
+          "OrderStatus": "2^Sent", 
+          "OrderedDate": "/Date(1439552628000-0700)/", 
+          "ProcID": "143391", 
+          "Questions": [
+            {
+              "Answer": "Bathroom Privileges", 
+              "Description": "UCSF NUR ADL INSTRUCTIONS", 
+              "ID": "100315"
+            }, 
+            {
+              "Answer": "May stand to void", 
+              "Description": "UCSF NUR ADL INSTRUCTIONS", 
+              "ID": "100315"
+            }, 
+            {
+              "Answer": "Other (specify)", 
+              "Description": "UCSF NUR ADL INSTRUCTIONS", 
+              "ID": "100315"
+            }, 
+            {
+              "Answer": "Other (specify)", 
+              "Description": "UCSF NUR ADL INSTRUCTIONS", 
+              "ID": "100315"
+            }, 
+            {
+              "Answer": "May stand to void", 
+              "Description": "UCSF NUR ADL INSTRUCTIONS", 
+              "ID": "100315"
+            }
+          ], 
+          "StartDate": "/Date(1439510400000-0700)/"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,35 @@
+{
+  "Error": "", 
+  "ExtractDateTime": "/Date(1439552035000-0700)/", 
+  "Patient": [
+    {
+      "CSN": "2085202", 
+      "Orders": [
+        {
+          "Audit": [
+            {
+              "Action": "3^Signed", 
+              "DateTime": "/Date(1439454824000-0700)/", 
+              "ID": "1", 
+              "User": "       ^"
+            }
+          ], 
+          "DiscontinuedDate": "/Date(-62135568000000-0800)/", 
+          "OrderDesc": "No VTE Prevention Indicated", 
+          "OrderID": "1689469", 
+          "OrderStatus": "2^Sent", 
+          "OrderedDate": "/Date(1439454824000-0700)/", 
+          "ProcID": "87881", 
+          "Questions": [
+            {
+              "Answer": "No VTEP because patient at very low risk for VTE (VTE score < 4 and walking unassisted or will be discharged within 24 hours)", 
+              "Description": "VTE PREVENTION VERY LOW RISK PATIENT ORDER", 
+              "ID": "102524"
+            }
+          ], 
+          "StartDate": "/Date(1439424000000-0700)/"
+        }
+      ]
+    }
+  ]
+}

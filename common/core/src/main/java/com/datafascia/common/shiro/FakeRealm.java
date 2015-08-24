@@ -21,6 +21,7 @@ import org.apache.shiro.subject.PrincipalCollection;
 public class FakeRealm extends RoleExposingRealm {
 
   private static final String REALM_NAME = FakeRealm.class.getSimpleName();
+  private static final String DEFAULT_ROLE = "System";
 
   /**
    * Constructor
@@ -45,6 +46,6 @@ public class FakeRealm extends RoleExposingRealm {
 
   @Override
   protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-    return new SimpleAuthorizationInfo(Collections.emptySet());
+    return new SimpleAuthorizationInfo(Collections.singleton(DEFAULT_ROLE));
   }
 }

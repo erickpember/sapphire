@@ -3,10 +3,8 @@
 package com.datafascia.common.shiro;
 
 import java.util.Collection;
-import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.realm.AuthorizingRealm;
 
 /**
@@ -21,8 +19,6 @@ public abstract class RoleExposingRealm extends AuthorizingRealm {
    * @return roles
    */
   public Collection<String> getRolesForSubject() {
-    AuthorizationInfo authorizationInfo =
-        getAuthorizationInfo(SecurityUtils.getSubject().getPrincipals());
-    return (authorizationInfo != null) ? authorizationInfo.getRoles() : Collections.emptyList();
+    return getAuthorizationInfo(SecurityUtils.getSubject().getPrincipals()).getRoles();
   }
 }

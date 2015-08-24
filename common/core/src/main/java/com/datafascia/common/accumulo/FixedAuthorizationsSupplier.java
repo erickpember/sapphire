@@ -6,12 +6,12 @@ import lombok.NoArgsConstructor;
 import org.apache.accumulo.core.security.Authorizations;
 
 /**
- * Supplies empty Accumulo authorizations always.
+ * Supplies the same Accumulo authorizations throughout the lifetime of the application.
  */
 @NoArgsConstructor
-public class EmptyAuthorizationsSupplier implements AuthorizationsSupplier {
+public class FixedAuthorizationsSupplier implements AuthorizationsSupplier {
 
-  private static final Authorizations AUTHORIZATIONS = new Authorizations();
+  private static final Authorizations AUTHORIZATIONS = new Authorizations("System");
 
   @Override
   public Authorizations get() {

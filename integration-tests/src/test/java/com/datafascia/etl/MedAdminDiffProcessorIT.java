@@ -2,7 +2,6 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl;
 
-import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import ca.uhn.fhir.model.dstu2.composite.RangeDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
@@ -14,30 +13,15 @@ import ca.uhn.fhir.model.primitive.DateTimeDt;
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import com.datafascia.api.services.ApiIT;
-import com.datafascia.common.accumulo.AccumuloConfiguration;
 import com.datafascia.common.accumulo.AccumuloTemplate;
-import com.datafascia.common.accumulo.AuthorizationsSupplier;
-import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
-import com.datafascia.common.accumulo.ConnectorFactory;
-import com.datafascia.common.accumulo.FixedAuthorizationsSupplier;
-import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
-import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
-import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
-import com.datafascia.common.persist.entity.AccumuloFhirEntityStore;
 import com.datafascia.common.persist.entity.AccumuloReflectEntityStore;
-import com.datafascia.common.persist.entity.FhirEntityStore;
-import com.datafascia.common.persist.entity.ReflectEntityStore;
 import com.datafascia.domain.fhir.IdentifierSystems;
-import com.datafascia.domain.persist.Tables;
 import com.datafascia.etl.ucsf.web.MedAdminDiffListener;
 import com.datafascia.etl.ucsf.web.MedAdminDiffProcessor;
 import com.datafascia.etl.ucsf.web.UcsfMedicationUtils;
 import com.datafascia.etl.ucsf.web.UcsfWebGetProcessor;
-import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import com.google.inject.Provides;
-import com.google.inject.name.Names;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -47,7 +31,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
-import javax.inject.Singleton;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -74,46 +57,9 @@ import static org.testng.Assert.fail;
 public class MedAdminDiffProcessorIT extends ApiIT implements MedAdminDiffListener {
   private static final String TABLE = "testTable";
   private MedAdminDiffProcessor processor;
-  private TestModule testModule;
 
-  // Setup accumulo injections
-  private static class TestModule extends AbstractModule {
-    @Override
-    protected void configure() {
-      bind(AuthorizationsSupplier.class).to(FixedAuthorizationsSupplier.class);
-      bind(AvroSchemaRegistry.class).to(MemorySchemaRegistry.class).in(Singleton.class);
-      bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
-      bind(FhirContext.class).in(Singleton.class);
-      bind(FhirEntityStore.class).to(AccumuloFhirEntityStore.class).in(Singleton.class);
-
-      bindConstant().annotatedWith(Names.named("entityTableNamePrefix")).to(Tables.ENTITY_PREFIX);
-    }
-
-    @Provides
-    @Singleton
-    public Connector connector(ConnectorFactory factory) {
-      return factory.getConnector();
-    }
-
-    @Provides
-    @Singleton
-    public ConnectorFactory connectorFactory() {
-      return new ConnectorFactory(AccumuloConfiguration.builder()
-          .instance(ConnectorFactory.MOCK_INSTANCE)
-          .zooKeepers("")
-          .user("root")
-          .password("secret")
-          .build());
-    }
-
-    @Provides
-    @Singleton
-    public ReflectEntityStore reflectEntityStore(
-        AvroSchemaRegistry schemaRegistry, AccumuloTemplate accumuloTemplate) {
-
-      return new AccumuloReflectEntityStore(schemaRegistry, Tables.ENTITY_PREFIX, accumuloTemplate);
-    }
-  }
+  @Inject
+  private Connector connector;
 
   @Inject
   private AccumuloTemplate accumuloTemplate;
@@ -123,8 +69,7 @@ public class MedAdminDiffProcessorIT extends ApiIT implements MedAdminDiffListen
 
   @BeforeClass
   public void beforeRepositoryTestSupport() throws Exception {
-    testModule = new TestModule();
-    Injector injector = Guice.createInjector(testModule);
+    Injector injector = Guice.createInjector(new TestModule());
     injector.injectMembers(this);
   }
 
@@ -172,7 +117,7 @@ public class MedAdminDiffProcessorIT extends ApiIT implements MedAdminDiffListen
 
     processor = (MedAdminDiffProcessor) runner.getProcessor();
     processor.setDiffListener(this);
-    processor.setConnector(testModule.connector(testModule.connectorFactory()));
+    processor.setConnector(connector);
     processor.setClient(client);
 
     // Positive tests of new data and diffs.

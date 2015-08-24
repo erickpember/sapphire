@@ -21,6 +21,7 @@ import ca.uhn.fhir.model.primitive.DecimalDt;
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.IGenericClient;
+import ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor;
 import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.domain.fhir.Languages;
@@ -71,6 +72,7 @@ public class ApiIT {
 
     // Register the interceptor with the client
     client = ctx.newRestfulGenericClient(fhirServer);
+    client.registerInterceptor(new BasicAuthInterceptor(FHIR_USERNAME, FHIR_PASSWORD));
 
     addStaticData();
   }

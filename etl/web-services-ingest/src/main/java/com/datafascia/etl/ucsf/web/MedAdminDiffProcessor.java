@@ -93,7 +93,7 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
       .build();
   public static final PropertyDescriptor ACCUMULOTABLE = new PropertyDescriptor.Builder()
       .name("Accumulo table to persist med orders and admins.")
-      .defaultValue("df-ucsf-medorders")
+      .defaultValue("UcsfMedOrder")
       .required(true)
       .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
       .build();

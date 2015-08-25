@@ -13,6 +13,7 @@ import com.datafascia.api.resources.fhir.MedicationPrescriptionResourceProvider;
 import com.datafascia.api.resources.fhir.MedicationResourceProvider;
 import com.datafascia.api.resources.fhir.ObservationResourceProvider;
 import com.datafascia.api.resources.fhir.PatientResourceProvider;
+import com.datafascia.api.resources.fhir.ProcedureRequestResourceProvider;
 import com.datafascia.api.resources.fhir.ProcedureResourceProvider;
 import java.util.Arrays;
 import javax.servlet.ServletException;
@@ -47,6 +48,7 @@ public class FhirServlet extends RestfulServer {
         new MedicationResourceProvider(),
         new ObservationResourceProvider(),
         new ProcedureResourceProvider(),
+        new ProcedureRequestResourceProvider(),
         new PatientResourceProvider()));
 
     /*

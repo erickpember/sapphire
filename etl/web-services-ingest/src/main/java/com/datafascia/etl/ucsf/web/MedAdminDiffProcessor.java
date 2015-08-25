@@ -17,6 +17,7 @@ import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.etl.ucsf.web.MedAdminDiffListener.ElementType;
 import com.datafascia.etl.ucsf.web.persist.JsonPersistUtils;
 import com.datafascia.etl.ucsf.web.rules.model.RxNorm;
+import com.google.common.base.Strings;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -28,7 +29,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import javax.inject.Inject;
-import joptsimple.internal.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
@@ -56,7 +56,7 @@ import org.json.simple.parser.ParseException;
 import org.kie.api.runtime.KieSession;
 
 /**
- * Processor for detecting and handling diffs in UCSF json files.
+ * Processor for detecting and handling diffs in UCSF medication administration.
  */
 @Slf4j
 public class MedAdminDiffProcessor extends AbstractProcessor {
@@ -136,7 +136,8 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
       .build();
 
   /**
-   * Set the listener to be called when a diff is found.
+   * Sets the listener to be called when a diff is found.
+   *
    * @param newListener The listener to be called when a diff is found.
    */
   public void setDiffListener(MedAdminDiffListener newListener) {
@@ -144,7 +145,8 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
   }
 
   /**
-   * Set the connector to use.
+   * Sets the connector to use.
+   *
    * @param newConnector The connector to use.
    */
   public void setConnector(Connector newConnector) {
@@ -223,7 +225,7 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
     } catch (SQLException e) {
       log.error("SQL error fetching rxnorm name.", e);
       plog.error("SQL error fetching rxnorm name: " + e.getMessage());
-      session.transfer(flowfile, FAILURE);
+      throw new ProcessException(e);
     }
 
     session.read(flowfile, new InputStreamCallback() {
@@ -256,12 +258,11 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
                         ex);
                     plog.error("Error fetching RxNorm name with SCD " + scd + ": " + ex.getMessage
                         ());
-                    session.transfer(flowfile, FAILURE);
+                    throw new ProcessException(ex);
                   } catch (MutationsRejectedException | TableNotFoundException ex) {
                     log.error("Error finding medication diffs: " + ex.getMessage(), ex);
                     plog.error("Error finding medication diffs: " + ex.getMessage());
-                    session.transfer(flowfile, FAILURE);
-                    return;
+                    throw new ProcessException(ex);
                   }
                 }
               }
@@ -270,17 +271,16 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
         } catch (ParseException e) {
           log.error("Error reading json.", e);
           plog.error("Failed to read json string: " + e.getMessage());
-          session.transfer(flowfile, FAILURE);
-          return;
+          throw new ProcessException(e);
         }
-        session.transfer(flowfile, SUCCESS);
       }
     });
-
+    session.transfer(flowfile, SUCCESS);
   }
 
   /**
-   * Take a medication JSON object and inspect it for diffs.
+   * Detects diffs in medication JSON object.
+   *
    * @param orderJson   A JSONObject of a medication order.
    * @param encounterId The ID of the encounter.
    * @param scd         The SCD of the drug this refers to.
@@ -289,7 +289,7 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
    * @throws TableNotFoundException     If the table doesn't exist.
    * @throws SQLException               If there is a problem interacting with SQL.
    */
-  public void findPrescriptionDiffs(JSONObject orderJson, String encounterId, String scd)
+  private void findPrescriptionDiffs(JSONObject orderJson, String encounterId, String scd)
       throws ParseException, MutationsRejectedException, TableNotFoundException, SQLException {
     String prescriptionId = orderJson.get("OrderID").toString();
     String[] routeParts = orderJson.get("Route").toString().split("\\^");
@@ -370,7 +370,8 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
   }
 
   /**
-   * Take a medication administration JSON object and inspect it for diffs.
+   * Detects diffs in medication administration JSON object.
+   *
    * @param admin       The admin to inspect for diffs.
    * @param encounterId the Id of the encounter.
    * @param prescriptionId     The Id of the order.
@@ -443,8 +444,7 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
     }
   }
 
-  private Medication populateMedication(RxNorm droolNorm) throws
-      SQLException {
+  private Medication populateMedication(RxNorm droolNorm) throws SQLException {
     Medication medication = orderMedicationCache.get(droolNorm.getRxcuiSCD());
     if (medication == null) {
       if (droolNorm.getRxcuiSCD() == null) {
@@ -454,7 +454,6 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
       // Fetch the normalized medication name.
       String drugName = rxNormDb.getRxString(Integer.parseInt(droolNorm.getRxcuiSCD()));
       kieSession.insert(droolNorm);
-
 
       // Fetch the medication object.
       Bundle response = client.search()

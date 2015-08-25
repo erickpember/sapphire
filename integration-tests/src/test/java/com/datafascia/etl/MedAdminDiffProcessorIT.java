@@ -65,6 +65,7 @@ import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.fail;
 
 /**
  * A test class for the MedAdminDiffProcessor
@@ -197,7 +198,12 @@ public class MedAdminDiffProcessorIT extends ApiIT implements MedAdminDiffListen
 
     // Errors from the webservices come back as HTML. Make sure we trigger a failure on those.
     enqueueCount = 0;
-    testFailure(runner, "invalid.json");
+    try {
+      testFailure(runner, "invalid.json");
+      fail("The expected ProcessException was not throw.");
+    } catch (Throwable ex) {
+      assertEquals(ex.getCause().getMessage(), "Unexpected character (<) at position 0.");
+    }
 
     // Make sure all the test cases were used.
     for (String key : expectedAdmins.keySet()) {

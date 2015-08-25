@@ -31,6 +31,10 @@ public class IdentifierSystems {
   public static final String INSTITUTION_MEDICATION_PRESCRIPTION =
       "http://datafascia.com/identifier/InstitutionMedicationPrescription";
 
+  /** institution assigned procedure request identifier */
+  public static final String INSTITUTION_PROCEDURE_REQUEST =
+      "http://datafascia.com/identifier/InstitutionProcedureRequest";
+
   // Private constructor disallows creating instances of this class.
   private IdentifierSystems() {
   }

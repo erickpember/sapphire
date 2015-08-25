@@ -15,6 +15,10 @@ public class CodingSystems {
   public static final String PROCEDURE_TYPE =
       "http://datafascia.com/coding/ProcedureType";
 
+  /** dataFascia invented this coding system for procedure request type */
+  public static final String PROCEDURE_REQUEST_TYPE =
+      "http://datafascia.com/coding/ProcedureRequestType";
+
   /** dataFascia invented this coding system for body site */
   public static final String BODY_SITE =
       "http://datafascia.com/coding/BodySite";

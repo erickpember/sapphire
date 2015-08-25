@@ -3,9 +3,11 @@
 package com.datafascia.emerge.csv;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import ca.uhn.fhir.model.dstu2.resource.MedicationPrescription;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.common.jackson.CSVMapper;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
+import com.datafascia.emerge.csv.CamIcuResult;
 import com.datafascia.emerge.models.DailyProcess;
 import com.google.common.base.Joiner;
 import java.io.FileWriter;
@@ -34,6 +36,8 @@ public class EmergeDailyProcessCSVGenerator {
   private static CSVMapper<DailyProcess> mapper;
   private static FhirClient client;
 
+  private static LocalDateTime now;
+
   // Private constructor disallows creating instances of this class
   private EmergeDailyProcessCSVGenerator() {
   }
@@ -41,6 +45,8 @@ public class EmergeDailyProcessCSVGenerator {
   /**
    * Generates Emerge CSV file.
    *
+   * @param institution
+   *     the source institution
    * @param apiEndpoint
    *     API endpoint URI
    * @param user
@@ -51,10 +57,11 @@ public class EmergeDailyProcessCSVGenerator {
    *     output CSV file name
    * @throws IOException if error writing to CSV file
    */
-  public static void generate(URI apiEndpoint, String user, String password, String csvFile)
-      throws IOException {
+  public static void generate(String institution, URI apiEndpoint, String user, String password,
+      String csvFile) throws IOException {
 
     log.info("Command parameters:");
+    log.info("Institution: {}", institution);
     log.info("API Endpoint: {}", apiEndpoint);
     log.info("CSV File: {}", csvFile);
     log.info("Username: {}", user);
@@ -66,7 +73,7 @@ public class EmergeDailyProcessCSVGenerator {
     try (PrintWriter pw = new PrintWriter(new FileWriter(csvFile))) {
       pw.println(Joiner.on(",").join(mapper.getHeaders()));
 
-      List<Encounter> encounters = client.getInProgressEncounters();
+      List<Encounter> encounters = client.getInProgressEncounters(institution);
       int entry = 1;
       for (Encounter encounter: encounters) {
         UnitedStatesPatient patient = client.getPatientFromEncounter(encounter);
@@ -94,12 +101,13 @@ public class EmergeDailyProcessCSVGenerator {
     DailyProcess dailyProcess = new DailyProcess();
     dailyProcess.setEntry(Integer.toString(entry));
 
-    LocalDateTime now = LocalDateTime.now(TIME_ZONE);
+    now = LocalDateTime.now(TIME_ZONE);
     dailyProcess.setDateCreated(DATE_TIME_FORMATTER.format(now));
     dailyProcess.setDataCollectionDate(DATE_FORMATTER.format(now));
 
     addPatientData(dailyProcess, patient, encounter);
     addObservationData(dailyProcess, encounter);
+    addMedicationPrescriptionData(dailyProcess, encounter);
     return dailyProcess;
   }
 
@@ -135,20 +143,76 @@ public class EmergeDailyProcessCSVGenerator {
     // Get all Observation resources for this encounter
     List<Observation> observations = client.getObservations(encounter);
     log.info("number of observations: {}", observations.size());
-    for (Observation observation: observations) {
-      Optional<String> observationCode = client.getObservationCode(observation);
-      if (observationCode.isPresent()) {
-        switch (observationCode.get()) {
-          case "3045000021":
-            Optional<String> value = client.getObservationStringValue(observation);
-            if (value.isPresent()) {
-              dailyProcess.setRassLevelLow(value.get());
+
+    // Process CAM-ICU Result
+    CamIcuResult.processCamIcuResult(client, dailyProcess, observations);
+  }
+
+  /**
+   * Populate the daily process data with medication data.
+   *
+   * @param dailyProcess
+   *     daily process data
+   * @param encounter
+   *     the current patient encounter resource
+   */
+  private static void addMedicationPrescriptionData(
+      DailyProcess dailyProcess, Encounter encounter) {
+    // Get all MedicationPrescription resources for this encounter
+    List<MedicationPrescription> prescriptions = client.getPrescriptions(encounter);
+    log.info("number of prescriptions: {}", prescriptions.size());
+    for (MedicationPrescription prescription: prescriptions) {
+      Optional<String> medicationName = client.getMedicationName(prescription);
+      Optional<String> status;
+      if (medicationName.isPresent()) {
+        switch (medicationName.get()) {
+          case "Continuous Infusion Lorazepam IV":
+            status = client.getPrescriptionStatus(prescription);
+            if (status.isPresent() && status.get().equals("active")) {
+              dailyProcess.setContinuousInfusionLorazepam("Yes");
             }
             break;
-          default:
+
+          case "Continuous Infusion Midazolam IV":
+            status = client.getPrescriptionStatus(prescription);
+            if (status.isPresent() && status.get().equals("active")) {
+              dailyProcess.setContinuousInfusionMidazolam("Yes");
+            }
             break;
+
+          case "Intermittent Chlordiazepoxide Enteral":
+            status = client.getPrescriptionStatus(prescription);
+            if (status.isPresent() && status.get().equals("active")) {
+              dailyProcess.setIntermittentChlordiazepoxide("Yes");
+            }
+            break;
+
+          case "Intermittent Lorazepam IV":
+            status = client.getPrescriptionStatus(prescription);
+            if (status.isPresent() && status.get().equals("active")) {
+              dailyProcess.setIntermittentLorazepamIv("Yes");
+            }
+            break;
+
+          case "Intermittent Lorazepam Enteral":
+            status = client.getPrescriptionStatus(prescription);
+            if (status.isPresent() && status.get().equals("active")) {
+              dailyProcess.setIntermittentLorazepamPo("Yes");
+            }
+            break;
+
+          case "Intermittent Midazolam IV":
+            status = client.getPrescriptionStatus(prescription);
+            if (status.isPresent() && status.get().equals("active")) {
+              dailyProcess.setIntermittentMidazolamIv("Yes");
+            }
+            break;
+
+          default:
+            // Ignore other prescriptions
         }
       }
     }
   }
+
 }

@@ -25,7 +25,7 @@ public class LocationIT extends ApiIT {
    */
   @Test
   public void testLocation() throws Exception {
-    String identifier = "POC-ER^Room-2^Bed-B";
+    String identifier = "13I^Room-2^Bed-B";
     String id = ENCODING.encode(identifier.getBytes(StandardCharsets.UTF_8));
     Location location = client.read()
         .resource(Location.class)

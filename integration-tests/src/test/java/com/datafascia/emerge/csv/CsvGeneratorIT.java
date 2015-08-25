@@ -21,6 +21,7 @@ public class CsvGeneratorIT extends ApiIT {
   @Test
   public void testDemographicCsv() throws Exception {
     EmergeDemographicCSVGenerator.generate(
+        "13I",
         new URI("http://localhost:" + ApiIT.app.getLocalPort()),
         "testuser",
         "supersecret",
@@ -39,6 +40,7 @@ public class CsvGeneratorIT extends ApiIT {
   @Test
   public void testDailyProcessCsv() throws Exception {
     EmergeDailyProcessCSVGenerator.generate(
+        "13I",
         new URI("http://localhost:" + ApiIT.app.getLocalPort()),
         "testuser",
         "supersecret",

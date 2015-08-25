@@ -4,12 +4,18 @@ package com.datafascia.emerge.csv;
 
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.model.api.Bundle;
+import ca.uhn.fhir.model.api.BundleEntry;
+import ca.uhn.fhir.model.api.IDatatype;
+import ca.uhn.fhir.model.api.IResource;
+import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Location;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
+import ca.uhn.fhir.model.dstu2.resource.MedicationPrescription;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
+import ca.uhn.fhir.model.primitive.DateTimeDt;
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.fhir.rest.client.IGenericClient;
@@ -18,6 +24,7 @@ import ca.uhn.fhir.rest.gclient.StringClientParam;
 import com.datafascia.domain.fhir.RaceEnum;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.google.common.base.Strings;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.StringJoiner;
@@ -50,20 +57,38 @@ public class FhirClient {
   /**
    * Get the list of encounters for a given status
    *
+   * @param institution
+   *     the source institution
    * @return encounters
    *     the list of encounters
    */
-  public List<Encounter> getInProgressEncounters() {
+  public List<Encounter> getInProgressEncounters(String institution) {
     Bundle bundle = client.search()
         .forResource(Encounter.class)
         .where(Encounter.STATUS.exactly().code(EncounterStateEnum.IN_PROGRESS.name()))
         .execute();
 
-    // Add all Encounter resources to the list
-    List<Encounter> encounters = bundle.getResources(Encounter.class);
-    while (bundle.getLinkNext().isEmpty() == false) {
-      bundle = client.loadPage().next(bundle).execute();
-      encounters.addAll(bundle.getResources(Encounter.class));
+    List<Encounter> encounters = new ArrayList<>();
+    boolean done = false;
+    while (!done) {
+      for (BundleEntry entry : bundle.getEntries()) {
+        IResource resource = entry.getResource();
+        Encounter encounter = null;
+        if (resource instanceof Encounter) {
+          encounter = (Encounter) resource;
+          Optional<String> patientInstitution = getPatientInstitution(encounter);
+
+          if (patientInstitution.isPresent() && institution.equals(patientInstitution.get())) {
+            encounters.add(encounter);
+          }
+        }
+      }
+      if (!bundle.getLinkNext().isEmpty()) {
+        // Load the next bundle
+        bundle = client.loadPage().next(bundle).execute();
+      } else {
+        done = true;
+      }
     }
 
     return encounters;
@@ -118,6 +143,31 @@ public class FhirClient {
     }
 
     return medAdmins;
+  }
+
+  /**
+   * Get the list of medication prescriptions for a given encounter
+   *
+   * @param encounter
+   *     the patient encounter
+   * @return prescriptions
+   *     the list of medication prescriptions for this encounter
+   */
+  public List<MedicationPrescription> getPrescriptions(Encounter encounter) {
+    Bundle bundle = client.search().forResource(MedicationPrescription.class)
+        .where(new StringClientParam("encounter").matches()
+            .value(encounter.getId().getIdPart()))
+        .execute();
+
+    // Add all MedicationPrescription resources to the list
+    List<MedicationPrescription> prescriptions =
+        bundle.getResources(MedicationPrescription.class);
+    while (bundle.getLinkNext().isEmpty() == false) {
+      bundle = client.loadPage().next(bundle).execute();
+      prescriptions.addAll(bundle.getResources(MedicationPrescription.class));
+    }
+
+    return prescriptions;
   }
 
   /**
@@ -217,6 +267,33 @@ public class FhirClient {
   }
 
   /**
+   * Get the patient's institution
+   *
+   * @param encounter
+   *     the encounter resource
+   * @return dpartment
+   *     the patient's current institution
+   */
+  public Optional<String> getPatientInstitution(Encounter encounter) {
+    String locationId =
+        encounter.getLocationFirstRep().getLocation().getReference().getIdPart();
+
+    Location location = client.read()
+        .resource(Location.class)
+        .withId(locationId)
+        .execute();
+
+    String[] locationParts = location.getIdentifierFirstRep().getValue().split("\\^");
+    if (locationParts.length > 0) {
+      String institution = locationParts[0];
+      log.info("patient institution: {}", institution);
+      return Optional.of(institution);
+    } else {
+      return Optional.empty();
+    }
+  }
+
+  /**
    * Get the patient's room number
    *
    * @param encounter
@@ -236,6 +313,7 @@ public class FhirClient {
     String[] locationParts = location.getIdentifierFirstRep().getValue().split("\\^");
     if (locationParts.length > 1) {
       String room = locationParts[1];
+      log.info("patient room: {}", room);
       return Optional.of(room);
     } else {
       return Optional.empty();
@@ -289,6 +367,29 @@ public class FhirClient {
   }
 
   /**
+   * Get the observation time
+   *
+   * @param observation
+   *     the observation to search
+   * @return time
+   *     the time of the observation
+   */
+  public Optional<DateTimeDt> getObservationTime(Observation observation) {
+    IDatatype applies = observation.getApplies();
+    if (applies instanceof DateTimeDt) {
+      log.info("observation time (DateTimeDt): {}", ((DateTimeDt) applies).getValue());
+      return Optional.of(((DateTimeDt) applies));
+    } else if (applies instanceof PeriodDt) {
+      // If the Observation contains a Period, only use the start time.
+      log.info("observation time (PeriodDt): {}",
+          ((PeriodDt) applies).getStartElement().getValue());
+      return Optional.of(((PeriodDt) applies).getStartElement());
+    }
+
+    return Optional.empty();
+  }
+
+  /**
    * Get the observation units of measure
    *
    * @param observation
@@ -311,6 +412,7 @@ public class FhirClient {
    *     the patient identifier assigned by the institution
    */
   public String getInstitutionPatientId(UnitedStatesPatient patient) {
+    log.info("patient institution identifier: {}", patient.getIdentifierFirstRep().getValue());
     return patient.getIdentifierFirstRep().getValue();
   }
 
@@ -325,4 +427,43 @@ public class FhirClient {
   public String getEncounterIdentifier(Encounter encounter) {
     return encounter.getIdentifierFirstRep().getValue();
   }
+
+  /**
+   * Get the medication name from the MedicationPrescription resource
+   *
+   * @param prescription
+   *     the MedicationPrescription resource to search
+   * @return name
+   *     the name of the medication
+   */
+  public Optional<String> getMedicationName(MedicationPrescription prescription) {
+    String name = prescription.getIdentifierFirstRep().getValue();
+    if (!name.equals("")) {
+      log.info("medication name: {}", name);
+      return Optional.of(name);
+    }
+
+    log.info("medication name: {empty}");
+    return Optional.empty();
+  }
+
+  /**
+   * Get the medication status from the MedicationPrescription resource
+   *
+   * @param prescription
+   *     the MedicationPrescription resource to search
+   * @return status
+   *     the status of the prescription
+   */
+  public Optional<String> getPrescriptionStatus(MedicationPrescription prescription) {
+    String status = prescription.getStatus();
+    if (!status.equals("")) {
+      log.info("prescription status: {}", status);
+      return Optional.of(status);
+    }
+
+    log.info("prescription status: {empty}");
+    return Optional.empty();
+  }
+
 }

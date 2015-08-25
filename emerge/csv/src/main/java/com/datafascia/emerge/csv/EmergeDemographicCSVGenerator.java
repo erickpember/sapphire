@@ -51,6 +51,8 @@ public class EmergeDemographicCSVGenerator {
   /**
    * Generates Emerge CSV file.
    *
+   * @param institution
+   *     the source institution
    * @param apiEndpoint
    *     API endpoint URI
    * @param user
@@ -62,10 +64,11 @@ public class EmergeDemographicCSVGenerator {
    *
    * @throws java.io.IOException errors writing to CSV file
    */
-  public static void generate(URI apiEndpoint, String user, String password, String csvFile)
-      throws IOException {
+  public static void generate(String institution, URI apiEndpoint, String user, String password,
+      String csvFile) throws IOException {
 
     log.info("Command parameters:");
+    log.info("institution: {}", institution);
     log.info("API Endpoint: {}", apiEndpoint);
     log.info("CSV File: {}", csvFile);
     log.info("Username: {}", user);
@@ -78,7 +81,7 @@ public class EmergeDemographicCSVGenerator {
       pw.println(Joiner.on(",").join(mapper.getHeaders()));
 
       // Get all in-progress encounters
-      List<Encounter> encounters = client.getInProgressEncounters();
+      List<Encounter> encounters = client.getInProgressEncounters(institution);
       int entry = 1;
       for (Encounter encounter: encounters) {
         UnitedStatesPatient patient = client.getPatientFromEncounter(encounter);

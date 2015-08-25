@@ -18,6 +18,9 @@ import lombok.extern.slf4j.Slf4j;
     commandDescription = "Generate Demographic CSV data for the Emerge application.")
 @Slf4j
 public class EmergeDemographicCSVCommand implements Command {
+  @Parameter(names = "-institution", description = "the source institution", required = true)
+  private String institution;
+
   @Parameter(names = "-apiURI", description = "dataFascia API endpoint URI", required = true,
              converter = URIConverter.class)
   private URI apiEndpoint;
@@ -34,7 +37,7 @@ public class EmergeDemographicCSVCommand implements Command {
   @Override
   public int execute() {
     try {
-      EmergeDemographicCSVGenerator.generate(apiEndpoint, user, password, csvFile);
+      EmergeDemographicCSVGenerator.generate(institution, apiEndpoint, user, password, csvFile);
     } catch (IOException e) {
       log.error("I/O exception", e);
       return EXIT_STATUS_FAILURE;

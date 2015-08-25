@@ -11,14 +11,18 @@ import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Location;
 import ca.uhn.fhir.model.dstu2.resource.Medication;
+import ca.uhn.fhir.model.dstu2.resource.MedicationPrescription;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationKindEnum;
+import ca.uhn.fhir.model.dstu2.valueset.MedicationPrescriptionStatusEnum;
 import ca.uhn.fhir.model.primitive.DateDt;
+import ca.uhn.fhir.model.primitive.DateTimeDt;
 import ca.uhn.fhir.model.primitive.DecimalDt;
 import ca.uhn.fhir.model.primitive.IdDt;
+import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor;
@@ -114,6 +118,7 @@ public class ApiIT {
     Medication medication = addMedication();
 
     List<Observation> observations = addObservations(patients, encounters);
+    List<MedicationPrescription> prescriptions = addPrescriptions(patients, encounters);
   }
 
   private List<UnitedStatesPatient> addPatients() {
@@ -333,8 +338,41 @@ public class ApiIT {
     observation6.setId(id);
     log.info("observation 6 ID: {}", id.getValue());
 
+    DateTimeDt myApplies = new DateTimeDt();
+    StringDt myValue = new StringDt("+");
+    Observation observation7 = new Observation();
+    observation7.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("observation4");
+    observation7.setCode(new CodeableConceptDt("system", "304890023"));
+    observation7.setValue(myValue);
+    observation7.setApplies(myApplies.withCurrentTime());
+    observation7.setSubject(new ResourceReferenceDt(patients.get(2)));
+    observation7.setEncounter(new ResourceReferenceDt(encounters.get(2)));
+    outcome = client.create().resource(observation7)
+        .encodedJson().execute();
+    id = outcome.getId();
+    observation7.setId(id);
+    log.info("observation 7 ID: {}", id.getValue());
+
+    DateTimeDt myApplies8 = new DateTimeDt();
+    StringDt myValue8 = new StringDt("UTA (RASS -4 or -5)");
+    Observation observation8 = new Observation();
+    observation7.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("observation4");
+    observation8.setCode(new CodeableConceptDt("system", "304890023"));
+    observation8.setValue(myValue8);
+    observation8.setApplies(myApplies8.withCurrentTime());
+    observation8.setSubject(new ResourceReferenceDt(patients.get(2)));
+    observation8.setEncounter(new ResourceReferenceDt(encounters.get(2)));
+    outcome = client.create().resource(observation8)
+        .encodedJson().execute();
+    id = outcome.getId();
+    observation8.setId(id);
+    log.info("observation 8 ID: {}", id.getValue());
+
     return Arrays.asList(
-        observation1, observation2, observation3, observation4, observation5, observation6);
+        observation1, observation2, observation3, observation4, observation5, observation6,
+        observation7);
   }
 
   private Location createLocation(String identifier) {
@@ -346,19 +384,19 @@ public class ApiIT {
   }
 
   private List<Location> addLocations() {
-    Location location1 = createLocation("POC-ER^Room-1^Bed-A");
+    Location location1 = createLocation("13I^Room-1^Bed-A");
     MethodOutcome outcome = client.create().resource(location1).execute();
     IdDt id = outcome.getId();
     location1.setId(id);
     log.info("location 1 ID: {}", id.getValue());
 
-    Location location2 = createLocation("POC-ER^Room-2^Bed-B");
+    Location location2 = createLocation("13I^Room-2^Bed-B");
     outcome = client.create().resource(location2).execute();
     id = outcome.getId();
     location2.setId(id);
     log.info("location 2 ID: {}", id.getValue());
 
-    Location location3 = createLocation("POC-ER^Room-3^Bed-A");
+    Location location3 = createLocation("13I^Room-3^Bed-A");
     outcome = client.create().resource(location3).execute();
     id = outcome.getId();
     location3.setId(id);
@@ -393,5 +431,63 @@ public class ApiIT {
     log.info("medication ID: {}", id.getValue());
 
     return medication;
+  }
+
+  private MedicationPrescription createPrescription(String identifier,
+      List<UnitedStatesPatient> patients, List<Encounter> encounters) {
+    MedicationPrescription rx = new MedicationPrescription();
+    rx.addIdentifier().setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue(identifier);
+    rx.setStatus(MedicationPrescriptionStatusEnum.ACTIVE);
+    rx.setEncounter(new ResourceReferenceDt(encounters.get(2)));
+    rx.setPatient(new ResourceReferenceDt(patients.get(2)));
+
+    return rx;
+  }
+
+  private List<MedicationPrescription> addPrescriptions(List<UnitedStatesPatient> patients,
+      List<Encounter> encounters) {
+    MedicationPrescription rx1 = createPrescription("Continuous Infusion Lorazepam IV",
+        patients, encounters);
+    MethodOutcome outcome = client.create().resource(rx1).execute();
+    IdDt id = outcome.getId();
+    rx1.setId(id);
+
+    MedicationPrescription rx2 = createPrescription("Continuous Infusion Midazolam IV",
+        patients, encounters);
+    outcome = client.create().resource(rx2).execute();
+    id = outcome.getId();
+    rx2.setId(id);
+
+    MedicationPrescription rx3 = createPrescription("Intermittent Chlordiazepoxide Enteral",
+        patients, encounters);
+    outcome = client.create().resource(rx3).execute();
+    id = outcome.getId();
+    rx3.setId(id);
+
+    MedicationPrescription rx4 = createPrescription("Intermittent Lorazepam IV",
+        patients, encounters);
+    outcome = client.create().resource(rx4).execute();
+    id = outcome.getId();
+    rx4.setId(id);
+
+    MedicationPrescription rx5 = createPrescription("Intermittent Lorazepam Enteral",
+        patients, encounters);
+    outcome = client.create().resource(rx5).execute();
+    id = outcome.getId();
+    rx5.setId(id);
+
+    MedicationPrescription rx6 = createPrescription("Intermittent Midazolam IV",
+        patients, encounters);
+    outcome = client.create().resource(rx6).execute();
+    id = outcome.getId();
+    rx6.setId(id);
+
+    MedicationPrescription rx7 = createPrescription("Intermittent Something or Other IV",
+        patients, encounters);
+    outcome = client.create().resource(rx7).execute();
+    id = outcome.getId();
+    rx7.setId(id);
+
+    return Arrays.asList(rx1, rx2, rx3, rx4, rx5, rx6);
   }
 }

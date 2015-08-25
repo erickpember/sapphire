@@ -18,6 +18,9 @@ import lombok.extern.slf4j.Slf4j;
     commandDescription = "Generate Daily Process CSV data for the Emerge application.")
 @Slf4j
 public class EmergeDailyProcessCSVCommand implements Command {
+  @Parameter(names = "-institution", description = "the source institution", required = true)
+  private String institution;
+
   @Parameter(names = "-apiURI", description = "dataFascia API endpoint URI", required = true,
              converter = URIConverter.class)
   private URI apiEndpoint;
@@ -34,7 +37,7 @@ public class EmergeDailyProcessCSVCommand implements Command {
   @Override
   public int execute() {
     try {
-      EmergeDailyProcessCSVGenerator.generate(apiEndpoint, user, password, csvFile);
+      EmergeDailyProcessCSVGenerator.generate(institution, apiEndpoint, user, password, csvFile);
     } catch (IOException e) {
       log.error("I/O exception", e);
       return EXIT_STATUS_FAILURE;

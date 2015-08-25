@@ -219,13 +219,15 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
     String jdbcUrl = context.getProperty(RXNORMDB).getValue();
     String username = context.getProperty(RXNORMDBUSERNAME).getValue();
     String password = context.getProperty(RXNORMDBPASSWORD).getValue();
-    try {
-      String rxnormDb = context.getProperty(RXNORMTABLE).getValue();
-      rxNormDb = new RxNormLookup(jdbcUrl, rxnormDb, username, password);
-    } catch (SQLException e) {
-      log.error("SQL error fetching rxnorm name.", e);
-      plog.error("SQL error fetching rxnorm name: " + e.getMessage());
-      throw new ProcessException(e);
+    if (rxNormDb == null) {
+      try {
+        String rxnormDb = context.getProperty(RXNORMTABLE).getValue();
+        rxNormDb = new RxNormLookup(jdbcUrl, rxnormDb, username, password);
+      } catch (SQLException e) {
+        log.error("SQL error fetching rxnorm name.", e);
+        plog.error("SQL error fetching rxnorm name: " + e.getMessage());
+        session.transfer(flowfile, FAILURE);
+      }
     }
 
     session.read(flowfile, new InputStreamCallback() {

@@ -130,7 +130,8 @@ public class EmergeDemographicCSVGenerator {
   private static void addPatientData(
       Demographic demo, UnitedStatesPatient patient, Encounter encounter) {
     demo.setGender(client.getPatientGender(patient).equals("female") ? "Female" : "Male");
-    demo.setPatientDateOfBirth(client.getPatientDateOfBirth(patient));
+    demo.setPatientDateOfBirth(client.getPatientDateOfBirth(patient,
+        TIME_ZONE, DATE_FORMATTER));
     demo.setSubjectPatientId(client.getInstitutionPatientId(patient));
     demo.setSubjectPatcom(client.getEncounterIdentifier(encounter));
 
@@ -173,7 +174,8 @@ public class EmergeDemographicCSVGenerator {
    *     read data from encounter
    */
   private static void addEncounterData(Demographic demo, Encounter encounter) {
-    demo.setSicuAdmissionDate(client.getPatientAdmissionDate(encounter));
+    demo.setSicuAdmissionDate(client.getPatientAdmissionDate(encounter,
+        TIME_ZONE, DATE_FORMATTER));
 
     List<Observation> observations = client.getObservations(encounter);
     log.info("number of observations: {}", observations.size());

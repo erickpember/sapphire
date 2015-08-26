@@ -31,7 +31,7 @@ public class DailyProcess {
   @Getter @Setter @JsonProperty(value = "Data Collection Date", index = 4)
   private String dataCollectionDate;
   @Getter @Setter @JsonProperty(value = "JHED ID", index = 5)
-  private String jhedId;
+  private String jhedId = "Topaz";
   @Getter @Setter @JsonProperty(value = "Subject ID", index = 6)
   private String subjectId;
   @Getter @Setter @JsonProperty(value = "Subject Patcom", index = 7)

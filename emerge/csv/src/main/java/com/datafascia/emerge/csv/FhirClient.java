@@ -24,6 +24,10 @@ import ca.uhn.fhir.rest.gclient.StringClientParam;
 import com.datafascia.domain.fhir.RaceEnum;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.google.common.base.Strings;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -245,12 +249,18 @@ public class FhirClient {
    *
    * @param patient
    *     the patient resource
+   * @param tz
+   *     the local time zone
+   * @param formatter
+   *     the date formatter to use
    * @return patient birth date
    *     the formatted birth date of the patient
    */
-  public String getPatientDateOfBirth(UnitedStatesPatient patient) {
-    log.info("date of birth: {}", patient.getBirthDateElement().getValueAsString());
-    return patient.getBirthDateElement().getValueAsString();
+  public String getPatientDateOfBirth(UnitedStatesPatient patient,
+      ZoneId tz, DateTimeFormatter formatter) {
+    LocalDate birthDate = patient.getBirthDate().toInstant().atZone(tz).toLocalDate();
+    log.info("date of birth: {}", formatter.format(birthDate));
+    return formatter.format(birthDate);
   }
 
   /**
@@ -258,12 +268,19 @@ public class FhirClient {
    *
    * @param encounter
    *     the encounter resource
+   * @param tz
+   *     the local time zone
+   * @param formatter
+   *     the date formatter to use
    * @return patient's admission datetime
    *     the formatted birth date of the patient
    */
-  public String getPatientAdmissionDate(Encounter encounter) {
-    log.info("admissiondate: {}", encounter.getPeriod().getStartElement().getValueAsString());
-    return encounter.getPeriod().getStartElement().getValueAsString();
+  public String getPatientAdmissionDate(Encounter encounter,
+      ZoneId tz, DateTimeFormatter formatter) {
+    LocalDateTime localDateTime = encounter.getPeriod().getStart().toInstant()
+        .atZone(tz).toLocalDateTime();
+    log.info("admission date: {}", formatter.format(localDateTime));
+    return formatter.format(localDateTime);
   }
 
   /**
@@ -465,5 +482,4 @@ public class FhirClient {
     log.info("prescription status: {empty}");
     return Optional.empty();
   }
-
 }

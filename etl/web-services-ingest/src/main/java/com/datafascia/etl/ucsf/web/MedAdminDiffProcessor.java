@@ -9,6 +9,7 @@ import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import ca.uhn.fhir.model.dstu2.resource.Medication;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.resource.MedicationPrescription;
+import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor;
@@ -350,9 +351,17 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
       // Recreate the prescription based on the new data.
       MedicationPrescription medpresc = UcsfMedicationUtils.populatePrescription(orderJson,
           medication, encounterId, prescriptionId, droolNorm.getMedsSets(), client);
-      medpresc.setId(UcsfMedicationUtils.getMedicationPrescription(prescriptionId, encounterId,
-          client).getId());
-      client.update().resource(medpresc).execute();
+      IdDt prescriptionFetchedId = UcsfMedicationUtils.getMedicationPrescription(
+          prescriptionId, encounterId, client).getId();
+      if (prescriptionFetchedId != null) {
+        medpresc.setId(prescriptionFetchedId);
+        client.update().resource(medpresc).execute();
+      } else {
+        log.warn(
+            "Could not find prescription for prescriptionId [{}] and encounterId [{}]",
+            prescriptionId,
+            encounterId);
+      }
     } else {
       MedicationPrescription prescription = UcsfMedicationUtils.populatePrescription
           (orderJson, medication, encounterId, prescriptionId, droolNorm.getMedsSets(), client);

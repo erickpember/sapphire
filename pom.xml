@@ -67,6 +67,7 @@
 
   <modules>
     <module>api/client</module>
+    <module>api/explorer</module>
     <module>api/server</module>
     <module>build-tools</module>
     <module>common/core</module>
@@ -135,11 +136,16 @@
         <artifactId>hapi-fhir-base</artifactId>
         <version>${hapi-fhir.version}</version>
       </dependency>
-
       <dependency>
         <groupId>ca.uhn.hapi.fhir</groupId>
         <artifactId>hapi-fhir-structures-dstu2</artifactId>
         <version>${hapi-fhir.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>ca.uhn.hapi.fhir</groupId>
+        <artifactId>hapi-fhir-testpage-overlay</artifactId>
+        <version>${hapi-fhir.version}</version>
+        <type>war</type>
       </dependency>
 
       <dependency>

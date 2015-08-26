@@ -3,6 +3,7 @@
 package com.datafascia.api.services;
 
 import ca.uhn.fhir.model.dstu2.resource.Medication;
+import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
@@ -13,13 +14,9 @@ import static org.testng.Assert.assertEquals;
  */
 @Slf4j
 public class MedicationIT extends ApiIT {
-  /**
-   * Validates Medication retrieval.
-   *
-   * @throws Exception
-   */
+
   @Test
-  public void testMedication() throws Exception {
+  public void should_read_medication() throws Exception {
     String id = "code";
     Medication medication = client.read()
         .resource(Medication.class)
@@ -27,5 +24,13 @@ public class MedicationIT extends ApiIT {
         .execute();
 
     assertEquals(medication.getId().getIdPart(), id);
+  }
+
+  @Test(expectedExceptions = ResourceNotFoundException.class)
+  public void should_not_find_medication() {
+    client.read()
+        .resource(Medication.class)
+        .withId("researchSupportingHomeopathy")
+        .execute();
   }
 }

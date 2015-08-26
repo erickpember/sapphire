@@ -19,7 +19,8 @@ import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import com.datafascia.common.fhir.DependencyInjectingResourceProvider;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.persist.LocationRepository;
-import java.util.NoSuchElementException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
 import lombok.NoArgsConstructor;
@@ -91,28 +92,34 @@ public class LocationResourceProvider extends DependencyInjectingResourceProvide
    * Retrieves a location using the ID.
    *
    * @param resourceId ID of Location resource.
-   * @return Returns a resource matching this identifier, or null if none exists.
+   * @return resource matching this identifier
+   * @throws ResourceNotFoundException if not found
    */
   @Read()
   public Location getResourceById(@IdParam IdDt resourceId) {
-    Location result = null;
-    try {
-      result = locationRepository.read(Id.of(resourceId.getIdPart())).get();
-    } catch (NoSuchElementException e) {
-      throw new ResourceNotFoundException("Failed to find resource for ID " + resourceId);
+    Optional<Location> result = locationRepository.read(Id.of(resourceId.getIdPart()));
+    if (result.isPresent()) {
+      return result.get();
+    } else {
+      throw new ResourceNotFoundException("Location resource with ID: " + resourceId.getIdPart()
+          + " not found.");
     }
-    return result;
   }
 
   /**
    * Retrieves a location using the external Location Identifier.
    *
    * @param locationIdentifier Identifier of Location resource.
-   * @return Returns a resource matching this identifier, or null if none exists.
+   * @return list containing the matching resource, or an empty list if no match is found
    */
   @Search()
-  public Location getResourceByIdentifier(
+  public List<Location> searchByIdentifier(
       @RequiredParam(name = Location.SP_IDENTIFIER) StringParam locationIdentifier) {
-    return locationRepository.read(Id.of(locationIdentifier.getValue())).get();
+    List<Location> locations = new ArrayList<>();
+    Optional<Location> result = locationRepository.read(Id.of(locationIdentifier.getValue()));
+    if (result.isPresent()) {
+      locations.add(result.get());
+    }
+    return locations;
   }
 }

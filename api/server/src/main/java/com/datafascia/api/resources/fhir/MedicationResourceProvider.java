@@ -19,7 +19,8 @@ import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import com.datafascia.common.fhir.DependencyInjectingResourceProvider;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.persist.MedicationRepository;
-import java.util.NoSuchElementException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
 import lombok.NoArgsConstructor;
@@ -92,33 +93,34 @@ public class MedicationResourceProvider extends DependencyInjectingResourceProvi
    * Retrieves a medication using the ID.
    *
    * @param resourceId ID of Medication resource.
-   * @return Returns a resource matching this identifier, or null if none exists.
+   * @return resource matching this identifier
+   * @throws ResourceNotFoundException if not found
    */
   @Read()
   public Medication getResourceById(@IdParam IdDt resourceId) {
-    Medication result = null;
-    try {
-      result = medicationRepository.read(Id.of(resourceId.getIdPart())).get();
-    } catch (NoSuchElementException e) {
-      throw new ResourceNotFoundException("Failed to find resource for ID " + resourceId);
+    Optional<Medication> result = medicationRepository.read(Id.of(resourceId.getIdPart()));
+    if (result.isPresent()) {
+      return result.get();
+    } else {
+      throw new ResourceNotFoundException("Medication resource with ID: " + resourceId.getIdPart()
+          + " not found.");
     }
-    return result;
   }
 
   /**
    * Retrieves a medication using the external Medication Code (used as Identifier).
    *
    * @param medicationCode Identifier of Medication resource.
-   * @return Returns a resource matching this identifier, or null if none exists.
+   * @return list of resources matching this code, empty if none exist.
    */
   @Search()
-  public Medication getResourceByCode(
+  public List<Medication> searchResourceByCode(
       @RequiredParam(name = Medication.SP_CODE) StringParam medicationCode) {
+    List<Medication> medications = new ArrayList<>();
     Optional<Medication> result = medicationRepository.read(Id.of(medicationCode.getValue()));
     if (result.isPresent()) {
-      return result.get();
-    } else {
-      return null;
+      medications.add(result.get());
     }
+    return medications;
   }
 }

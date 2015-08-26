@@ -7,6 +7,7 @@ import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import ca.uhn.fhir.model.primitive.DateDt;
 import ca.uhn.fhir.rest.api.MethodOutcome;
+import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -97,6 +98,14 @@ public class PatientIT extends ApiIT {
         .withId("96087004")
         .execute();
     assertFalse(patient.getActive(), "Patient was not deleted by being set to inactive.");
+  }
+
+  @Test(expectedExceptions = ResourceNotFoundException.class)
+  public void should_not_find_patient() {
+    client.read()
+        .resource(UnitedStatesPatient.class)
+        .withId("thatGuyWhoOwesMe$200")
+        .execute();
   }
 
   /**

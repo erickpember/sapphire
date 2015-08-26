@@ -6,6 +6,7 @@ import ca.uhn.fhir.model.api.Bundle;
 import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
+import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
@@ -18,14 +19,8 @@ import static org.testng.Assert.assertEquals;
 @Slf4j
 public class EncounterIT extends ApiIT {
 
-  /**
-   * Validates Encounter searching.
-   *
-   * @throws Exception
-   */
   @Test
-  public void testEncounter() throws Exception {
-    // Test filtering by an encounter state code.
+  public void should_search_encounters_by_status() throws Exception {
     Bundle results = client.search()
         .forResource(Encounter.class)
         .where(Encounter.STATUS.exactly().code(EncounterStateEnum.IN_PROGRESS.name()))
@@ -40,5 +35,13 @@ public class EncounterIT extends ApiIT {
         .execute();
     encounters = ApiUtil.extractBundle(results, Encounter.class);
     assertEquals(encounters.size(), 3);
+  }
+
+  @Test(expectedExceptions = ResourceNotFoundException.class)
+  public void should_not_find_encounter() {
+    client.read()
+        .resource(Encounter.class)
+        .withId("sasquatch")
+        .execute();
   }
 }

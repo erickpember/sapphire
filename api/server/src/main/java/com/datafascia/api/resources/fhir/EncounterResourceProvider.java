@@ -17,10 +17,12 @@ import ca.uhn.fhir.rest.annotation.Update;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
+import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import com.datafascia.common.fhir.DependencyInjectingResourceProvider;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.persist.EncounterRepository;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -113,23 +115,35 @@ public class EncounterResourceProvider extends DependencyInjectingResourceProvid
    * Retrieves a encounter using the ID.
    *
    * @param resourceId ID of Encounter resource.
-   * @return Returns a resource matching this identifier, or null if none exists.
+   * @return resource matching this identifier
+   * @throws ResourceNotFoundException if not found
    */
   @Read()
   public Encounter getResourceById(@IdParam IdDt resourceId) {
-    return encounterRepository.read(Id.of(resourceId.getIdPart())).get();
+    Optional<Encounter> result = encounterRepository.read(Id.of(resourceId.getIdPart()));
+    if (result.isPresent()) {
+      return result.get();
+    } else {
+      throw new ResourceNotFoundException("Encounter resource with ID: " + resourceId.getIdPart()
+          + " not found.");
+    }
   }
 
   /**
    * Retrieves a encounter using the external Encounter Identifier.
    *
    * @param encounterIdentifier Identifier of Encounter resource.
-   * @return Returns a resource matching this identifier, or null if none exists.
+   * @return list containing the matching encounter, or an empty list.
    */
   @Search()
-  public Encounter getResourceByIdentifier(
+  public List<Encounter> searchByIdentifier(
       @RequiredParam(name = Encounter.SP_IDENTIFIER) StringParam encounterIdentifier) {
-    return encounterRepository.read(Id.of(encounterIdentifier.getValue())).get();
+    List<Encounter> encounters = new ArrayList<>();
+    Optional<Encounter> result = encounterRepository.read(Id.of(encounterIdentifier.getValue()));
+    if (result.isPresent()) {
+      encounters.add(result.get());
+    }
+    return encounters;
   }
 
   /**

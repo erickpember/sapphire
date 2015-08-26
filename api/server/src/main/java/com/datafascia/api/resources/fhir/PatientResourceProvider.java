@@ -15,6 +15,7 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.param.NumberParam;
 import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
+import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import com.datafascia.common.api.ApiParams;
 import com.datafascia.common.fhir.DependencyInjectingResourceProvider;
@@ -104,11 +105,18 @@ public class PatientResourceProvider extends DependencyInjectingResourceProvider
    * Retrieves a patient using the ID.
    *
    * @param resourceId ID of patient resource.
-   * @return Returns a resource matching this identifier, or null if none exists.
+   * @return resource matching this identifier
+   * @throws ResourceNotFoundException if not found
    */
   @Read()
   public UnitedStatesPatient getResourceById(@IdParam IdDt resourceId) {
-    return patientRepository.read(Id.of(resourceId.getIdPart())).get();
+    Optional<UnitedStatesPatient> result = patientRepository.read(Id.of(resourceId.getIdPart()));
+    if (result.isPresent()) {
+      return result.get();
+    } else {
+      throw new ResourceNotFoundException("Patient resource with ID: " + resourceId.getIdPart()
+          + " not found.");
+    }
   }
 
   /**

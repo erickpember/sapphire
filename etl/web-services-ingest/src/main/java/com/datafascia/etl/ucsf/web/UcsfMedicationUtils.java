@@ -403,10 +403,11 @@ public class UcsfMedicationUtils {
    * @return An encounter.
    */
   public static Encounter getEncounter(String csn, IGenericClient client) {
-    return client.read()
-        .resource(Encounter.class)
-        .withId(csn)
-        .execute();
+    try {
+      return client.read().resource(Encounter.class).withId(csn).execute();
+    } catch (ResourceNotFoundException e) {
+      return null;
+    }
   }
 
   /**

@@ -79,7 +79,6 @@
     <module>etl/nar</module>
     <module>etl/web-services-ingest</module>
     <module>integration-tests</module>
-    <module>scenario-tests</module>
     <module>shell</module>
   </modules>
 

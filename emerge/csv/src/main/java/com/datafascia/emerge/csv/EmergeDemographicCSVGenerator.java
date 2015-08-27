@@ -30,7 +30,7 @@ public class EmergeDemographicCSVGenerator {
 
   private static final ZoneId TIME_ZONE = ZoneId.of("America/Los_Angeles");
   private static final DateTimeFormatter DATE_TIME_FORMATTER =
-      DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
+      DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
   // Date format the CSV is expecting.
   private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
   // Name format

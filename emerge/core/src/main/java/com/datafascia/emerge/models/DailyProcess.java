@@ -91,14 +91,14 @@ public class DailyProcess {
   @Getter @Setter @JsonProperty(value = "Please list the current Lorazepam rate (mg/h)", index = 32)
   private String pleaseListTheCurrentLorazepamRateMgH;
   @Getter @Setter
-  @JsonProperty(value = "Please list the highest Lorazepam rate 24 hours (mg/h)", index = 33)
+  @JsonProperty(value = "Please list the highest Lorazepam  rate 24 hours (mg/h)", index = 33)
   private String pleaseListTheHighestLorazepamRate24HoursMgH;
   @Getter @Setter @JsonProperty(value = "Continuous Infusion Midazolam", index = 34)
   private String continuousInfusionMidazolam = "No";
   @Getter @Setter @JsonProperty(value = "Please list the current Midazolam rate (mg/h)", index = 35)
   private String pleaseListTheCurrentMidazolamRateMgH;
   @Getter @Setter
-  @JsonProperty(value = "Please list the highest Midazolam rate 24 hours (mg/h)", index = 36)
+  @JsonProperty(value = "Please list the highest Midazolam  rate 24 hours (mg/h)", index = 36)
   private String pleaseListTheHighestMidazolamRate24HoursMgH;
   @Getter @Setter @JsonProperty(value = "Continuous Infusion Morphine", index = 37)
   private String continuousInfusionMorphine = "No";

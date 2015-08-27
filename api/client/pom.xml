@@ -31,24 +31,6 @@
     </dependency>
 
     <dependency>
-      <groupId>com.fasterxml.jackson.dataformat</groupId>
-      <artifactId>jackson-dataformat-csv</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.fasterxml.jackson.module</groupId>
-      <artifactId>jackson-module-jsonSchema</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>com.squareup.retrofit</groupId>
-      <artifactId>converter-jackson</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.squareup.retrofit</groupId>
-      <artifactId>retrofit</artifactId>
-    </dependency>
-
-    <dependency>
       <groupId>org.projectlombok</groupId>
       <artifactId>lombok</artifactId>
       <scope>provided</scope>

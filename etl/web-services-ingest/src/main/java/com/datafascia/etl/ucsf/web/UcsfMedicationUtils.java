@@ -2,8 +2,6 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.ucsf.web;
 
-import ca.uhn.fhir.model.api.Bundle;
-import ca.uhn.fhir.model.api.BundleEntry;
 import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
 import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import ca.uhn.fhir.model.dstu2.composite.RangeDt;
@@ -15,10 +13,8 @@ import ca.uhn.fhir.model.dstu2.resource.MedicationPrescription;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationPrescriptionStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
-import ca.uhn.fhir.rest.api.MethodOutcome;
-import ca.uhn.fhir.rest.client.IGenericClient;
-import ca.uhn.fhir.rest.gclient.StringClientParam;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
+import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.etl.ucsf.web.rules.model.MedsSet;
@@ -52,19 +48,19 @@ public class UcsfMedicationUtils {
   /**
    * Populate a MedicationAdministration.
    *
-   * @param adminJson   The base JSON.
-   * @param adminId     The ID of the administration.
-   * @param orderId     The ID of the prescription.
-   * @param encounterId The encounter.
-   * @param med         The medication.
-   * @param medsSet     A list of medication group sets.
-   * @param client      The FHIR client.
+   * @param adminJson     The base JSON.
+   * @param adminId       The ID of the administration.
+   * @param orderId       The ID of the prescription.
+   * @param encounterId   The encounter.
+   * @param med           The medication.
+   * @param medsSet       A list of medication group sets.
+   * @param clientBuilder The resource client builder.
    * @return The populated administration.
    * @throws java.sql.SQLException When there is a problem communicating with SQL.
    */
   public static MedicationAdministration populateAdministration(JSONObject adminJson, String
       adminId, String orderId, String encounterId, Medication med, List<MedsSet> medsSet,
-      IGenericClient client) throws SQLException {
+      ClientBuilder clientBuilder) throws SQLException {
     MedicationAdministration admin = new MedicationAdministration();
 
     String[] adminAction = adminJson.get("AdminAction").toString().split("\\^");
@@ -73,11 +69,12 @@ public class UcsfMedicationUtils {
     }
 
     ResourceReferenceDt prescriptionRef = new ResourceReferenceDt();
-    prescriptionRef.setResource(getMedicationPrescription(orderId, encounterId, client));
+    prescriptionRef.setResource(clientBuilder.getMedicationPrescriptionClient()
+        .getMedicationPrescription(orderId, encounterId));
     admin.setPrescription(prescriptionRef);
 
     if (encounterId != null) {
-      Encounter encounter = getEncounter(encounterId, client);
+      Encounter encounter = clientBuilder.getEncounterClient().getEncounter(encounterId);
       if (encounter != null) {
         admin.setEncounter(new ResourceReferenceDt(encounter.getId()));
       } else {
@@ -226,18 +223,18 @@ public class UcsfMedicationUtils {
 
   /**
    * Populate a MedicationPrescription.
-   * @param orderJson   The base JSON.
-   * @param medication  The medication.
-   * @param encounterId The ID of the associated encounter.
-   * @param orderId     The id of the order.
-   * @param medsSet     The medsset codes and names.
-   * @param client      The FHIR client.
+   * @param orderJson     The base JSON.
+   * @param medication    The medication.
+   * @param encounterId   The ID of the associated encounter.
+   * @param orderId       The id of the order.
+   * @param medsSet       The medsset codes and names.
+   * @param clientBuilder The resource client builder.
    * @return The populated prescription.
    * @throws java.sql.SQLException When there is a problem communicating with SQL.
    */
   public static MedicationPrescription populatePrescription(JSONObject orderJson,
       Medication medication, String encounterId, String orderId, List<MedsSet> medsSet,
-      IGenericClient client) throws SQLException {
+      ClientBuilder clientBuilder) throws SQLException {
     MedicationPrescription prescription = new MedicationPrescription();
     prescription.addIdentifier()
         .setSystem(IdentifierSystems.INSTITUTION_MEDICATION_PRESCRIPTION)
@@ -255,7 +252,7 @@ public class UcsfMedicationUtils {
     if (encounterId != null) {
       Encounter encounter = new Encounter();
       try {
-        encounter = getEncounter(encounterId, client);
+        encounter = clientBuilder.getEncounterClient().getEncounter(encounterId);
       } catch (ResourceNotFoundException e) {
         log.warn("\n encounters are broken in a unit test, rip all this code out.\n");
       }
@@ -312,141 +309,6 @@ public class UcsfMedicationUtils {
     }
 
     return prescription;
-  }
-
-  /**
-   * Returns a MedicationPrescription for a given order ID.
-   *
-   * @param prescriptionId The prescription ID.
-   * @param encounterId ID of the parent Encounter resource.
-   * @param client  The FHIR client to fetch with.
-   * @return A MedicationPrescription
-   */
-  public static MedicationPrescription getMedicationPrescription(String prescriptionId,
-      String encounterId, IGenericClient client) {
-    Bundle results = client.search().forResource(MedicationPrescription.class)
-        .where(new StringClientParam(MedicationPrescription.SP_ENCOUNTER)
-            .matches()
-            .value(encounterId))
-        .where(new StringClientParam(MedicationPrescription.SP_RES_ID)
-            .matches()
-            .value(prescriptionId))
-        .execute();
-    List<BundleEntry> entries = results.getEntries();
-    if (!entries.isEmpty()) {
-      return (MedicationPrescription) entries.get(0).getResource();
-    } else {
-      return null;
-    }
-  }
-
-  /**
-   * Returns a MedicationAdministration for a given order ID and admin ID.
-   *
-   * @param adminId The medication administration ID.
-   * @param encounterId The ID of the parent encounter.
-   * @param prescriptionId The prescription ID.
-   * @param client  The FHIR client to fetch with.
-   * @return A MedicationAdministration
-   */
-  public static MedicationAdministration getMedicationAdministration(String adminId,
-      String encounterId, String prescriptionId, IGenericClient client) {
-    Bundle results = client.search().forResource(MedicationAdministration.class)
-        .where(new StringClientParam(MedicationAdministration.SP_RES_ID)
-            .matches()
-            .value(prescriptionId + "-" + adminId))
-        .where(new StringClientParam(MedicationAdministration.SP_ENCOUNTER)
-            .matches()
-            .value(encounterId))
-        .where(new StringClientParam(MedicationAdministration.SP_PRESCRIPTION)
-            .matches()
-            .value(prescriptionId))
-        .execute();
-    List<BundleEntry> entries = results.getEntries();
-    if (!entries.isEmpty()) {
-      return (MedicationAdministration) entries.get(0).getResource();
-    } else {
-      return null;
-    }
-  }
-
-  /**
-   * Returns a MedicationAdministration for a given identifier.
-   *
-   * @param adminId     The resource ID.
-   * @param encounterId The ID of the parent encounter.
-   * @param client The FHIR client to fetch with.
-   * @return A MedicationAdministration
-   */
-  public static MedicationAdministration getMedicationAdministration(String adminId,
-      String encounterId, IGenericClient client) {
-    Bundle results = client.search().forResource(MedicationAdministration.class)
-        .where(new StringClientParam(MedicationAdministration.SP_RES_ID)
-            .matches()
-            .value(adminId))
-        .where(new StringClientParam(MedicationAdministration.SP_ENCOUNTER)
-            .matches()
-            .value(encounterId))
-        .execute();
-    List<BundleEntry> entries = results.getEntries();
-    if (!entries.isEmpty()) {
-      return (MedicationAdministration) entries.get(0).getResource();
-    } else {
-      return null;
-    }
-  }
-
-  /**
-   * Returns an encounter for a given Contact Serial Number.
-   * @param csn    The Contact Serial Number.
-   * @param client The FHIR client to fetch with.
-   * @return An encounter.
-   */
-  public static Encounter getEncounter(String csn, IGenericClient client) {
-    try {
-      return client.read().resource(Encounter.class).withId(csn).execute();
-    } catch (ResourceNotFoundException e) {
-      return null;
-    }
-  }
-
-  /**
-   * Save a given MedicationPrescription.
-   * @param prescription The MedicationPrescription to save.
-   * @param client       The FHIR client to fetch with.
-   * @return The MedicationPrescription with populated native ID.
-   */
-  public static MedicationPrescription savePrescription(MedicationPrescription prescription,
-      IGenericClient client) {
-    MethodOutcome outcome = client.create().resource(prescription).execute();
-    prescription.setId(outcome.getId());
-    return prescription;
-  }
-
-  /**
-   * Save a given MedicationAdministration.
-   * @param administration The MedicationAdministration to save.
-   * @param client         The FHIR client to fetch with.
-   * @return The MedicationAdministration with populated native ID.
-   */
-  public static MedicationAdministration saveAdministration(MedicationAdministration
-      administration, IGenericClient client) {
-    MethodOutcome outcome = client.create().resource(administration).execute();
-    administration.setId(outcome.getId());
-    return administration;
-  }
-
-  /**
-   * Retrieve a medication for a given FHIR-native ID.
-   * @param nativeId The FHIR-native ID to fetch for.
-   * @param client   The FHIR client to fetch with.
-   * @return A medication.
-   */
-  public static Medication getMedication(String nativeId, IGenericClient client) {
-    return client.read()
-        .resource(Medication.class)
-        .withId(nativeId)
-        .execute();
   }
 
   /**

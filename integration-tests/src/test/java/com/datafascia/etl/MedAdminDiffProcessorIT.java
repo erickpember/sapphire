@@ -12,13 +12,13 @@ import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.api.MethodOutcome;
+import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.services.ApiIT;
 import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.persist.entity.AccumuloReflectEntityStore;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.etl.ucsf.web.MedAdminDiffListener;
 import com.datafascia.etl.ucsf.web.MedAdminDiffProcessor;
-import com.datafascia.etl.ucsf.web.UcsfMedicationUtils;
 import com.datafascia.etl.ucsf.web.UcsfWebGetProcessor;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -57,6 +57,7 @@ import static org.testng.Assert.fail;
 public class MedAdminDiffProcessorIT extends ApiIT implements MedAdminDiffListener {
   private static final String TABLE = "testTable";
   private MedAdminDiffProcessor processor;
+  private ClientBuilder clientBuilder;
 
   @Inject
   private Connector connector;
@@ -115,10 +116,11 @@ public class MedAdminDiffProcessorIT extends ApiIT implements MedAdminDiffListen
     runner.setProperty(MedAdminDiffProcessor.FHIR_USERNAME, FHIR_USERNAME);
     runner.setProperty(MedAdminDiffProcessor.FHIR_PASSWORD, FHIR_PASSWORD);
 
+    clientBuilder = new ClientBuilder(fhirServer, FHIR_USERNAME, FHIR_PASSWORD);
+
     processor = (MedAdminDiffProcessor) runner.getProcessor();
     processor.setDiffListener(this);
     processor.setConnector(connector);
-    processor.setClient(client);
 
     // Positive tests of new data and diffs.
     runner.enqueue(addContent("GetMedAdminUnit{questionMark}ListID=15860.json"));
@@ -136,7 +138,7 @@ public class MedAdminDiffProcessorIT extends ApiIT implements MedAdminDiffListen
         "{colon}38{colon}54Z.json"));
     runner.enqueue(addContent("GetMedAdminUnit{questionMark}ListID=15860&FromDate=2015-07-14T06" +
         "{colon}40{colon}30Z.json"));
-    UcsfMedicationUtils.getEncounter("5041113", client);
+
     runner.run(enqueueCount);
     runner.assertQueueEmpty();
     runner.assertAllFlowFilesTransferred(MedAdminDiffProcessor.SUCCESS);
@@ -269,8 +271,8 @@ public class MedAdminDiffProcessorIT extends ApiIT implements MedAdminDiffListen
         log.warn("No medication given for admin " + admin.getIdentifierFirstRep().getValue() +
             ". Was expecting " + expected.scd + " aka " + expected.drugName);
       } else {
-        Medication medication = UcsfMedicationUtils.getMedication(admin.getMedication()
-            .getReference().getIdPart(), client);
+        Medication medication = clientBuilder.getMedicationClient().getMedication(
+            admin.getMedication().getReference().getIdPart());
         assertEquals(medication.getCode().getCodingFirstRep().getCode(), expected.scd);
         assertEquals(medication.getName(), expected.drugName);
       }

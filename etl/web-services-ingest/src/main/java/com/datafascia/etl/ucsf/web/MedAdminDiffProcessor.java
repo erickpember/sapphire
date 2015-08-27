@@ -2,16 +2,11 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.ucsf.web;
 
-import ca.uhn.fhir.context.FhirContext;
-import ca.uhn.fhir.model.api.Bundle;
-import ca.uhn.fhir.model.api.BundleEntry;
 import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import ca.uhn.fhir.model.dstu2.resource.Medication;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.resource.MedicationPrescription;
-import ca.uhn.fhir.rest.api.MethodOutcome;
-import ca.uhn.fhir.rest.client.IGenericClient;
-import ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor;
+import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.common.inject.Injectors;
 import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.etl.ucsf.web.MedAdminDiffListener.ElementType;
@@ -66,9 +61,8 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
   private RxNormLookup rxNormDb;
   private String tableName;
   private KieSession kieSession;
-  private IGenericClient client = null;
+  private ClientBuilder clientBuilder;
   private final Authorizations authorizations = new Authorizations("System");
-  private final FhirContext ctx = FhirContext.forDstu2();
   @Inject
   private volatile Connector connector;
   private final HashMap<String, Medication> orderMedicationCache = new HashMap<>();
@@ -203,13 +197,10 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
       }
     }
 
-    if (client == null) {
-      client = ctx.newRestfulGenericClient(context.getProperty(FHIR_SERVER).getValue());
-      String fhirUsername = context.getProperty(FHIR_USERNAME).getValue();
-      String fhirPassword = context.getProperty(FHIR_PASSWORD).getValue();
-      if (!Strings.isNullOrEmpty(fhirUsername) && !Strings.isNullOrEmpty(fhirPassword)) {
-        client.registerInterceptor(new BasicAuthInterceptor(fhirUsername, fhirPassword));
-      }
+    if (clientBuilder == null) {
+      clientBuilder = new ClientBuilder(context.getProperty(FHIR_SERVER).getValue(),
+          context.getProperty(FHIR_USERNAME).getValue(),
+          context.getProperty(FHIR_PASSWORD).getValue());
     }
 
     final ProcessorLog plog = this.getLogger();
@@ -258,8 +249,8 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
                   } catch (SQLException ex) {
                     log.error("Error fetching RxNorm name with SCD " + scd + ": " + ex.getMessage(),
                         ex);
-                    plog.error("Error fetching RxNorm name with SCD " + scd + ": " + ex.getMessage
-                        ());
+                    plog.error("Error fetching RxNorm name with SCD " + scd + ": "
+                        + ex.getMessage());
                     throw new ProcessException(ex);
                   } catch (MutationsRejectedException | TableNotFoundException ex) {
                     log.error("Error finding medication diffs: " + ex.getMessage(), ex);
@@ -283,13 +274,13 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
   /**
    * Detects diffs in medication JSON object.
    *
-   * @param orderJson   A JSONObject of a medication order.
+   * @param orderJson A JSONObject of a medication order.
    * @param encounterId The ID of the encounter.
-   * @param scd         The SCD of the drug this refers to.
+   * @param scd The SCD of the drug this refers to.
    * @throws MutationsRejectedException If the mutation fails.
-   * @throws ParseException             If the persisted data in accumulo is corrupt.
-   * @throws TableNotFoundException     If the table doesn't exist.
-   * @throws SQLException               If there is a problem interacting with SQL.
+   * @throws ParseException If the persisted data in accumulo is corrupt.
+   * @throws TableNotFoundException If the table doesn't exist.
+   * @throws SQLException If there is a problem interacting with SQL.
    */
   private void findPrescriptionDiffs(JSONObject orderJson, String encounterId, String scd)
       throws ParseException, MutationsRejectedException, TableNotFoundException, SQLException {
@@ -349,12 +340,12 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
 
       // Recreate the prescription based on the new data.
       MedicationPrescription medpresc = UcsfMedicationUtils.populatePrescription(orderJson,
-          medication, encounterId, prescriptionId, droolNorm.getMedsSets(), client);
-      MedicationPrescription existingPrescription = UcsfMedicationUtils.getMedicationPrescription(
-          prescriptionId, encounterId, client);
+          medication, encounterId, prescriptionId, droolNorm.getMedsSets(), clientBuilder);
+      MedicationPrescription existingPrescription = clientBuilder.getMedicationPrescriptionClient()
+          .getMedicationPrescription(prescriptionId, encounterId);
       if (existingPrescription != null) {
         medpresc.setId(existingPrescription.getId());
-        client.update().resource(medpresc).execute();
+        clientBuilder.getMedicationPrescriptionClient().updateMedicationPrescription(medpresc);
       } else {
         log.warn(
             "Could not find prescription for prescriptionId [{}] and encounterId [{}]",
@@ -362,9 +353,9 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
             encounterId);
       }
     } else {
-      MedicationPrescription prescription = UcsfMedicationUtils.populatePrescription
-          (orderJson, medication, encounterId, prescriptionId, droolNorm.getMedsSets(), client);
-      prescription = UcsfMedicationUtils.savePrescription(prescription, client);
+      MedicationPrescription prescription = UcsfMedicationUtils.populatePrescription(orderJson,
+          medication, encounterId, prescriptionId, droolNorm.getMedsSets(), clientBuilder);
+      prescription = clientBuilder.getMedicationPrescriptionClient().savePrescription(prescription);
       diffListener.newOrder(prescription);
     }
 
@@ -382,21 +373,21 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
   /**
    * Detects diffs in medication administration JSON object.
    *
-   * @param admin       The admin to inspect for diffs.
+   * @param admin The admin to inspect for diffs.
    * @param encounterId the Id of the encounter.
-   * @param prescriptionId     The Id of the order.
-   * @param droolNorm   The populated RxNorm pojo.
+   * @param prescriptionId The Id of the order.
+   * @param droolNorm The populated RxNorm pojo.
    * @throws MutationsRejectedException If the mutation fails.
-   * @throws ParseException             If the JSON found is unparsable.
-   * @throws TableNotFoundException     If the table doesn't exist.
-   * @throws SQLException               If there is a problem interacting with SQL.
+   * @throws ParseException If the JSON found is unparsable.
+   * @throws TableNotFoundException If the table doesn't exist.
+   * @throws SQLException If there is a problem interacting with SQL.
    */
   private void findAdministrationDiffs(JSONObject admin, String encounterId, String prescriptionId,
       RxNorm droolNorm) throws ParseException,
       MutationsRejectedException, TableNotFoundException, SQLException {
     /*
-     * Only recording actual administrations, not scheduled ones or verifications.
-     * Might need to invert this to a whitelist instead containing "Given" and "New Bag".
+     * Only recording actual administrations, not scheduled ones or verifications. Might need to
+     * invert this to a whitelist instead containing "Given" and "New Bag".
      */
 
     String[] adminAction = admin.get("AdminAction").toString().split("\\^");
@@ -431,25 +422,25 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
       }
 
       // Recreate the administration based on the new data.
-      MedicationAdministration medAdmin = UcsfMedicationUtils.populateAdministration
-          (admin, adminId, prescriptionId, encounterId, populateMedication(droolNorm),
-              droolNorm.getMedsSets(), client);
+      MedicationAdministration medAdmin = UcsfMedicationUtils.populateAdministration(admin, adminId,
+          prescriptionId, encounterId, populateMedication(droolNorm),
+          droolNorm.getMedsSets(), clientBuilder);
       if (!medAdmin.isEmpty()) {
         try {
-          medAdmin.setId(UcsfMedicationUtils.getMedicationAdministration(adminId, encounterId,
-              prescriptionId, client).getId());
+          medAdmin.setId(clientBuilder.getMedicationAdministrationClient()
+              .getMedicationAdministration(adminId, encounterId, prescriptionId).getId());
         } catch (NullPointerException e) {
           log.error("No admin for order " + prescriptionId + " and admin " + adminId);
           throw e;
         }
-        client.update().resource(medAdmin).execute();
+        clientBuilder.getMedicationAdministrationClient().updateMedicationAdministration(medAdmin);
       }
     } else {
       // We have a new administration. Populate a MedicationAdministration and save it.
       MedicationAdministration medAdmin = UcsfMedicationUtils
           .populateAdministration(admin, adminId, prescriptionId, encounterId,
-              populateMedication(droolNorm), droolNorm.getMedsSets(), client);
-      medAdmin = UcsfMedicationUtils.saveAdministration(medAdmin, client);
+              populateMedication(droolNorm), droolNorm.getMedsSets(), clientBuilder);
+      medAdmin = clientBuilder.getMedicationAdministrationClient().saveAdministration(medAdmin);
       diffListener.newAdmin(medAdmin);
     }
   }
@@ -466,23 +457,19 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
       kieSession.insert(droolNorm);
 
       // Fetch the medication object.
-      Bundle response = client.search()
-          .forResource(Medication.class)
-          .where(Medication.CODE.exactly().code(droolNorm.getRxcuiSCD()))
-          .execute();
-      List<BundleEntry> entries = response.getEntries();
+      /* Bundle response = client.search()
+       * .forResource(Medication.class)
+       * .where(Medication.CODE.exactly().code(droolNorm.getRxcuiSCD())) .execute();
+       * List<BundleEntry> entries = response.getEntries(); */
+      medication = clientBuilder.getMedicationClient().getMedication(droolNorm.getRxcuiSCD());
 
-      if (entries.size() > 0) {
-        BundleEntry entry = entries.get(0);
-        medication = (Medication) entry.getResource();
-      } else {
+      if (medication == null) {
         medication = new Medication();
         medication.setName(drugName);
         medication.setCode(new CodeableConceptDt(CodingSystems.SEMANTIC_CLINICAL_DRUG,
             droolNorm.getRxcuiSCD()));
 
-        MethodOutcome outcome = client.create().resource(medication).execute();
-        medication.setId(outcome.getId());
+        medication = clientBuilder.getMedicationClient().saveMedication(medication);
       }
 
       if (!orderMedicationCache.keySet().contains(droolNorm.getRxcuiSCD())) {
@@ -490,9 +477,5 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
       }
     }
     return medication;
-  }
-
-  public void setClient(IGenericClient client) {
-    this.client = client;
   }
 }

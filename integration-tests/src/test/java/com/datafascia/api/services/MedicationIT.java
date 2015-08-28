@@ -2,8 +2,11 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.services;
 
+import ca.uhn.fhir.model.api.Bundle;
+import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.dstu2.resource.Medication;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
@@ -24,6 +27,10 @@ public class MedicationIT extends ApiIT {
         .execute();
 
     assertEquals(medication.getId().getIdPart(), id);
+
+    Bundle results = client.search().forResource(Medication.class).execute();
+    List<IResource> medications = ApiUtil.extractBundle(results, Medication.class);
+    assertEquals(medications.size(), 1);
   }
 
   @Test(expectedExceptions = ResourceNotFoundException.class)

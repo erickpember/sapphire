@@ -108,6 +108,12 @@ public class MedicationAdministrationIT extends ApiIT {
     assertEquals(medicationAdministrations.get(0).getId().getIdPart(),
         medicationAdministration1.getId().getIdPart(), "Two argument read/search failed.");
 
+    results = client.search().forResource(MedicationAdministration.class)
+        .execute();
+    medicationAdministrations = ApiUtil.extractBundle(results,
+        MedicationAdministration.class);
+    assertEquals(medicationAdministrations.size(), 2, "No-argument search failed.");
+
     // Get rid of this particular encounter and patient so it doesn't mess up other tests.
     client.delete().resourceById(encounter.getId()).execute();
     client.delete().resourceById(patient.getId()).execute();

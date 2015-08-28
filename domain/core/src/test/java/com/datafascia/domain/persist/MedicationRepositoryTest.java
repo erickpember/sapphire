@@ -10,6 +10,7 @@ import ca.uhn.fhir.model.dstu2.resource.Medication.Product;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationKindEnum;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.fhir.Ids;
+import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
 import org.testng.annotations.Test;
@@ -24,10 +25,10 @@ public class MedicationRepositoryTest extends RepositoryTestSupport {
   @Inject
   private MedicationRepository medicationRepository;
 
-  private Medication createMedication() {
+  private Medication createMedication(String code) {
     Medication medication = new Medication();
     medication.setName("name");
-    medication.setCode(new CodeableConceptDt("code", "code"));
+    medication.setCode(new CodeableConceptDt(code, code));
     medication.setIsBrand(Boolean.TRUE);
     medication.setManufacturer(new ResourceReferenceDt("manufacturerId"));
     medication.setKind(MedicationKindEnum.PRODUCT);
@@ -44,11 +45,17 @@ public class MedicationRepositoryTest extends RepositoryTestSupport {
 
   @Test
   public void should_read_medication() {
-    Medication medication = createMedication();
+    Medication medication = createMedication("code");
     medicationRepository.save(medication);
 
     Id<Medication> medicationId = Ids.toPrimaryKey(medication.getId());
     Optional<Medication> optionalMedication = medicationRepository.read(medicationId);
     assertEquals(optionalMedication.get().getId(), medication.getId());
+
+    Medication medication2 = createMedication("code2");
+    medicationRepository.save(medication2);
+
+    List<Medication> medications = medicationRepository.list();
+    assertEquals(medications.size(), 2);
   }
 }

@@ -9,7 +9,10 @@ import com.datafascia.common.persist.entity.EntityId;
 import com.datafascia.common.persist.entity.FhirEntityStore;
 import com.google.common.io.BaseEncoding;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
@@ -77,5 +80,15 @@ public class LocationRepository extends FhirEntityStoreRepository {
    */
   public Optional<Location> read(Id<Location> locationId) {
     return entityStore.read(toEntityId(locationId));
+  }
+
+  /**
+   * Finds all locations.
+   *
+   * @return found locations
+   */
+  public List<Location> list() {
+    Stream<Location> stream = entityStore.stream(Location.class);
+    return stream.collect(Collectors.toList());
   }
 }

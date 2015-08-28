@@ -5,6 +5,7 @@ package com.datafascia.api.resources.fhir;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Procedure;
 import ca.uhn.fhir.rest.annotation.Create;
+import ca.uhn.fhir.rest.annotation.OptionalParam;
 import ca.uhn.fhir.rest.annotation.RequiredParam;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Search;
@@ -12,8 +13,11 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.param.StringParam;
 import com.datafascia.common.fhir.DependencyInjectingResourceProvider;
 import com.datafascia.common.persist.Id;
+import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.ProcedureRepository;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.inject.Inject;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +27,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 @NoArgsConstructor @Slf4j
 public class ProcedureResourceProvider extends DependencyInjectingResourceProvider {
+
+  @Inject
+  private EncounterRepository encounterRepository;
 
   @Inject
   private ProcedureRepository procedureRepository;
@@ -68,6 +75,32 @@ public class ProcedureResourceProvider extends DependencyInjectingResourceProvid
       @RequiredParam(name = Procedure.SP_ENCOUNTER) StringParam encounterId) {
     Id<Encounter> encounterInternalId = Id.of(encounterId.getValue());
     List<Procedure> procedures = procedureRepository.list(encounterInternalId);
+    return procedures;
+  }
+
+  /**
+   * Searches procedures based on encounter. Returns list of Procedures where Procedure.encounter
+   * matches a given Encounter resource ID. Absent an encounter, returns results for all encounters.
+   *
+   * @param encounterId Internal resource ID for the Encounter used in looking up a Procedure.
+   * @return A list containing up to 1 Procedure, matching this query.
+   */
+  @Search()
+  public List<Procedure> search(
+      @OptionalParam(name = Procedure.SP_ENCOUNTER) StringParam encounterId) {
+    List<Procedure> procedures = new ArrayList<>();
+    if (encounterId != null) {
+      Id<Encounter> encounterInternalId = Id.of(encounterId.getValue());
+      procedures = procedureRepository.list(encounterInternalId);
+    } else {
+      // Pull records for all encounters.
+      List<Encounter> allEncounters = encounterRepository.list(Optional.empty());
+      for (Encounter eachEncounter : allEncounters) {
+        List<Procedure> admins = procedureRepository.list(EncounterRepository.
+            generateId(eachEncounter));
+        procedures.addAll(admins);
+      }
+    }
     return procedures;
   }
 }

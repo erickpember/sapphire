@@ -6,7 +6,7 @@ import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.MedicationPrescription;
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.annotation.Create;
-import ca.uhn.fhir.rest.annotation.RequiredParam;
+import ca.uhn.fhir.rest.annotation.OptionalParam;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.annotation.Update;
@@ -17,6 +17,7 @@ import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import com.datafascia.common.fhir.DependencyInjectingResourceProvider;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.fhir.Ids;
+import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.MedicationPrescriptionRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +31,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 @NoArgsConstructor @Slf4j
 public class MedicationPrescriptionResourceProvider extends DependencyInjectingResourceProvider {
+
+  @Inject
+  private EncounterRepository encounterRepository;
 
   @Inject
   private MedicationPrescriptionRepository medicationPrescriptionRepository;
@@ -58,49 +62,69 @@ public class MedicationPrescriptionResourceProvider extends DependencyInjectingR
    */
   @Create
   public MethodOutcome create(@ResourceParam MedicationPrescription medicationPrescription) {
-    medicationPrescriptionRepository.save(medicationPrescription);
-    return new MethodOutcome(medicationPrescription.getId());
-  }
-
-  /**
-   * Searches MedicationPrescriptions based on encounter. Returns list of Medication Prescriptions
-   * where MedicationPrescription.encounter matches a given Encounter resource ID.
-   *
-   * @param encounterId Internal resource ID for the Encounter for which we want corresponding
-   *                    medicationPrescriptions.
-   * @return Search results.
-   */
-  @Search()
-  public List<MedicationPrescription> searchByEncounterId(
-      @RequiredParam(name = MedicationPrescription.SP_ENCOUNTER) StringParam encounterId) {
-    Id<Encounter> encounterInternalId = Id.of(encounterId.getValue());
-    List<MedicationPrescription> medicationPrescriptions = medicationPrescriptionRepository.
-        list(encounterInternalId);
-
-    return medicationPrescriptions;
+    if (medicationPrescription.getEncounter() != null) {
+      medicationPrescriptionRepository.save(medicationPrescription);
+      return new MethodOutcome(medicationPrescription.getId());
+    } else {
+      throw new UnprocessableEntityException("Can not create MedicationPrescription:"
+          + " encounter reference can not be null.");
+    }
   }
 
   /**
    * Because the MedicationPrescriptionRepository does not support single-argument reads, a
    * double-argument read method that requires the Encounter ID as well as the Medication
    * Prescription ID is implemented here in the API as a search method.
+   * Absent an encounterID, all encounters are searched.
+   * Absent a prescriptionId, all prescriptions are searched.
    *
    * @param encounterId    Internal resource ID for the Encounter used in looking up a Prescription.
    * @param prescriptionId Resource ID of the specific MedicationPrescription we want to retrieve.
-   * @return A list containing up to 1 MedicationPrescription, matching this query.
+   * @return
+   *     A list containing MedicationPrescriptions, matching this query.
    */
   @Search()
-  public List<MedicationPrescription> searchByEncounterIdAndMedPrescriptionId(
-      @RequiredParam(name = MedicationPrescription.SP_ENCOUNTER) StringParam encounterId,
-      @RequiredParam(name = MedicationPrescription.SP_RES_ID) StringParam prescriptionId) {
-    Id<Encounter> encounterInternalId = Id.of(encounterId.getValue());
-    Id<MedicationPrescription> prescriptionInternalId = Id.of(prescriptionId.getValue());
+  public List<MedicationPrescription> search(
+      @OptionalParam(name = MedicationPrescription.SP_ENCOUNTER) StringParam encounterId,
+      @OptionalParam(name = MedicationPrescription.SP_RES_ID) StringParam prescriptionId) {
     List<MedicationPrescription> medicationPrescriptions = new ArrayList<>();
-    Optional<MedicationPrescription> result = medicationPrescriptionRepository.
-        read(encounterInternalId, prescriptionInternalId);
 
-    if (result.isPresent()) {
-      medicationPrescriptions.add(result.get());
+    if (encounterId != null && prescriptionId != null) {
+      Id<Encounter> encounterInternalId = Id.of(encounterId.getValue());
+      Id<MedicationPrescription> prescriptionInternalId = Id.of(prescriptionId.getValue());
+      Optional<MedicationPrescription> result = medicationPrescriptionRepository.
+          read(encounterInternalId, prescriptionInternalId);
+
+      if (result.isPresent()) {
+        medicationPrescriptions.add(result.get());
+      }
+    } else {
+      // Pull records for one encounter.
+      if (encounterId != null) {
+        medicationPrescriptions.addAll(medicationPrescriptionRepository.list(Id.of(encounterId.
+            getValue())));
+      } else {
+        // Pull records for all encounters.
+        List<Encounter> allEncounters = encounterRepository.list(Optional.empty());
+        for (Encounter eachEncounter : allEncounters) {
+          List<MedicationPrescription> admins = medicationPrescriptionRepository.list(
+              EncounterRepository.generateId(eachEncounter));
+          medicationPrescriptions.addAll(admins);
+        }
+
+        // Filter by prescription ID if necessary. This is a very inefficient 1-arg get.
+        if (prescriptionId != null) {
+          List<MedicationPrescription> filteredResults = new ArrayList<>();
+          for (MedicationPrescription medicationPrescription : medicationPrescriptions) {
+            if (medicationPrescription.getId().getIdPart().equalsIgnoreCase(
+                prescriptionId.getValue())) {
+              filteredResults.add(medicationPrescription);
+              break;
+            }
+          }
+          medicationPrescriptions = filteredResults;
+        }
+      }
     }
 
     return medicationPrescriptions;

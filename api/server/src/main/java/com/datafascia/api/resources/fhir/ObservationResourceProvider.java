@@ -6,16 +6,18 @@ import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.rest.annotation.Create;
 import ca.uhn.fhir.rest.annotation.OptionalParam;
-import ca.uhn.fhir.rest.annotation.RequiredParam;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.param.StringParam;
+import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import com.datafascia.common.fhir.DependencyInjectingResourceProvider;
 import com.datafascia.common.persist.Id;
+import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.ObservationRepository;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import javax.inject.Inject;
 import lombok.NoArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +27,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 @NoArgsConstructor @Slf4j
 public class ObservationResourceProvider extends DependencyInjectingResourceProvider {
+
+  @Inject
+  private EncounterRepository encounterRepository;
 
   @Inject
   private ObservationRepository observationRepository;
@@ -53,13 +58,20 @@ public class ObservationResourceProvider extends DependencyInjectingResourceProv
    */
   @Create
   public MethodOutcome create(@ResourceParam Observation observation) {
-    observationRepository.save(observation);
-    return new MethodOutcome(observation.getId());
+    if (observation.getEncounter() != null) {
+      observationRepository.save(observation);
+      return new MethodOutcome(observation.getId());
+    } else {
+      throw new UnprocessableEntityException("Can not create Observation:"
+          + " encounter reference can not be null.");
+    }
   }
 
   /**
    * Searches observations based on encounter. Returns list of Observations where
    * Observation.encounter matches a given Encounter resource ID.
+   *
+   * If encounterId is left blank, observations for all encounters are retrieved.
    *
    * @param encounterId Internal resource ID for the Encounter for which we want corresponding
    *                    observations.
@@ -68,11 +80,23 @@ public class ObservationResourceProvider extends DependencyInjectingResourceProv
    * @return Search results.
    */
   @Search()
-  public List<Observation> searchByEncounterId(
-      @RequiredParam(name = Observation.SP_ENCOUNTER) StringParam encounterId,
+  public List<Observation> search(
+      @OptionalParam(name = Observation.SP_ENCOUNTER) StringParam encounterId,
       @OptionalParam(name = Observation.SP_CODE) StringParam code) {
-    Id<Encounter> encounterInternalId = Id.of(encounterId.getValue());
-    List<Observation> observations = observationRepository.list(encounterInternalId);
+    List<Observation> observations = new ArrayList<>();
+
+    if (encounterId != null) {
+      Id<Encounter> encounterInternalId = Id.of(encounterId.getValue());
+      observations.addAll(observationRepository.list(encounterInternalId));
+    } else {
+      // Pull records for all encounters.
+      List<Encounter> allEncounters = encounterRepository.list(Optional.empty());
+      for (Encounter eachEncounter : allEncounters) {
+        List<Observation> admins = observationRepository.list(
+            EncounterRepository.generateId(eachEncounter));
+        observations.addAll(admins);
+      }
+    }
 
     if (code != null) {
       List<Observation> filteredResults = new ArrayList<>();

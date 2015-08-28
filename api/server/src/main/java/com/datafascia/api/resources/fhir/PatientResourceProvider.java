@@ -34,6 +34,8 @@ import lombok.extern.slf4j.Slf4j;
 @NoArgsConstructor @Slf4j
 public class PatientResourceProvider extends DependencyInjectingResourceProvider {
 
+  public static final int MAX_DEFAULT_PATIENT_RESULTS = 100000;
+
   @Inject
   private PatientRepository patientRepository;
 
@@ -147,7 +149,7 @@ public class PatientResourceProvider extends DependencyInjectingResourceProvider
     }
 
     if (count == null) {
-      count = new NumberParam("100");
+      count = new NumberParam(Integer.toString(MAX_DEFAULT_PATIENT_RESULTS));
     }
 
     List<UnitedStatesPatient> patients = patientRepository.list(

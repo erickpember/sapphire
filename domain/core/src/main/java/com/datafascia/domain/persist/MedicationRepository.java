@@ -7,7 +7,10 @@ import ca.uhn.fhir.model.primitive.IdDt;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.persist.entity.EntityId;
 import com.datafascia.common.persist.entity.FhirEntityStore;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
@@ -66,5 +69,15 @@ public class MedicationRepository extends FhirEntityStoreRepository {
    */
   public Optional<Medication> read(Id<Medication> medicationId) {
     return entityStore.read(toEntityId(medicationId));
+  }
+
+  /**
+   * Finds all medications.
+   *
+   * @return found medications
+   */
+  public List<Medication> list() {
+    Stream<Medication> stream = entityStore.stream(Medication.class);
+    return stream.collect(Collectors.toList());
   }
 }

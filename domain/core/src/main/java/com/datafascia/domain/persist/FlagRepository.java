@@ -61,7 +61,7 @@ public class FlagRepository extends FhirEntityStoreRepository {
   }
 
   /**
-   * Finds flags for a patient.
+   * Finds flags for a patient, or all flags if patient is left blank.
    *
    * @param patientId
    *     patient ID

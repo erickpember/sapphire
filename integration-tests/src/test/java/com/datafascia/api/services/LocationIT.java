@@ -2,10 +2,13 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.services;
 
+import ca.uhn.fhir.model.api.Bundle;
+import ca.uhn.fhir.model.api.IResource;
 import ca.uhn.fhir.model.dstu2.resource.Location;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import com.google.common.io.BaseEncoding;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
@@ -29,6 +32,10 @@ public class LocationIT extends ApiIT {
         .execute();
 
     assertEquals(location.getIdentifierFirstRep().getValue(), identifier);
+
+    Bundle results = client.search().forResource(Location.class).execute();
+    List<IResource> locations = ApiUtil.extractBundle(results, Location.class);
+    assertEquals(locations.size(), 3);
   }
 
   @Test(expectedExceptions = ResourceNotFoundException.class)

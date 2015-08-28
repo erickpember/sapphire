@@ -5,6 +5,7 @@ package com.datafascia.api.resources.fhir;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import ca.uhn.fhir.rest.annotation.Create;
+import ca.uhn.fhir.rest.annotation.OptionalParam;
 import ca.uhn.fhir.rest.annotation.RequiredParam;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Search;
@@ -16,6 +17,7 @@ import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import com.datafascia.common.fhir.DependencyInjectingResourceProvider;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.fhir.Ids;
+import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.ProcedureRequestRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +31,9 @@ import lombok.extern.slf4j.Slf4j;
  */
 @NoArgsConstructor @Slf4j
 public class ProcedureRequestResourceProvider extends DependencyInjectingResourceProvider {
+
+  @Inject
+  private EncounterRepository encounterRepository;
 
   @Inject
   private ProcedureRequestRepository procedureRequestRepository;
@@ -103,6 +108,63 @@ public class ProcedureRequestResourceProvider extends DependencyInjectingResourc
       procedureRequests.add(result.get());
     }
 
+    return procedureRequests;
+  }
+
+  /**
+   * Because the ProcedureRequestRepository does not support single-argument reads, a
+   * double-argument read method that requires the Encounter ID as well as the Procedure
+   * Request ID is implemented here in the API as a search method.
+   * Absent an encounterId, all encounters are searched.
+   * Absent a requestId, all requests are searched.
+   *
+   * @param encounterId    Internal resource ID for the Encounter used in looking up a Request.
+   * @param requestId Resource ID of the specific ProcedureRequest we want to retrieve.
+   * @return A list containing up to 1 ProcedureRequest, matching this query.
+   */
+  @Search()
+  public List<ProcedureRequest> search(
+      @OptionalParam(name = ProcedureRequest.SP_ENCOUNTER) StringParam encounterId,
+      @OptionalParam(name = ProcedureRequest.SP_RES_ID) StringParam requestId) {
+    List<ProcedureRequest> procedureRequests = new ArrayList<>();
+
+    if (encounterId != null && requestId != null) {
+      Id<Encounter> encounterInternalId = Id.of(encounterId.getValue());
+      Id<ProcedureRequest> requestInternalId = Id.of(requestId.getValue());
+      Optional<ProcedureRequest> result = procedureRequestRepository.
+          read(encounterInternalId, requestInternalId);
+
+      if (result.isPresent()) {
+        procedureRequests.add(result.get());
+      }
+    } else {
+      // Pull records for one encounter.
+      if (encounterId != null) {
+        procedureRequests.addAll(procedureRequestRepository.list(Id.of(encounterId.
+            getValue())));
+      } else {
+        // Pull records for all encounters.
+        List<Encounter> allEncounters = encounterRepository.list(Optional.empty());
+        for (Encounter eachEncounter : allEncounters) {
+          List<ProcedureRequest> admins = procedureRequestRepository.list(
+              EncounterRepository.generateId(eachEncounter));
+          procedureRequests.addAll(admins);
+        }
+
+        // Filter by request ID if necessary. This is a very inefficient 1-arg get.
+        if (requestId != null) {
+          List<ProcedureRequest> filteredResults = new ArrayList<>();
+          for (ProcedureRequest procedureRequest : procedureRequests) {
+            if (procedureRequest.getId().getIdPart().equalsIgnoreCase(
+                requestId.getValue())) {
+              filteredResults.add(procedureRequest);
+              break;
+            }
+          }
+          procedureRequests = filteredResults;
+        }
+      }
+    }
     return procedureRequests;
   }
 

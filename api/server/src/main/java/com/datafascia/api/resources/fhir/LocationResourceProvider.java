@@ -122,4 +122,15 @@ public class LocationResourceProvider extends DependencyInjectingResourceProvide
     }
     return locations;
   }
+
+  /**
+   * Retrieves all locations
+   *
+   * @return
+   *     all locations
+   */
+  @Search()
+  public List<Location> search() {
+    return locationRepository.list();
+  }
 }

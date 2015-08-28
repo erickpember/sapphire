@@ -103,6 +103,12 @@ public class ProcedureRequestIT extends ApiIT {
     assertEquals(procedureRequests.get(0).getId().getIdPart(),
         procedureRequest1.getId().getIdPart(), "Two argument read/search failed.");
 
+    results = client.search().forResource(ProcedureRequest.class)
+        .execute();
+    procedureRequests = ApiUtil.extractBundle(results,
+        ProcedureRequest.class);
+    assertEquals(procedureRequests.size(), 2, "No-argument search failed.");
+
     // Get rid of this particular encounter and patient so it doesn't mess up other tests.
     client.delete().resourceById(encounter.getId()).execute();
     client.delete().resourceById(patient.getId()).execute();

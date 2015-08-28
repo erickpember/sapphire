@@ -123,4 +123,15 @@ public class MedicationResourceProvider extends DependencyInjectingResourceProvi
     }
     return medications;
   }
+
+  /**
+   * Retrieves all medications
+   *
+   * @return
+   *     all medications
+   */
+  @Search()
+  public List<Medication> search() {
+    return medicationRepository.list();
+  }
 }

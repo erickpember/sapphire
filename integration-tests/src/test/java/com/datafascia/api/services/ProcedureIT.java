@@ -87,6 +87,10 @@ public class ProcedureIT extends ApiIT {
       }
     }
 
+    results = client.search().forResource(Procedure.class).execute();
+    procedures = ApiUtil.extractBundle(results, Procedure.class);
+    assertEquals(procedures.size(), 2);
+
     // Get rid of this particular encounter and patient so it doesn't mess up other tests.
     client.delete().resourceById(encounter.getId()).execute();
     client.delete().resourceById(patient.getId()).execute();

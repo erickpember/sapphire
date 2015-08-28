@@ -120,7 +120,7 @@ public class FrequencyLookup {
           throws IOException {
     ArrayList<String> lines = new ArrayList<>();
     BufferedReader reader = new BufferedReader(new InputStreamReader(
-                           FrequencyLookup.class.getClass().getResourceAsStream(filename)));
+        FrequencyLookup.class.getResourceAsStream(filename)));
 
     String inputLine = null;
 

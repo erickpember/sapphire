@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Set;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
+import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.flowfile.FlowFile;
 import org.apache.nifi.logging.ProcessorLog;
@@ -46,6 +47,7 @@ import org.json.simple.parser.ParseException;
  * Processor for handling nursing orders at UCSF.
  */
 @Slf4j
+@Tags({"ingest","datafascia", "ucsf", "json"})
 public class NursingOrdersProcessor extends AbstractProcessor {
   private Set<Relationship> relationships;
   private List<PropertyDescriptor> properties;

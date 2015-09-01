@@ -427,8 +427,20 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
           droolNorm.getMedsSets(), clientBuilder);
       if (!medAdmin.isEmpty()) {
         try {
-          medAdmin.setId(clientBuilder.getMedicationAdministrationClient()
-              .getMedicationAdministration(adminId, encounterId, prescriptionId).getId());
+          MedicationAdministration existingAdministration = clientBuilder
+              .getMedicationAdministrationClient().getMedicationAdministration(adminId, encounterId,
+                  prescriptionId);
+          if (existingAdministration != null) {
+            medAdmin.setId(existingAdministration.getId());
+            clientBuilder.getMedicationAdministrationClient()
+                .updateMedicationAdministration(medAdmin);
+          } else {
+            log.warn(
+                "Could not find administration [{}] for prescriptionId [{}] and encounterId [{}]",
+                adminId,
+                prescriptionId,
+                encounterId);
+          }
         } catch (NullPointerException e) {
           log.error("No admin for order " + prescriptionId + " and admin " + adminId);
           throw e;

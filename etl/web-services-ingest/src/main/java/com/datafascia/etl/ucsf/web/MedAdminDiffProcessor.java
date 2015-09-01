@@ -428,27 +428,19 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
       MedicationAdministration medAdmin = UcsfMedicationUtils.populateAdministration(admin, adminId,
           prescriptionId, encounterId, populateMedication(droolNorm),
           droolNorm.getMedsSets(), clientBuilder);
-      if (!medAdmin.isEmpty()) {
-        try {
-          MedicationAdministration existingAdministration = clientBuilder
-              .getMedicationAdministrationClient().getMedicationAdministration(adminId, encounterId,
-                  prescriptionId);
-          if (existingAdministration != null) {
-            medAdmin.setId(existingAdministration.getId());
-            clientBuilder.getMedicationAdministrationClient()
-                .updateMedicationAdministration(medAdmin);
-          } else {
-            log.warn(
-                "Could not find administration [{}] for prescriptionId [{}] and encounterId [{}]",
-                adminId,
-                prescriptionId,
-                encounterId);
-          }
-        } catch (NullPointerException e) {
-          log.error("No admin for order " + prescriptionId + " and admin " + adminId);
-          throw e;
-        }
-        clientBuilder.getMedicationAdministrationClient().updateMedicationAdministration(medAdmin);
+      MedicationAdministration existingAdministration = clientBuilder
+          .getMedicationAdministrationClient().getMedicationAdministration(adminId, encounterId,
+              prescriptionId);
+      if (existingAdministration != null) {
+        medAdmin.setId(existingAdministration.getId());
+        clientBuilder.getMedicationAdministrationClient()
+            .updateMedicationAdministration(medAdmin);
+      } else {
+        log.warn(
+            "Could not find administration [{}] for prescriptionId [{}] and encounterId [{}]",
+            adminId,
+            prescriptionId,
+            encounterId);
       }
     } else {
       // We have a new administration. Populate a MedicationAdministration and save it.

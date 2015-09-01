@@ -256,12 +256,13 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
     final ProcessSession session = sessionFactory.createSession();
 
     // get the URL
-    final String url;
+    String url;
     if (lastTimestamp != null) {
       url = context.getProperty(URL).getValue() + "&FromDate=" + lastTimestamp;
     } else {
       url = context.getProperty(URL).getValue();
     }
+    url = url.replace("^", "%5E");
 
     log.info("Using URL: " + url);
 

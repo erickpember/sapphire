@@ -87,13 +87,13 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
       .build();
   public static final PropertyDescriptor ACCUMULOTABLE = new PropertyDescriptor.Builder()
       .name("Accumulo table to persist med orders and admins.")
-      .defaultValue("UcsfMedOrder")
+      .defaultValue("UcsfMedorders")
       .required(true)
       .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
       .build();
   public static final PropertyDescriptor RXNORMDB = new PropertyDescriptor.Builder()
       .name("RxNorm database JDBC url")
-      .defaultValue("RxNorm.RXNCONSO")
+      .defaultValue("jdbc:mysql://dbops1.cxtheffccik1.us-west-2.rds.amazonaws.com:3306/RxNorm")
       .required(true)
       .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
       .build();
@@ -105,6 +105,7 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
       .build();
   public static final PropertyDescriptor RXNORMDBUSERNAME = new PropertyDescriptor.Builder()
       .name("RxNorm database username.")
+      .defaultValue("rxnorm")
       .required(true)
       .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
       .build();
@@ -115,11 +116,13 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
       .build();
   public static final PropertyDescriptor FHIR_SERVER = new PropertyDescriptor.Builder()
       .name("Fhir server connection.")
+      .defaultValue("http://api/fhir/")
       .required(true)
       .addValidator(StandardValidators.URL_VALIDATOR)
       .build();
   public static final PropertyDescriptor FHIR_USERNAME = new PropertyDescriptor.Builder()
       .name("Fhir server username.")
+      .defaultValue("nifi")
       .required(false)
       .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
       .build();

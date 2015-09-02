@@ -121,7 +121,7 @@ public class NursingOrdersProcessor extends AbstractProcessor {
           JSONObject jsonObject = (JSONObject) new JSONParser().parse(jsonString);
 
           Object errorObj = jsonObject.get("Error");
-          if (errorObj != null) {
+          if (errorObj != null && !errorObj.toString().equals("")) {
             log.error("Nursing order web service error: " + errorObj.toString());
           }
 

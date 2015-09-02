@@ -135,10 +135,15 @@ public class NursingOrdersProcessor extends AbstractProcessor {
                   JSONObject jsonNursing = (JSONObject) obj2;
                   String status = jsonNursing.get("OrderStatus").toString();
                   ProcedureRequest procedure = populateProcedureRequest(jsonNursing, encounterId);
-                  if (status.equals("2^Sent")) {
+
+                  ProcedureRequest existingRequest = clientBuilder.getProcedureRequestClient()
+                      .getProcedureRequest(procedure.getIdentifierFirstRep().getValue(),
+                          encounterId);
+
+                  if (existingRequest == null) {
                     clientBuilder.getProcedureRequestClient().saveProcedureRequest(procedure,
                         encounterId);
-                  } else if (status.equals("4^Canceled")) {
+                  } else {
                     clientBuilder.getProcedureRequestClient().updateProcedureRequest(procedure,
                         encounterId);
                   }

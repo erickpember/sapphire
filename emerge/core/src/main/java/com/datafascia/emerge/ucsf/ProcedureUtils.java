@@ -3,6 +3,7 @@
 package com.datafascia.emerge.ucsf;
 
 import ca.uhn.fhir.model.dstu2.resource.Procedure;
+import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import ca.uhn.fhir.model.dstu2.valueset.ProcedureStatusEnum;
 import java.util.List;
 
@@ -26,5 +27,29 @@ public class ProcedureUtils {
     return procedures.stream().anyMatch(
         procedure -> procedure.getStatusElement().getValueAsEnum()
             == ProcedureStatusEnum.IN_PROGRESS);
+  }
+
+  /**
+   * Finds freshest hypothermia blanket order.
+   *
+   * @param procedureRequests
+   *     items to search
+   * @return freshest hypothermia blanket order, or {@code null} if not found
+   */
+  public static ProcedureRequest findFreshestHypothermiaBlanketOrder(
+      List<ProcedureRequest> procedureRequests) {
+
+    procedureRequests.sort(new ProcedureRequestScheduledComparator().reversed());
+
+    for (ProcedureRequest procedureRequest : procedureRequests) {
+      String code = procedureRequest.getType().getCodingFirstRep().getCode();
+      switch (code) {
+        case "Hypothermia Blanket Order #1":
+        case "Hypothermia Blanket Order #2":
+          return procedureRequest;
+      }
+    }
+
+    return null;
   }
 }

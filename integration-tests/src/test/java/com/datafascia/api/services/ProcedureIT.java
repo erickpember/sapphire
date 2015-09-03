@@ -30,6 +30,7 @@ import org.testng.annotations.Test;
 
 import static com.datafascia.api.services.ApiIT.client;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 /**
@@ -89,7 +90,7 @@ public class ProcedureIT extends ApiIT {
 
     results = client.search().forResource(Procedure.class).execute();
     procedures = ApiUtil.extractBundle(results, Procedure.class);
-    assertEquals(procedures.size(), 2);
+    assertTrue(procedures.size() > 0, "No-argument search failed.");
 
     // Get rid of this particular encounter and patient so it doesn't mess up other tests.
     client.delete().resourceById(encounter.getId()).execute();

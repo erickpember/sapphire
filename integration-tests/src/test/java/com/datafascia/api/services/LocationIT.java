@@ -13,6 +13,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Integration tests for location resources.
@@ -35,7 +36,7 @@ public class LocationIT extends ApiIT {
 
     Bundle results = client.search().forResource(Location.class).execute();
     List<IResource> locations = ApiUtil.extractBundle(results, Location.class);
-    assertEquals(locations.size(), 3);
+    assertTrue(locations.size() > 1, "No-argument search failed.");
   }
 
   @Test(expectedExceptions = ResourceNotFoundException.class)

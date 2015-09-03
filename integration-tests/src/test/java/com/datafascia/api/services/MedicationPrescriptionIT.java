@@ -27,6 +27,7 @@ import org.testng.annotations.Test;
 
 import static com.datafascia.api.services.ApiIT.client;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 /**
@@ -109,7 +110,7 @@ public class MedicationPrescriptionIT extends ApiIT {
         .execute();
     medicationPrescriptions = ApiUtil.extractBundle(results,
         MedicationPrescription.class);
-    assertEquals(medicationPrescriptions.size(), 9, "No-argument search failed.");
+    assertTrue(medicationPrescriptions.size() > 0, "No-argument search failed.");
 
     // Get rid of this particular encounter and patient so it doesn't mess up other tests.
     client.delete().resourceById(encounter.getId()).execute();

@@ -12,6 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Integration tests for encounter resources.
@@ -34,7 +35,7 @@ public class EncounterIT extends ApiIT {
         .forResource(Encounter.class)
         .execute();
     encounters = ApiUtil.extractBundle(results, Encounter.class);
-    assertEquals(encounters.size(), 3);
+    assertTrue(encounters.size() > 0, "No-argument search failed.");
   }
 
   @Test(expectedExceptions = ResourceNotFoundException.class)

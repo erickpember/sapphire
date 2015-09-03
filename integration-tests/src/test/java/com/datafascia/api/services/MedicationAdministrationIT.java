@@ -30,6 +30,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 /**
@@ -112,7 +113,7 @@ public class MedicationAdministrationIT extends ApiIT {
         .execute();
     medicationAdministrations = ApiUtil.extractBundle(results,
         MedicationAdministration.class);
-    assertEquals(medicationAdministrations.size(), 2, "No-argument search failed.");
+    assertTrue(medicationAdministrations.size() > 1, "No-argument search failed.");
 
     // Get rid of this particular encounter and patient so it doesn't mess up other tests.
     client.delete().resourceById(encounter.getId()).execute();

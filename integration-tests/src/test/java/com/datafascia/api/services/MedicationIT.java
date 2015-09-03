@@ -11,6 +11,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Integration tests for medication resources.
@@ -30,7 +31,7 @@ public class MedicationIT extends ApiIT {
 
     Bundle results = client.search().forResource(Medication.class).execute();
     List<IResource> medications = ApiUtil.extractBundle(results, Medication.class);
-    assertEquals(medications.size(), 1);
+    assertTrue(medications.size() > 0, "No-argument search failed.");
   }
 
   @Test(expectedExceptions = ResourceNotFoundException.class)

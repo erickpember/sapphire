@@ -351,9 +351,13 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
         clientBuilder.getMedicationPrescriptionClient().updateMedicationPrescription(medpresc);
       } else {
         log.warn(
-            "Could not find prescription for prescriptionId [{}] and encounterId [{}]",
+            "Could not find prescription [{}] for encounterId [{}]."
+                + " Older data for this exists in the accumulo table [{}] but"
+                + " is not stored in the API. Attempting to create it now.",
             prescriptionId,
-            encounterId);
+            encounterId,
+            tableName);
+        clientBuilder.getMedicationPrescriptionClient().savePrescription(medpresc);
       }
     } else {
       MedicationPrescription prescription = UcsfMedicationUtils.populatePrescription(orderJson,
@@ -437,10 +441,13 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
             .updateMedicationAdministration(medAdmin);
       } else {
         log.warn(
-            "Could not find administration [{}] for prescriptionId [{}] and encounterId [{}]",
+            "Could not find administration [{}] for prescriptionId [{}] and encounterId [{}]."
+                + " Older data for this admin exists in the accumulo table " + tableName + " but"
+                + " is not stored in the API. Attempting to create it now.",
             adminId,
             prescriptionId,
             encounterId);
+        clientBuilder.getMedicationAdministrationClient().saveAdministration(medAdmin);
       }
     } else {
       // We have a new administration. Populate a MedicationAdministration and save it.

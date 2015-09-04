@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.ucsf.web;
 
+import com.datafascia.etl.ucsf.web.config.UcsfWebGetConfig;
 import com.google.common.base.Charsets;
 import com.google.common.io.Resources;
 import com.sun.net.httpserver.HttpExchange;
@@ -39,11 +40,18 @@ public class UcsfWebGetProcessorTest {
     server.setExecutor(null);
     server.start();
 
-    String url = "http://localhost:" + webPort + "/test/GetMedAdminUnit?ListID=15860";
+    UcsfWebGetConfig config = UcsfWebGetConfig.load("src/test/resources/webgetconfig.yml");
+    for (String url : config.urls) {
+      String patched = url.replace("{{PORT}}", Integer.toString(webPort));
+      config.urls.remove(url);
+      config.urls.add(patched);
+    }
+
+    config.filename = "medAdmin";
 
     TestRunner runner = TestRunners.newTestRunner(UcsfWebGetProcessor.class);
-    runner.setProperty(UcsfWebGetProcessor.URL, url);
-    runner.setProperty(UcsfWebGetProcessor.FILENAME, "medAdmin");
+    ((UcsfWebGetProcessor) runner.getProcessor()).setConfig(config);
+    runner.setProperty(UcsfWebGetProcessor.YAMLPATH, "null");
     runner.run();
 
     runner.assertAllFlowFilesTransferred(UcsfWebGetProcessor.SUCCESS, 1);

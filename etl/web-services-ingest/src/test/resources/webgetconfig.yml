@@ -1,0 +1,4 @@
+---
+filename: medAdmin
+urls:
+      - "http://localhost:{{PORT}}/test/GetMedAdminUnit?ListID=15860"

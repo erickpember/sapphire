@@ -3,8 +3,10 @@
 // Forked from GetHTTP which is available under the Apache 2.0 license.
 package com.datafascia.etl.ucsf.web;
 
+import com.datafascia.etl.ucsf.web.config.UcsfWebGetConfig;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -20,11 +22,11 @@ import java.security.cert.CertificateException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Pattern;
 import javax.net.ssl.SSLContext;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
@@ -81,68 +83,11 @@ import org.kohsuke.MetaInfServices;
 public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
   public static final String HEADER_ACCEPT = "Accept";
 
-  public static final PropertyDescriptor URL = new PropertyDescriptor.Builder()
-      .name("Base URL")
-      .description("The base URL to pull from")
-      .required(true)
-      .addValidator(StandardValidators.URL_VALIDATOR)
-      .addValidator(
-          StandardValidators.createRegexMatchingValidator(Pattern.compile("https?\\://.*")))
-      .build();
-  public static final PropertyDescriptor FOLLOW_REDIRECTS = new PropertyDescriptor.Builder()
-      .name("Follow Redirects")
-      .description("If we receive a 3xx HTTP Status Code from the server, indicates whether or " +
-          "not we should follow the redirect that the server specifies")
-      .defaultValue("false")
-      .allowableValues("true", "false")
-      .build();
-  public static final PropertyDescriptor CONNECTION_TIMEOUT = new PropertyDescriptor.Builder()
-      .name("Connection Timeout")
-      .description("How long to wait when attempting to connect to the remote server before " +
-          "giving up")
-      .required(true)
-      .defaultValue("30 sec")
-      .addValidator(StandardValidators.TIME_PERIOD_VALIDATOR)
-      .build();
-  public static final PropertyDescriptor ACCEPT_CONTENT_TYPE = new PropertyDescriptor.Builder()
-      .name("Accept Content-Type")
-      .description("If specified, requests will only accept the provided Content-Type")
-      .required(false)
-      .defaultValue("application/json")
-      .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
-      .build();
-  public static final PropertyDescriptor DATA_TIMEOUT = new PropertyDescriptor.Builder()
-      .name("Data Timeout")
-      .description("How long to wait between receiving segments of data from the remote server " +
-          "before giving up and discarding the partial file")
-      .required(true)
-      .defaultValue("30 sec")
-      .addValidator(StandardValidators.TIME_PERIOD_VALIDATOR)
-      .build();
-  public static final PropertyDescriptor FILENAME = new PropertyDescriptor.Builder()
-      .name("Filename")
-      .description("The filename to assign to the file when pulled")
+  public static final PropertyDescriptor YAMLPATH = new PropertyDescriptor.Builder()
+      .name("YAML path")
+      .description("The file path to the YAML config")
       .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
       .required(true)
-      .build();
-  public static final PropertyDescriptor USERNAME = new PropertyDescriptor.Builder()
-      .name("Username")
-      .description("Username required to access the URL")
-      .required(false)
-      .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
-      .build();
-  public static final PropertyDescriptor PASSWORD = new PropertyDescriptor.Builder()
-      .name("Password")
-      .description("Password required to access the URL")
-      .required(false)
-      .sensitive(true)
-      .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
-      .build();
-  public static final PropertyDescriptor USER_AGENT = new PropertyDescriptor.Builder()
-      .name("User Agent")
-      .description("What to report as the User Agent when we connect to the remote server")
-      .required(false)
-      .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
       .build();
   public static final PropertyDescriptor SSL_CONTEXT_SERVICE = new PropertyDescriptor.Builder()
       .name("SSL Context Service")
@@ -158,8 +103,8 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
 
   private Set<Relationship> relationships;
   private List<PropertyDescriptor> properties;
-
-  private static String lastTimestamp;
+  private UcsfWebGetConfig config;
+  private HashMap<String, String> lastTimestamps = new HashMap<String, String>();
 
   @Override
   protected void init(final ProcessorInitializationContext context) {
@@ -168,16 +113,8 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
     this.relationships = Collections.unmodifiableSet(relationships);
 
     final List<PropertyDescriptor> properties = new ArrayList<>();
-    properties.add(URL);
-    properties.add(FILENAME);
+    properties.add(YAMLPATH);
     properties.add(SSL_CONTEXT_SERVICE);
-    properties.add(USERNAME);
-    properties.add(PASSWORD);
-    properties.add(CONNECTION_TIMEOUT);
-    properties.add(DATA_TIMEOUT);
-    properties.add(USER_AGENT);
-    properties.add(ACCEPT_CONTENT_TYPE);
-    properties.add(FOLLOW_REDIRECTS);
     this.properties = Collections.unmodifiableList(properties);
   }
 
@@ -249,32 +186,30 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
     return Instant.ofEpochMilli(utc);
   }
 
+  public void setConfig(UcsfWebGetConfig config) {
+    this.config = config;
+  }
+
   @Override
   public void onTrigger(final ProcessContext context, final ProcessSessionFactory sessionFactory)
       throws ProcessException {
+
+    if (config == null) {
+      String yamlFilename = context.getProperty(YAMLPATH).getValue();
+      try {
+        config = UcsfWebGetConfig.load(yamlFilename);
+      } catch (FileNotFoundException ex) {
+        throw new ProcessException("Configuration could not be loaded. File " + yamlFilename
+            + " could not be found.", ex);
+      } catch (UnsupportedEncodingException ex) {
+        throw new ProcessException("Configuration could not be loaded. This system does not"
+            + " support UTF-8", ex);
+      }
+    }
+
     final ProcessorLog logger = getLogger();
-
     final ProcessSession session = sessionFactory.createSession();
-
-    // get the URL
-    String url;
-    if (lastTimestamp != null) {
-      url = context.getProperty(URL).getValue() + "&FromDate=" + lastTimestamp;
-    } else {
-      url = context.getProperty(URL).getValue();
-    }
-    url = url.replace("^", "%5E");
-
-    logger.info("Using URL: " + url);
-
-    String source = url;
-    try {
-      source = new URI(url).getHost();
-    } catch (final URISyntaxException swallow) {
-      // this won't happen as the url has already been validated
-    }
-
-    // get the ssl context service
+    final StopWatch stopWatch = new StopWatch(true);
     final SSLContextService sslContextService = context.getProperty(SSL_CONTEXT_SERVICE)
         .asControllerService(SSLContextService.class);
 
@@ -300,64 +235,72 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
       conMan = new BasicHttpClientConnectionManager(socketFactoryRegistry);
     }
 
-    try {
-      // build the request configuration
-      final RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
-      requestConfigBuilder.setConnectionRequestTimeout(context.getProperty(DATA_TIMEOUT)
-          .asTimePeriod(TimeUnit.MILLISECONDS).intValue());
-      requestConfigBuilder.setConnectTimeout(context.getProperty(CONNECTION_TIMEOUT)
-          .asTimePeriod(TimeUnit.MILLISECONDS).intValue());
-      requestConfigBuilder.setRedirectsEnabled(false);
-      requestConfigBuilder.setSocketTimeout(context.getProperty(DATA_TIMEOUT)
-          .asTimePeriod(TimeUnit.MILLISECONDS).intValue());
-      requestConfigBuilder.setRedirectsEnabled(context.getProperty(FOLLOW_REDIRECTS).asBoolean());
+    // build the request configuration
+    final RequestConfig.Builder requestConfigBuilder = RequestConfig.custom();
+    requestConfigBuilder.setConnectionRequestTimeout(config.connectionTimeoutMilliseconds);
+    requestConfigBuilder.setConnectTimeout(config.connectionTimeoutMilliseconds);
+    requestConfigBuilder.setRedirectsEnabled(false);
+    requestConfigBuilder.setSocketTimeout(config.dataTimeoutMilliseconds);
+    requestConfigBuilder.setRedirectsEnabled(config.followRedirects);
 
-      // build the http client
-      final HttpClientBuilder clientBuilder = HttpClientBuilder.create();
-      clientBuilder.setConnectionManager(conMan);
+    // build the http client
+    final HttpClientBuilder clientBuilder = HttpClientBuilder.create();
+    clientBuilder.setConnectionManager(conMan);
 
-      // include the user agent
-      final String userAgent = context.getProperty(USER_AGENT).getValue();
-      if (userAgent != null) {
-        clientBuilder.setUserAgent(userAgent);
+    // include the user agent
+    if (config.userAgent != null) {
+      clientBuilder.setUserAgent(config.userAgent);
+    }
+
+    // set the ssl context if necessary
+    if (sslContextService != null) {
+      clientBuilder.setSslcontext(sslContextService
+          .createSSLContext(SSLContextService.ClientAuth.REQUIRED));
+    }
+
+    // set the credentials if appropriate
+    if (config.username != null) {
+      final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+      if (config.password == null) {
+        credentialsProvider.setCredentials(AuthScope.ANY,
+            new UsernamePasswordCredentials(config.username));
+      } else {
+        credentialsProvider.setCredentials(AuthScope.ANY,
+            new UsernamePasswordCredentials(config.username, config.password));
       }
+      clientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+    }
 
-      // set the ssl context if necessary
-      if (sslContextService != null) {
-        clientBuilder.setSslcontext(sslContextService
-            .createSSLContext(SSLContextService.ClientAuth.REQUIRED));
+    // create the http client
+    final HttpClient client = clientBuilder.build();
+
+    for (String url : config.urls) {
+      String baseUrl = url;
+      String lastTimestamp = lastTimestamps.get(url);
+
+      if (lastTimestamp != null) {
+        url = url + "&FromDate=" + lastTimestamp;
       }
+      url = url.replace("^", "%5E");
 
-      final String username = context.getProperty(USERNAME).getValue();
-      final String password = context.getProperty(PASSWORD).getValue();
+      log.info("Using URL: " + url);
 
-      // set the credentials if appropriate
-      if (username != null) {
-        final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-        if (password == null) {
-          credentialsProvider.setCredentials(AuthScope.ANY,
-              new UsernamePasswordCredentials(username));
-        } else {
-          credentialsProvider.setCredentials(AuthScope.ANY,
-              new UsernamePasswordCredentials(username, password));
-        }
-        clientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+      String source = url;
+      try {
+        source = new URI(url).getHost();
+      } catch (final URISyntaxException ex) {
+        throw new ProcessException("Given url: " + url + " is not valid.", ex);
       }
-
-      // create the http client
-      final HttpClient client = clientBuilder.build();
 
       // create request
       final HttpGet get = new HttpGet(url);
       get.setConfig(requestConfigBuilder.build());
 
-      final String accept = context.getProperty(ACCEPT_CONTENT_TYPE).getValue();
-      if (accept != null) {
-        get.addHeader(HEADER_ACCEPT, accept);
+      if (config.acceptContentType != null) {
+        get.addHeader(HEADER_ACCEPT, config.acceptContentType);
       }
 
       try {
-        final StopWatch stopWatch = new StopWatch(true);
         final HttpResponse response = client.execute(get);
         final int statusCode = response.getStatusLine().getStatusCode();
         final String statusExplanation = response.getStatusLine().getReasonPhrase();
@@ -375,7 +318,7 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
         try {
           JSONObject jsonObject = (JSONObject) new JSONParser().parse(jsonString);
           String extractDateTime = jsonObject.get("ExtractDateTime").toString();
-          lastTimestamp = epicDateToISO8601(extractDateTime);
+          lastTimestamps.put(baseUrl, epicDateToISO8601(extractDateTime));
         } catch (ParseException e) {
           throw new ProcessException(e);
         }
@@ -388,8 +331,7 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
           }
         });
 
-        flowFile = session.putAttribute(flowFile, CoreAttributes.FILENAME.key(),
-            context.getProperty(FILENAME).getValue());
+        flowFile = session.putAttribute(flowFile, CoreAttributes.FILENAME.key(), config.filename);
         flowFile = session.putAttribute(flowFile, this.getClass().getSimpleName().toLowerCase()
             + ".remote.source", source);
         final long flowFileSize = flowFile.getSize();
@@ -408,9 +350,6 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
             new Object[]{url, e.getMessage()}, e);
         throw new ProcessException(e);
       }
-
-    } finally {
-      conMan.shutdown();
     }
   }
 }

@@ -12,8 +12,10 @@ import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import ca.uhn.fhir.model.primitive.StringDt;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.common.nifi.DependencyInjectingProcessor;
 import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.domain.fhir.IdentifierSystems;
+import com.google.inject.Inject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.DateTimeException;
@@ -30,7 +32,6 @@ import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.flowfile.FlowFile;
 import org.apache.nifi.logging.ProcessorLog;
-import org.apache.nifi.processor.AbstractProcessor;
 import org.apache.nifi.processor.ProcessContext;
 import org.apache.nifi.processor.ProcessSession;
 import org.apache.nifi.processor.Processor;
@@ -38,7 +39,6 @@ import org.apache.nifi.processor.ProcessorInitializationContext;
 import org.apache.nifi.processor.Relationship;
 import org.apache.nifi.processor.exception.ProcessException;
 import org.apache.nifi.processor.io.InputStreamCallback;
-import org.apache.nifi.processor.util.StandardValidators;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -50,10 +50,12 @@ import org.kohsuke.MetaInfServices;
  */
 @MetaInfServices(Processor.class)
 @Slf4j
-@Tags({"ingest","datafascia", "ucsf", "json"})
-public class NursingOrdersProcessor extends AbstractProcessor {
+@Tags({"ingest", "datafascia", "ucsf", "json"})
+public class NursingOrdersProcessor extends DependencyInjectingProcessor {
   private Set<Relationship> relationships;
   private List<PropertyDescriptor> properties;
+
+  @Inject
   private ClientBuilder clientBuilder = null;
 
   public static final Relationship SUCCESS = new Relationship.Builder()
@@ -63,21 +65,6 @@ public class NursingOrdersProcessor extends AbstractProcessor {
   public static final Relationship FAILURE = new Relationship.Builder()
       .name("FAILURE")
       .description("Failure relationship")
-      .build();
-  public static final PropertyDescriptor FHIR_SERVER = new PropertyDescriptor.Builder()
-      .name("Fhir server connection.")
-      .required(true)
-      .addValidator(StandardValidators.URL_VALIDATOR)
-      .build();
-  public static final PropertyDescriptor FHIR_USERNAME = new PropertyDescriptor.Builder()
-      .name("Fhir server username.")
-      .required(false)
-      .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
-      .build();
-  public static final PropertyDescriptor FHIR_PASSWORD = new PropertyDescriptor.Builder()
-      .name("Fhir server password.")
-      .required(false)
-      .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
       .build();
 
   @Override
@@ -93,9 +80,6 @@ public class NursingOrdersProcessor extends AbstractProcessor {
   @Override
   public void init(final ProcessorInitializationContext context) {
     List<PropertyDescriptor> initProperties = new ArrayList<>();
-    initProperties.add(FHIR_SERVER);
-    initProperties.add(FHIR_USERNAME);
-    initProperties.add(FHIR_PASSWORD);
     this.properties = Collections.unmodifiableList(initProperties);
 
     Set<Relationship> initRelationships = new HashSet<>();
@@ -106,12 +90,6 @@ public class NursingOrdersProcessor extends AbstractProcessor {
 
   @Override
   public void onTrigger(ProcessContext context, ProcessSession session) throws ProcessException {
-    if (clientBuilder == null) {
-      clientBuilder = new ClientBuilder(context.getProperty(FHIR_SERVER).getValue(),
-          context.getProperty(FHIR_USERNAME).getValue(),
-          context.getProperty(FHIR_PASSWORD).getValue());
-    }
-
     final ProcessorLog plog = this.getLogger();
     final FlowFile flowfile = session.get();
 

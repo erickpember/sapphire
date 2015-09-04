@@ -79,13 +79,7 @@ public class NursingOrderProcessorIT extends ApiIT {
     Thread.sleep(2000);
 
     TestRunner runner = TestRunners.newTestRunner(NursingOrdersProcessor.class);
-    runner.setProperty(NursingOrdersProcessor.FHIR_SERVER, fhirServer);
-    runner.setProperty(NursingOrdersProcessor.FHIR_USERNAME, FHIR_USERNAME);
-    runner.setProperty(NursingOrdersProcessor.FHIR_PASSWORD, FHIR_PASSWORD);
-
-    clientBuilder = new ClientBuilder(fhirServer, FHIR_USERNAME, FHIR_PASSWORD);
-
-    processor = (NursingOrdersProcessor) runner.getProcessor();
+    clientBuilder = new ClientBuilder();
 
     // Positive tests of new data and diffs.
     runner.enqueue(addContent("GetOrdersByUnit.json"));

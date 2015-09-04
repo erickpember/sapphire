@@ -168,13 +168,13 @@ public class UcsfMedicationUtils {
         = UcsfOrderStatusEnum.values()[Integer.parseInt(orderStatus)];
     switch (orderStatusEnum) {
       case PENDING:
-        return MedicationPrescriptionStatusEnum.ON_HOLD;
+        return MedicationPrescriptionStatusEnum.ACTIVE;
       case SUSPEND:
         return MedicationPrescriptionStatusEnum.STOPPED;
       case DISPENSED:
         return MedicationPrescriptionStatusEnum.ACTIVE;
       case PENDINGVERIFY:
-        return MedicationPrescriptionStatusEnum.ON_HOLD;
+        return MedicationPrescriptionStatusEnum.ACTIVE;
       case VERIFIED:
         return MedicationPrescriptionStatusEnum.ACTIVE;
       case SENT:

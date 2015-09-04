@@ -52,4 +52,48 @@ public class ProcedureUtils {
 
     return null;
   }
+
+  private static ProcedureRequest filterIdentifierFreshest(
+            List<ProcedureRequest> procedureRequests, String identifier) {
+
+    return procedureRequests.stream()
+        .filter(request -> request.getIdentifierFirstRep().getValue().equals(identifier))
+        .max(new ProcedureRequestScheduledComparator())
+        .orElse(null);
+  }
+
+  /**
+   * Finds freshest place SCDs.
+   *
+   * @param procedureRequests
+   *     items to search
+   * @return freshest place SCDs, or {@code null} if not found
+   */
+  public static ProcedureRequest findFreshestPlaceSCDs(List<ProcedureRequest> procedureRequests) {
+    return filterIdentifierFreshest(procedureRequests, "Place SCDs");
+  }
+
+  /**
+   * Finds freshest maintain SCDs.
+   *
+   * @param procedureRequests
+   *     items to search
+   * @return freshest maintain SCDs, or {@code null} if not found
+   */
+  public static ProcedureRequest findFreshestMaintainSCDs(
+      List<ProcedureRequest> procedureRequests) {
+
+    return filterIdentifierFreshest(procedureRequests, "Maintain SCDs");
+  }
+
+  /**
+   * Finds freshest remove SCDs.
+   *
+   * @param procedureRequests
+   *     items to search
+   * @return freshest remove SCDs, or {@code null} if not found
+   */
+  public static ProcedureRequest findFreshestRemoveSCDs(List<ProcedureRequest> procedureRequests) {
+    return filterIdentifierFreshest(procedureRequests, "Remove SCDs");
+  }
 }

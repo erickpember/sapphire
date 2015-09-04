@@ -55,7 +55,6 @@ import static org.testng.Assert.fail;
  */
 @Slf4j
 public class MedAdminDiffProcessorIT extends ApiIT implements MedAdminDiffListener {
-  private static final String TABLE = "testTable";
   private MedAdminDiffProcessor processor;
   private ClientBuilder clientBuilder;
 
@@ -107,16 +106,7 @@ public class MedAdminDiffProcessorIT extends ApiIT implements MedAdminDiffListen
     Thread.sleep(2000);
 
     TestRunner runner = TestRunners.newTestRunner(MedAdminDiffProcessor.class);
-    runner.setProperty(MedAdminDiffProcessor.ACCUMULOTABLE, TABLE);
-    runner.setProperty(MedAdminDiffProcessor.RXNORMDB, MemorySQLTestDatabase.JDBCURL);
-    runner.setProperty(MedAdminDiffProcessor.RXNORMTABLE, MemorySQLTestDatabase.TABLE);
-    runner.setProperty(MedAdminDiffProcessor.RXNORMDBUSERNAME, MemorySQLTestDatabase.USER);
-    runner.setProperty(MedAdminDiffProcessor.RXNORMDBPASSWORD, MemorySQLTestDatabase.PASSWORD);
-    runner.setProperty(MedAdminDiffProcessor.FHIR_SERVER, fhirServer);
-    runner.setProperty(MedAdminDiffProcessor.FHIR_USERNAME, FHIR_USERNAME);
-    runner.setProperty(MedAdminDiffProcessor.FHIR_PASSWORD, FHIR_PASSWORD);
-
-    clientBuilder = new ClientBuilder(fhirServer, FHIR_USERNAME, FHIR_PASSWORD);
+    clientBuilder = new ClientBuilder();
 
     processor = (MedAdminDiffProcessor) runner.getProcessor();
     processor.setDiffListener(this);

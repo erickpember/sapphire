@@ -3,3 +3,10 @@ df-api:
   endpoint: http://localhost:9090/fhir
   username: testuser
   password: supersecret
+
+UcsfMedAdminProcessor:
+  accumuloTable: testTable
+  rxnormDb: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+  rxnormDbTable: RXNCONSO
+  rxnormDbUsername: testuser
+  rxnormDbPassword: testpassword

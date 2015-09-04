@@ -7,7 +7,10 @@ import ca.uhn.fhir.model.dstu2.resource.Medication;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.resource.MedicationPrescription;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.common.configuration.ConfigurationNode;
+import com.datafascia.common.configuration.Configure;
 import com.datafascia.common.inject.Injectors;
+import com.datafascia.common.nifi.DependencyInjectingProcessor;
 import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.etl.ucsf.web.MedAdminDiffListener.ElementType;
 import com.datafascia.etl.ucsf.web.persist.JsonPersistUtils;
@@ -36,7 +39,6 @@ import org.apache.commons.io.IOUtils;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.flowfile.FlowFile;
 import org.apache.nifi.logging.ProcessorLog;
-import org.apache.nifi.processor.AbstractProcessor;
 import org.apache.nifi.processor.ProcessContext;
 import org.apache.nifi.processor.ProcessSession;
 import org.apache.nifi.processor.Processor;
@@ -44,7 +46,6 @@ import org.apache.nifi.processor.ProcessorInitializationContext;
 import org.apache.nifi.processor.Relationship;
 import org.apache.nifi.processor.exception.ProcessException;
 import org.apache.nifi.processor.io.InputStreamCallback;
-import org.apache.nifi.processor.util.StandardValidators;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -55,20 +56,33 @@ import org.kohsuke.MetaInfServices;
 /**
  * Processor for detecting and handling diffs in UCSF medication administration.
  */
+@ConfigurationNode("UcsfMedAdminProcessor")
 @MetaInfServices(Processor.class)
 @Slf4j
-public class MedAdminDiffProcessor extends AbstractProcessor {
+public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
   private Set<Relationship> relationships;
   private List<PropertyDescriptor> properties;
   private MedAdminDiffListener diffListener;
   private RxNormLookup rxNormDb;
   private String tableName;
   private KieSession kieSession;
+  @Inject
   private ClientBuilder clientBuilder;
   private final Authorizations authorizations = new Authorizations("System");
   @Inject
   private volatile Connector connector;
   private final HashMap<String, Medication> orderMedicationCache = new HashMap<>();
+
+  @Configure
+  public String accumuloTable;
+  @Configure
+  public String rxnormDb;
+  @Configure
+  public String rxnormDbTable;
+  @Configure
+  public String rxnormDbUsername;
+  @Configure
+  public String rxnormDbPassword;
 
   // Statuses to ignore in MedAdmin diffs.
   private final static List<String> IGNORE_STATUSES = new ArrayList<>(Arrays.asList(
@@ -87,52 +101,6 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
   public static final Relationship FAILURE = new Relationship.Builder()
       .name("FAILURE")
       .description("Failure relationship")
-      .build();
-  public static final PropertyDescriptor ACCUMULOTABLE = new PropertyDescriptor.Builder()
-      .name("Accumulo table to persist med orders and admins.")
-      .defaultValue("UcsfMedorders")
-      .required(true)
-      .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
-      .build();
-  public static final PropertyDescriptor RXNORMDB = new PropertyDescriptor.Builder()
-      .name("RxNorm database JDBC url")
-      .defaultValue("jdbc:mysql://dbops1.cxtheffccik1.us-west-2.rds.amazonaws.com:3306/RxNorm")
-      .required(true)
-      .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
-      .build();
-  public static final PropertyDescriptor RXNORMTABLE = new PropertyDescriptor.Builder()
-      .name("RxNorm database table to fetch from.")
-      .defaultValue("RxNorm.RXNCONSO")
-      .required(true)
-      .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
-      .build();
-  public static final PropertyDescriptor RXNORMDBUSERNAME = new PropertyDescriptor.Builder()
-      .name("RxNorm database username.")
-      .defaultValue("rxnorm")
-      .required(true)
-      .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
-      .build();
-  public static final PropertyDescriptor RXNORMDBPASSWORD = new PropertyDescriptor.Builder()
-      .name("RxNorm database password.")
-      .required(true)
-      .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
-      .build();
-  public static final PropertyDescriptor FHIR_SERVER = new PropertyDescriptor.Builder()
-      .name("Fhir server connection.")
-      .defaultValue("http://api/fhir/")
-      .required(true)
-      .addValidator(StandardValidators.URL_VALIDATOR)
-      .build();
-  public static final PropertyDescriptor FHIR_USERNAME = new PropertyDescriptor.Builder()
-      .name("Fhir server username.")
-      .defaultValue("nifi")
-      .required(false)
-      .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
-      .build();
-  public static final PropertyDescriptor FHIR_PASSWORD = new PropertyDescriptor.Builder()
-      .name("Fhir server password.")
-      .required(false)
-      .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
       .build();
 
   /**
@@ -166,14 +134,6 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
   @Override
   public void init(final ProcessorInitializationContext context) {
     List<PropertyDescriptor> initProperties = new ArrayList<>();
-    initProperties.add(ACCUMULOTABLE);
-    initProperties.add(RXNORMDB);
-    initProperties.add(RXNORMDBUSERNAME);
-    initProperties.add(RXNORMDBPASSWORD);
-    initProperties.add(RXNORMTABLE);
-    initProperties.add(FHIR_SERVER);
-    initProperties.add(FHIR_USERNAME);
-    initProperties.add(FHIR_PASSWORD);
     this.properties = Collections.unmodifiableList(initProperties);
 
     Set<Relationship> initRelationships = new HashSet<>();
@@ -193,7 +153,7 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
     }
 
     if (tableName == null) {
-      tableName = context.getProperty(ACCUMULOTABLE).getValue();
+      tableName = accumuloTable;
       if (!connector.tableOperations().exists(tableName)) {
         try {
           connector.tableOperations().create(tableName);
@@ -203,23 +163,14 @@ public class MedAdminDiffProcessor extends AbstractProcessor {
       }
     }
 
-    if (clientBuilder == null) {
-      clientBuilder = new ClientBuilder(context.getProperty(FHIR_SERVER).getValue(),
-          context.getProperty(FHIR_USERNAME).getValue(),
-          context.getProperty(FHIR_PASSWORD).getValue());
-    }
-
     final ProcessorLog plog = this.getLogger();
     final FlowFile flowfile = session.get();
 
     // Build the connection to the RxNorm database.
-    String jdbcUrl = context.getProperty(RXNORMDB).getValue();
-    String username = context.getProperty(RXNORMDBUSERNAME).getValue();
-    String password = context.getProperty(RXNORMDBPASSWORD).getValue();
     if (rxNormDb == null) {
       try {
-        String rxnormDb = context.getProperty(RXNORMTABLE).getValue();
-        rxNormDb = new RxNormLookup(jdbcUrl, rxnormDb, username, password);
+        rxNormDb = new RxNormLookup(rxnormDb, rxnormDbTable, rxnormDbUsername,
+            rxnormDbPassword);
       } catch (SQLException e) {
         log.error("SQL error fetching rxnorm name.", e);
         plog.error("SQL error fetching rxnorm name: " + e.getMessage());

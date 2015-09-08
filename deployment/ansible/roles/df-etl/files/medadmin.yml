@@ -1,0 +1,6 @@
+---
+accumuloTable: UcsfMedorders
+rxnormDb: jdbc:mysql://dbops1.cxtheffccik1.us-west-2.rds.amazonaws.com:3306/RxNorm
+rxnormDbTable: RxNorm.RXNCONSO
+rxnormDbUsername: rxnorm
+rxnormDbPassword: 

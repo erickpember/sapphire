@@ -37,7 +37,7 @@
     src: "{{ playbook_dir }}/../../etl/nar/target/df-etl-nar-{{ df_platform_version }}.nar"
     dest: "{{ company_data_prefix }}/nifi/lib/df-etl-nar-{{ df_platform_version }}.nar"
   register: copy_df_etl_nar
-    
+
 - name: Stop df-etl
   shell: docker stop etl1.local.datafascia.com && docker rm -v etl1.local.datafascia.com
   ignore_errors: True
@@ -169,6 +169,14 @@
           --volume={{ company_data_prefix }}:{{ company_data_prefix }}
           datafascia/kafka
   when: "'datafascia/kafka:latest' not in list_containers.stdout_lines"
+
+- name: Copy NiFi flow configuration
+  copy:
+    src: "{{ playbook_dir }}/roles/df-etl/files/{{ item }}"
+    dest: "{{ company_data_prefix }}/nifi/conf/{{ item }}"
+  with_items:
+    - medadmin-webgetconfig.yml
+    - nursingorder-webgetconfig.yml
 
 - name: Run df-etl
   command: >

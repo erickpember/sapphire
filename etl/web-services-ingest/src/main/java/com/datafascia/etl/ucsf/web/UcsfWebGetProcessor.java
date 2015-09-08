@@ -10,6 +10,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
@@ -283,7 +284,7 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
       }
       url = url.replace("^", "%5E");
 
-      log.info("Using URL: " + url);
+      logger.info("Using URL: " + url);
 
       String source = url;
       try {

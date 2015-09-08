@@ -5,10 +5,14 @@ accumulo:
   user: root
   password: secret
 
-eventQueue:
-  kafkaBrokers: "kafka1.local.datafascia.com:9092"
-  topic: event
+df-api:
+  endpoint: http://api1.local.datafascia.com:9090/fhir
+  username: testuser
+  password: supersecret
 
-hl7MessageQueue:
-  kafkaBrokers: "kafka1.local.datafascia.com:9092"
-  topic: hl7Message
+UcsfMedAdminProcessor:
+  accumuloTable: testTable
+  rxnormDb: jdbc:h2:mem:testdb;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+  rxnormDbTable: RXNCONSO
+  rxnormDbUsername: testuser
+  rxnormDbPassword: testpassword

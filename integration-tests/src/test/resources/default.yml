@@ -1,0 +1,5 @@
+---
+df-api:
+  endpoint: http://localhost:9090/fhir
+  username: testuser
+  password: supersecret

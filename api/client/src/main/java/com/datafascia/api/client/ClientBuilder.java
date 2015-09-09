@@ -5,7 +5,12 @@ package com.datafascia.api.client;
 import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.client.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor;
+import com.datafascia.common.configuration.ConfigurationNode;
+import com.datafascia.common.configuration.Configure;
+import com.datafascia.common.configuration.guice.ConfigureModule;
 import com.google.common.base.Strings;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 
 /**
  * A builder for resource clients.
@@ -13,6 +18,23 @@ import com.google.common.base.Strings;
 public class ClientBuilder {
   private static final FhirContext ctx = FhirContext.forDstu2();
   private final IGenericClient client;
+  private static Injector injector;
+
+  /**
+   * Constructs a ClientBuilder using local config.
+   */
+  public ClientBuilder() {
+    injector = Guice.createInjector(
+        new ConfigureModule() {
+        }
+    );
+    ClientConfiguration config = injector.getInstance(ClientConfiguration.class);
+
+    client = ctx.newRestfulGenericClient(config.endpoint);
+    if (!Strings.isNullOrEmpty(config.username) && !Strings.isNullOrEmpty(config.password)) {
+      client.registerInterceptor(new BasicAuthInterceptor(config.username, config.password));
+    }
+  }
 
   /**
    * Constructs a ClientBuilder.
@@ -49,5 +71,18 @@ public class ClientBuilder {
 
   public MedicationClient getMedicationClient() {
     return new MedicationClient(client);
+  }
+
+  /**
+   * Configuration for API client.
+   */
+  @ConfigurationNode("df-api")
+  public static class ClientConfiguration {
+    @Configure
+    private String endpoint;
+    @Configure
+    private String username;
+    @Configure
+    private String password;
   }
 }

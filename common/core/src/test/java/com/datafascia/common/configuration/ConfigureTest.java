@@ -22,9 +22,6 @@ public class ConfigureTest {
     private boolean booleanField;
 
     @Configure
-    private String csvField;
-
-    @Configure
     private int intField;
 
     @Configure
@@ -73,34 +70,30 @@ public class ConfigureTest {
 
   @BeforeClass
   public static void beforeClass() {
-    injector = Guice.createInjector(
-        new ConfigureModule() {
-        }
-    );
+    injector = Guice.createInjector(new ConfigureModule());
   }
 
   @Test
   public void should_inject_fields() {
     InjectInto instance = injector.getInstance(InjectInto.class);
     assertEquals(instance.booleanField, true);
-    assertEquals(instance.csvField, "csv-value1,csv-value2");
-    assertEquals(instance.intField, 123);
-    assertEquals(instance.stringField, "string-value");
+    assertEquals(instance.intField, 1);
+    assertEquals(instance.stringField, "stringField-value");
   }
 
   @Test
   public void should_inject_methods() {
     InjectInto instance = injector.getInstance(InjectInto.class);
     assertEquals(instance.booleanMethodValue, true);
-    assertEquals(instance.intMethodValue, 123);
-    assertEquals(instance.stringMethodValue, "string-value");
+    assertEquals(instance.intMethodValue, 2);
+    assertEquals(instance.stringMethodValue, "stringMethod-value");
   }
 
   @Test
   public void should_inject_setters() {
     InjectInto instance = injector.getInstance(InjectInto.class);
     assertEquals(instance.booleanSetterValue, true);
-    assertEquals(instance.intSetterValue, 123);
-    assertEquals(instance.stringSetterValue, "string-value");
+    assertEquals(instance.intSetterValue, 3);
+    assertEquals(instance.stringSetterValue, "setString-value");
   }
 }

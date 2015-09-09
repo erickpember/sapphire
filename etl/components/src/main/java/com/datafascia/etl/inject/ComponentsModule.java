@@ -16,12 +16,12 @@ import com.datafascia.common.accumulo.FixedAuthorizationsSupplier;
 import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
 import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
 import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
-import com.datafascia.common.configuration.guice.ConfigureModule;
 import com.datafascia.common.persist.entity.AccumuloFhirEntityStore;
 import com.datafascia.common.persist.entity.AccumuloReflectEntityStore;
 import com.datafascia.common.persist.entity.FhirEntityStore;
 import com.datafascia.common.persist.entity.ReflectEntityStore;
 import com.datafascia.domain.persist.Tables;
+import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.name.Names;
 import javax.inject.Singleton;
@@ -30,10 +30,10 @@ import org.apache.accumulo.core.client.Connector;
 /**
  * Provides objects to application.
  */
-public class ComponentsModule extends ConfigureModule {
+public class ComponentsModule extends AbstractModule {
 
   @Override
-  protected void onConfigure() {
+  protected void configure() {
     bind(AuthorizationsSupplier.class).to(FixedAuthorizationsSupplier.class);
     bind(AvroSchemaRegistry.class).to(MemorySchemaRegistry.class).in(Singleton.class);
     bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);

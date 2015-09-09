@@ -1,1 +1,2 @@
+com.datafascia.common.configuration.guice.ConfigureModule
 com.datafascia.etl.inject.ComponentsModule

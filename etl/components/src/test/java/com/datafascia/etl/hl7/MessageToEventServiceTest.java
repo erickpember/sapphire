@@ -3,6 +3,7 @@
 package com.datafascia.etl.hl7;
 
 import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
+import com.datafascia.common.configuration.guice.ConfigureModule;
 import com.datafascia.domain.event.AdmitPatientData;
 import com.datafascia.domain.event.Event;
 import com.datafascia.etl.inject.ComponentsModule;
@@ -35,7 +36,7 @@ public class MessageToEventServiceTest {
 
   @BeforeClass
   public void injectMembers() throws Exception {
-    Injector injector = Guice.createInjector(new ComponentsModule());
+    Injector injector = Guice.createInjector(new ConfigureModule(), new ComponentsModule());
     injector.injectMembers(this);
   }
 

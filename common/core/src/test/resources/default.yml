@@ -1,13 +1,13 @@
+---
 test-node:
   booleanField: true
-  csvField: csv-value1,csv-value2
-  intField: 123
-  stringField: string-value
+  intField: 1
+  stringField: stringField-value
 
   booleanMethod: true
-  intMethod: 123
-  stringMethod: string-value
+  intMethod: 2
+  stringMethod: stringMethod-value
 
   boolean: true
-  int: 123
-  string: string-value
+  int: 3
+  string: setString-value

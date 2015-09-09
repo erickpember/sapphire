@@ -10,7 +10,7 @@ import com.google.inject.matcher.Matchers;
  * Guice module which enables injection of configuration values with
  * {@link com.datafascia.common.configuration.Configure} annotation.
  */
-public abstract class ConfigureModule extends AbstractModule {
+public class ConfigureModule extends AbstractModule {
 
   @Override
   protected final void configure() {

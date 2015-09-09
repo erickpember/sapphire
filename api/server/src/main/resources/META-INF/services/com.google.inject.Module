@@ -1,2 +1,3 @@
 com.datafascia.api.inject.ApplicationModule
 com.datafascia.common.accumulo.AccumuloModule
+com.datafascia.common.configuration.guice.ConfigureModule

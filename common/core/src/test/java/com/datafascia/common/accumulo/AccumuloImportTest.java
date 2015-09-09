@@ -10,6 +10,7 @@ import com.google.inject.Injector;
 import com.google.inject.Provides;
 import java.io.File;
 import java.io.IOException;
+import javax.inject.Singleton;
 import org.apache.accumulo.core.client.Connector;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -19,27 +20,34 @@ import org.testng.annotations.Test;
  */
 public class AccumuloImportTest {
 
+  private static class TestModule extends AbstractModule {
+    @Override
+    protected void configure() {
+    }
+
+    @Provides
+    @Singleton
+    public Connector connector(ConnectorFactory factory) {
+      return factory.getConnector();
+    }
+
+    @Provides
+    @Singleton
+    public ConnectorFactory connectorFactory() {
+      return new ConnectorFactory(AccumuloConfiguration.builder()
+          .instance(ConnectorFactory.MOCK_INSTANCE)
+          .zooKeepers("")
+          .user("root")
+          .password("secret")
+          .build());
+    }
+  }
+
   private Connector connector;
 
   @BeforeClass
   public void setup() throws IOException, InterruptedException {
-    Injector injector = Guice.createInjector(
-        new AbstractModule() {
-          @Override
-          protected void configure() {
-          }
-
-          @Provides
-          public AccumuloConfiguration accumuloConfiguration() {
-            return AccumuloConfiguration.builder()
-                .instance(ConnectorFactory.MOCK_INSTANCE)
-                .zooKeepers("")
-                .user("root")
-                .password("")
-                .build();
-          }
-        },
-        new AccumuloModule());
+    Injector injector = Guice.createInjector(new TestModule());
 
     connector = injector.getInstance(Connector.class);
   }

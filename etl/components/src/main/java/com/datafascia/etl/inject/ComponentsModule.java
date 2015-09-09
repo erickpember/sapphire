@@ -8,7 +8,6 @@ import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.parser.CanonicalModelClassFactory;
 import ca.uhn.hl7v2.parser.Parser;
 import com.codahale.metrics.MetricRegistry;
-import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
 import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.ConnectorFactory;
@@ -40,6 +39,7 @@ public class ComponentsModule extends AbstractModule {
     bind(FhirContext.class).in(Singleton.class);
     bind(FhirEntityStore.class).to(AccumuloFhirEntityStore.class).in(Singleton.class);
     bind(MetricRegistry.class).in(Singleton.class);
+    bind(ReflectEntityStore.class).to(AccumuloReflectEntityStore.class).in(Singleton.class);
 
     bindConstant().annotatedWith(Names.named("entityTableNamePrefix")).to(Tables.ENTITY_PREFIX);
   }
@@ -68,12 +68,5 @@ public class ComponentsModule extends AbstractModule {
   @Provides @Singleton
   public Parser parser(HapiContext context) {
     return context.getPipeParser();
-  }
-
-  @Provides @Singleton
-  public ReflectEntityStore reflectEntityStore(
-      AvroSchemaRegistry schemaRegistry, AccumuloTemplate accumuloTemplate) {
-
-    return new AccumuloReflectEntityStore(schemaRegistry, Tables.ENTITY_PREFIX, accumuloTemplate);
   }
 }

@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.inject;
 
+import ca.uhn.fhir.context.FhirContext;
 import com.datafascia.common.accumulo.AccumuloConfiguration;
 import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.ConnectorFactory;
@@ -9,7 +10,9 @@ import com.datafascia.common.accumulo.FixedColumnVisibilityPolicy;
 import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
 import com.datafascia.common.avro.schemaregistry.MemorySchemaRegistry;
 import com.datafascia.common.persist.entity.AccumuloFhirEntityStore;
+import com.datafascia.common.persist.entity.AccumuloReflectEntityStore;
 import com.datafascia.common.persist.entity.FhirEntityStore;
+import com.datafascia.common.persist.entity.ReflectEntityStore;
 import com.datafascia.domain.persist.Tables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
@@ -26,7 +29,9 @@ public class ApplicationModule extends AbstractModule {
   protected void configure() {
     bind(AvroSchemaRegistry.class).to(MemorySchemaRegistry.class).in(Singleton.class);
     bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
+    bind(FhirContext.class).in(Singleton.class);
     bind(FhirEntityStore.class).to(AccumuloFhirEntityStore.class).in(Singleton.class);
+    bind(ReflectEntityStore.class).to(AccumuloReflectEntityStore.class).in(Singleton.class);
 
     bindConstant().annotatedWith(Names.named("entityTableNamePrefix")).to(Tables.ENTITY_PREFIX);
   }

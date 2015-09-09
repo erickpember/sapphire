@@ -46,6 +46,7 @@ public abstract class RepositoryTestSupport {
       bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
       bind(FhirContext.class).in(Singleton.class);
       bind(FhirEntityStore.class).to(AccumuloFhirEntityStore.class).in(Singleton.class);
+      bind(ReflectEntityStore.class).to(AccumuloReflectEntityStore.class).in(Singleton.class);
 
       bindConstant().annotatedWith(Names.named("entityTableNamePrefix")).to(Tables.ENTITY_PREFIX);
     }
@@ -63,13 +64,6 @@ public abstract class RepositoryTestSupport {
           .user("root")
           .password("secret")
           .build());
-    }
-
-    @Provides @Singleton
-    public ReflectEntityStore reflectEntityStore(
-        AvroSchemaRegistry schemaRegistry, AccumuloTemplate accumuloTemplate) {
-
-      return new AccumuloReflectEntityStore(schemaRegistry, Tables.ENTITY_PREFIX, accumuloTemplate);
     }
   }
 

@@ -10,6 +10,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Optional;
 import java.util.stream.Stream;
 import javax.inject.Inject;
+import javax.inject.Named;
 import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.data.Range;
 import org.apache.avro.Schema;
@@ -25,34 +26,23 @@ public class AccumuloReflectEntityStore implements ReflectEntityStore {
   private static final char COMPONENT_SEPARATOR = '=';
   private static final char KEY_SEPARATOR = '&';
 
-  private final AvroSchemaRegistry schemaRegistry;
-  private final String dataTableName;
-  private final AccumuloTemplate accumuloTemplate;
+  @Inject
+  private AvroSchemaRegistry schemaRegistry;
+
+  @Inject @Named("entityTableNamePrefix")
+  private String tableNamePrefix;
+
+  @Inject
+  private AccumuloTemplate accumuloTemplate;
 
   /**
-   * Constructor
+   * Gets name of Accumulo table storing entity data.
    *
-   * @param schemaRegistry
-   *     schema registry
-   * @param tableNamePrefix
-   *     Accumulo table name prefix
-   * @param accumuloTemplate
-   *     data access operations template
+   * @return Accumulo table name
    */
-  @Inject
-  public AccumuloReflectEntityStore(
-      AvroSchemaRegistry schemaRegistry,
-      String tableNamePrefix,
-      AccumuloTemplate accumuloTemplate) {
-
-    this.schemaRegistry = schemaRegistry;
-    this.dataTableName = tableNamePrefix + DATA;
-    this.accumuloTemplate = accumuloTemplate;
-
-    accumuloTemplate.createTableIfNotExist(dataTableName);
-  }
-
   public String getDataTableName() {
+    String dataTableName = tableNamePrefix + DATA;
+    accumuloTemplate.createTableIfNotExist(dataTableName);
     return dataTableName;
   }
 
@@ -84,14 +74,14 @@ public class AccumuloReflectEntityStore implements ReflectEntityStore {
     long schemaId = schemaRegistry.putSchema(object.getClass().getSimpleName(), schema);
 
     accumuloTemplate.save(
-        dataTableName, toRowId(entityId), new ReflectMutationSetter(schemaId, object));
+        getDataTableName(), toRowId(entityId), new ReflectMutationSetter(schemaId, object));
   }
 
   @Override
   public <E> Optional<E> read(EntityId entityId) {
     Class<E> entityType = (Class<E>) entityId.getType();
 
-    Scanner scanner = accumuloTemplate.createScanner(dataTableName);
+    Scanner scanner = accumuloTemplate.createScanner(getDataTableName());
     scanner.setRange(Range.exact(toRowId(entityId)));
     scanner.fetchColumnFamily(new Text(entityType.getSimpleName()));
 
@@ -107,7 +97,7 @@ public class AccumuloReflectEntityStore implements ReflectEntityStore {
 
   @Override
   public <E> Stream<E> stream(EntityId parentId, Class<E> entityType) {
-    Scanner scanner = accumuloTemplate.createScanner(dataTableName);
+    Scanner scanner = accumuloTemplate.createScanner(getDataTableName());
     scanner.setRange(Range.prefix(toRowIdPrefix(parentId, entityType)));
     scanner.fetchColumnFamily(new Text(entityType.getSimpleName()));
 
@@ -123,7 +113,7 @@ public class AccumuloReflectEntityStore implements ReflectEntityStore {
   public <E> Stream<E> stream(EntityId startEntityId) {
     Class<E> entityType = (Class<E>) startEntityId.getType();
 
-    Scanner scanner = accumuloTemplate.createScanner(dataTableName);
+    Scanner scanner = accumuloTemplate.createScanner(getDataTableName());
     scanner.setRange(new Range(toRowId(startEntityId), null));
     scanner.fetchColumnFamily(new Text(entityType.getSimpleName()));
 
@@ -131,7 +121,12 @@ public class AccumuloReflectEntityStore implements ReflectEntityStore {
   }
 
   @Override
+  public void delete(EntityId entityId) {
+    accumuloTemplate.delete(getDataTableName(), toRowId(entityId));
+  }
+
+  @Override
   public <E> void delete(EntityId parentId, Class<E> entityType) {
-    accumuloTemplate.delete(dataTableName, toRowIdPrefix(parentId, entityType));
+    accumuloTemplate.delete(getDataTableName(), toRowIdPrefix(parentId, entityType));
   }
 }

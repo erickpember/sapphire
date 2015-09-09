@@ -4,7 +4,6 @@ package com.datafascia.etl;
 
 import ca.uhn.fhir.context.FhirContext;
 import com.datafascia.common.accumulo.AccumuloConfiguration;
-import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
 import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.ConnectorFactory;
@@ -24,9 +23,10 @@ import javax.inject.Singleton;
 import org.apache.accumulo.core.client.Connector;
 
 /**
- * A guice module to support etl processor tests.
+ * A Guice module to support ETL processor tests.
  */
 class TestModule extends AbstractModule {
+
   @Override
   protected void configure() {
     bind(AuthorizationsSupplier.class).to(FixedAuthorizationsSupplier.class);
@@ -34,6 +34,7 @@ class TestModule extends AbstractModule {
     bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
     bind(FhirContext.class).in(Singleton.class);
     bind(FhirEntityStore.class).to(AccumuloFhirEntityStore.class).in(Singleton.class);
+    bind(ReflectEntityStore.class).to(AccumuloReflectEntityStore.class).in(Singleton.class);
 
     bindConstant().annotatedWith(Names.named("entityTableNamePrefix")).to(Tables.ENTITY_PREFIX);
   }
@@ -53,13 +54,5 @@ class TestModule extends AbstractModule {
         .user("root")
         .password("secret")
         .build());
-  }
-
-  @Provides
-  @Singleton
-  public ReflectEntityStore reflectEntityStore(
-      AvroSchemaRegistry schemaRegistry, AccumuloTemplate accumuloTemplate) {
-
-    return new AccumuloReflectEntityStore(schemaRegistry, Tables.ENTITY_PREFIX, accumuloTemplate);
   }
 }

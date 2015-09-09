@@ -16,6 +16,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
+import com.google.inject.name.Names;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -39,7 +40,6 @@ import static org.testng.Assert.assertEquals;
  */
 public class AccumuloReflectEntityStoreTest {
 
-  private static final String TABLE_NAME_PREFIX = "Test";
   private static final EntityId PATIENT_ID = new EntityId(Patient.class, Id.of("patientId1"));
 
   /**
@@ -51,6 +51,9 @@ public class AccumuloReflectEntityStoreTest {
       bind(AuthorizationsSupplier.class).to(FixedAuthorizationsSupplier.class);
       bind(AvroSchemaRegistry.class).to(MemorySchemaRegistry.class);
       bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
+      bind(ReflectEntityStore.class).to(AccumuloReflectEntityStore.class).in(Singleton.class);
+
+      bindConstant().annotatedWith(Names.named("entityTableNamePrefix")).to("Entity");
     }
 
     @Provides @Singleton
@@ -66,13 +69,6 @@ public class AccumuloReflectEntityStoreTest {
           .user("root")
           .password("secret")
           .build());
-    }
-
-    @Provides @Singleton
-    public ReflectEntityStore entityStore(
-        AvroSchemaRegistry schemaRegistry, AccumuloTemplate accumuloTemplate) {
-
-      return new AccumuloReflectEntityStore(schemaRegistry, TABLE_NAME_PREFIX, accumuloTemplate);
     }
   }
 

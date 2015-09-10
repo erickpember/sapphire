@@ -30,6 +30,11 @@
       <artifactId>df-domain-core</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>df-emerge-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>ca.uhn.hapi</groupId>

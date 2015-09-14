@@ -13,6 +13,7 @@ import com.datafascia.api.resources.fhir.MedicationPrescriptionResourceProvider;
 import com.datafascia.api.resources.fhir.MedicationResourceProvider;
 import com.datafascia.api.resources.fhir.ObservationResourceProvider;
 import com.datafascia.api.resources.fhir.PatientResourceProvider;
+import com.datafascia.api.resources.fhir.PractitionerResourceProvider;
 import com.datafascia.api.resources.fhir.ProcedureRequestResourceProvider;
 import com.datafascia.api.resources.fhir.ProcedureResourceProvider;
 import java.util.Arrays;
@@ -49,7 +50,8 @@ public class FhirServlet extends RestfulServer {
         new ObservationResourceProvider(),
         new ProcedureResourceProvider(),
         new ProcedureRequestResourceProvider(),
-        new PatientResourceProvider()));
+        new PatientResourceProvider(),
+        new PractitionerResourceProvider()));
 
     /*
      * Tells HAPI to use content types which are not technically FHIR compliant when a browser is

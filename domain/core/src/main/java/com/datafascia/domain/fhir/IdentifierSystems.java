@@ -31,6 +31,10 @@ public class IdentifierSystems {
   public static final String INSTITUTION_MEDICATION_PRESCRIPTION =
       "http://datafascia.com/identifier/InstitutionMedicationPrescription";
 
+  /** institution assigned practitioner identifier */
+  public static final String INSTITUTION_PRACTITIONER =
+      "http://datafascia.com/identifier/InstitutionPractitioner";
+
   /** institution assigned procedure request identifier */
   public static final String INSTITUTION_PROCEDURE_REQUEST =
       "http://datafascia.com/identifier/InstitutionProcedureRequest";

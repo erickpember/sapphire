@@ -10,6 +10,8 @@ import com.datafascia.domain.event.Event;
 import com.datafascia.domain.fhir.Dates;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.domain.persist.EncounterRepository;
+import com.datafascia.emerge.ucsf.HarmEvidence;
+import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
 import java.util.Optional;
 import java.util.function.Consumer;
 import javax.inject.Inject;
@@ -23,6 +25,9 @@ public class DischargePatient implements Consumer<Event> {
 
   @Inject
   private transient EncounterRepository encounterRepository;
+
+  @Inject
+  private transient HarmEvidenceRepository harmEvidenceRepository;
 
   private Id<Encounter> getEncounterId(AdmitPatientData admitPatientData) {
     Encounter encounter = new Encounter();
@@ -48,5 +53,9 @@ public class DischargePatient implements Consumer<Event> {
     encounter.getPeriod().setEnd(
         Dates.toDateTime(admitPatientData.getEncounter().getDischargeTime()));
     encounterRepository.save(encounter);
+
+    String patientId = encounter.getPatient().getReference().getIdPart();
+    Id<HarmEvidence> recordId = Id.of(patientId);
+    harmEvidenceRepository.delete(recordId);
   }
 }

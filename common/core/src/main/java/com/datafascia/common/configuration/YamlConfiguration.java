@@ -15,6 +15,7 @@ import org.yaml.snakeyaml.Yaml;
  * Hierarchical configuration from YAML file.
  */
 public class YamlConfiguration extends AbstractHierarchicalFileConfiguration {
+  private static final long serialVersionUID = 1L;
 
   private final Yaml yaml = new Yaml();
 
@@ -31,24 +32,22 @@ public class YamlConfiguration extends AbstractHierarchicalFileConfiguration {
   }
 
   @SuppressWarnings("unchecked")
-  protected void setNodeValue(ConfigurationNode targetNode, Object source) {
-    if (source instanceof Map<?, ?>) {
-      for (Map.Entry<String, Object> entry : ((Map<String, Object>) source).entrySet()) {
+  protected void setNodeValue(ConfigurationNode targetNode, Object value) {
+    if (value instanceof Map<?, ?>) {
+      for (Map.Entry<String, Object> entry : ((Map<String, Object>) value).entrySet()) {
         Node childNode = new Node(entry.getKey());
-        childNode.setReference(entry);
         setNodeValue(childNode, entry.getValue());
         targetNode.addChild(childNode);
       }
-    } else if (source instanceof Collection) {
-      for (Object child : (Iterable<?>) source) {
+    } else if (value instanceof Collection) {
+      for (Object child : (Iterable<?>) value) {
         Node childNode = new Node("item");
-        childNode.setReference(child);
         setNodeValue(childNode, child);
         targetNode.addChild(childNode);
       }
     }
 
-    targetNode.setValue(source);
+    targetNode.setValue(value);
   }
 
   @Override

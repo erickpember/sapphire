@@ -10,16 +10,14 @@ import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 /**
  * Client utilities for medications.
  */
-public class MedicationClient {
-  private final IGenericClient client;
-
+public class MedicationClient extends BaseClient<Medication> {
   /**
    * Builds a MedicationClient
    *
    * @param client The FHIR client to use.
    */
   public MedicationClient(IGenericClient client) {
-    this.client = client;
+    super(client);
   }
 
   /**

@@ -8,16 +8,14 @@ import ca.uhn.fhir.rest.client.IGenericClient;
 /**
  * Client utilities for encounters.
  */
-public class EncounterClient {
-  private final IGenericClient client;
-
+public class EncounterClient extends BaseClient<Encounter> {
   /**
    * Builds a EncounterClient
    *
    * @param client The FHIR client to use.
    */
   public EncounterClient(IGenericClient client) {
-    this.client = client;
+    super(client);
   }
 
   /**

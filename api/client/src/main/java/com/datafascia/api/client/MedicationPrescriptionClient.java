@@ -13,16 +13,14 @@ import java.util.List;
 /**
  * Client utilities for medication prescriptions.
  */
-public class MedicationPrescriptionClient {
-  private final IGenericClient client;
-
+public class MedicationPrescriptionClient extends BaseClient<MedicationPrescription> {
   /**
    * Builds a MedicationPrescriptionClient
    *
    * @param client The FHIR client to use.
    */
   public MedicationPrescriptionClient(IGenericClient client) {
-    this.client = client;
+    super(client);
   }
 
   /**

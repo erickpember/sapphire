@@ -13,16 +13,14 @@ import java.util.List;
 /**
  * Client utilities for procedure requests.
  */
-public class ProcedureRequestClient {
-  private final IGenericClient client;
-
+public class ProcedureRequestClient extends BaseClient<ProcedureRequest> {
   /**
    * Builds a ProcedureRequestClient
    *
    * @param client The FHIR client to use.
    */
   public ProcedureRequestClient(IGenericClient client) {
-    this.client = client;
+    super(client);
   }
 
   /**

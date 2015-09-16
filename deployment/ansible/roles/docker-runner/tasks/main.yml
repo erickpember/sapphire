@@ -18,16 +18,30 @@
     dest: "{{ docker_run_command }}"
     mode: 0755
 
-- name: Check for changed NiFi flow configuration
+- name: Create {{ company_data_prefix }}/nifi subdirectories
+  file:
+    path: "{{ company_data_prefix }}/nifi/{{ item }}"
+    state: directory
+  with_items:
+    - conf
+    - lib
+
+- name: Copy NiFi flow configuration
   copy:
     src: "{{ playbook_dir }}/roles/df-etl/files/flow.xml.gz"
-    dest: "{{ company_package_dir }}/flow.xml.gz"
+    dest: "{{ company_data_prefix }}/nifi/conf/flow.xml.gz"
   register: copy_flow_xml_gz
 
+- name: Copy df-etl-nar package
+  copy:
+    src: "{{ playbook_dir }}/../../etl/nar/target/df-etl-nar-{{ df_platform_version }}.nar"
+    dest: "{{ company_data_prefix }}/nifi/lib/df-etl-nar-{{ df_platform_version }}.nar"
+  register: copy_df_etl_nar
+    
 - name: Stop df-etl
   shell: docker stop etl1.local.datafascia.com && docker rm -v etl1.local.datafascia.com
   ignore_errors: True
-  when: copy_df_etl_nar.changed or copy_flow_xml_gz.changed
+  when: copy_flow_xml_gz.changed or copy_df_etl_nar.changed
 
 - name: Stop df-api-server
   shell: docker stop api1.local.datafascia.com && docker rm -v api1.local.datafascia.com
@@ -155,16 +169,6 @@
           --volume={{ company_data_prefix }}:{{ company_data_prefix }}
           datafascia/kafka
   when: "'datafascia/kafka:latest' not in list_containers.stdout_lines"
-
-- name: Create {{ company_data_prefix }}/nifi/conf directory
-  file:
-    path: "{{ company_data_prefix }}/nifi/conf"
-    state: directory
-
-- name: Copy NiFi flow configuration
-  copy:
-    src: "{{ playbook_dir }}/roles/df-etl/files/flow.xml.gz"
-    dest: "{{ company_data_prefix }}/nifi/conf/flow.xml.gz"
 
 - name: Run df-etl
   command: >

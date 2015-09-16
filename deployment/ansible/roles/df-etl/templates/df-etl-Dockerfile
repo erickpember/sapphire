@@ -26,8 +26,6 @@ RUN ansible-playbook \
     rm -rf {{ company_package_dir }} && \
     yum clean all
 
-COPY df-etl-nar-{{ df_platform_version }}.nar {{ company_install_prefix }}/nifi/lib/df-etl-nar-{{ df_platform_version }}.nar
-
 EXPOSE 8080 9520
 
 CMD ["{{ company_install_prefix }}/nifi/run.sh"]

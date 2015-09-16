@@ -108,18 +108,6 @@
       touch {{ docker_image_creator_home }}/kafka.created
       creates={{ docker_image_creator_home }}/kafka.created
 
-- name: Copy df-etl-nar package
-  copy:
-    src: "{{ playbook_dir }}/../../etl/nar/target/df-etl-nar-{{ df_platform_version }}.nar"
-    dest: "{{ company_package_dir }}/df-etl-nar-{{ df_platform_version }}.nar"
-  register: copy_df_etl_nar
-
-- name: Force creation of df-etl Docker image
-  file:
-    path: "{{ docker_image_creator_home }}/df-etl.created"
-    state: absent
-  when: copy_df_etl_nar.changed
-
 - name: Copy df-etl Dockerfile
   template:
     src: "{{ playbook_dir }}/roles/df-etl/templates/df-etl-Dockerfile"

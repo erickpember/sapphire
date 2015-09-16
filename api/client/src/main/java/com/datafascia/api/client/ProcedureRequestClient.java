@@ -8,6 +8,8 @@ import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.IGenericClient;
 import ca.uhn.fhir.rest.gclient.StringClientParam;
+import com.google.common.base.Strings;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -72,5 +74,66 @@ public class ProcedureRequestClient extends BaseClient<ProcedureRequest> {
     } else {
       return null;
     }
+  }
+
+  /**
+   * Fetches a ProcedureRequest
+   *
+   * @param encounterId The ID of the encounter they belong to.
+   * @return A list ProcedureRequests.
+   */
+  public List<ProcedureRequest> getProcedureRequest(String encounterId) {
+    Bundle results = client.search().forResource(ProcedureRequest.class)
+        .where(new StringClientParam(ProcedureRequest.SP_ENCOUNTER)
+            .matches()
+            .value(encounterId))
+        .execute();
+    List<BundleEntry> entries = results.getEntries();
+    ArrayList<ProcedureRequest> requests = new ArrayList<>();
+    for (BundleEntry entry : entries) {
+      requests.add((ProcedureRequest) entry.getResource());
+    }
+    return requests;
+  }
+
+  /**
+   * Searches ProcedureRequests
+   *
+   * @param encounterId The ID of the encounter to which the procedure requests belong.
+   * @param type Type of procedure request, optional.
+   * @param status Status of procedure request, optional.
+   * @return A list ProcedureRequests.
+   */
+  public List<ProcedureRequest> searchProcedureRequest(String encounterId, String type,
+      String status) {
+    Bundle results = client.search().forResource(ProcedureRequest.class)
+        .where(new StringClientParam(ProcedureRequest.SP_ENCOUNTER)
+            .matches()
+            .value(encounterId))
+        .execute();
+
+    List<ProcedureRequest> procedureRequests = extractBundle(results, ProcedureRequest.class);
+
+    if (!Strings.isNullOrEmpty(type)) {
+      List<ProcedureRequest> filteredResults = new ArrayList<>();
+      for (ProcedureRequest procedureRequest : procedureRequests) {
+        if (procedureRequest.getType().getCodingFirstRep().getCode().equalsIgnoreCase(type)) {
+          filteredResults.add(procedureRequest);
+        }
+      }
+      procedureRequests = filteredResults;
+    }
+
+    if (!Strings.isNullOrEmpty(status)) {
+      List<ProcedureRequest> filteredResults = new ArrayList<>();
+      for (ProcedureRequest procedureRequest : procedureRequests) {
+        if (procedureRequest.getStatus().equalsIgnoreCase(status)) {
+          filteredResults.add(procedureRequest);
+        }
+      }
+      procedureRequests = filteredResults;
+    }
+
+    return procedureRequests;
   }
 }

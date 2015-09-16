@@ -1,4 +1,5 @@
 com.datafascia.etl.event.ProcessEvent
 com.datafascia.etl.hl7.TransformMessageToEvent
+com.datafascia.etl.hl7.ProcessHL7
 com.datafascia.etl.ingest.ArchiveIngestMessage
 com.datafascia.etl.ingest.ListenHL7

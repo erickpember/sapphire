@@ -39,6 +39,10 @@ public class ClientBuilder {
     return new MedicationPrescriptionClient(client);
   }
 
+  public ObservationClient getObservationClient() {
+    return new ObservationClient(client);
+  }
+
   public ProcedureRequestClient getProcedureRequestClient() {
     return new ProcedureRequestClient(client);
   }

@@ -26,7 +26,6 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 import javax.net.ssl.SSLContext;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -56,6 +55,7 @@ import org.apache.nifi.processor.AbstractSessionFactoryProcessor;
 import org.apache.nifi.processor.ProcessContext;
 import org.apache.nifi.processor.ProcessSession;
 import org.apache.nifi.processor.ProcessSessionFactory;
+import org.apache.nifi.processor.Processor;
 import org.apache.nifi.processor.ProcessorInitializationContext;
 import org.apache.nifi.processor.Relationship;
 import org.apache.nifi.processor.exception.ProcessException;
@@ -66,17 +66,18 @@ import org.apache.nifi.util.StopWatch;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.kohsuke.MetaInfServices;
 
 /**
  * A fork of GetHTTP that intercepts the response, pulls out the data extract date, and feeds it
  * back for the next fetch.
  */
+@CapabilityDescription("Fetches a JSON file via HTTP")
+@MetaInfServices(Processor.class)
 @Tags({"get", "fetch", "poll", "http", "https", "ingest", "source", "input", "datafascia", "ucsf",
     "json"})
-@CapabilityDescription("Fetches a JSON file via HTTP")
 @WritesAttribute(attribute = "filename",
     description = "the filename is set to the name of the file on the remote server")
-@Slf4j
 public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
   public static final String HEADER_ACCEPT = "Accept";
 
@@ -264,7 +265,7 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
     }
     url = url.replace("^", "%5E");
 
-    log.info("Using URL: " + url);
+    logger.info("Using URL: " + url);
 
     String source = url;
     try {

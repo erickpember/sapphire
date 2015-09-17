@@ -33,6 +33,7 @@ import org.apache.nifi.logging.ProcessorLog;
 import org.apache.nifi.processor.AbstractProcessor;
 import org.apache.nifi.processor.ProcessContext;
 import org.apache.nifi.processor.ProcessSession;
+import org.apache.nifi.processor.Processor;
 import org.apache.nifi.processor.ProcessorInitializationContext;
 import org.apache.nifi.processor.Relationship;
 import org.apache.nifi.processor.exception.ProcessException;
@@ -42,10 +43,12 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import org.kohsuke.MetaInfServices;
 
 /**
  * Processor for handling nursing orders at UCSF.
  */
+@MetaInfServices(Processor.class)
 @Slf4j
 @Tags({"ingest","datafascia", "ucsf", "json"})
 public class NursingOrdersProcessor extends AbstractProcessor {

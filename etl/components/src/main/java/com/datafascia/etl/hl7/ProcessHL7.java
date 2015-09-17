@@ -18,14 +18,17 @@ import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.flowfile.FlowFile;
 import org.apache.nifi.processor.ProcessContext;
 import org.apache.nifi.processor.ProcessSession;
+import org.apache.nifi.processor.Processor;
 import org.apache.nifi.processor.Relationship;
 import org.apache.nifi.processor.exception.ProcessException;
+import org.kohsuke.MetaInfServices;
 
 /**
  * Updates application state in response to HL7 message.
  */
 @CapabilityDescription("Updates application state in response to HL7 message.")
 @EventDriven
+@MetaInfServices(Processor.class)
 @SupportsBatching
 @Tags({"HL7", "health level 7", "healthcare"})
 public class ProcessHL7 extends DependencyInjectingProcessor {

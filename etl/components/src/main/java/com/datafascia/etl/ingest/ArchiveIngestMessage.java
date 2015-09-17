@@ -22,17 +22,22 @@ import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.flowfile.FlowFile;
 import org.apache.nifi.processor.ProcessContext;
 import org.apache.nifi.processor.ProcessSession;
+import org.apache.nifi.processor.Processor;
 import org.apache.nifi.processor.ProcessorInitializationContext;
 import org.apache.nifi.processor.Relationship;
 import org.apache.nifi.processor.exception.ProcessException;
 import org.apache.nifi.processor.util.StandardValidators;
+import org.kohsuke.MetaInfServices;
 
 /**
  * NiFi processor that archives FlowFiles to the IngestMessage table in
  * Accumulo.
  */
 @CapabilityDescription("Archives FlowFiles to the IngestMessage table in Accumulo.")
-@EventDriven @SupportsBatching @Tags({"archive"})
+@EventDriven
+@MetaInfServices(Processor.class)
+@SupportsBatching
+@Tags({"archive"})
 public class ArchiveIngestMessage extends DependencyInjectingProcessor {
 
   public static final Relationship SUCCESS = new Relationship.Builder()

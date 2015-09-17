@@ -30,15 +30,17 @@ import org.apache.nifi.flowfile.FlowFile;
 import org.apache.nifi.processor.AbstractProcessor;
 import org.apache.nifi.processor.ProcessContext;
 import org.apache.nifi.processor.ProcessSession;
-import org.apache.nifi.processor.ProcessorInitializationContext;
+import org.apache.nifi.processor.Processor;
 import org.apache.nifi.processor.Relationship;
 import org.apache.nifi.processor.exception.ProcessException;
 import org.apache.nifi.processor.util.StandardValidators;
+import org.kohsuke.MetaInfServices;
 
 /**
  * NiFi processor that starts an HL7 MLLP server to receive HL7 messages.
  */
 @CapabilityDescription("Starts an HL7 MLLP server to receive HL7 messages.")
+@MetaInfServices(Processor.class)
 @Tags({"HL7", "health level 7", "healthcare", "ingest", "listen", "MLLP"})
 public class ListenHL7 extends AbstractProcessor {
 
@@ -61,17 +63,11 @@ public class ListenHL7 extends AbstractProcessor {
       .addValidator(StandardValidators.BOOLEAN_VALIDATOR)
       .build();
 
-  private Set<Relationship> relationships;
-  private List<PropertyDescriptor> supportedPropertyDescriptors;
+  private Set<Relationship> relationships = ImmutableSet.of(SUCCESS);
+  private List<PropertyDescriptor> supportedPropertyDescriptors = Arrays.asList(PORT, TLS);
 
   private volatile HL7Service server;
   private final BlockingQueue<String> receivedMessages = new LinkedBlockingQueue<>();
-
-  @Override
-  protected void init(ProcessorInitializationContext context) {
-    relationships = ImmutableSet.of(SUCCESS);
-    supportedPropertyDescriptors = Arrays.asList(PORT, TLS);
-  }
 
   @Override
   public Set<Relationship> getRelationships() {

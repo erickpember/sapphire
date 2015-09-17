@@ -5,14 +5,15 @@ package com.datafascia.etl.hl7;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.parser.Parser;
+import com.datafascia.common.inject.Injectors;
 import com.datafascia.domain.event.Event;
+import com.google.inject.Injector;
 import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.ServiceLoader;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
@@ -32,11 +33,14 @@ public class MessageToEventService {
 
   /**
    * Constructor
+   *
+   * @param injector
+   *     Guice injector
    */
-  public MessageToEventService() {
-    ServiceLoader<MessageToEventTransformer> serviceLoader =
-        ServiceLoader.load(MessageToEventTransformer.class);
-    for (MessageToEventTransformer transformer : serviceLoader) {
+  @Inject
+  public MessageToEventService(Injector injector) {
+    for (MessageToEventTransformer transformer :
+        Injectors.loadService(MessageToEventTransformer.class, injector)) {
       messageTypeToTransformerMap.put(transformer.getApplicableMessageType(), transformer);
       log.debug(
           "loaded transformer of {}",

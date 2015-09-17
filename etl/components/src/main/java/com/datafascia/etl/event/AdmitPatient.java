@@ -23,8 +23,8 @@ import com.datafascia.domain.persist.LocationRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
+import java.time.Clock;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.StringJoiner;
@@ -36,19 +36,20 @@ import javax.inject.Inject;
  */
 public class AdmitPatient implements Consumer<Event> {
 
-  private static final ZoneId TIME_ZONE = ZoneId.of("America/Los_Angeles");
+  @Inject
+  private Clock clock;
 
   @Inject
-  private transient PatientRepository patientRepository;
+  private PatientRepository patientRepository;
 
   @Inject
-  private transient LocationRepository locationRepository;
+  private LocationRepository locationRepository;
 
   @Inject
-  private transient EncounterRepository encounterRepository;
+  private EncounterRepository encounterRepository;
 
   @Inject
-  private transient HarmEvidenceRepository harmEvidenceRepository;
+  private HarmEvidenceRepository harmEvidenceRepository;
 
   private static UnitedStatesPatient createPatient(PatientData patientData) {
     UnitedStatesPatient patient = new UnitedStatesPatient();
@@ -140,8 +141,8 @@ public class AdmitPatient implements Consumer<Event> {
     }
   }
 
-  private static String formatLocalDate(Date date) {
-    LocalDate localDate = date.toInstant().atZone(TIME_ZONE).toLocalDate();
+  private String formatLocalDate(Date date) {
+    LocalDate localDate = date.toInstant().atZone(clock.getZone()).toLocalDate();
     return DateTimeFormatter.ISO_LOCAL_DATE.format(localDate);
   }
 
@@ -150,7 +151,7 @@ public class AdmitPatient implements Consumer<Event> {
     return (locationParts.length > 1) ? locationParts[1] : "";
   }
 
-  private static HarmEvidence createHarmEvidence(
+  private HarmEvidence createHarmEvidence(
       Encounter encounter, UnitedStatesPatient patient, Location location) {
 
     return HarmEvidence.builder()

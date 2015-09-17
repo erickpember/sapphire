@@ -19,6 +19,8 @@ import com.datafascia.domain.persist.Tables;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.name.Names;
+import java.time.Clock;
+import java.time.ZoneId;
 import javax.inject.Singleton;
 import org.apache.accumulo.core.client.Connector;
 
@@ -31,6 +33,7 @@ class TestModule extends AbstractModule {
   protected void configure() {
     bind(AuthorizationsSupplier.class).to(FixedAuthorizationsSupplier.class);
     bind(AvroSchemaRegistry.class).to(MemorySchemaRegistry.class).in(Singleton.class);
+    bind(Clock.class).toInstance(Clock.system(ZoneId.of("America/Los_Angeles")));
     bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
     bind(FhirContext.class).in(Singleton.class);
     bind(FhirEntityStore.class).to(AccumuloFhirEntityStore.class).in(Singleton.class);

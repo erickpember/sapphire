@@ -7,6 +7,7 @@ import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Module;
 import com.google.inject.util.Modules;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.ServiceLoader;
 import lombok.extern.slf4j.Slf4j;
@@ -61,5 +62,40 @@ public class Injectors {
       log.info("Creating injector from modules {}", modules);
       return Guice.createInjector(modules);
     }
+  }
+
+  /**
+   * Creates providers using {@link ServiceLoader}, then injects into the providers.
+   *
+   * @param <S>
+   *     service type
+   * @param service
+   *     interface or abstract class representing the service
+   * @param injector
+   *     Guice injector
+   * @return providers
+   */
+  public static <S> List<S> loadService(Class<S> service, Injector injector) {
+    List<S> providers = new ArrayList<>();
+    ServiceLoader<S> serviceLoader = ServiceLoader.load(service);
+    for (S provider : serviceLoader) {
+      injector.injectMembers(provider);
+      providers.add(provider);
+    }
+
+    return providers;
+  }
+
+  /**
+   * Creates providers using {@link ServiceLoader}, then injects into the providers.
+   *
+   * @param <S>
+   *     service type
+   * @param service
+   *     interface or abstract class representing the service
+   * @return providers
+   */
+  public static <S> List<S> loadService(Class<S> service) {
+    return loadService(service, Injectors.getInjector());
   }
 }

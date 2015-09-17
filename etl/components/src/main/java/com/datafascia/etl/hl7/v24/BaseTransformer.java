@@ -23,19 +23,21 @@ import com.datafascia.etl.hl7.RaceMap;
 import com.google.common.base.MoreObjects;
 import com.google.common.base.Strings;
 import com.neovisionaries.i18n.LanguageCode;
+import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import javax.inject.Inject;
 
 /**
  * Implements common methods for transformers.
  */
 public abstract class BaseTransformer implements MessageToEventTransformer {
 
-  private static final ZoneId TIME_ZONE = ZoneId.of("America/Los_Angeles");
+  @Inject
+  private Clock clock;
 
   protected static final String SUBSCRIPT_PLACEHOLDER = "REPLACEME";
 
@@ -266,7 +268,7 @@ public abstract class BaseTransformer implements MessageToEventTransformer {
         fromTime.getYear(), fromTime.getMonth(), fromTime.getDay(),
         fromTime.getHour(), fromTime.getMinute(), fromTime.getSecond(),
         0,
-        TIME_ZONE);
+        clock.getZone());
     return zonedDateTime.toInstant();
   }
 }

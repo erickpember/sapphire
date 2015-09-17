@@ -1,4 +1,6 @@
 com.datafascia.etl.hl7.v24.ADT_A01_Transformer
 com.datafascia.etl.hl7.v24.ADT_A02_Transformer
 com.datafascia.etl.hl7.v24.ADT_A03_Transformer
+com.datafascia.etl.hl7.v24.ADT_A09_Transformer
+com.datafascia.etl.hl7.v24.ADT_A17_Transformer
 com.datafascia.etl.hl7.v24.ORU_R01_Transformer

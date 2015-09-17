@@ -31,7 +31,8 @@ public class ADT_A02_Transformer extends AdmitPatientTransformer {
 
     List<Event> outputEvents = new ArrayList<>();
     try {
-      AdmitPatientData admitPatientData = toAdmitPatientData(message.getPID(), message.getPV1());
+      AdmitPatientData admitPatientData = toAdmitPatientData(
+          message.getMSH(), message.getPID(), message.getPV1());
 
       outputEvents.add(Event.builder()
           .institutionId(institutionId)

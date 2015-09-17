@@ -35,7 +35,8 @@ public class ADT_A03_Transformer extends AdmitPatientTransformer {
           input, message.getPID(), message.getPV1(), institutionId, facilityId, ObservationType.A03)
           .ifPresent(event -> outputEvents.add(event));
 
-      AdmitPatientData admitPatientData = toAdmitPatientData(message.getPID(), message.getPV1());
+      AdmitPatientData admitPatientData = toAdmitPatientData(
+          message.getMSH(), message.getPID(), message.getPV1());
 
       outputEvents.add(Event.builder()
           .institutionId(institutionId)

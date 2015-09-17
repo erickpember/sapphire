@@ -94,7 +94,7 @@ public class AdmitPatient implements Consumer<Event> {
     encounter.addIdentifier()
         .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue(fromEncounter.getIdentifier());
     encounter
-        .setStatus(EncounterStateEnum.IN_PROGRESS)
+        .setStatus(EncounterStateEnum.FINISHED.forCode(fromEncounter.getStatus()))
         .setPeriod(period)
         .setPatient(new ResourceReferenceDt(patient.getId()))
         .addLocation().setLocation(new ResourceReferenceDt(location.getId()));

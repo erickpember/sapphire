@@ -6,6 +6,7 @@ import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.event.AdmitPatientData;
+import com.datafascia.domain.event.EncounterData;
 import com.datafascia.domain.event.Event;
 import com.datafascia.domain.fhir.Dates;
 import com.datafascia.domain.fhir.IdentifierSystems;
@@ -48,8 +49,9 @@ public class DischargePatient implements Consumer<Event> {
       return;
     }
 
+    EncounterData fromEncounter = admitPatientData.getEncounter();
     Encounter encounter = optionalEncounter.get();
-    encounter.setStatus(EncounterStateEnum.FINISHED);
+    encounter.setStatus(EncounterStateEnum.FINISHED.forCode(fromEncounter.getStatus()));
     encounter.getPeriod().setEnd(
         Dates.toDateTime(admitPatientData.getEncounter().getDischargeTime()));
     encounterRepository.save(encounter);

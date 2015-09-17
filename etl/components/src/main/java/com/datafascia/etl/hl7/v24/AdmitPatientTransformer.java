@@ -2,9 +2,11 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.hl7.v24;
 
+import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v24.datatype.XPN;
+import ca.uhn.hl7v2.model.v24.segment.MSH;
 import ca.uhn.hl7v2.model.v24.segment.PID;
 import ca.uhn.hl7v2.model.v24.segment.PV1;
 import ca.uhn.hl7v2.util.Terser;
@@ -53,8 +55,31 @@ public abstract class AdmitPatientTransformer extends BaseTransformer {
         .build();
   }
 
-  private EncounterData toEncounterData(PV1 pv1) throws HL7Exception {
+  private static String toEncounterState(String triggerEvent) {
+    switch (triggerEvent) {
+      case "A01":
+      case "A06":
+      case "A07":
+      case "A08":
+      case "A12":
+      case "A13":
+      case "A17":
+        return EncounterStateEnum.IN_PROGRESS.getCode();
+      case "A03":
+        return EncounterStateEnum.FINISHED.getCode();
+      case "A04":
+        return EncounterStateEnum.ARRIVED.getCode();
+      case "A11":
+        return EncounterStateEnum.CANCELLED.getCode();
+      default:
+        return "";
+    }
+  }
+
+  private EncounterData toEncounterData(MSH msh, PV1 pv1) throws HL7Exception {
     return EncounterData.builder()
+        .status(
+            toEncounterState(msh.getMessageType().getTriggerEvent().getValue()))
         .identifier(
             pv1.getVisitNumber().getID().getValue())
         .location(
@@ -66,10 +91,10 @@ public abstract class AdmitPatientTransformer extends BaseTransformer {
         .build();
   }
 
-  protected AdmitPatientData toAdmitPatientData(PID pid, PV1 pv1) throws HL7Exception {
+  protected AdmitPatientData toAdmitPatientData(MSH msh, PID pid, PV1 pv1) throws HL7Exception {
     return AdmitPatientData.builder()
         .patient(toPatientData(pid))
-        .encounter(toEncounterData(pv1))
+        .encounter(toEncounterData(msh, pv1))
         .build();
   }
 

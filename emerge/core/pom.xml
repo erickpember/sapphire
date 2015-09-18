@@ -36,6 +36,11 @@
       <artifactId>df-common-core</artifactId>
       <version>${project.version}</version>
     </dependency>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>df-api-client</artifactId>
+      <version>${project.version}</version>
+    </dependency>
 
     <dependency>
       <groupId>com.fasterxml.jackson.dataformat</groupId>

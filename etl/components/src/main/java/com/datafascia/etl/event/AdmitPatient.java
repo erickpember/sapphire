@@ -2,7 +2,6 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.event;
 
-import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import ca.uhn.fhir.model.dstu2.composite.HumanNameDt;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
@@ -24,9 +23,6 @@ import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
 import java.time.Clock;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 import java.util.StringJoiner;
 import java.util.function.Consumer;
 import javax.inject.Inject;
@@ -88,7 +84,7 @@ public class AdmitPatient implements Consumer<Event> {
       EncounterData fromEncounter, UnitedStatesPatient patient, Location location) {
 
     PeriodDt period = new PeriodDt();
-    period.setStart(Date.from(fromEncounter.getAdmitTime()), TemporalPrecisionEnum.SECOND);
+    period.setStart(Dates.toDateTime(fromEncounter.getAdmitTime()));
 
     Encounter encounter = new Encounter();
     encounter.addIdentifier()
@@ -141,11 +137,6 @@ public class AdmitPatient implements Consumer<Event> {
     }
   }
 
-  private String formatLocalDate(Date date) {
-    LocalDate localDate = date.toInstant().atZone(clock.getZone()).toLocalDate();
-    return DateTimeFormatter.ISO_LOCAL_DATE.format(localDate);
-  }
-
   private static String formatRoomNumber(Location location) {
     String[] locationParts = location.getIdentifierFirstRep().getValue().split("\\^");
     return (locationParts.length > 1) ? locationParts[1] : "";
@@ -154,17 +145,25 @@ public class AdmitPatient implements Consumer<Event> {
   private HarmEvidence createHarmEvidence(
       Encounter encounter, UnitedStatesPatient patient, Location location) {
 
-    return HarmEvidence.builder()
+    HarmEvidence harmEvidence = HarmEvidence.builder()
         .encounterIdentifier(encounter.getIdentifierFirstRep().getValue())
-        .sicuAdmissionDate(formatLocalDate(encounter.getPeriod().getStart()))
         .patientIdentifier(patient.getIdentifierFirstRep().getValue())
         .patientAccountNumber(patient.getIdentifier().get(1).getValue())
         .patientName(formatPatientName(patient))
         .race(formatRace(patient))
         .gender(patient.getGender().equals("female") ? "Female" : "Male")
-        .patientDateOfBirth(formatLocalDate(patient.getBirthDate()))
         .roomNumber(formatRoomNumber(location))
         .build();
+
+    if (!encounter.getPeriod().getStartElement().isEmpty()) {
+      harmEvidence.setSicuAdmissionDate(encounter.getPeriod().getStartElement().toHumanDisplay());
+    }
+
+    if (!patient.getBirthDateElement().isEmpty()) {
+      harmEvidence.setPatientDateOfBirth(patient.getBirthDateElement().toHumanDisplay());
+    }
+
+    return harmEvidence;
   }
 
   @Override

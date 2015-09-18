@@ -70,4 +70,29 @@ public class MedicationPrescriptionClient {
   public void updateMedicationPrescription(MedicationPrescription prescription) {
     client.update().resource(prescription).execute();
   }
+
+  /**
+   * Fetches a list of MedicationPrescription resources
+   *
+   * @param encounterId
+   *     the encounter identifier linked to the MedicationPrescription resources
+   * @return medicationPrescriptions
+   *     a list MedicationPrescriptions
+   */
+  public List<MedicationPrescription> getMedicationPrescriptions(String encounterId) {
+    Bundle bundle = client.search().forResource(MedicationPrescription.class)
+        .where(new StringClientParam(MedicationPrescription.SP_ENCOUNTER)
+            .matches()
+            .value(encounterId))
+        .execute();
+
+    List<MedicationPrescription> prescriptions =
+        bundle.getResources(MedicationPrescription.class);
+    while (bundle.getLinkNext().isEmpty() == false) {
+      bundle = client.loadPage().next(bundle).execute();
+      prescriptions.addAll(bundle.getResources(MedicationPrescription.class));
+    }
+
+    return prescriptions;
+  }
 }

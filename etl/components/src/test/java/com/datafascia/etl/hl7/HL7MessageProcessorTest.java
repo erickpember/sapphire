@@ -3,12 +3,14 @@
 package com.datafascia.etl.hl7;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import ca.uhn.fhir.model.dstu2.resource.Location;
 import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import com.datafascia.common.accumulo.AccumuloConfiguration;
 import com.datafascia.common.accumulo.ConnectorFactory;
 import com.datafascia.common.configuration.guice.ConfigureModule;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.persist.EncounterRepository;
+import com.datafascia.domain.persist.LocationRepository;
 import com.datafascia.etl.inject.ComponentsModule;
 import com.google.common.io.Resources;
 import com.google.inject.AbstractModule;
@@ -55,6 +57,9 @@ public class HL7MessageProcessorTest {
   @Inject
   private EncounterRepository encounterRepository;
 
+  @Inject
+  private LocationRepository locationRepository;
+
   @BeforeMethod
   public void injectMembers() throws Exception {
     Injector injector = Guice.createInjector(
@@ -87,6 +92,12 @@ public class HL7MessageProcessorTest {
     Encounter encounter = encounterRepository.read(encounterId).get();
 
     assertEquals(encounter.getStatusElement().getValueAsEnum(), EncounterStateEnum.IN_PROGRESS);
+
+    Id<Location> locationId = Id.of(
+        encounter.getLocationFirstRep().getLocation().getReference().getIdPart());
+    Location location = locationRepository.read(locationId).get();
+
+    assertEquals(location.getIdentifierFirstRep().getValue(), "A4I^A4561^05^5102^R^^^^^^OUTADT");
   }
 
   @Test
@@ -162,12 +173,19 @@ public class HL7MessageProcessorTest {
   @Test
   public void ADT_A12_should_update_encounter_in_progress() throws Exception {
     processMessage("ADT_A01.hl7");
+    processMessage("ADT_A02.hl7");
     processMessage("ADT_A12.hl7");
 
     Id<Encounter> encounterId = Id.of("5014212");
     Encounter encounter = encounterRepository.read(encounterId).get();
 
     assertEquals(encounter.getStatusElement().getValueAsEnum(), EncounterStateEnum.IN_PROGRESS);
+
+    Id<Location> locationId = Id.of(
+        encounter.getLocationFirstRep().getLocation().getReference().getIdPart());
+    Location location = locationRepository.read(locationId).get();
+
+    assertEquals(location.getIdentifierFirstRep().getValue(), "A6A^A6597^28^5102^D^^^^^^OUTADT");
   }
 
   // HL7 defines that ADT A13 reuses the same message structure as ADT A01.

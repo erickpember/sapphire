@@ -8,7 +8,6 @@ import ca.uhn.hl7v2.model.v24.message.ADT_A09;
 import com.datafascia.domain.event.AdmitPatientData;
 import com.datafascia.domain.event.Event;
 import com.datafascia.domain.event.EventType;
-import com.datafascia.domain.event.ObservationType;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,17 +30,17 @@ public class ADT_A09_Transformer extends AdmitPatientTransformer {
 
     List<Event> outputEvents = new ArrayList<>();
     try {
-      toAddObservationsEvent(
-          input, message.getPID(), message.getPV1(), institutionId, facilityId, ObservationType.A03)
-          .ifPresent(event -> outputEvents.add(event));
-
       AdmitPatientData admitPatientData = toAdmitPatientData(
           message.getMSH(), message.getPID(), message.getPV1());
+
+      String triggerEvent = message.getMSH().getMessageType().getTriggerEvent().getValue();
+      EventType eventType = triggerEvent.equals("A12")
+          ? EventType.PATIENT_ADMIT : EventType.PATIENT_DISCHARGE;
 
       outputEvents.add(Event.builder()
           .institutionId(institutionId)
           .facilityId(facilityId)
-          .type(EventType.PATIENT_DISCHARGE)
+          .type(eventType)
           .data(admitPatientData)
           .build());
 

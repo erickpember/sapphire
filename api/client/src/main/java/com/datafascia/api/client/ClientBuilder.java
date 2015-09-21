@@ -53,6 +53,10 @@ public class ClientBuilder {
     return new EncounterClient(client);
   }
 
+  public FlagClient getFlagClient() {
+    return new FlagClient(client);
+  }
+
   public MedicationAdministrationClient getMedicationAdministrationClient() {
     return new MedicationAdministrationClient(client);
   }

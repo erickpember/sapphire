@@ -11,7 +11,8 @@ import java.util.Optional;
 public enum FlagCodeEnum implements SystemDefinedCode<String> {
   UNKNOWN("UNKNOWN"),
   ADVANCE_DIRECTIVE("AD"),
-  PHYSICIAN_ORDERS_FOR_LIFE_SUSTAINING_TREATMENT("POLST");
+  PHYSICIAN_ORDERS_FOR_LIFE_SUSTAINING_TREATMENT("POLST"),
+  PATIENT_CARE_CONFERENCE_NOTE("PATIENT_CARE_CONFERENCE_NOTE");
 
   private static final String SYSTEM = "http://datafascia.com/code/Flag";
 

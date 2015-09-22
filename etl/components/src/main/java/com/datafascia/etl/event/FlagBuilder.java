@@ -21,6 +21,7 @@ public class FlagBuilder {
 
   private static final String ADVANCE_DIRECTIVE = "230218701ADPOA";
   private static final String PHYSICIAN_ORDERS_FOR_LIFE_SUSTAINING_TREATMENT = "230218701POLST";
+  private static final String PATIENT_CARE_CONFERENCE_NOTE = "10000002";
 
   private final UnitedStatesPatient patient;
   private final List<Flag> flags = new ArrayList<>();
@@ -62,6 +63,9 @@ public class FlagBuilder {
         break;
       case PHYSICIAN_ORDERS_FOR_LIFE_SUSTAINING_TREATMENT:
         addFlag(FlagCodeEnum.PHYSICIAN_ORDERS_FOR_LIFE_SUSTAINING_TREATMENT, observation);
+        break;
+      case PATIENT_CARE_CONFERENCE_NOTE:
+        addFlag(FlagCodeEnum.PATIENT_CARE_CONFERENCE_NOTE, observation);
         break;
     }
   }

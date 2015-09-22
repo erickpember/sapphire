@@ -30,7 +30,8 @@ public class PatientCareConferenceNoteTimestamp {
     List<Flag> flags = client.getFlagClient().searchFlag(patientId, CODE, null);
     Flag freshestFlag = FlagUtils.findFreshestFlag(flags);
 
-    if (freshestFlag.getStatusElement().getValueAsEnum() == FlagStatusEnum.ACTIVE) {
+    if (freshestFlag != null &&
+        freshestFlag.getStatusElement().getValueAsEnum() == FlagStatusEnum.ACTIVE) {
       return freshestFlag.getPeriod().getStartElement();
     } else {
       return null;

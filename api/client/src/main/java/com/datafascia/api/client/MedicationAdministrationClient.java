@@ -8,6 +8,7 @@ import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.IGenericClient;
 import ca.uhn.fhir.rest.gclient.StringClientParam;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -21,6 +22,28 @@ public class MedicationAdministrationClient extends BaseClient<MedicationAdminis
    */
   public MedicationAdministrationClient(IGenericClient client) {
     super(client);
+  }
+
+  /**
+   * Returns a list of administrations for a given encounter.
+   *
+   * @param encounterId ID of the parent Encounter resource.
+   * @return A list of MedicationAdministrations
+   */
+  public List<MedicationAdministration> getMedicationAdministrations(String encounterId) {
+    Bundle results = client.search().forResource(MedicationAdministration.class)
+        .where(new StringClientParam(MedicationAdministration.SP_ENCOUNTER)
+            .matches()
+            .value(encounterId))
+        .execute();
+    List<BundleEntry> entries = results.getEntries();
+    ArrayList<MedicationAdministration> administrations = new ArrayList<>();
+
+    for (BundleEntry entry : entries) {
+      administrations.add((MedicationAdministration) entry.getResource());
+    }
+
+    return administrations;
   }
 
   /**

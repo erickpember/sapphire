@@ -3,6 +3,7 @@
 package com.datafascia.emerge.ucsf;
 
 import ca.uhn.fhir.model.dstu2.resource.Flag;
+import ca.uhn.fhir.model.dstu2.valueset.FlagStatusEnum;
 import java.util.List;
 
 /**
@@ -26,5 +27,22 @@ public class FlagUtils {
     return flags.stream()
         .max(new FlagPeriodComparator())
         .orElse(null);
+  }
+
+  /**
+  * Returns true if a flag is non-null and active, otherwise false.
+  *
+  * @param flag
+  *   flag to test
+  * @return
+  *   true if flag's status is active, otherwise false
+  */
+  public static boolean isActive(Flag flag) {
+    if (flag != null &&
+        flag.getStatusElement().getValueAsEnum() == FlagStatusEnum.ACTIVE) {
+      return true;
+    } else {
+      return false;
+    }
   }
 }

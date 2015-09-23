@@ -79,7 +79,9 @@ public class AdmitPatient {
 
   private static String formatRoomNumber(Location location) {
     String[] locationParts = location.getIdentifierFirstRep().getValue().split("\\^");
-    return (locationParts.length > 1) ? locationParts[1] : "";
+    String room = locationParts[1];
+    String bed = locationParts[2];
+    return room + '-' + bed;
   }
 
   private HarmEvidence createHarmEvidence(

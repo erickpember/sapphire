@@ -328,10 +328,10 @@ public class FhirClient {
         .execute();
 
     String[] locationParts = location.getIdentifierFirstRep().getValue().split("\\^");
-    if (locationParts.length > 1) {
+    if (locationParts.length > 2) {
       String room = locationParts[1];
-      log.info("patient room: {}", room);
-      return Optional.of(room);
+      String bed = locationParts[2];
+      return Optional.of(room + '-' + bed);
     } else {
       return Optional.empty();
     }

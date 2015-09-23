@@ -4,6 +4,7 @@ package com.datafascia.emerge.ucsf;
 
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * ProcedureRequest helper methods
@@ -26,5 +27,19 @@ public class ProcedureRequestUtils {
     return procedureRequests.stream()
         .max(new ProcedureRequestScheduledComparator())
         .orElse(null);
+  }
+
+  /**
+   * Sorts procedure requests
+   *
+   * @param procedureRequests
+   *     ProcedureRequests to search
+   * @return
+   *     sorted list of procedure request, by timingDateTime, ascending order
+   */
+  public static List<ProcedureRequest> sortProcedureRequests(
+      List<ProcedureRequest> procedureRequests) {
+    return procedureRequests.stream()
+        .sorted().collect(Collectors.toList());
   }
 }

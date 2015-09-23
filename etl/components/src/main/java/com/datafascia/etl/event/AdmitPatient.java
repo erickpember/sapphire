@@ -13,6 +13,7 @@ import com.datafascia.domain.persist.LocationRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
+import com.datafascia.etl.hl7.EncounterStatusTransition;
 import java.util.StringJoiner;
 import javax.inject.Inject;
 
@@ -20,6 +21,9 @@ import javax.inject.Inject;
  * Admits patient.
  */
 public class AdmitPatient {
+
+  @Inject
+  private EncounterStatusTransition encounterStatusTransition;
 
   @Inject
   private PatientRepository patientRepository;
@@ -106,7 +110,7 @@ public class AdmitPatient {
    * Admits patient.
    *
    * @param triggerEvent
-   *     MSH trigger event
+   *     HL7 message trigger event
    * @param patient
    *     patient
    * @param location
@@ -127,6 +131,7 @@ public class AdmitPatient {
     encounter
         .setPatient(new ResourceReferenceDt(patient))
         .addLocation().setLocation(new ResourceReferenceDt(location));
+    encounterStatusTransition.updateEncounterStatus(triggerEvent, encounter);
 
     encounterRepository.save(encounter);
 

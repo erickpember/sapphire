@@ -6,7 +6,6 @@ import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Location;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
-import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v24.datatype.XPN;
@@ -76,30 +75,8 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
     return location;
   }
 
-  private static EncounterStateEnum toEncounterState(String triggerEvent) {
-    switch (triggerEvent) {
-      case "A01":
-      case "A06":
-      case "A07":
-      case "A08":
-      case "A12":
-      case "A13":
-      case "A17":
-        return EncounterStateEnum.IN_PROGRESS;
-      case "A03":
-        return EncounterStateEnum.FINISHED;
-      case "A04":
-        return EncounterStateEnum.ARRIVED;
-      case "A11":
-        return EncounterStateEnum.CANCELLED;
-      default:
-        return null;
-    }
-  }
-
-  private Encounter toEncounter(MSH msh, PV1 pv1) throws HL7Exception {
-    Encounter encounter = new Encounter()
-        .setStatus(toEncounterState(msh.getMessageType().getTriggerEvent().getValue()));
+  private Encounter toEncounter(PV1 pv1) throws HL7Exception {
+    Encounter encounter = new Encounter();
     encounter.addIdentifier()
         .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER)
         .setValue(getEncounterIdentifier(pv1));
@@ -125,7 +102,7 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
   protected void admitPatient(MSH msh, PID pid, PV1 pv1) throws HL7Exception {
     UnitedStatesPatient patient = toPatient(pid);
     Location location = toLocation(pv1);
-    Encounter encounter = toEncounter(msh, pv1);
+    Encounter encounter = toEncounter(pv1);
     admitPatient.accept(
         msh.getMessageType().getTriggerEvent().getValue(), patient, location, encounter);
   }
@@ -140,7 +117,7 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
    * @throws HL7Exception if HL7 message is malformed
    */
   protected void dischargePatient(MSH msh, PV1 pv1) throws HL7Exception {
-    Encounter encounter = toEncounter(msh, pv1);
+    Encounter encounter = toEncounter(pv1);
     dischargePatient.accept(msh.getMessageType().getTriggerEvent().getValue(), encounter);
   }
 

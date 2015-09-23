@@ -1,0 +1,61 @@
+// Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
+// For license information, please contact http://datafascia.com/contact
+package com.datafascia.etl.hl7.adt;
+
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
+import com.datafascia.etl.hl7.EncounterStatusTransition.MessageType;
+
+// Transitions from Encounter status new
+rule "Encounter status new, trigger event A01"
+when
+  $encounter: Encounter( statusElement.valueAsEnum == null )
+  MessageType( triggerEvent == "A01" );
+then
+  $encounter.setStatus(EncounterStateEnum.IN_PROGRESS);
+end
+
+rule "Encounter status new, trigger event A04"
+when
+  $encounter: Encounter( statusElement.valueAsEnum == null )
+  MessageType( triggerEvent == "A04" );
+then
+  $encounter.setStatus(EncounterStateEnum.ARRIVED);
+end
+
+// Transitions from Encounter status arrived
+rule "Encounter status arrived, trigger event A01"
+when
+  $encounter: Encounter( statusElement.valueAsEnum == EncounterStateEnum.ARRIVED )
+  MessageType( triggerEvent == "A01" );
+then
+  $encounter.setStatus(EncounterStateEnum.IN_PROGRESS);
+end
+
+// Transitions from Encounter status in-progress
+rule "Encounter status in-progress, trigger event A03"
+when
+  $encounter: Encounter( statusElement.valueAsEnum == EncounterStateEnum.IN_PROGRESS )
+  MessageType( triggerEvent == "A03" );
+then
+  $encounter.setStatus(EncounterStateEnum.FINISHED);
+end
+
+rule "Encounter status in-progress, trigger event A11"
+when
+  $encounter: Encounter( statusElement.valueAsEnum == EncounterStateEnum.IN_PROGRESS )
+  MessageType( triggerEvent == "A11" );
+then
+  $encounter.setStatus(EncounterStateEnum.CANCELLED);
+end
+
+// Transitions from Encounter status finished
+rule "Encounter status finished, trigger event A13"
+when
+  $encounter: Encounter( statusElement.valueAsEnum == EncounterStateEnum.FINISHED )
+  MessageType( triggerEvent == "A13" );
+then
+  $encounter.setStatus(EncounterStateEnum.IN_PROGRESS);
+end
+
+// No transitions from Encounter status cancelled

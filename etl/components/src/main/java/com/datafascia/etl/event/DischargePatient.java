@@ -7,6 +7,7 @@ import com.datafascia.common.persist.Id;
 import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
+import com.datafascia.etl.hl7.EncounterStatusTransition;
 import java.util.Optional;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -18,6 +19,9 @@ import lombok.extern.slf4j.Slf4j;
 public class DischargePatient {
 
   @Inject
+  private EncounterStatusTransition encounterStatusTransition;
+
+  @Inject
   private transient EncounterRepository encounterRepository;
 
   @Inject
@@ -27,7 +31,7 @@ public class DischargePatient {
    * Discharges patient.
    *
    * @param triggerEvent
-   *     MSH trigger event
+   *     HL7 message trigger event
    * @param inputEncounter
    *     encounter
    */
@@ -42,6 +46,8 @@ public class DischargePatient {
     Encounter encounter = optionalEncounter.get();
     encounter.setStatus(inputEncounter.getStatusElement());
     encounter.getPeriod().setEnd(inputEncounter.getPeriod().getEndElement());
+    encounterStatusTransition.updateEncounterStatus(triggerEvent, encounter);
+
     encounterRepository.save(encounter);
 
     String patientId = encounter.getPatient().getReference().getIdPart();

@@ -3,18 +3,9 @@
 package com.datafascia.etl.event;
 
 import ca.uhn.fhir.model.dstu2.composite.HumanNameDt;
-import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Location;
-import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
-import com.datafascia.domain.event.AdmitPatientData;
-import com.datafascia.domain.event.EncounterData;
-import com.datafascia.domain.event.Event;
-import com.datafascia.domain.event.PatientData;
-import com.datafascia.domain.fhir.Dates;
-import com.datafascia.domain.fhir.IdentifierSystems;
-import com.datafascia.domain.fhir.Languages;
 import com.datafascia.domain.fhir.RaceEnum;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.persist.EncounterRepository;
@@ -22,18 +13,13 @@ import com.datafascia.domain.persist.LocationRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
-import java.time.Clock;
 import java.util.StringJoiner;
-import java.util.function.Consumer;
 import javax.inject.Inject;
 
 /**
- * Processes admit patient event.
+ * Admits patient.
  */
-public class AdmitPatient implements Consumer<Event> {
-
-  @Inject
-  private Clock clock;
+public class AdmitPatient {
 
   @Inject
   private PatientRepository patientRepository;
@@ -46,56 +32,6 @@ public class AdmitPatient implements Consumer<Event> {
 
   @Inject
   private HarmEvidenceRepository harmEvidenceRepository;
-
-  private static UnitedStatesPatient createPatient(PatientData patientData) {
-    UnitedStatesPatient patient = new UnitedStatesPatient();
-    patient.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_PATIENT)
-        .setValue(patientData.getInstitutionPatientId());
-    patient.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_BILLING_ACCOUNT)
-        .setValue(patientData.getAccountNumber());
-    patient.addName()
-        .addGiven(patientData.getFirstName())
-        .addGiven(patientData.getMiddleName())
-        .addFamily(patientData.getLastName());
-    patient.addCommunication()
-        .setPreferred(true).setLanguage(Languages.createLanguage(patientData.getLanguage()));
-    patient
-        .setRace(patientData.getRace())
-        .setGender(patientData.getGender())
-        .setBirthDate(Dates.toDate(patientData.getBirthDate()))
-        .setMaritalStatus(patientData.getMaritalStatus())
-        .setActive(true);
-    return patient;
-  }
-
-  private static Location createLocation(EncounterData fromEncounter) {
-    String identifier = fromEncounter.getLocation();
-    Location location = new Location()
-        .setName(identifier);
-    location.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_LOCATION)
-        .setValue(identifier);
-    return location;
-  }
-
-  private static Encounter createEncounter(
-      EncounterData fromEncounter, UnitedStatesPatient patient, Location location) {
-
-    PeriodDt period = new PeriodDt();
-    period.setStart(Dates.toDateTime(fromEncounter.getAdmitTime()));
-
-    Encounter encounter = new Encounter();
-    encounter.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue(fromEncounter.getIdentifier());
-    encounter
-        .setStatus(EncounterStateEnum.FINISHED.forCode(fromEncounter.getStatus()))
-        .setPeriod(period)
-        .setPatient(new ResourceReferenceDt(patient.getId()))
-        .addLocation().setLocation(new ResourceReferenceDt(location.getId()));
-    return encounter;
-  }
 
   private static String formatPatientName(UnitedStatesPatient patient) {
     StringJoiner joiner = new StringJoiner(" ");
@@ -166,17 +102,32 @@ public class AdmitPatient implements Consumer<Event> {
     return harmEvidence;
   }
 
-  @Override
-  public void accept(Event event) {
-    AdmitPatientData admitPatientData = (AdmitPatientData) event.getData();
+  /**
+   * Admits patient.
+   *
+   * @param triggerEvent
+   *     MSH trigger event
+   * @param patient
+   *     patient
+   * @param location
+   *     location
+   * @param encounter
+   *     encounter
+   */
+  public void accept(
+      String triggerEvent,
+      UnitedStatesPatient patient,
+      Location location,
+      Encounter encounter) {
 
-    UnitedStatesPatient patient = createPatient(admitPatientData.getPatient());
     patientRepository.save(patient);
 
-    Location location = createLocation(admitPatientData.getEncounter());
     locationRepository.save(location);
 
-    Encounter encounter = createEncounter(admitPatientData.getEncounter(), patient, location);
+    encounter
+        .setPatient(new ResourceReferenceDt(patient))
+        .addLocation().setLocation(new ResourceReferenceDt(location));
+
     encounterRepository.save(encounter);
 
     HarmEvidence harmEvidence = createHarmEvidence(encounter, patient, location);

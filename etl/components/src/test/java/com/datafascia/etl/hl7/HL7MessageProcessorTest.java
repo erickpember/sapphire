@@ -4,13 +4,16 @@ package com.datafascia.etl.hl7;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Location;
+import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import com.datafascia.common.accumulo.AccumuloConfiguration;
 import com.datafascia.common.accumulo.ConnectorFactory;
 import com.datafascia.common.configuration.guice.ConfigureModule;
 import com.datafascia.common.persist.Id;
+import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.LocationRepository;
+import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.etl.inject.ComponentsModule;
 import com.google.common.io.Resources;
 import com.google.inject.AbstractModule;
@@ -59,6 +62,9 @@ public class HL7MessageProcessorTest {
 
   @Inject
   private LocationRepository locationRepository;
+
+  @Inject
+  private PatientRepository patientRepository;
 
   @BeforeMethod
   public void injectMembers() throws Exception {
@@ -210,5 +216,36 @@ public class HL7MessageProcessorTest {
     Encounter encounter = encounterRepository.read(encounterId).get();
 
     assertEquals(encounter.getStatusElement().getValueAsEnum(), EncounterStateEnum.IN_PROGRESS);
+  }
+
+  private void assertPatientGenderEquals(AdministrativeGenderEnum expected) {
+    Id<UnitedStatesPatient> patientId = Id.of("97552037");
+    UnitedStatesPatient patient = patientRepository.read(patientId).get();
+
+    assertEquals(patient.getGenderElement().getValueAsEnum(), expected);
+  }
+
+  @Test
+  public void should_extract_gender_female() throws Exception {
+    processMessage("gender-female.hl7");
+    assertPatientGenderEquals(AdministrativeGenderEnum.FEMALE);
+  }
+
+  @Test
+  public void should_extract_gender_male() throws Exception {
+    processMessage("gender-male.hl7");
+    assertPatientGenderEquals(AdministrativeGenderEnum.MALE);
+  }
+
+  @Test
+  public void should_extract_gender_other() throws Exception {
+    processMessage("gender-other.hl7");
+    assertPatientGenderEquals(AdministrativeGenderEnum.OTHER);
+  }
+
+  @Test
+  public void should_extract_gender_unknown() throws Exception {
+    processMessage("gender-unknown.hl7");
+    assertPatientGenderEquals(AdministrativeGenderEnum.UNKNOWN);
   }
 }

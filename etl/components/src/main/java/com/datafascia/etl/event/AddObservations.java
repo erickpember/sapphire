@@ -2,20 +2,10 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.event;
 
-import ca.uhn.fhir.model.api.IDatatype;
-import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
-import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
-import ca.uhn.fhir.model.primitive.DecimalDt;
 import ca.uhn.fhir.model.primitive.IdDt;
-import ca.uhn.fhir.model.primitive.StringDt;
-import com.datafascia.domain.event.AddObservationsData;
-import com.datafascia.domain.event.Event;
-import com.datafascia.domain.event.ObservationData;
-import com.datafascia.domain.fhir.CodingSystems;
-import com.datafascia.domain.fhir.Dates;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.persist.EncounterRepository;
@@ -23,30 +13,22 @@ import com.datafascia.domain.persist.FlagRepository;
 import com.datafascia.domain.persist.ObservationRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.domain.persist.ProcedureRepository;
-import java.util.function.Consumer;
+import java.util.List;
 import javax.inject.Inject;
 
 /**
- * Processes add observations event.
+ * Adds observations.
  */
-public class AddObservations implements Consumer<Event> {
+public class AddObservations {
 
   @Inject
-  private transient ObservationRepository observationRepository;
+  private ObservationRepository observationRepository;
 
   @Inject
-  private transient FlagRepository flagRepository;
+  private FlagRepository flagRepository;
 
   @Inject
-  private transient ProcedureRepository procedureRepository;
-
-  private static Encounter getEncounter(String encounterIdentifier) {
-    Encounter encounter = new Encounter();
-    encounter.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue(encounterIdentifier);
-    encounter.setId(new IdDt(EncounterRepository.generateId(encounter).toString()));
-    return encounter;
-  }
+  private ProcedureRepository procedureRepository;
 
   private static UnitedStatesPatient getPatient(String patientIdentifier) {
     UnitedStatesPatient patient = new UnitedStatesPatient();
@@ -56,42 +38,37 @@ public class AddObservations implements Consumer<Event> {
     return patient;
   }
 
-  private static Observation toObservation(
-      ObservationData fromObservation, Encounter encounter, UnitedStatesPatient patient) {
-
-    CodeableConceptDt observationCode =
-        new CodeableConceptDt(CodingSystems.OBSERVATION, fromObservation.getIdentifierCode())
-        .setText(fromObservation.getIdentifierText());
-
-    IDatatype observationValue;
-    if ("NM".equals(fromObservation.getValueType())) {
-      observationValue = new QuantityDt()
-          .setValue(new DecimalDt(fromObservation.getValue().get(0)))
-          .setUnits(fromObservation.getValueUnits());
-    } else {
-      observationValue = new StringDt(fromObservation.getValue().get(0));
-    }
-
-    Observation observation = new Observation()
-        .setCode(observationCode)
-        .setValue(observationValue)
-        .setIssued(Dates.toInstant(fromObservation.getObservationDateAndTime()))
-        .setEncounter(new ResourceReferenceDt(encounter.getId()))
-        .setSubject(new ResourceReferenceDt(patient.getId()));
-    return observation;
+  private static Encounter getEncounter(String encounterIdentifier) {
+    Encounter encounter = new Encounter();
+    encounter.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue(encounterIdentifier);
+    encounter.setId(new IdDt(EncounterRepository.generateId(encounter).toString()));
+    return encounter;
   }
 
-  @Override
-  public void accept(Event event) {
-    AddObservationsData addObservationsData = (AddObservationsData) event.getData();
-    Encounter encounter = getEncounter(addObservationsData.getEncounterIdentifier());
-    UnitedStatesPatient patient = getPatient(addObservationsData.getInstitutionPatientId());
+  /**
+   * Adds observations.
+   *
+   * @param observations
+   *     observations to add
+   * @param patientIdentifier
+   *     patient identifier
+   * @param encounterIdentifier
+   *     encounter identifier
+   */
+  public void accept(
+      List<Observation> observations, String patientIdentifier, String encounterIdentifier) {
+
+    UnitedStatesPatient patient = getPatient(patientIdentifier);
+    Encounter encounter = getEncounter(encounterIdentifier);
 
     FlagBuilder flagBuilder = new FlagBuilder(patient);
     ProcedureBuilder procedureBuilder = new ProcedureBuilder(encounter);
 
-    for (ObservationData fromObservation : addObservationsData.getObservations()) {
-      Observation observation = toObservation(fromObservation, encounter, patient);
+    for (Observation observation : observations) {
+      observation
+          .setSubject(new ResourceReferenceDt(patient))
+          .setEncounter(new ResourceReferenceDt(encounter));
       observationRepository.save(encounter, observation);
 
       flagBuilder.add(observation);

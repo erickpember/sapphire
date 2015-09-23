@@ -2,51 +2,36 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.hl7;
 
-import com.datafascia.domain.event.Event;
-import com.datafascia.etl.event.AddObservations;
-import com.datafascia.etl.event.AdmitPatient;
-import com.datafascia.etl.event.DischargePatient;
+import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.Message;
+import ca.uhn.hl7v2.parser.Parser;
+import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 import javax.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Updates application state in response to HL7 message.
  */
-@Slf4j
 public class HL7MessageProcessor implements Consumer<byte[]> {
 
   @Inject
-  private MessageToEventService messageToEventService;
+  private Parser parser;
 
   @Inject
-  private AdmitPatient admitPatient;
+  private MessageRouter messageRouter;
 
-  @Inject
-  private DischargePatient dischargePatient;
-
-  @Inject
-  private AddObservations addObservations;
-
-  private void processEvent(Event event) {
-    switch (event.getType()) {
-      case PATIENT_ADMIT:
-        admitPatient.accept(event);
-        break;
-      case PATIENT_DISCHARGE:
-        dischargePatient.accept(event);
-        break;
-      case OBSERVATIONS_ADD:
-        addObservations.accept(event);
-        break;
-      default:
-        log.debug("Ignored event type {}", event.getType());
+  private Message parseHL7(byte[] bytes) {
+    String hl7 = new String(bytes, StandardCharsets.UTF_8);
+    try {
+      return parser.parse(hl7);
+    } catch (HL7Exception e) {
+      throw new IllegalStateException("Cannot parse HL7 " + hl7, e);
     }
   }
 
   @Override
-  public void accept(byte[] message) {
-    messageToEventService.toEvents(message)
-        .forEach(this::processEvent);
+  public void accept(byte[] bytes) {
+    Message message = parseHL7(bytes);
+    messageRouter.accept(message);
   }
 }

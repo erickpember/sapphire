@@ -62,8 +62,8 @@ public class ClientBuilder {
     return new MedicationAdministrationClient(client);
   }
 
-  public MedicationPrescriptionClient getMedicationPrescriptionClient() {
-    return new MedicationPrescriptionClient(client);
+  public MedicationOrderClient getMedicationOrderClient() {
+    return new MedicationOrderClient(client);
   }
 
   public ObservationClient getObservationClient() {

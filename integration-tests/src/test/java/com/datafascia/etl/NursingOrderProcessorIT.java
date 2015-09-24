@@ -2,13 +2,13 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl;
 
+import ca.uhn.fhir.model.dstu2.composite.AnnotationDt;
+import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.composite.TimingDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
-import ca.uhn.fhir.model.primitive.IdDt;
-import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.services.ApiIT;
@@ -27,6 +27,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.nifi.util.TestRunner;
 import org.apache.nifi.util.TestRunners;
+import org.hl7.fhir.instance.model.api.IIdType;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -67,7 +68,7 @@ public class NursingOrderProcessorIT extends ApiIT {
     encounter1.setStatus(EncounterStateEnum.IN_PROGRESS);
     MethodOutcome outcome = client.create().resource(encounter1)
         .encodedJson().execute();
-    IdDt id = outcome.getId();
+    IIdType id = outcome.getId();
     encounter1.setId(id);
     return encounter1;
   }
@@ -101,18 +102,19 @@ public class NursingOrderProcessorIT extends ApiIT {
       assertNotNull(storedRequest);
       assertEquals(storedRequest.getEncounter().getReference().getIdPart(), expectedOrder
           .getEncounter());
-      assertEquals(storedRequest.getType().getCodingFirstRep().getCode(), expectedOrder
+      assertEquals(storedRequest.getCode().getCodingFirstRep().getCode(), expectedOrder
           .getProcedureId());
-      assertEquals(storedRequest.getType().getText(), expectedOrder
+      assertEquals(storedRequest.getCode().getText(), expectedOrder
           .getDescription());
       assertEquals(storedRequest.getIdentifierFirstRep().getValue(), expectedOrder.getOrderId());
-      assertEquals(((TimingDt)storedRequest.getTiming()).getRepeat().getBounds().getStart(),
-          expectedOrder.getStartDate());
-      assertEquals(((TimingDt)storedRequest.getTiming()).getRepeat().getBounds().getEnd(),
-          expectedOrder.getDiscontinuedDate());
 
-      for (StringDt note : storedRequest.getNotes()) {
-        assertTrue(expectedOrder.getQuestions().contains(note.toString()));
+      PeriodDt period =
+          (PeriodDt) ((TimingDt) storedRequest.getScheduled()).getRepeat().getBounds();
+      assertEquals(period.getStart(), expectedOrder.getStartDate());
+      assertEquals(period.getEnd(), expectedOrder.getDiscontinuedDate());
+
+      for (AnnotationDt note : storedRequest.getNotes()) {
+        assertTrue(expectedOrder.getQuestions().contains(note.getText()));
       }
     }
   }

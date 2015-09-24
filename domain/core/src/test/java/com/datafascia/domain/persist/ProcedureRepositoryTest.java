@@ -79,11 +79,11 @@ public class ProcedureRepositoryTest extends RepositoryTestSupport {
 
   private Procedure createProcedure(String typeCode, String bodySiteCode, Encounter encounter) {
     Procedure procedure = new Procedure()
-        .setType(new CodeableConceptDt(CodingSystems.PROCEDURE_TYPE, typeCode))
+        .setCode(new CodeableConceptDt(CodingSystems.PROCEDURE, typeCode))
         .setPerformed(new DateTimeDt(new Date(), TemporalPrecisionEnum.SECOND))
         .setEncounter(new ResourceReferenceDt(encounter.getId()));
-    procedure.addBodySite()
-        .setSite(new CodeableConceptDt(CodingSystems.BODY_SITE, bodySiteCode));
+    procedure.addBodySite(
+        new CodeableConceptDt(CodingSystems.BODY_SITE, bodySiteCode));
     return procedure;
   }
 
@@ -105,7 +105,7 @@ public class ProcedureRepositoryTest extends RepositoryTestSupport {
     List<Procedure> procedures = procedureRepository.list(encounterId);
     assertEquals(procedures.size(), 2);
     for (Procedure procedure : procedures) {
-      String typeCode = procedure.getType().getCodingFirstRep().getCode();
+      String typeCode = procedure.getCode().getCodingFirstRep().getCode();
       switch (typeCode) {
         case TYPE_CODE1:
           assertEquals(procedure.getId().getIdPart(), procedure1.getId().getIdPart());

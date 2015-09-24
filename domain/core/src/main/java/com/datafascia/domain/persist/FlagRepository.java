@@ -56,7 +56,7 @@ public class FlagRepository extends FhirEntityStoreRepository {
     Id<Flag> flagId = generateId(flag);
     flag.setId(new IdDt(Observation.class.getSimpleName(), flagId.toString()));
 
-    Id<UnitedStatesPatient> patientId = Ids.toPrimaryKey(flag.getPatient().getReference());
+    Id<UnitedStatesPatient> patientId = Ids.toPrimaryKey(flag.getSubject().getReference());
     entityStore.save(toEntityId(patientId, flagId), flag);
   }
 

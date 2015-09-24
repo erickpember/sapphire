@@ -9,7 +9,7 @@ import com.datafascia.api.resources.fhir.EncounterResourceProvider;
 import com.datafascia.api.resources.fhir.FlagResourceProvider;
 import com.datafascia.api.resources.fhir.LocationResourceProvider;
 import com.datafascia.api.resources.fhir.MedicationAdministrationResourceProvider;
-import com.datafascia.api.resources.fhir.MedicationPrescriptionResourceProvider;
+import com.datafascia.api.resources.fhir.MedicationOrderResourceProvider;
 import com.datafascia.api.resources.fhir.MedicationResourceProvider;
 import com.datafascia.api.resources.fhir.ObservationResourceProvider;
 import com.datafascia.api.resources.fhir.PatientResourceProvider;
@@ -45,7 +45,7 @@ public class FhirServlet extends RestfulServer {
         new FlagResourceProvider(),
         new LocationResourceProvider(),
         new MedicationAdministrationResourceProvider(),
-        new MedicationPrescriptionResourceProvider(),
+        new MedicationOrderResourceProvider(),
         new MedicationResourceProvider(),
         new ObservationResourceProvider(),
         new ProcedureResourceProvider(),

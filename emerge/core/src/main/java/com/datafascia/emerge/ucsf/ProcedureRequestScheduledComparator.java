@@ -19,6 +19,6 @@ public class ProcedureRequestScheduledComparator implements Comparator<Procedure
 
   @Override
   public int compare(ProcedureRequest left, ProcedureRequest right) {
-    return toDate(left.getTiming()).compareTo(toDate(right.getTiming()));
+    return toDate(left.getScheduled()).compareTo(toDate(right.getScheduled()));
   }
 }

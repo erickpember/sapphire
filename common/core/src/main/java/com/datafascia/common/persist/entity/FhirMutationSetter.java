@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 import org.apache.accumulo.core.data.Value;
-import org.hl7.fhir.instance.model.IBaseResource;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 
 /**
  * Copies values from JSON object to Accumulo mutation.

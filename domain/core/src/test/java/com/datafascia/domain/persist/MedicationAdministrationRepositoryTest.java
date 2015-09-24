@@ -5,9 +5,9 @@ package com.datafascia.domain.persist;
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
-import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import ca.uhn.fhir.model.dstu2.composite.RatioDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
+import ca.uhn.fhir.model.dstu2.composite.SimpleQuantityDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration.Dosage;
@@ -91,7 +91,7 @@ public class MedicationAdministrationRepositoryTest extends RepositoryTestSuppor
     dosage.setRoute(new CodeableConceptDt("route", "route"));
     dosage.setMethod(new CodeableConceptDt("method", "method"));
 
-    dosage.setQuantity(new QuantityDt(9000));
+    dosage.setQuantity(new SimpleQuantityDt(9000));
     dosage.setRate(new RatioDt());
     administration.setDosage(dosage);
     administration.setPatient(new ResourceReferenceDt(patient));

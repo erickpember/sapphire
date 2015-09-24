@@ -80,7 +80,7 @@ public class ProcedureRequestRepositoryTest extends RepositoryTestSupport {
   private ProcedureRequest createProcedureRequest(String typeCode, String bodySiteCode, String id,
       Encounter encounter) {
     ProcedureRequest procedurerequest = new ProcedureRequest()
-        .setType(new CodeableConceptDt(CodingSystems.PROCEDURE_REQUEST_TYPE, typeCode))
+        .setCode(new CodeableConceptDt(CodingSystems.PROCEDURE_REQUEST, typeCode))
         .setSubject(encounter.getPatient())
         .setOrderer(encounter.getPatient())
         .setPerformer(encounter.getPatient())
@@ -89,8 +89,8 @@ public class ProcedureRequestRepositoryTest extends RepositoryTestSupport {
     procedurerequest.addIdentifier()
         .setSystem(IdentifierSystems.INSTITUTION_PROCEDURE_REQUEST)
         .setValue(id);
-    procedurerequest.addBodySite()
-        .setSite(new CodeableConceptDt(CodingSystems.BODY_SITE, bodySiteCode));
+    procedurerequest.addBodySite(
+        new CodeableConceptDt(CodingSystems.BODY_SITE, bodySiteCode));
     return procedurerequest;
   }
 
@@ -112,7 +112,7 @@ public class ProcedureRequestRepositoryTest extends RepositoryTestSupport {
     List<ProcedureRequest> procedurerequests = procedurerequestRepository.list(encounterId);
     assertEquals(procedurerequests.size(), 2);
     for (ProcedureRequest procedurerequest : procedurerequests) {
-      String typeCode = procedurerequest.getType().getCodingFirstRep().getCode();
+      String typeCode = procedurerequest.getCode().getCodingFirstRep().getCode();
       switch (typeCode) {
         case TYPE_CODE1:
           assertEquals(procedurerequest.getId().getIdPart(), procedurerequest1.getId().getIdPart());

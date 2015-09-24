@@ -342,12 +342,11 @@ public class ProcedureBuilder {
 
     Procedure procedure = new Procedure()
         .setStatus(removed ? ProcedureStatusEnum.COMPLETED : ProcedureStatusEnum.IN_PROGRESS)
-        .setType(new CodeableConceptDt(
-            CodingSystems.PROCEDURE_TYPE, computeLineProcedureType(tunneledStatus, lineName)))
+        .setCode(new CodeableConceptDt(
+            CodingSystems.PROCEDURE, computeLineProcedureType(tunneledStatus, lineName)))
         .setEncounter(new ResourceReferenceDt(encounter));
-    procedure.addBodySite()
-        .setSite(new CodeableConceptDt(
-            CodingSystems.BODY_SITE, computeLineProcedureBodySite(location, orientation)));
+    procedure.addBodySite(new CodeableConceptDt(
+        CodingSystems.BODY_SITE, computeLineProcedureBodySite(location, orientation)));
     if (placementDateTime.isPresent()) {
       procedure.setPerformed(placementDateTime.get());
     }

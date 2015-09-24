@@ -7,19 +7,14 @@ import ca.uhn.fhir.model.primitive.DateTimeDt;
 import ca.uhn.fhir.model.primitive.IdDt;
 import java.util.ArrayList;
 import java.util.Arrays;
-import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
 
 /**
- * Test for ProcedureRequestUtils
+ * {@link ProcedureRequestUtils} test
  */
-@Slf4j
 public class ProcedureRequestUtilsTest {
-
-  public ProcedureRequestUtilsTest() {
-  }
 
   /**
    * Test of findFreshestProcedureRequest method, of class ProcedureRequestUtils.
@@ -36,7 +31,7 @@ public class ProcedureRequestUtilsTest {
   private ProcedureRequest createProcedureRequest(DateTimeDt date, String id) {
     ProcedureRequest request = new ProcedureRequest();
     request.setId(new IdDt(id));
-    request.setTiming(date);
+    request.setScheduled(date);
     return request;
   }
 }

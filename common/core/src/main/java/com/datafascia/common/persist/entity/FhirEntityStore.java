@@ -4,7 +4,7 @@ package com.datafascia.common.persist.entity;
 
 import java.util.Optional;
 import java.util.stream.Stream;
-import org.hl7.fhir.instance.model.IBaseResource;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 
 /**
  * Persists FHIR resources as entities.

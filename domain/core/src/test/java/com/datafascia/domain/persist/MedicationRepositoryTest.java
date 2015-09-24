@@ -7,7 +7,6 @@ import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Medication;
 import ca.uhn.fhir.model.dstu2.resource.Medication.Package;
 import ca.uhn.fhir.model.dstu2.resource.Medication.Product;
-import ca.uhn.fhir.model.dstu2.valueset.MedicationKindEnum;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.fhir.Ids;
 import java.util.List;
@@ -27,11 +26,9 @@ public class MedicationRepositoryTest extends RepositoryTestSupport {
 
   private Medication createMedication(String code) {
     Medication medication = new Medication();
-    medication.setName("name");
-    medication.setCode(new CodeableConceptDt(code, code));
+    medication.setCode(new CodeableConceptDt(code, code).setText("name"));
     medication.setIsBrand(Boolean.TRUE);
     medication.setManufacturer(new ResourceReferenceDt("manufacturerId"));
-    medication.setKind(MedicationKindEnum.PRODUCT);
 
     Product product = new Product();
     product.setForm(new CodeableConceptDt("formCode", "formCode"));

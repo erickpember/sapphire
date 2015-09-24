@@ -12,12 +12,12 @@ public class CodingSystems {
       "http://datafascia.com/coding/Observation";
 
   /** dataFascia invented this coding system for procedure type */
-  public static final String PROCEDURE_TYPE =
-      "http://datafascia.com/coding/ProcedureType";
+  public static final String PROCEDURE =
+      "http://datafascia.com/coding/Procedure";
 
-  /** dataFascia invented this coding system for procedure request type */
-  public static final String PROCEDURE_REQUEST_TYPE =
-      "http://datafascia.com/coding/ProcedureRequestType";
+  /** dataFascia invented this coding system for procedure request */
+  public static final String PROCEDURE_REQUEST =
+      "http://datafascia.com/coding/ProcedureRequest";
 
   /** dataFascia invented this coding system for body site */
   public static final String BODY_SITE =

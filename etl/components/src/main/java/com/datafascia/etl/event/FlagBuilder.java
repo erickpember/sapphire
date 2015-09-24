@@ -44,7 +44,7 @@ public class FlagBuilder {
         .setStatus(FlagStatusEnum.ACTIVE)
         .setPeriod(period)
         .setCode(new CodeableConceptDt(code.getSystem(), code.getCode()))
-        .setPatient(new ResourceReferenceDt(patient));
+        .setSubject(new ResourceReferenceDt(patient));
 
     flags.add(flag);
   }

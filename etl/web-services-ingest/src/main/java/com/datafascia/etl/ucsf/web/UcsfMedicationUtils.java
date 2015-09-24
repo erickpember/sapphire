@@ -3,14 +3,14 @@
 package com.datafascia.etl.ucsf.web;
 
 import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
-import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import ca.uhn.fhir.model.dstu2.composite.RangeDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
+import ca.uhn.fhir.model.dstu2.composite.SimpleQuantityDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Medication;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
-import ca.uhn.fhir.model.dstu2.resource.MedicationPrescription;
-import ca.uhn.fhir.model.dstu2.valueset.MedicationPrescriptionStatusEnum;
+import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
+import ca.uhn.fhir.model.dstu2.valueset.MedicationOrderStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import com.datafascia.api.client.ClientBuilder;
@@ -79,8 +79,8 @@ public class UcsfMedicationUtils {
     }
 
     ResourceReferenceDt prescriptionRef = new ResourceReferenceDt();
-    prescriptionRef.setResource(clientBuilder.getMedicationPrescriptionClient()
-        .getMedicationPrescription(orderId, encounterId));
+    prescriptionRef.setResource(clientBuilder.getMedicationOrderClient()
+        .read(orderId, encounterId));
     admin.setPrescription(prescriptionRef);
 
     if (encounterId != null) {
@@ -126,8 +126,8 @@ public class UcsfMedicationUtils {
     if (!dose.isEmpty()) {
       try {
         MedicationAdministration.Dosage dosage = new MedicationAdministration.Dosage();
-        QuantityDt quantity = new QuantityDt();
-        quantity.setUnits(doseUnit);
+        SimpleQuantityDt quantity = new SimpleQuantityDt();
+        quantity.setUnit(doseUnit);
         quantity.setValue(new BigDecimal(dose));
         dosage.setQuantity(quantity);
         admin.setDosage(dosage);
@@ -149,26 +149,26 @@ public class UcsfMedicationUtils {
    * @param orderStatus The original status from the web service.
    * @return A FHIR prescription status.
    */
-  public static MedicationPrescriptionStatusEnum webOrderStatusToFhir(String orderStatus) {
+  public static MedicationOrderStatusEnum webOrderStatusToFhir(String orderStatus) {
     UcsfOrderStatusEnum orderStatusEnum
         = UcsfOrderStatusEnum.values()[Integer.parseInt(orderStatus)];
     switch (orderStatusEnum) {
       case PENDING:
-        return MedicationPrescriptionStatusEnum.ACTIVE;
+        return MedicationOrderStatusEnum.ACTIVE;
       case SUSPEND:
-        return MedicationPrescriptionStatusEnum.ON_HOLD;
+        return MedicationOrderStatusEnum.ON_HOLD;
       case DISPENSED:
-        return MedicationPrescriptionStatusEnum.ACTIVE;
+        return MedicationOrderStatusEnum.ACTIVE;
       case PENDINGVERIFY:
-        return MedicationPrescriptionStatusEnum.DRAFT;
+        return MedicationOrderStatusEnum.DRAFT;
       case VERIFIED:
-        return MedicationPrescriptionStatusEnum.ACTIVE;
+        return MedicationOrderStatusEnum.ACTIVE;
       case SENT:
-        return MedicationPrescriptionStatusEnum.DRAFT;
+        return MedicationOrderStatusEnum.DRAFT;
       case COMPLETED:
-        return MedicationPrescriptionStatusEnum.COMPLETED;
+        return MedicationOrderStatusEnum.COMPLETED;
       case DISCONTINUED:
-        return MedicationPrescriptionStatusEnum.STOPPED;
+        return MedicationOrderStatusEnum.STOPPED;
       default:
         return null;
     }
@@ -210,7 +210,7 @@ public class UcsfMedicationUtils {
   }
 
   /**
-   * Populate a MedicationPrescription.
+   * Populate a MedicationOrder.
    *
    * @param orderJson The base JSON.
    * @param medication The medication.
@@ -218,15 +218,20 @@ public class UcsfMedicationUtils {
    * @param orderId The id of the order.
    * @param medsSet The medsset codes and names.
    * @param clientBuilder The resource client builder.
-   * @return The populated prescription.
+   * @return The populated medication order.
    * @throws java.sql.SQLException When there is a problem communicating with SQL.
    */
-  public static MedicationPrescription populatePrescription(JSONObject orderJson,
-      Medication medication, String encounterId, String orderId, List<MedsSet> medsSet,
+  public static MedicationOrder populateMedicationOrder(
+      JSONObject orderJson,
+      Medication medication,
+      String encounterId,
+      String orderId,
+      List<MedsSet> medsSet,
       ClientBuilder clientBuilder) throws SQLException {
-    MedicationPrescription prescription = new MedicationPrescription();
-    prescription.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_MEDICATION_PRESCRIPTION)
+
+    MedicationOrder medicationOrder = new MedicationOrder();
+    medicationOrder.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_MEDICATION_ORDER)
         .setValue(orderId);
 
     // Fetch fields from the JSON.
@@ -248,7 +253,7 @@ public class UcsfMedicationUtils {
       if (!encounter.isEmpty()) {
         ResourceReferenceDt encounterRef = new ResourceReferenceDt();
         encounterRef.setResource(encounter);
-        prescription.setEncounter(encounterRef);
+        medicationOrder.setEncounter(encounterRef);
       } else {
         log.warn("Could not find encounter with CSN " + encounterId + ". HAPI FHIR doesn't allow "
             + "dangling references, so the linkage between the encounter and order " + orderId
@@ -259,28 +264,28 @@ public class UcsfMedicationUtils {
     if (medication != null) {
       ResourceReferenceDt medicationRef = new ResourceReferenceDt();
       medicationRef.setReference(medication.getId());
-      prescription.setMedication(medicationRef);
+      medicationOrder.setMedication(medicationRef);
     }
-    prescription.setDateWritten(orderedDateDt);
-    prescription.setStatus(UcsfMedicationUtils.webOrderStatusToFhir(orderStatus));
+    medicationOrder.setDateWritten(orderedDateDt);
+    medicationOrder.setStatus(UcsfMedicationUtils.webOrderStatusToFhir(orderStatus));
 
-    MedicationPrescription.DosageInstruction dosage = prescription.addDosageInstruction();
+    MedicationOrder.DosageInstruction dosage = medicationOrder.addDosageInstruction();
 
     // If the dose contains a dash, then it's a range.
     if (orderedDose.contains("-")) {
       String[] ratioParts = orderedDose.split("-");
       RangeDt range = new RangeDt();
-      range.setLow(new QuantityDt(Long.parseLong(ratioParts[0])));
-      range.setHigh(new QuantityDt(Long.parseLong(ratioParts[1])));
+      range.setLow(new SimpleQuantityDt(Long.parseLong(ratioParts[0])));
+      range.setHigh(new SimpleQuantityDt(Long.parseLong(ratioParts[1])));
       dosage.setDose(range);
       if (orderedDoseUnitParts.length > 1) {
-        range.getLow().setUnits(orderedDoseUnitParts[1]);
-        range.getHigh().setUnits(orderedDoseUnitParts[1]);
+        range.getLow().setUnit(orderedDoseUnitParts[1]);
+        range.getHigh().setUnit(orderedDoseUnitParts[1]);
       }
     } else if (!orderedDose.isEmpty()) {
-      QuantityDt quantityDt = new QuantityDt();
+      SimpleQuantityDt quantityDt = new SimpleQuantityDt();
       if (orderedDoseUnitParts.length > 1) {
-        quantityDt.setUnits(orderedDoseUnitParts[1]);
+        quantityDt.setUnit(orderedDoseUnitParts[1]);
       }
       try {
         quantityDt.setValue(new BigDecimal(orderedDose));
@@ -292,12 +297,12 @@ public class UcsfMedicationUtils {
     }
 
     for (MedsSet medsSetInst : medsSet) {
-      IdentifierDt groupIdent = prescription.addIdentifier();
+      IdentifierDt groupIdent = medicationOrder.addIdentifier();
       groupIdent.setSystem(CodingSystems.UCSF_MEDICATION_GROUP_NAME);
       groupIdent.setValue(medsSetInst.getName());
     }
 
-    return prescription;
+    return medicationOrder;
   }
 
   /**

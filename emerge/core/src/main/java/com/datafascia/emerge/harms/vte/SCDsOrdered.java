@@ -17,18 +17,18 @@ import java.util.Optional;
  * VTE SCDs Ordered Implementation
  */
 public class SCDsOrdered {
+
   private static Optional<DateTimeDt> getStartTime(ProcedureRequest request) {
     if (request != null) {
-      IDatatype timing = request.getTiming();
-      if (timing instanceof DateTimeDt) {
-        return Optional.of((DateTimeDt) timing);
-      } else if  (timing instanceof PeriodDt) {
-        return Optional.of(((PeriodDt) timing).getStartElement());
+      IDatatype scheduled = request.getScheduled();
+      if (scheduled instanceof DateTimeDt) {
+        return Optional.of((DateTimeDt) scheduled);
+      } else if (scheduled instanceof PeriodDt) {
+        return Optional.of(((PeriodDt) scheduled).getStartElement());
       }
     }
     return Optional.empty();
   }
-
 
   /**
    * SCDs Ordered Implementation

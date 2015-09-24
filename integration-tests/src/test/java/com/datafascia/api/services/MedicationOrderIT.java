@@ -8,7 +8,7 @@ import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
-import ca.uhn.fhir.model.dstu2.resource.MedicationPrescription;
+import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
@@ -25,22 +25,21 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
-import static com.datafascia.api.services.ApiIT.client;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 /**
- * Integration tests for MedicationPrescription resources.
+ * Integration tests for MedicationOrder resources.
  */
 @Slf4j
-public class MedicationPrescriptionIT extends ApiIT {
+public class MedicationOrderIT extends ApiIT {
   /**
    * Validates MedicationPrescription retrieval.
    *
    */
   @Test
-  public void should_list_medicationPrescriptions() {
+  public void should_list_medication_orders() {
     UnitedStatesPatient patient = createPatient();
     MethodOutcome outcome = client.create().resource(patient)
         .encodedJson().execute();
@@ -52,65 +51,60 @@ public class MedicationPrescriptionIT extends ApiIT {
         .encodedJson().execute();
     encounter.setId(outcome.getId());
 
-    MedicationPrescription medicationPrescription1
-        = createMedicationPrescription("1", patient, encounter);
-    medicationPrescription1.setEncounter(new ResourceReferenceDt(encounter));
-    outcome = client.create().resource(medicationPrescription1)
+    MedicationOrder medicationOrder1
+        = createMedicationOrder("1", patient, encounter);
+    medicationOrder1.setEncounter(new ResourceReferenceDt(encounter));
+    outcome = client.create().resource(medicationOrder1)
         .encodedJson().execute();
-    medicationPrescription1.setId(outcome.getId());
+    medicationOrder1.setId(outcome.getId());
 
-    MedicationPrescription medicationPrescription2
-        = createMedicationPrescription("2", patient, encounter);
-    medicationPrescription1.setEncounter(new ResourceReferenceDt(encounter));
-    outcome = client.create().resource(medicationPrescription2)
+    MedicationOrder medicationOrder2
+        = createMedicationOrder("2", patient, encounter);
+    medicationOrder1.setEncounter(new ResourceReferenceDt(encounter));
+    outcome = client.create().resource(medicationOrder2)
         .encodedJson().execute();
-    medicationPrescription2.setId(outcome.getId());
+    medicationOrder2.setId(outcome.getId());
 
-    Bundle results = client.search().forResource(MedicationPrescription.class)
+    Bundle results = client.search().forResource(MedicationOrder.class)
         .where(new StringClientParam("encounter")
             .matches()
             .value(encounter.getId().getIdPart()))
         .execute();
 
-    List<IResource> medicationPrescriptions = ApiUtil.extractBundle(results,
-        MedicationPrescription.class);
-    assertEquals(medicationPrescriptions.size(), 2);
-    for (IResource resource : medicationPrescriptions) {
-      MedicationPrescription medicationPrescription = (MedicationPrescription) resource;
-      switch (medicationPrescription.getIdentifierFirstRep().getValue()) {
+    List<IResource> medicationOrders = ApiUtil.extractBundle(results, MedicationOrder.class);
+    assertEquals(medicationOrders.size(), 2);
+    for (IResource resource : medicationOrders) {
+      MedicationOrder medicationOrder = (MedicationOrder) resource;
+      switch (medicationOrder.getIdentifierFirstRep().getValue()) {
         case "1":
-          assertEquals(medicationPrescription.getId().getIdPart(), medicationPrescription1.
-              getId().getIdPart());
+          assertEquals(medicationOrder.getId().getIdPart(), medicationOrder1.getId().getIdPart());
           break;
         case "2":
-          assertEquals(medicationPrescription.getId().getIdPart(), medicationPrescription2.
-              getId().getIdPart());
+          assertEquals(medicationOrder.getId().getIdPart(), medicationOrder2.getId().getIdPart());
           break;
         default:
-          fail("unexpected medicationPrescription identifier:" + medicationPrescription.
-              getIdentifierFirstRep().getValue());
+          fail("unexpected medicationPrescription identifier:" +
+              medicationOrder.getIdentifierFirstRep().getValue());
       }
     }
 
-    results = client.search().forResource(MedicationPrescription.class)
-        .where(new StringClientParam(MedicationPrescription.SP_ENCOUNTER)
+    results = client.search().forResource(MedicationOrder.class)
+        .where(new StringClientParam(MedicationOrder.SP_ENCOUNTER)
             .matches()
             .value(encounter.getId().getIdPart()))
-        .where(new StringClientParam(MedicationPrescription.SP_RES_ID)
+        .where(new StringClientParam(MedicationOrder.SP_RES_ID)
             .matches()
-            .value(medicationPrescription1.getId().getIdPart()))
+            .value(medicationOrder1.getId().getIdPart()))
         .execute();
-    medicationPrescriptions = ApiUtil.extractBundle(results,
-        MedicationPrescription.class);
-    assertEquals(medicationPrescriptions.size(), 1, "Two argument read/search failed.");
-    assertEquals(medicationPrescriptions.get(0).getId().getIdPart(),
-        medicationPrescription1.getId().getIdPart(), "Two argument read/search failed.");
+    medicationOrders = ApiUtil.extractBundle(results, MedicationOrder.class);
+    assertEquals(medicationOrders.size(), 1, "Two argument read/search failed.");
+    assertEquals(medicationOrders.get(0).getId().getIdPart(),
+        medicationOrder1.getId().getIdPart(), "Two argument read/search failed.");
 
-    results = client.search().forResource(MedicationPrescription.class)
+    results = client.search().forResource(MedicationOrder.class)
         .execute();
-    medicationPrescriptions = ApiUtil.extractBundle(results,
-        MedicationPrescription.class);
-    assertTrue(medicationPrescriptions.size() > 0, "No-argument search failed.");
+    medicationOrders = ApiUtil.extractBundle(results, MedicationOrder.class);
+    assertTrue(medicationOrders.size() > 0, "No-argument search failed.");
 
     // Get rid of this particular encounter and patient so it doesn't mess up other tests.
     client.delete().resourceById(encounter.getId()).execute();
@@ -151,12 +145,12 @@ public class MedicationPrescriptionIT extends ApiIT {
     return encounter;
   }
 
-  private MedicationPrescription createMedicationPrescription(String identifier,
-      UnitedStatesPatient patient, Encounter encounter) {
+  private MedicationOrder createMedicationOrder(
+      String identifier, UnitedStatesPatient patient, Encounter encounter) {
 
-    MedicationPrescription prescription = new MedicationPrescription();
+    MedicationOrder prescription = new MedicationOrder();
     prescription.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_MEDICATION_PRESCRIPTION)
+        .setSystem(IdentifierSystems.INSTITUTION_MEDICATION_ORDER)
         .setValue(identifier);
     prescription.setMedication(new ResourceReferenceDt("medicationID"));
     prescription.setPatient(new ResourceReferenceDt(patient));

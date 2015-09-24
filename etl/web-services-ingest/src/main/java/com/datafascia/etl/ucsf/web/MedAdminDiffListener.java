@@ -3,7 +3,7 @@
 package com.datafascia.etl.ucsf.web;
 
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
-import ca.uhn.fhir.model.dstu2.resource.MedicationPrescription;
+import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 
 /**
  * A callback for diffs found in medications.
@@ -12,7 +12,7 @@ public interface MedAdminDiffListener {
   /**
    * The type of diff found.
    */
-  public enum ElementType {
+  enum ElementType {
     ORDER, ADMIN
   }
 
@@ -32,7 +32,7 @@ public interface MedAdminDiffListener {
    *
    * @param order The data itself.
    */
-  public void newOrder(MedicationPrescription order);
+  public void newOrder(MedicationOrder order);
 
   /**
    * New admin found.

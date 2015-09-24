@@ -23,7 +23,6 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
-import static com.datafascia.api.services.ApiIT.client;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
@@ -52,13 +51,13 @@ public class FlagIT extends ApiIT {
     patient2.setId(outcome.getId());
 
     Flag flag1 = createFlag(ADVANCE_DIRECTIVE);
-    flag1.setPatient(new ResourceReferenceDt(patient));
+    flag1.setSubject(new ResourceReferenceDt(patient));
     outcome = client.create().resource(flag1)
         .encodedJson().execute();
     flag1.setId(outcome.getId());
 
     Flag flag2 = createFlag(PHYSICIAN_ORDERS_FOR_LIFE_SUSTAINING_TREATMENT);
-    flag2.setPatient(new ResourceReferenceDt(patient2));
+    flag2.setSubject(new ResourceReferenceDt(patient2));
     outcome = client.create().resource(flag2)
         .encodedJson().execute();
     flag2.setId(outcome.getId());

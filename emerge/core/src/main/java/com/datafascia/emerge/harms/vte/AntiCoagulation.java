@@ -5,8 +5,8 @@ package com.datafascia.emerge.harms.vte;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Medication;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
-import ca.uhn.fhir.model.dstu2.resource.MedicationPrescription;
-import ca.uhn.fhir.model.dstu2.valueset.MedicationPrescriptionStatusEnum;
+import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
+import ca.uhn.fhir.model.dstu2.valueset.MedicationOrderStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.harms.HarmsLookups;
@@ -26,16 +26,17 @@ public class AntiCoagulation {
    */
   public static AnticoagulationTypeEnum getAnticoagulationTypeForEncounter(ClientBuilder client,
       String encounterId) {
-    List<MedicationPrescription> prescriptions = client.getMedicationPrescriptionClient()
-        .getMedicationPrescriptions(encounterId);
+    List<MedicationOrder> medicationOrders = client.getMedicationOrderClient()
+        .list(encounterId);
 
     // First check active prescriptions for the anticoagulants.
-    for (MedicationPrescription prescription : prescriptions) {
-      if (prescription.getStatus().toUpperCase()
-          .equals(MedicationPrescriptionStatusEnum.ACTIVE.toString())) {
+    for (MedicationOrder medicationOrder : medicationOrders) {
+      if (medicationOrder.getStatusElement().getValueAsEnum() == MedicationOrderStatusEnum.ACTIVE) {
+        ResourceReferenceDt medicationReference =
+            (ResourceReferenceDt) medicationOrder.getMedication();
         Medication medication = client.getMedicationClient()
-            .getMedication(prescription.getMedication().getReference().getValue());
-        String medName = medication.getName();
+            .getMedication(medicationReference.getReference().getIdPart());
+        String medName = medication.getCode().getText();
 
         for (AnticoagulationTypeEnum at : AnticoagulationTypeEnum.values()) {
           if (at.toString().toUpperCase().equals(medName.replace(" ", "_"))) {
@@ -52,12 +53,14 @@ public class AntiCoagulation {
     for (MedicationAdministration administration : administrations) {
       ResourceReferenceDt prescriptionReference = administration.getPrescription();
 
-      MedicationPrescription prescription = client.getMedicationPrescriptionClient()
-          .getMedicationPrescription(prescriptionReference.getElementSpecificId(), encounterId);
+      MedicationOrder medicationOrder = client.getMedicationOrderClient()
+          .read(prescriptionReference.getReference().getIdPart(), encounterId);
+      ResourceReferenceDt medicationReference =
+          (ResourceReferenceDt) medicationOrder.getMedication();
 
       Medication medication = client.getMedicationClient()
-          .getMedication(prescription.getMedication().getReference().getValue());
-      String medName = medication.getName();
+          .getMedication(medicationReference.getReference().getIdPart());
+      String medName = medication.getCode().getText();
 
       for (AnticoagulationTypeEnum at : AnticoagulationTypeEnum.values()) {
         DateTimeDt timeTaken = (DateTimeDt) administration.getEffectiveTime();

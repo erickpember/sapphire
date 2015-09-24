@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.Map;
 import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Value;
-import org.hl7.fhir.instance.model.IBaseResource;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 
 /**
  * Copies values from Accumulo row to Java object.

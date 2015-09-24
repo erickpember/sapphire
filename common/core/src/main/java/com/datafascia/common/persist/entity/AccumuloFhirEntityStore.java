@@ -16,7 +16,7 @@ import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.data.Range;
 import org.apache.avro.Schema;
 import org.apache.hadoop.io.Text;
-import org.hl7.fhir.instance.model.IBaseResource;
+import org.hl7.fhir.instance.model.api.IBaseResource;
 
 /**
  * Copies values between Java object fields and Accumulo entries.

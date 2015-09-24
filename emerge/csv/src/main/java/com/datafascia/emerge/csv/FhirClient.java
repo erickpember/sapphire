@@ -12,7 +12,7 @@ import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Location;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
-import ca.uhn.fhir.model.dstu2.resource.MedicationPrescription;
+import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
@@ -150,25 +150,24 @@ public class FhirClient {
   }
 
   /**
-   * Get the list of medication prescriptions for a given encounter
+   * Gets medication orders for a given encounter.
    *
    * @param encounter
    *     the patient encounter
    * @return prescriptions
-   *     the list of medication prescriptions for this encounter
+   *     the medication orders for this encounter
    */
-  public List<MedicationPrescription> getPrescriptions(Encounter encounter) {
-    Bundle bundle = client.search().forResource(MedicationPrescription.class)
+  public List<MedicationOrder> getMedicationOrders(Encounter encounter) {
+    Bundle bundle = client.search().forResource(MedicationOrder.class)
         .where(new StringClientParam("encounter").matches()
             .value(encounter.getId().getIdPart()))
         .execute();
 
     // Add all MedicationPrescription resources to the list
-    List<MedicationPrescription> prescriptions =
-        bundle.getResources(MedicationPrescription.class);
+    List<MedicationOrder> prescriptions = bundle.getResources(MedicationOrder.class);
     while (bundle.getLinkNext().isEmpty() == false) {
       bundle = client.loadPage().next(bundle).execute();
-      prescriptions.addAll(bundle.getResources(MedicationPrescription.class));
+      prescriptions.addAll(bundle.getResources(MedicationOrder.class));
     }
 
     return prescriptions;
@@ -392,32 +391,32 @@ public class FhirClient {
    *     the time of the observation
    */
   public Optional<DateTimeDt> getObservationTime(Observation observation) {
-    IDatatype applies = observation.getApplies();
-    if (applies instanceof DateTimeDt) {
-      log.info("observation time (DateTimeDt): {}", ((DateTimeDt) applies).getValue());
-      return Optional.of(((DateTimeDt) applies));
-    } else if (applies instanceof PeriodDt) {
+    IDatatype effective = observation.getEffective();
+    if (effective instanceof DateTimeDt) {
+      log.info("observation time (DateTimeDt): {}", ((DateTimeDt) effective).getValue());
+      return Optional.of(((DateTimeDt) effective));
+    } else if (effective instanceof PeriodDt) {
       // If the Observation contains a Period, only use the start time.
       log.info("observation time (PeriodDt): {}",
-          ((PeriodDt) applies).getStartElement().getValue());
-      return Optional.of(((PeriodDt) applies).getStartElement());
+          ((PeriodDt) effective).getStartElement().getValue());
+      return Optional.of(((PeriodDt) effective).getStartElement());
     }
 
     return Optional.empty();
   }
 
   /**
-   * Get the observation units of measure
+   * Gets the observation unit of measure
    *
    * @param observation
    *     the observation to search
    * @return value
-   *     the units of measure for the observation
+   *     the unit of measure for the observation
    */
   public String getObservationUnits(Observation observation) {
     QuantityDt quantity = (QuantityDt) observation.getValue();
-    log.info("observation units: {}", quantity.getUnits());
-    return quantity.getUnits();
+    log.info("observation unit: {}", quantity.getUnit());
+    return quantity.getUnit();
   }
 
   /**
@@ -446,15 +445,15 @@ public class FhirClient {
   }
 
   /**
-   * Get the medication name from the MedicationPrescription resource
+   * Get the medication name from the MedicationOrder resource
    *
-   * @param prescription
-   *     the MedicationPrescription resource to search
+   * @param order
+   *     the MedicationOrder resource to search
    * @return name
    *     the name of the medication
    */
-  public Optional<String> getMedicationName(MedicationPrescription prescription) {
-    String name = prescription.getIdentifierFirstRep().getValue();
+  public Optional<String> getMedicationName(MedicationOrder order) {
+    String name = order.getIdentifierFirstRep().getValue();
     if (!name.equals("")) {
       log.info("medication name: {}", name);
       return Optional.of(name);
@@ -465,15 +464,15 @@ public class FhirClient {
   }
 
   /**
-   * Get the medication status from the MedicationPrescription resource
+   * Get the medication status from the MedicationOrder resource
    *
-   * @param prescription
-   *     the MedicationPrescription resource to search
+   * @param order
+   *     the MedicationOrder resource to search
    * @return status
    *     the status of the prescription
    */
-  public Optional<String> getPrescriptionStatus(MedicationPrescription prescription) {
-    String status = prescription.getStatus();
+  public Optional<String> getMedicationOrderStatus(MedicationOrder order) {
+    String status = order.getStatus();
     if (!status.equals("")) {
       log.info("prescription status: {}", status);
       return Optional.of(status);

@@ -6,7 +6,7 @@ import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
-import ca.uhn.fhir.model.dstu2.resource.MedicationPrescription;
+import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
 import ca.uhn.fhir.model.primitive.DateDt;
@@ -27,9 +27,9 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 /**
- * {@link MedicationPrescriptionRepository} test
+ * {@link MedicationOrderRepository} test
  */
-public class MedicationPrescriptionRepositoryTest extends RepositoryTestSupport {
+public class MedicationOrderRepositoryTest extends RepositoryTestSupport {
 
   @Inject
   private PatientRepository patientRepository;
@@ -38,7 +38,7 @@ public class MedicationPrescriptionRepositoryTest extends RepositoryTestSupport 
   private EncounterRepository encounterRepository;
 
   @Inject
-  private MedicationPrescriptionRepository medicationPrescriptionRepository;
+  private MedicationOrderRepository medicationOrderRepository;
 
   private UnitedStatesPatient createPatient() {
     UnitedStatesPatient patient = new UnitedStatesPatient();
@@ -72,12 +72,12 @@ public class MedicationPrescriptionRepositoryTest extends RepositoryTestSupport 
     return encounter;
   }
 
-  private MedicationPrescription createMedicationPrescription(
+  private MedicationOrder createMedicationOrder(
       UnitedStatesPatient patient, Encounter encounter) {
 
-    MedicationPrescription prescription = new MedicationPrescription();
+    MedicationOrder prescription = new MedicationOrder();
     prescription.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_MEDICATION_PRESCRIPTION)
+        .setSystem(IdentifierSystems.INSTITUTION_MEDICATION_ORDER)
         .setValue("medicationPrescriptionId");
     prescription.setMedication(new ResourceReferenceDt("medicationID"));
     prescription.setPatient(new ResourceReferenceDt(patient));
@@ -86,25 +86,23 @@ public class MedicationPrescriptionRepositoryTest extends RepositoryTestSupport 
   }
 
   @Test
-  public void should_list_and_read_medication_prescriptions() {
+  public void should_list_and_read_medication_orders() {
     UnitedStatesPatient patient = createPatient();
     patientRepository.save(patient);
 
     Encounter encounter = createEncounter(patient);
     encounterRepository.save(encounter);
 
-    MedicationPrescription prescription = createMedicationPrescription(patient, encounter);
-    medicationPrescriptionRepository.save(prescription);
+    MedicationOrder prescription = createMedicationOrder(patient, encounter);
+    medicationOrderRepository.save(prescription);
 
     Id<Encounter> encounterId = Ids.toPrimaryKey(encounter.getId());
-    List<MedicationPrescription> prescriptions = medicationPrescriptionRepository.list(
-        encounterId);
-    assertEquals(prescriptions.get(0).getId().getIdPart(), prescription.getId().getIdPart());
+    List<MedicationOrder> medicationOrders = medicationOrderRepository.list(encounterId);
+    assertEquals(medicationOrders.get(0).getId().getIdPart(), prescription.getId().getIdPart());
 
-    Id<MedicationPrescription> adminId = MedicationPrescriptionRepository.generateId(
-        prescription);
-    Optional<MedicationPrescription> resultPrescription = medicationPrescriptionRepository.
-        read(encounterId, adminId);
+    Id<MedicationOrder> orderId = MedicationOrderRepository.generateId(prescription);
+    Optional<MedicationOrder> resultPrescription = medicationOrderRepository.read(
+        encounterId, orderId);
     assertTrue(resultPrescription.isPresent(), "Read operation failed.");
     assertEquals(resultPrescription.get().getId().getIdPart(),
         prescription.getId().getIdPart(), "Read operation failed.");

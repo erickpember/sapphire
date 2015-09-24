@@ -55,8 +55,8 @@ public class ProcedureBuilderTest {
     addObservation(procedureBuilder, "304890093", "Access Location", "Arm");
     Procedure procedure = procedureBuilder.build().get();
 
-    assertEquals(procedure.getType().getCodingFirstRep().getCode(), "Tunneled CVC Single Lumen");
-    CodeableConceptDt bodySite = (CodeableConceptDt) procedure.getBodySiteFirstRep().getSite();
+    assertEquals(procedure.getCode().getCodingFirstRep().getCode(), "Tunneled CVC Single Lumen");
+    CodeableConceptDt bodySite = procedure.getBodySiteFirstRep();
     assertEquals(bodySite.getCodingFirstRep().getCode(), "Femoral (Left)");
     DateTimeDt performed = Dates.toDateTime(
         LocalDate.parse("2015-02-08"), LocalTime.parse("18:19:00"));

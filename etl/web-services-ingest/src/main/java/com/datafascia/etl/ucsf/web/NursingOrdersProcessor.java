@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.ucsf.web;
 
+import ca.uhn.fhir.model.dstu2.composite.AnnotationDt;
 import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
@@ -10,7 +11,6 @@ import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
-import ca.uhn.fhir.model.primitive.StringDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.common.nifi.DependencyInjectingProcessor;
 import com.datafascia.domain.fhir.CodingSystems;
@@ -150,21 +150,21 @@ public class NursingOrdersProcessor extends DependencyInjectingProcessor {
     String startDate = jsonNursing.get("StartDate").toString();
     String discontinuedDate = jsonNursing.get("DiscontinuedDate").toString();
 
-    ProcedureRequest procedure = new ProcedureRequest();
-    procedure.addIdentifier()
+    ProcedureRequest procedureRequest = new ProcedureRequest();
+    procedureRequest.addIdentifier()
         .setSystem(IdentifierSystems.INSTITUTION_PROCEDURE_REQUEST)
         .setValue(orderId);
 
     if (status.equalsIgnoreCase("2^SENT")) {
-      procedure.setStatus(ProcedureRequestStatusEnum.PROPOSED);
+      procedureRequest.setStatus(ProcedureRequestStatusEnum.PROPOSED);
     } else if (status.equalsIgnoreCase("6^HOLDING FOR REFERRAL")) {
-      procedure.setStatus(ProcedureRequestStatusEnum.PROPOSED);
+      procedureRequest.setStatus(ProcedureRequestStatusEnum.PROPOSED);
     } else if (status.equalsIgnoreCase("7^DENIED APPROVAL")) {
-      procedure.setStatus(ProcedureRequestStatusEnum.REJECTED);
+      procedureRequest.setStatus(ProcedureRequestStatusEnum.REJECTED);
     } else if (status.equalsIgnoreCase("4^CANCELED")) {
-      procedure.setStatus(ProcedureRequestStatusEnum.REJECTED);
+      procedureRequest.setStatus(ProcedureRequestStatusEnum.REJECTED);
     } else if (status.equalsIgnoreCase("5^COMPLETED")) {
-      procedure.setStatus(ProcedureRequestStatusEnum.COMPLETED);
+      procedureRequest.setStatus(ProcedureRequestStatusEnum.COMPLETED);
     }
 
     TimingDt timing = new TimingDt();
@@ -188,33 +188,31 @@ public class NursingOrdersProcessor extends DependencyInjectingProcessor {
     TimingDt.Repeat repeat = new TimingDt.Repeat();
     repeat.setBounds(period);
     timing.setRepeat(repeat);
-    procedure.setTiming(timing);
-    procedure.getTiming();
+    procedureRequest.setScheduled(timing);
 
-    CodeableConceptDt concept = new CodeableConceptDt(CodingSystems.PROCEDURE_REQUEST_TYPE,
-        procID);
-    concept.setText(orderDesc);
-    procedure.setType(concept);
+    procedureRequest.setCode(
+        new CodeableConceptDt(CodingSystems.PROCEDURE_REQUEST, procID)
+            .setText(orderDesc));
 
     Encounter encounter = clientBuilder.getEncounterClient().getEncounter(encounterId);
     if (encounter != null) {
-      procedure.setEncounter(new ResourceReferenceDt(encounter.getId()));
+      procedureRequest.setEncounter(new ResourceReferenceDt(encounter.getId()));
     } else {
       log.warn("Could not find encounter with CSN " + encounterId + ". HAPI FHIR doesn't allow "
           + "dangling references, so the linkage between the encounter and nursing order " + orderId
           + " is lost.");
     }
 
-    ArrayList<StringDt> notes = new ArrayList<>();
+    List<AnnotationDt> notes = new ArrayList<>();
     Object questions = jsonNursing.get("Questions");
     if (questions != null) {
       for (Object obj : ((JSONArray) questions)) {
         String answer = ((JSONObject) obj).get("Answer").toString();
-        notes.add(new StringDt(answer));
+        notes.add(new AnnotationDt().setText(answer));
       }
     }
-    procedure.setNotes(notes);
+    procedureRequest.setNotes(notes);
 
-    return procedure;
+    return procedureRequest;
   }
 }

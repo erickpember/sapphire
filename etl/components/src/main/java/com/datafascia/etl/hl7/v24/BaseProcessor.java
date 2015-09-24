@@ -92,8 +92,8 @@ public abstract class BaseProcessor implements MessageProcessor {
   private static ObservationStatusEnum toObservationStatus(String resultStatus) {
     if (resultStatus == null) {
       return null;
-
     }
+
     switch (resultStatus) {
       case "C":
         return ObservationStatusEnum.AMENDED;
@@ -111,7 +111,7 @@ public abstract class BaseProcessor implements MessageProcessor {
       case "W":
         return ObservationStatusEnum.ENTERED_IN_ERROR;
       default:
-        return ObservationStatusEnum.UNKNOWN;
+        return ObservationStatusEnum.UNKNOWN_STATUS;
     }
   }
 
@@ -144,7 +144,7 @@ public abstract class BaseProcessor implements MessageProcessor {
             toCodeableConcept(obx.getObservationIdentifier()))
         .setValue(
             observationValue)
-        .setApplies(
+        .setEffective(
             toDateTime(obx.getDateTimeOfTheObservation()))
         .setStatus(
             toObservationStatus(obx.getObservationResultStatus().getValue()))

@@ -3,10 +3,10 @@
 package com.datafascia.emerge.harms.vte;
 
 import ca.uhn.fhir.model.api.IDatatype;
+import ca.uhn.fhir.model.dstu2.composite.AnnotationDt;
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
-import ca.uhn.fhir.model.primitive.StringDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.harms.HarmsLookups;
 import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
@@ -37,13 +37,13 @@ public class ProphylaxisContraindicated {
         findFreshestProcedureRequest(inProgressPpxRequests);
 
     // if the request happens after now, throw it out
-    if (toDate(freshestInProgressPpxRequest.getTiming()).compareTo(new Date()) > 0) {
+    if (toDate(freshestInProgressPpxRequest.getScheduled()).compareTo(new Date()) > 0) {
       return NULL_RESULT;
     }
 
-    List<StringDt> notes = freshestInProgressPpxRequest.getNotes();
-    for (StringDt note : notes) {
-      switch (note.getValue()) {
+    List<AnnotationDt> notes = freshestInProgressPpxRequest.getNotes();
+    for (AnnotationDt note : notes) {
+      switch (note.getText()) {
         case "High risk or recurrent CNS procedure/drain":
           return "High risk or recurrent CNS procedure/drain";
         case "Allergy to heparin or HIT":

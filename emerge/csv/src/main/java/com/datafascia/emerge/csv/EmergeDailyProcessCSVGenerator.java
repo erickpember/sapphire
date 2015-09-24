@@ -3,11 +3,10 @@
 package com.datafascia.emerge.csv;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
-import ca.uhn.fhir.model.dstu2.resource.MedicationPrescription;
+import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.common.jackson.CSVMapper;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
-import com.datafascia.emerge.csv.CamIcuResult;
 import com.datafascia.emerge.models.DailyProcess;
 import com.google.common.base.Joiner;
 import java.io.FileWriter;
@@ -159,50 +158,50 @@ public class EmergeDailyProcessCSVGenerator {
   private static void addMedicationPrescriptionData(
       DailyProcess dailyProcess, Encounter encounter) {
     // Get all MedicationPrescription resources for this encounter
-    List<MedicationPrescription> prescriptions = client.getPrescriptions(encounter);
-    log.info("number of prescriptions: {}", prescriptions.size());
-    for (MedicationPrescription prescription: prescriptions) {
-      Optional<String> medicationName = client.getMedicationName(prescription);
+    List<MedicationOrder> medicationOrders = client.getMedicationOrders(encounter);
+    log.info("number of medication orders: {}", medicationOrders.size());
+    for (MedicationOrder medicationOrder : medicationOrders) {
+      Optional<String> medicationName = client.getMedicationName(medicationOrder);
       Optional<String> status;
       if (medicationName.isPresent()) {
         switch (medicationName.get()) {
           case "Continuous Infusion Lorazepam IV":
-            status = client.getPrescriptionStatus(prescription);
+            status = client.getMedicationOrderStatus(medicationOrder);
             if (status.isPresent() && status.get().equals("active")) {
               dailyProcess.setContinuousInfusionLorazepam("Yes");
             }
             break;
 
           case "Continuous Infusion Midazolam IV":
-            status = client.getPrescriptionStatus(prescription);
+            status = client.getMedicationOrderStatus(medicationOrder);
             if (status.isPresent() && status.get().equals("active")) {
               dailyProcess.setContinuousInfusionMidazolam("Yes");
             }
             break;
 
           case "Intermittent Chlordiazepoxide Enteral":
-            status = client.getPrescriptionStatus(prescription);
+            status = client.getMedicationOrderStatus(medicationOrder);
             if (status.isPresent() && status.get().equals("active")) {
               dailyProcess.setIntermittentChlordiazepoxide("Yes");
             }
             break;
 
           case "Intermittent Lorazepam IV":
-            status = client.getPrescriptionStatus(prescription);
+            status = client.getMedicationOrderStatus(medicationOrder);
             if (status.isPresent() && status.get().equals("active")) {
               dailyProcess.setIntermittentLorazepamIv("Yes");
             }
             break;
 
           case "Intermittent Lorazepam Enteral":
-            status = client.getPrescriptionStatus(prescription);
+            status = client.getMedicationOrderStatus(medicationOrder);
             if (status.isPresent() && status.get().equals("active")) {
               dailyProcess.setIntermittentLorazepamPo("Yes");
             }
             break;
 
           case "Intermittent Midazolam IV":
-            status = client.getPrescriptionStatus(prescription);
+            status = client.getMedicationOrderStatus(medicationOrder);
             if (status.isPresent() && status.get().equals("active")) {
               dailyProcess.setIntermittentMidazolamIv("Yes");
             }
@@ -214,5 +213,4 @@ public class EmergeDailyProcessCSVGenerator {
       }
     }
   }
-
 }

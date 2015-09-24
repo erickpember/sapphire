@@ -42,7 +42,7 @@ public class ProcedureUtils {
     procedureRequests.sort(new ProcedureRequestScheduledComparator().reversed());
 
     for (ProcedureRequest procedureRequest : procedureRequests) {
-      String code = procedureRequest.getType().getCodingFirstRep().getCode();
+      String code = procedureRequest.getCode().getCodingFirstRep().getCode();
       switch (code) {
         case "Hypothermia Blanket Order #1":
         case "Hypothermia Blanket Order #2":

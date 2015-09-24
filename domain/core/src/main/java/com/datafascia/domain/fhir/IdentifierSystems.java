@@ -27,9 +27,9 @@ public class IdentifierSystems {
   public static final String INSTITUTION_MEDICATION_ADMINISTRATION =
       "http://datafascia.com/identifier/InstitutionMedicationAdministration";
 
-  /** institution assigned medication prescription identifier */
-  public static final String INSTITUTION_MEDICATION_PRESCRIPTION =
-      "http://datafascia.com/identifier/InstitutionMedicationPrescription";
+  /** institution assigned medication order identifier */
+  public static final String INSTITUTION_MEDICATION_ORDER =
+      "http://datafascia.com/identifier/InstitutionMedicationOrder";
 
   /** institution assigned practitioner identifier */
   public static final String INSTITUTION_PRACTITIONER =

@@ -100,12 +100,13 @@ public class ProcedureRequestClient extends BaseClient<ProcedureRequest> {
    * Searches ProcedureRequests
    *
    * @param encounterId The ID of the encounter to which the procedure requests belong.
-   * @param type Type of procedure request, optional.
+   * @param code procedure request code, optional.
    * @param status Status of procedure request, optional.
    * @return A list ProcedureRequests.
    */
-  public List<ProcedureRequest> searchProcedureRequest(String encounterId, String type,
-      String status) {
+  public List<ProcedureRequest> searchProcedureRequest(
+      String encounterId, String code, String status) {
+
     Bundle results = client.search().forResource(ProcedureRequest.class)
         .where(new StringClientParam(ProcedureRequest.SP_ENCOUNTER)
             .matches()
@@ -114,10 +115,10 @@ public class ProcedureRequestClient extends BaseClient<ProcedureRequest> {
 
     List<ProcedureRequest> procedureRequests = extractBundle(results, ProcedureRequest.class);
 
-    if (!Strings.isNullOrEmpty(type)) {
+    if (!Strings.isNullOrEmpty(code)) {
       List<ProcedureRequest> filteredResults = new ArrayList<>();
       for (ProcedureRequest procedureRequest : procedureRequests) {
-        if (procedureRequest.getType().getCodingFirstRep().getCode().equalsIgnoreCase(type)) {
+        if (procedureRequest.getCode().getCodingFirstRep().getCode().equalsIgnoreCase(code)) {
           filteredResults.add(procedureRequest);
         }
       }

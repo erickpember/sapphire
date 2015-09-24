@@ -2,8 +2,8 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.harms.vte;
 
-import ca.uhn.fhir.model.dstu2.resource.MedicationPrescription;
-import ca.uhn.fhir.model.dstu2.valueset.MedicationPrescriptionStatusEnum;
+import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
+import ca.uhn.fhir.model.dstu2.valueset.MedicationOrderStatusEnum;
 import com.datafascia.api.client.ClientBuilder;
 import java.util.List;
 
@@ -24,13 +24,14 @@ public class PharmacologicVtePpx {
   public static String pharmacologicVtePpxType(ClientBuilder client, String encounterId) {
     String type = null;
 
-    List<MedicationPrescription> prescriptions = client.getMedicationPrescriptionClient()
-        .getMedicationPrescriptions(encounterId);
-    for (MedicationPrescription prescription : prescriptions) {
-      if (prescription.getStatus().equals(MedicationPrescriptionStatusEnum.ACTIVE.getCode())) {
-        if ((prescription.getIdentifier().get(0).getValue().equals("Intermittent Enoxaparin SC")) ||
-            (prescription.getIdentifier().get(0).getValue().equals("Intermittent Heparin SC"))) {
-          type = prescription.getIdentifierFirstRep().getValue();
+    List<MedicationOrder> medicationOrders = client.getMedicationOrderClient()
+        .list(encounterId);
+    for (MedicationOrder medicationOrder : medicationOrders) {
+      if (medicationOrder.getStatusElement().getValueAsEnum() == MedicationOrderStatusEnum.ACTIVE) {
+        String medicationOrderIdentifier = medicationOrder.getIdentifierFirstRep().getValue();
+        if (medicationOrderIdentifier.equals("Intermittent Enoxaparin SC") ||
+            medicationOrderIdentifier.equals("Intermittent Heparin SC")) {
+          type = medicationOrder.getIdentifierFirstRep().getValue();
         }
       }
     }

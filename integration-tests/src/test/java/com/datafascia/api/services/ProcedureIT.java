@@ -28,7 +28,6 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
-import static com.datafascia.api.services.ApiIT.client;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -75,7 +74,7 @@ public class ProcedureIT extends ApiIT {
     assertEquals(procedures.size(), 2);
     for (IResource resource : procedures) {
       Procedure procedure = (Procedure) resource;
-      switch (procedure.getType().getCodingFirstRep().getCode()) {
+      switch (procedure.getCode().getCodingFirstRep().getCode()) {
         case TYPE_CODE1:
           assertEquals(procedure.getId().getIdPart(), procedure1.getId().getIdPart());
           break;
@@ -83,7 +82,7 @@ public class ProcedureIT extends ApiIT {
           assertEquals(procedure.getId().getIdPart(), procedure2.getId().getIdPart());
           break;
         default:
-          fail("unexpected procedure type:" + procedure.getType().getCodingFirstRep()
+          fail("unexpected procedure type:" + procedure.getCode().getCodingFirstRep()
               .getCode());
       }
     }
@@ -132,11 +131,11 @@ public class ProcedureIT extends ApiIT {
 
   private Procedure createProcedure(String typeCode, String bodySiteCode, Encounter encounter) {
     Procedure procedure = new Procedure()
-        .setType(new CodeableConceptDt(CodingSystems.PROCEDURE_TYPE, typeCode))
+        .setCode(new CodeableConceptDt(CodingSystems.PROCEDURE, typeCode))
         .setPerformed(new DateTimeDt(new Date(), TemporalPrecisionEnum.SECOND))
         .setEncounter(new ResourceReferenceDt(encounter.getId()));
-    procedure.addBodySite()
-        .setSite(new CodeableConceptDt(CodingSystems.BODY_SITE, bodySiteCode));
+    procedure.addBodySite(
+        new CodeableConceptDt(CodingSystems.BODY_SITE, bodySiteCode));
     return procedure;
   }
 }

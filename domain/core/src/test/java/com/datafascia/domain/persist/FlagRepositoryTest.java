@@ -67,7 +67,7 @@ public class FlagRepositoryTest extends RepositoryTestSupport {
         .setStatus(FlagStatusEnum.ACTIVE)
         .setPeriod(period)
         .setCode(new CodeableConceptDt(code, code))
-        .setPatient(new ResourceReferenceDt(patient));
+        .setSubject(new ResourceReferenceDt(patient));
     return flag;
   }
 

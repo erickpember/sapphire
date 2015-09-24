@@ -19,6 +19,6 @@ public class ObservationEffectiveComparator implements Comparator<Observation> {
 
   @Override
   public int compare(Observation left, Observation right) {
-    return toDate(left.getApplies()).compareTo(toDate(right.getApplies()));
+    return toDate(left.getEffective()).compareTo(toDate(right.getEffective()));
   }
 }

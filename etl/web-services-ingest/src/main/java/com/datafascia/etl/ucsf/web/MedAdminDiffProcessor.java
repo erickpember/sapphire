@@ -5,7 +5,7 @@ package com.datafascia.etl.ucsf.web;
 import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import ca.uhn.fhir.model.dstu2.resource.Medication;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
-import ca.uhn.fhir.model.dstu2.resource.MedicationPrescription;
+import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.common.configuration.ConfigurationNode;
 import com.datafascia.common.configuration.Configure;
@@ -296,13 +296,18 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
       }
 
       // Recreate the prescription based on the new data.
-      MedicationPrescription medpresc = UcsfMedicationUtils.populatePrescription(orderJson,
-          medication, encounterId, prescriptionId, droolNorm.getMedsSets(), clientBuilder);
-      MedicationPrescription existingPrescription = clientBuilder.getMedicationPrescriptionClient()
-          .getMedicationPrescription(prescriptionId, encounterId);
-      if (existingPrescription != null) {
-        medpresc.setId(existingPrescription.getId());
-        clientBuilder.getMedicationPrescriptionClient().updateMedicationPrescription(medpresc);
+      MedicationOrder newOrder = UcsfMedicationUtils.populateMedicationOrder(
+          orderJson,
+          medication,
+          encounterId,
+          prescriptionId,
+          droolNorm.getMedsSets(),
+          clientBuilder);
+      MedicationOrder existingOrder = clientBuilder.getMedicationOrderClient()
+          .read(prescriptionId, encounterId);
+      if (existingOrder != null) {
+        newOrder.setId(existingOrder.getId());
+        clientBuilder.getMedicationOrderClient().update(newOrder);
       } else {
         log.warn(
             "Could not find prescription [{}] for encounterId [{}]."
@@ -311,13 +316,18 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
             prescriptionId,
             encounterId,
             tableName);
-        clientBuilder.getMedicationPrescriptionClient().savePrescription(medpresc);
+        clientBuilder.getMedicationOrderClient().create(newOrder);
       }
     } else {
-      MedicationPrescription prescription = UcsfMedicationUtils.populatePrescription(orderJson,
-          medication, encounterId, prescriptionId, droolNorm.getMedsSets(), clientBuilder);
-      prescription = clientBuilder.getMedicationPrescriptionClient().savePrescription(prescription);
-      diffListener.newOrder(prescription);
+      MedicationOrder newOrder = UcsfMedicationUtils.populateMedicationOrder(
+          orderJson,
+          medication,
+          encounterId,
+          prescriptionId,
+          droolNorm.getMedsSets(),
+          clientBuilder);
+      newOrder = clientBuilder.getMedicationOrderClient().create(newOrder);
+      diffListener.newOrder(newOrder);
     }
 
     JSONArray meds = (JSONArray) orderJson.get("MedAdmin");
@@ -425,17 +435,13 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
       kieSession.insert(droolNorm);
 
       // Fetch the medication object.
-      /* Bundle response = client.search()
-       * .forResource(Medication.class)
-       * .where(Medication.CODE.exactly().code(droolNorm.getRxcuiSCD())) .execute();
-       * List<BundleEntry> entries = response.getEntries(); */
       medication = clientBuilder.getMedicationClient().getMedication(droolNorm.getRxcuiSCD());
 
       if (medication == null) {
         medication = new Medication();
-        medication.setName(drugName);
-        medication.setCode(new CodeableConceptDt(CodingSystems.SEMANTIC_CLINICAL_DRUG,
-            droolNorm.getRxcuiSCD()));
+        medication.setCode(
+            new CodeableConceptDt(CodingSystems.SEMANTIC_CLINICAL_DRUG, droolNorm.getRxcuiSCD())
+                .setText(drugName));
 
         medication = clientBuilder.getMedicationClient().saveMedication(medication);
       }

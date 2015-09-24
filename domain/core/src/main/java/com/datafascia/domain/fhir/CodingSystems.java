@@ -31,6 +31,12 @@ public class CodingSystems {
   public static final String SEMANTIC_CLINICAL_DRUG =
       "http://datafascia.com/coding/SemanticClinicalDrug";
 
+  /** dataFascia invented this coding system for UCSF administration not given reasons */
+  public static final String UCSF_REASON_NOT_GIVEN = "http://datafascia.com/coding/ReasonNotGiven";
+
+  /** dataFascia invented this coding system for UCSF administration given reasons */
+  public static final String UCSF_REASON_GIVEN = "http://datafascia.com/coding/ReasonGiven";
+
   // Private constructor disallows creating instances of this class.
   private CodingSystems() {
   }

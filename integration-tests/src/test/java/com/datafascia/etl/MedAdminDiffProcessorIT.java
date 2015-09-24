@@ -206,6 +206,8 @@ public class MedAdminDiffProcessorIT extends ApiIT implements MedAdminDiffListen
       return;
     }
 
+    log.info("Checking order " + orderIdentifier);
+
     MedicationPrescription.DosageInstruction expectedDosage = order.addDosageInstruction();
 
     if (expected.orderedDose != null) {
@@ -593,7 +595,7 @@ public class MedAdminDiffProcessorIT extends ApiIT implements MedAdminDiffListen
       put("159301119", new TestNewPrescription().builder()
           .identifier("159301119")
           .dateTimeOrdered("/Date(1434013689000-0700)/")
-          .orderStatus("ACTIVE")
+          .orderStatus("DRAFT")
           .orderedDose("80")
           .orderedDoseUnits("mg")
           .build());
@@ -601,7 +603,7 @@ public class MedAdminDiffProcessorIT extends ApiIT implements MedAdminDiffListen
           .identifier("159301120")
           .dateTimeOrdered("/Date(1434112582000-0700)/")
           .frequency("Twice Daily")
-          .orderStatus("ACTIVE")
+          .orderStatus("DRAFT")
           .orderedDose("500")
           .orderedDoseUnits("mg")
           .route("Oral")
@@ -609,14 +611,14 @@ public class MedAdminDiffProcessorIT extends ApiIT implements MedAdminDiffListen
       put("159301127", new TestNewPrescription().builder()
           .identifier("159301127")
           .dateTimeOrdered("/Date(1436361637000-0700)/")
-          .orderStatus("ACTIVE")
+          .orderStatus("DRAFT")
           .orderedDose("0-20")
           .orderedDoseUnits("mg/hr")
           .build());
       put("159301128", new TestNewPrescription().builder()
           .identifier("159301128")
           .dateTimeOrdered("/Date(1436361638000-0700)/")
-          .orderStatus("ACTIVE")
+          .orderStatus("DRAFT")
           .orderedDose("5-10")
           .orderedDoseUnits("mg")
           .route("Intravenous")
@@ -639,42 +641,42 @@ public class MedAdminDiffProcessorIT extends ApiIT implements MedAdminDiffListen
       put("159301147", new TestNewPrescription().builder()
           .identifier("159301147")
           .dateTimeOrdered("/Date(1436792480000-0700)/")
-          .orderStatus("ACTIVE")
+          .orderStatus("DRAFT")
           .orderedDose("20000")
           .orderedDoseUnits("Units")
           .build());
       put("159301150", new TestNewPrescription().builder()
           .identifier("159301150")
           .dateTimeOrdered("/Date(1436879925000-0700)/")
-          .orderStatus("ACTIVE")
+          .orderStatus("DRAFT")
           .orderedDose("50")
           .orderedDoseUnits("mL/hr")
           .build());
       put("159301151", new TestNewPrescription().builder()
           .identifier("159301151")
           .dateTimeOrdered("/Date(1436879926000-0700)/")
-          .orderStatus("ACTIVE")
+          .orderStatus("DRAFT")
           .orderedDose("1")
           .orderedDoseUnits("g")
           .build());
       put("159301152", new TestNewPrescription().builder()
           .identifier("159301152")
           .dateTimeOrdered("/Date(1436879926000-0700)/")
-          .orderStatus("ACTIVE")
+          .orderStatus("DRAFT")
           .orderedDose("2")
           .orderedDoseUnits("mcg/kg/min")
           .build());
       put("159301153", new TestNewPrescription().builder()
           .identifier("159301153")
           .dateTimeOrdered("/Date(1436879927000-0700)/")
-          .orderStatus("ACTIVE")
+          .orderStatus("DRAFT")
           .orderedDose("500")
           .orderedDoseUnits("mL")
           .build());
       put("159301154", new TestNewPrescription().builder()
           .identifier("159301154")
           .dateTimeOrdered("/Date(1436880679000-0700)/")
-          .orderStatus("ACTIVE")
+          .orderStatus("DRAFT")
           .orderedDose("1")
           .orderedDoseUnits("mcg/kg/min")
           .build());

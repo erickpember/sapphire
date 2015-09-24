@@ -10,7 +10,6 @@ import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Medication;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.resource.MedicationPrescription;
-import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationPrescriptionStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
@@ -24,7 +23,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -45,27 +43,39 @@ import org.kie.internal.io.ResourceFactory;
  */
 @Slf4j
 public class UcsfMedicationUtils {
+  enum NotGivenReason {
+    DUE,
+    NOT_GIVEN
+  }
+
+  enum GivenReason {
+    SYSTEM_ONLY,
+    ANESTHESIA,
+    PROCEDURE,
+    CIRCUIT
+  }
+
   /**
    * Populate a MedicationAdministration.
    *
-   * @param adminJson     The base JSON.
-   * @param adminId       The ID of the administration.
-   * @param orderId       The ID of the prescription.
-   * @param encounterId   The encounter.
-   * @param med           The medication.
-   * @param medsSet       A list of medication group sets.
+   * @param adminJson The base JSON.
+   * @param adminId The ID of the administration.
+   * @param orderId The ID of the prescription.
+   * @param encounterId The encounter.
+   * @param med The medication.
+   * @param medsSet A list of medication group sets.
    * @param clientBuilder The resource client builder.
    * @return The populated administration.
    * @throws java.sql.SQLException When there is a problem communicating with SQL.
    */
-  public static MedicationAdministration populateAdministration(JSONObject adminJson, String
-      adminId, String orderId, String encounterId, Medication med, List<MedsSet> medsSet,
+  public static MedicationAdministration populateAdministration(JSONObject adminJson,
+      String adminId, String orderId, String encounterId, Medication med, List<MedsSet> medsSet,
       ClientBuilder clientBuilder) throws SQLException {
     MedicationAdministration admin = new MedicationAdministration();
 
     String[] adminAction = adminJson.get("AdminAction").toString().split("\\^");
     if (adminAction.length > 1) {
-      admin.setStatus(webAdminStatusToFhir(adminAction[1]));
+      UcsfAdminStatusEnum.populateAdminStatus(admin, adminAction[1]);
     }
 
     ResourceReferenceDt prescriptionRef = new ResourceReferenceDt();
@@ -78,9 +88,9 @@ public class UcsfMedicationUtils {
       if (encounter != null) {
         admin.setEncounter(new ResourceReferenceDt(encounter.getId()));
       } else {
-        log.warn("Could not find encounter with CSN " + encounterId + ". HAPI FHIR doesn't allow " +
-            "dangling references, so the linkage between the encounter and admin " + orderId +
-            "-" + adminId + " is lost.");
+        log.warn("Could not find encounter with CSN " + encounterId + ". HAPI FHIR doesn't allow "
+            + "dangling references, so the linkage between the encounter and admin " + orderId
+            + "-" + adminId + " is lost.");
       }
     } else {
       log.info("No encounter given for admin " + adminId + " on order " + orderId + "!!!!!");
@@ -134,30 +144,6 @@ public class UcsfMedicationUtils {
   }
 
   /**
-   * Returns the FHIR status for a web admin.
-   * @param adminStatus The original status from the UCSF web service.
-   * @return A FHIR status.
-   */
-  public static MedicationAdministrationStatusEnum webAdminStatusToFhir(String adminStatus) {
-    UcsfAdminStatusEnum adminStatusEnum = UcsfAdminStatusEnum.valueOf(adminStatus.replace(" ",
-        "").toUpperCase(Locale.ENGLISH));
-    switch (adminStatusEnum) {
-      case GIVEN:
-        return MedicationAdministrationStatusEnum.COMPLETED;
-      case CANCELEDENTRY:
-        return MedicationAdministrationStatusEnum.ENTERED_IN_ERROR;
-      case NEWBAG:
-        return MedicationAdministrationStatusEnum.IN_PROGRESS;
-      case RATEVERIFY:
-        return MedicationAdministrationStatusEnum.IN_PROGRESS;
-      case STOPPED:
-        return MedicationAdministrationStatusEnum.STOPPED;
-      default:
-        return null;
-    }
-  }
-
-  /**
    * Convert the order status given by the web service to a status understood by FHIR.
    *
    * @param orderStatus The original status from the web service.
@@ -170,15 +156,15 @@ public class UcsfMedicationUtils {
       case PENDING:
         return MedicationPrescriptionStatusEnum.ACTIVE;
       case SUSPEND:
-        return MedicationPrescriptionStatusEnum.STOPPED;
+        return MedicationPrescriptionStatusEnum.ON_HOLD;
       case DISPENSED:
         return MedicationPrescriptionStatusEnum.ACTIVE;
       case PENDINGVERIFY:
-        return MedicationPrescriptionStatusEnum.ACTIVE;
+        return MedicationPrescriptionStatusEnum.DRAFT;
       case VERIFIED:
         return MedicationPrescriptionStatusEnum.ACTIVE;
       case SENT:
-        return MedicationPrescriptionStatusEnum.ACTIVE;
+        return MedicationPrescriptionStatusEnum.DRAFT;
       case COMPLETED:
         return MedicationPrescriptionStatusEnum.COMPLETED;
       case DISCONTINUED:
@@ -190,6 +176,7 @@ public class UcsfMedicationUtils {
 
   /**
    * Returns the SCD segment for a given medication order from the UCSF web services.
+   *
    * @param json The JSON from which to extract the SCD.
    * @return The SCD for the medication.
    */
@@ -206,6 +193,7 @@ public class UcsfMedicationUtils {
 
   /**
    * Extract the ingredient codes from an order.
+   *
    * @param json The JSONObject representing the order.
    * @return A list of ingredient codes.
    */
@@ -223,11 +211,12 @@ public class UcsfMedicationUtils {
 
   /**
    * Populate a MedicationPrescription.
-   * @param orderJson     The base JSON.
-   * @param medication    The medication.
-   * @param encounterId   The ID of the associated encounter.
-   * @param orderId       The id of the order.
-   * @param medsSet       The medsset codes and names.
+   *
+   * @param orderJson The base JSON.
+   * @param medication The medication.
+   * @param encounterId The ID of the associated encounter.
+   * @param orderId The id of the order.
+   * @param medsSet The medsset codes and names.
    * @param clientBuilder The resource client builder.
    * @return The populated prescription.
    * @throws java.sql.SQLException When there is a problem communicating with SQL.
@@ -261,9 +250,9 @@ public class UcsfMedicationUtils {
         encounterRef.setResource(encounter);
         prescription.setEncounter(encounterRef);
       } else {
-        log.warn("Could not find encounter with CSN " + encounterId + ". HAPI FHIR doesn't allow " +
-            "dangling references, so the linkage between the encounter and order " + orderId +
-            " is lost.");
+        log.warn("Could not find encounter with CSN " + encounterId + ". HAPI FHIR doesn't allow "
+            + "dangling references, so the linkage between the encounter and order " + orderId
+            + " is lost.");
       }
     }
 
@@ -313,7 +302,8 @@ public class UcsfMedicationUtils {
 
   /**
    * Creates a new KieContainer, which will include a KieModule with the DRL files sent as parameter
-   * @param ks                KieServices
+   *
+   * @param ks KieServices
    * @param drlResourcesPaths DRL files that will be included
    * @return the new KieContainer
    */

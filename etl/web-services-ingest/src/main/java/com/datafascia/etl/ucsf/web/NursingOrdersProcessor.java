@@ -150,31 +150,20 @@ public class NursingOrdersProcessor extends DependencyInjectingProcessor {
     String startDate = jsonNursing.get("StartDate").toString();
     String discontinuedDate = jsonNursing.get("DiscontinuedDate").toString();
 
-    // Determine if the order has been signed.
-    boolean signed = false;
-    Object auditObject = jsonNursing.get("Audit");
-    if (auditObject != null) {
-      for (Object obj : (JSONArray) auditObject) {
-        String action = ((JSONObject) obj).get("Action").toString();
-        if (action.equals("3^Signed")) {
-          signed = true;
-          break;
-        }
-      }
-    }
-
     ProcedureRequest procedure = new ProcedureRequest();
     procedure.addIdentifier()
         .setSystem(IdentifierSystems.INSTITUTION_PROCEDURE_REQUEST)
         .setValue(orderId);
 
-    if (signed) {
-      procedure.setStatus(ProcedureRequestStatusEnum.ACCEPTED);
-    } else if (status.equals("2^Sent")) {
+    if (status.equalsIgnoreCase("2^SENT")) {
       procedure.setStatus(ProcedureRequestStatusEnum.PROPOSED);
-    }
-
-    if (status.equals("4^Canceled")) {
+    } else if (status.equalsIgnoreCase("6^HOLDING FOR REFERRAL")) {
+      procedure.setStatus(ProcedureRequestStatusEnum.PROPOSED);
+    } else if (status.equalsIgnoreCase("7^DENIED APPROVAL")) {
+      procedure.setStatus(ProcedureRequestStatusEnum.REJECTED);
+    } else if (status.equalsIgnoreCase("4^CANCELED")) {
+      procedure.setStatus(ProcedureRequestStatusEnum.REJECTED);
+    } else if (status.equalsIgnoreCase("5^COMPLETED")) {
       procedure.setStatus(ProcedureRequestStatusEnum.COMPLETED);
     }
 

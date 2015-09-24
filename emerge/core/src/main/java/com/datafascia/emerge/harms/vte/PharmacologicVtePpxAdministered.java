@@ -40,7 +40,7 @@ public class PharmacologicVtePpxAdministered {
       String medName = medication.getName();
       for (PharmacologicVtePpxTypeEnum vtePpx : PharmacologicVtePpxTypeEnum.values()) {
         DateTimeDt timeTaken = (DateTimeDt) administration.getEffectiveTime();
-        Integer period = HarmsLookups.efficacyList.get(medName);
+        Long period = HarmsLookups.efficacyList.get(medName);
         if (vtePpx.toString().equalsIgnoreCase(medName.replace(" ", "_"))
             && HarmsLookups.withinDrugPeriod(timeTaken.getValue(), period)) {
           administered = true;

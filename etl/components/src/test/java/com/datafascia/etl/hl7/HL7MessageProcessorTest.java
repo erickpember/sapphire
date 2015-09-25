@@ -163,6 +163,16 @@ public class HL7MessageProcessorTest {
     assertEquals(encounter.getStatusElement().getValueAsEnum(), EncounterStateEnum.IN_PROGRESS);
   }
 
+  @Test
+  public void ADT_A08_should_create_nonexistent_encounter_in_progress() throws Exception {
+    processMessage("ADT_A08.hl7");
+
+    Id<Encounter> encounterId = Id.of("5014212");
+    Encounter encounter = encounterRepository.read(encounterId).get();
+
+    assertEquals(encounter.getStatusElement().getValueAsEnum(), EncounterStateEnum.IN_PROGRESS);
+  }
+
   // HL7 defines that ADT A11 reuses the same message structure as ADT A09.
   @Test
   public void ADT_A11_should_update_encounter_cancelled() throws Exception {

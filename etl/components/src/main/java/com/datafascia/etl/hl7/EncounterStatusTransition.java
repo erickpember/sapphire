@@ -6,6 +6,7 @@ import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.persist.EncounterRepository;
+import com.google.common.base.MoreObjects;
 import java.util.Arrays;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -64,5 +65,9 @@ public class EncounterStatusTransition {
     encounter.setStatus(readCurrentStatus(encounter));
 
     session.execute(Arrays.asList(new MessageType(triggerEvent), encounter));
+
+    encounter.setStatus(MoreObjects.firstNonNull(
+        encounter.getStatusElement().getValueAsEnum(),
+        EncounterStateEnum.IN_PROGRESS));
   }
 }

@@ -5,8 +5,6 @@ package com.datafascia.etl.event;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.persist.EncounterRepository;
-import com.datafascia.emerge.ucsf.HarmEvidence;
-import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
 import com.datafascia.etl.hl7.EncounterStatusTransition;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -25,7 +23,7 @@ public class DischargePatient {
   private transient EncounterRepository encounterRepository;
 
   @Inject
-  private transient HarmEvidenceRepository harmEvidenceRepository;
+  private HarmEvidenceUpdater harmEvidenceUpdater;
 
   /**
    * Discharges patient.
@@ -50,8 +48,6 @@ public class DischargePatient {
 
     encounterRepository.save(encounter);
 
-    String patientId = encounter.getPatient().getReference().getIdPart();
-    Id<HarmEvidence> recordId = Id.of(patientId);
-    harmEvidenceRepository.delete(recordId);
+    harmEvidenceUpdater.dischargePatient(encounter);
   }
 }

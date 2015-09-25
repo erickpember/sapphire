@@ -1,0 +1,33 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://datafascia.com/schema/emerge",
+
+  "type": "object",
+  "description": "An explanation about the purpose of this instance described by this schema.",
+  "properties": {
+    "EmergeDataFeed": {
+      "type": "object",
+      "description": "An explanation about the purpose of this instance described by this schema.",
+      "properties": {
+        "timeOfDataFeed": {
+          "type": "string",
+          "description": "An explanation about the purpose of this instance described by this schema."
+        },
+        "EmergePatients": {
+          "type": "array",
+          "description": "An explanation about the purpose of this instance described by this schema.",
+          "items": {
+            "$ref": "HarmEvidence.json"
+          }
+        }
+      },
+      "required": [
+        "timeOfDataFeed",
+        "EmergePatients"
+      ]
+    }
+  },
+  "required": [
+    "EmergeDataFeed"
+  ]
+}

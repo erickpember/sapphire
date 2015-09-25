@@ -1,0 +1,780 @@
+{
+  "$schema": "http://json-schema.org/draft-04/schema#",
+  "id": "http://datafascia.com/schema/emerge",
+
+  "definitions": {
+    "Practitioner": {
+      "type": "object",
+      "description": "An explanation about the purpose of this instance described by this schema.",
+      "properties": {
+        "name": {
+          "type": "string",
+          "description": "An explanation about the purpose of this instance described by this schema."
+        },
+        "addedToCareTeam": {
+          "type": "string",
+          "description": "An explanation about the purpose of this instance described by this schema."
+        },
+        "updateTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When this data was updated"
+        }
+      }
+    },
+    "TimestampedBoolean": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "boolean"
+        },
+        "updateTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the value was updated"
+        }
+      }
+    },
+    "TimestampedNumber": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "number"
+        },
+        "updateTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the value was updated"
+        }
+      }
+    },
+    "TimestampedString": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string"
+        },
+        "updateTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the value was updated"
+        }
+      }
+    }
+  },
+
+  "type": "object",
+  "description": "Demographic and safety checklist data intended for consumption by Emerge at UCSF.",
+  "properties": {
+    "patientID": {
+      "type": "string",
+      "description": "Institution assigned patient identifier. For example, medical record number."
+    },
+    "encounterID": {
+      "type": "string",
+      "description": "Institution assigned encounter identifier. For example, visit number."
+    },
+    "demographicData": {
+      "type": "object",
+      "description": "An explanation about the purpose of this instance described by this schema.",
+      "properties": {
+        "updateTime": {
+          "type": "string",
+          "description": "An explanation about the purpose of this instance described by this schema."
+        },
+        "patientName": {
+          "type": "string",
+          "description": "An explanation about the purpose of this instance described by this schema."
+        },
+        "ICUadmitDate": {
+          "type": "string",
+          "description": "An explanation about the purpose of this instance described by this schema."
+        },
+        "readmission": {
+          "type": "boolean",
+          "description": "An explanation about the purpose of this instance described by this schema."
+        },
+        "dateOfBirth": {
+          "type": "string",
+          "description": "An explanation about the purpose of this instance described by this schema."
+        },
+        "gender": {
+          "type": "string",
+          "enum": [ "female", "male" ],
+          "description": "An explanation about the purpose of this instance described by this schema."
+        },
+        "race": {
+          "type": "string",
+          "description": "An explanation about the purpose of this instance described by this schema."
+        },
+        "admissionHeight": {
+          "type": "number",
+          "description": "An explanation about the purpose of this instance described by this schema."
+        },
+        "admissionWeight": {
+          "type": "number",
+          "description": "An explanation about the purpose of this instance described by this schema."
+        }
+      }
+    },
+    "medicalData": {
+      "type": "object",
+      "description": "An explanation about the purpose of this instance described by this schema.",
+      "properties": {
+        "Delirium": {
+          "type": "object",
+          "description": "An explanation about the purpose of this instance described by this schema.",
+          "properties": {
+            "pain": {
+              "type": "object",
+              "description": "An explanation about the purpose of this instance described by this schema.",
+              "properties": {
+                "painGoal": {
+                  "type": "object",
+                  "description": "An explanation about the purpose of this instance described by this schema.",
+                  "properties": {
+                    "goal": {
+                      "type": "integer",
+                      "description": "An explanation about the purpose of this instance described by this schema."
+                    },
+                    "dataEntryTime": {
+                      "type": "string",
+                      "description": "An explanation about the purpose of this instance described by this schema."
+                    }
+                  }
+                },
+                "numerical": {
+                  "type": "object",
+                  "description": "An explanation about the purpose of this instance described by this schema.",
+                  "properties": {
+                    "dailyMin": {
+                      "type": "object",
+                      "description": "An explanation about the purpose of this instance described by this schema.",
+                      "properties": {
+                        "painMin": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        },
+                        "startOfTimePeriod": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        },
+                        "timeOfCalculation": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        },
+                        "endOfTimePeriod": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        }
+                      }
+                    },
+                    "currentScore": {
+                      "type": "object",
+                      "description": "An explanation about the purpose of this instance described by this schema.",
+                      "properties": {
+                        "timeOfDataAquisition": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        },
+                        "painScore": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        }
+                      }
+                    },
+                    "dailyMax": {
+                      "type": "object",
+                      "description": "An explanation about the purpose of this instance described by this schema.",
+                      "properties": {
+                        "startOfTimePeriod": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        },
+                        "painMax": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        },
+                        "timeOfCalculation": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        },
+                        "endOfTimePeriod": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        }
+                      }
+                    }
+                  }
+                },
+                "verbal": {
+                  "type": "object",
+                  "description": "An explanation about the purpose of this instance described by this schema.",
+                  "properties": {
+                    "dailyMin": {
+                      "type": "object",
+                      "description": "An explanation about the purpose of this instance described by this schema.",
+                      "properties": {
+                        "painMin": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        },
+                        "startOfTimePeriod": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        },
+                        "timeOfCalculation": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        },
+                        "endOfTimePeriod": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        }
+                      }
+                    },
+                    "currentScore": {
+                      "type": "object",
+                      "description": "An explanation about the purpose of this instance described by this schema.",
+                      "properties": {
+                        "timeOfDataAquisition": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        },
+                        "painScore": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        }
+                      }
+                    },
+                    "dailyMax": {
+                      "type": "object",
+                      "description": "An explanation about the purpose of this instance described by this schema.",
+                      "properties": {
+                        "startOfTimePeriod": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        },
+                        "painMax": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        },
+                        "timeOfCalculation": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        },
+                        "endOfTimePeriod": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        }
+                      }
+                    }
+                  }
+                },
+                "cpot": {
+                  "type": "object",
+                  "description": "An explanation about the purpose of this instance described by this schema.",
+                  "properties": {
+                    "dailyMin": {
+                      "type": "object",
+                      "description": "An explanation about the purpose of this instance described by this schema.",
+                      "properties": {
+                        "painMin": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        },
+                        "startOfTimePeriod": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        },
+                        "timeOfCalculation": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        },
+                        "endOfTimePeriod": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        }
+                      }
+                    },
+                    "currentScore": {
+                      "type": "object",
+                      "description": "An explanation about the purpose of this instance described by this schema.",
+                      "properties": {
+                        "timeOfDataAquisition": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        },
+                        "painScore": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        }
+                      }
+                    },
+                    "dailyMax": {
+                      "type": "object",
+                      "description": "An explanation about the purpose of this instance described by this schema.",
+                      "properties": {
+                        "startOfTimePeriod": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        },
+                        "painMax": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        },
+                        "timeOfCalculation": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        },
+                        "endOfTimePeriod": {
+                          "type": "string",
+                          "description": "An explanation about the purpose of this instance described by this schema."
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            },
+            "RASS": {
+              "type": "object",
+              "description": "An explanation about the purpose of this instance described by this schema.",
+              "properties": {
+                "rassGoal": {
+                  "type": "object",
+                  "description": "An explanation about the purpose of this instance described by this schema.",
+                  "properties": {
+                    "goal": {
+                      "type": "integer",
+                      "description": "An explanation about the purpose of this instance described by this schema."
+                    },
+                    "dataEntryTime": {
+                      "type": "string",
+                      "description": "An explanation about the purpose of this instance described by this schema."
+                    }
+                  }
+                },
+                "dailyMin": {
+                  "type": "object",
+                  "description": "An explanation about the purpose of this instance described by this schema.",
+                  "properties": {
+                    "RASSMin": {
+                      "type": "string",
+                      "description": "An explanation about the purpose of this instance described by this schema."
+                    },
+                    "startOfTimePeriod": {
+                      "type": "string",
+                      "description": "An explanation about the purpose of this instance described by this schema."
+                    },
+                    "timeOfCalculation": {
+                      "type": "string",
+                      "description": "An explanation about the purpose of this instance described by this schema."
+                    },
+                    "endOfTimePeriod": {
+                      "type": "string",
+                      "description": "An explanation about the purpose of this instance described by this schema."
+                    }
+                  }
+                },
+                "currentScore": {
+                  "type": "object",
+                  "description": "An explanation about the purpose of this instance described by this schema.",
+                  "properties": {
+                    "RASSScore": {
+                      "type": "string",
+                      "description": "An explanation about the purpose of this instance described by this schema."
+                    },
+                    "timeOfDataAquisition": {
+                      "type": "string",
+                      "description": "An explanation about the purpose of this instance described by this schema."
+                    }
+                  }
+                },
+                "dailyMax": {
+                  "type": "object",
+                  "description": "An explanation about the purpose of this instance described by this schema.",
+                  "properties": {
+                    "startOfTimePeriod": {
+                      "type": "string",
+                      "description": "An explanation about the purpose of this instance described by this schema."
+                    },
+                    "RASSMax": {
+                      "type": "string",
+                      "description": "An explanation about the purpose of this instance described by this schema."
+                    },
+                    "timeOfCalculation": {
+                      "type": "string",
+                      "description": "An explanation about the purpose of this instance described by this schema."
+                    },
+                    "endOfTimePeriod": {
+                      "type": "string",
+                      "description": "An explanation about the purpose of this instance described by this schema."
+                    }
+                  }
+                }
+              }
+            },
+            "cam": {
+              "type": "object",
+              "description": "An explanation about the purpose of this instance described by this schema.",
+              "properties": {
+                "result": {
+                  "type": "string",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                },
+                "utaReason": {
+                  "type": "string",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                },
+                "updateTime": {
+                  "type": "string",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                }
+              }
+            },
+            "benzo": {
+              "type": "object",
+              "description": "An explanation about the purpose of this instance described by this schema.",
+              "properties": {
+                "contraindicated": {
+                  "$ref": "#/definitions/TimestampedBoolean"
+                },
+                "orders": {
+                  "type": "array",
+                  "description": "An explanation about the purpose of this instance described by this schema.",
+                  "items": {
+                    "type": "object",
+                    "description": "An explanation about the purpose of this instance described by this schema.",
+                    "properties": {
+                      "drug": {
+                        "type": "string",
+                        "description": "An explanation about the purpose of this instance described by this schema."
+                      },
+                      "updateTime": {
+                        "type": "string",
+                        "description": "An explanation about the purpose of this instance described by this schema."
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "SAT_DSI": {
+          "type": "object",
+          "description": "An explanation about the purpose of this instance described by this schema.",
+          "properties": {
+            "candidate": {
+              "type": "boolean",
+              "description": "An explanation about the purpose of this instance described by this schema."
+            },
+            "notCandidateReason": {
+              "type": "string",
+              "description": "An explanation about the purpose of this instance described by this schema."
+            },
+            "performed": {
+              "type": "boolean",
+              "description": "An explanation about the purpose of this instance described by this schema."
+            },
+            "updateTime": {
+              "type": "string",
+              "description": "An explanation about the purpose of this instance described by this schema."
+            }
+          }
+        },
+        "CLABSI": {
+          "type": "object",
+          "description": "An explanation about the purpose of this instance described by this schema.",
+          "properties": {
+            "dailyNeedsAssessment": {
+              "type": "object",
+              "description": "An explanation about the purpose of this instance described by this schema.",
+              "properties": {
+                "performed": {
+                  "type": "string",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                },
+                "updateTime": {
+                  "type": "string",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                }
+              }
+            },
+            "centralLine ": {
+              "type": "array",
+              "description": "An explanation about the purpose of this instance described by this schema.",
+              "items": {
+                "type": "object",
+                "description": "An explanation about the purpose of this instance described by this schema.",
+                "properties": {
+                  "type": {
+                    "type": "string",
+                    "description": "An explanation about the purpose of this instance described by this schema."
+                  },
+                  "site": {
+                    "type": "string",
+                    "description": "An explanation about the purpose of this instance described by this schema."
+                  },
+                  "side": {
+                    "type": "string",
+                    "description": "An explanation about the purpose of this instance described by this schema."
+                  },
+                  "days": {
+                    "type": "integer",
+                    "description": "An explanation about the purpose of this instance described by this schema."
+                  },
+                  "updateTime": {
+                    "type": "string",
+                    "description": "An explanation about the purpose of this instance described by this schema."
+                  }
+                }
+              }
+            }
+          }
+        },
+        "IAW": {
+          "type": "object",
+          "description": "An explanation about the purpose of this instance described by this schema.",
+          "properties": {
+            "mobilityAchieved": {
+              "type": "object",
+              "description": "An explanation about the purpose of this instance described by this schema.",
+              "properties": {
+                "updateTime": {
+                  "type": "string",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                },
+                "levelMobilityAchieved": {
+                  "type": "string",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                },
+                "mobilityScoreTime": {
+                  "type": "string",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                },
+                "clinicianType": {
+                  "type": "string",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                },
+                "assistDevice": {
+                  "type": "string",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                },
+                "numberOfAssists": {
+                  "type": "string",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                }
+              }
+            }
+          }
+        },
+        "AOG": {
+          "type": "object",
+          "description": "An explanation about the purpose of this instance described by this schema.",
+          "properties": {
+            "patientCareConferenceNote": {
+              "type": "object",
+              "description": "An explanation about the purpose of this instance described by this schema.",
+              "properties": {
+                "updateTime": {
+                  "type": "string",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                },
+                "patientCareConferenceNoteTime": {
+                  "type": "string",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                },
+                "value": {
+                  "type": "boolean",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                }
+              }
+            },
+            "ADPOLST": {
+              "type": "object",
+              "description": "An explanation about the purpose of this instance described by this schema.",
+              "properties": {
+                "updateTime": {
+                  "type": "string",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                },
+                "adValue": {
+                  "type": "boolean",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                },
+                "polstValue": {
+                  "type": "boolean",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                }
+              }
+            },
+            "codeStatus": {
+              "type": "object",
+              "properties": {
+                "updateTime": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "When the value was updated"
+                },
+                "orderedDateTime": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "Procedure request scheduled date time"
+                },
+                "value": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "VTE": {
+          "type": "object",
+          "description": "An explanation about the purpose of this instance described by this schema.",
+          "properties": {
+            "onSystemicAnticoagulation": {
+              "$ref": "#/definitions/TimestampedBoolean"
+            },
+            "lowerExtremitySCDsContraindicated": {
+              "type": "object",
+              "description": "An explanation about the purpose of this instance described by this schema.",
+              "properties": {
+                "updateTime": {
+                  "type": "string",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                },
+                "value": {
+                  "type": "boolean",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                }
+              }
+            },
+            "SCDsInUse": {
+              "$ref": "#/definitions/TimestampedBoolean"
+            },
+            "SCDsOrdered": {
+              "$ref": "#/definitions/TimestampedBoolean"
+            },
+            "pharmacologicallyProphylaxedAgainstVTE": {
+              "$ref": "#/definitions/TimestampedBoolean"
+            },
+            "anticoagulationType": {
+              "$ref": "#/definitions/TimestampedString"
+            },
+            "pharmacologicVTEProphylaxisContraindicated": {
+              "type": "object",
+              "description": "An explanation about the purpose of this instance described by this schema.",
+              "properties": {
+                "updateTime": {
+                  "type": "string",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                },
+                "value": {
+                  "type": "boolean",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                },
+                "reason": {
+                  "type": "string",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                }
+              }
+            },
+            "pharmacologicVTEProphylaxisOrdered": {
+              "$ref": "#/definitions/TimestampedBoolean"
+            },
+            "pharmacologicVTRProphylaxisType": {
+              "$ref": "#/definitions/TimestampedString"
+            },
+            "pharmacologicVTEProphylaxisAdministered": {
+              "$ref": "#/definitions/TimestampedBoolean"
+            }
+          }
+        },
+        "VAE": {
+          "type": "object",
+          "description": "An explanation about the purpose of this instance described by this schema.",
+          "properties": {
+            "ventilated": {
+              "$ref": "#/definitions/TimestampedBoolean"
+            },
+            "discreteHOBGreaterThan30Deg": {
+              "$ref": "#/definitions/TimestampedBoolean"
+            },
+            "continuousHOB": {
+              "$ref": "#/definitions/TimestampedNumber"
+            },
+            "supOrderStatus": {
+              "$ref": "#/definitions/TimestampedBoolean"
+            },
+            "mechanicalVentilationGreaterThan48Hours": {
+              "$ref": "#/definitions/TimestampedBoolean"
+            },
+            "recentStressUlcerProphylaxisAdministration": {
+              "$ref": "#/definitions/TimestampedBoolean"
+            },
+            "ventilationMode": {
+              "$ref": "#/definitions/TimestampedString"
+            },
+            "current Tidal Volume ": {
+              "$ref": "#/definitions/TimestampedNumber"
+            },
+            "subglotticSuctionSurgicalAirway": {
+              "$ref": "#/definitions/TimestampedString"
+            },
+            "subglotticSuctionNonSurgicalAirway ": {
+              "$ref": "#/definitions/TimestampedBoolean"
+            },
+            "subglotticSuctionUse": {
+              "$ref": "#/definitions/TimestampedString"
+            },
+            "oralCare": {
+              "$ref": "#/definitions/TimestampedString"
+            },
+            "inlineSuction": {
+              "$ref": "#/definitions/TimestampedBoolean"
+            },
+            "dailySpontaneousBreathingTrial": {
+              "type": "object",
+              "description": "An explanation about the purpose of this instance described by this schema.",
+              "properties": {
+                "updateTime": {
+                  "type": "string",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                },
+                "value": {
+                  "type": "string",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                },
+                "contraindicatedReason": {
+                  "type": "string",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                }
+              }
+            }
+          }
+        },
+        "RespectDignity": {
+          "type": "object",
+          "description": "An explanation about the purpose of this instance described by this schema.",
+          "properties": {
+            "icuAttending": {
+              "$ref": "#/definitions/Practitioner"
+            },
+            "primaryServiceAttending": {
+              "$ref": "#/definitions/Practitioner"
+            },
+            "RN": {
+              "$ref": "#/definitions/Practitioner"
+            }
+          }
+        }
+      }
+    }
+  }
+}

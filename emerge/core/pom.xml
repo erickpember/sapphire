@@ -30,15 +30,9 @@
       <artifactId>df-api-client</artifactId>
       <version>${project.version}</version>
     </dependency>
-
     <dependency>
       <groupId>${project.groupId}</groupId>
       <artifactId>df-common-core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>${project.groupId}</groupId>
-      <artifactId>df-api-client</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -64,4 +58,30 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.jsonschema2pojo</groupId>
+        <artifactId>jsonschema2pojo-maven-plugin</artifactId>
+        <version>0.4.15</version>
+        <configuration>
+          <generateBuilders>true</generateBuilders>
+          <includeAdditionalProperties>false</includeAdditionalProperties>
+          <includeHashcodeAndEquals>false</includeHashcodeAndEquals>
+          <outputDirectory>${project.build.directory}/generated-sources/schema</outputDirectory>
+          <sourceDirectory>${project.basedir}/src/main/schema</sourceDirectory>
+          <targetPackage>com.datafascia.emerge.ucsf</targetPackage>
+          <usePrimitives>true</usePrimitives>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>generate</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

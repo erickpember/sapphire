@@ -170,10 +170,15 @@
           datafascia/kafka
   when: "'datafascia/kafka:latest' not in list_containers.stdout_lines"
 
+- name: Create /etc/dF/nifi directory
+  file:
+    path: /etc/dF/nifi
+    state: directory
+
 - name: Copy NiFi flow configuration
   copy:
     src: "{{ playbook_dir }}/roles/df-etl/files/{{ item }}"
-    dest: "{{ company_data_prefix }}/nifi/conf/{{ item }}"
+    dest: "/etc/dF/nifi/conf/{{ item }}"
   with_items:
     - medadmin-webgetconfig.yml
     - nursingorder-webgetconfig.yml

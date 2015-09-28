@@ -4,8 +4,8 @@ package com.datafascia.emerge.harms.aog;
 
 import ca.uhn.fhir.model.dstu2.resource.Flag;
 import com.datafascia.api.client.ClientBuilder;
-import com.datafascia.domain.fhir.FlagCodeEnum;
 import com.datafascia.emerge.ucsf.FlagUtils;
+import com.datafascia.emerge.ucsf.codes.FlagCodeEnum;
 import java.util.List;
 
 /**

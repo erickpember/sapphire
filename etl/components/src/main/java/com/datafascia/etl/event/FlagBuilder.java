@@ -9,8 +9,8 @@ import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Flag;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.dstu2.valueset.FlagStatusEnum;
-import com.datafascia.domain.fhir.FlagCodeEnum;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
+import com.datafascia.emerge.ucsf.codes.FlagCodeEnum;
 import java.util.ArrayList;
 import java.util.List;
 

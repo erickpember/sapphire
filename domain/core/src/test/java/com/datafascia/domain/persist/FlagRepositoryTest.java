@@ -12,7 +12,6 @@ import ca.uhn.fhir.model.dstu2.valueset.FlagStatusEnum;
 import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
 import ca.uhn.fhir.model.primitive.DateDt;
 import com.datafascia.common.persist.Id;
-import com.datafascia.domain.fhir.FlagCodeEnum;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.domain.fhir.Ids;
 import com.datafascia.domain.fhir.Languages;
@@ -31,6 +30,9 @@ import static org.testng.Assert.fail;
  * {@link FlagRepository} test
  */
 public class FlagRepositoryTest extends RepositoryTestSupport {
+
+  private static final String ADVANCE_DIRECTIVE = "AD";
+  private static final String PHYSICIAN_ORDERS_FOR_LIFE_SUSTAINING_TREATMENT = "POLST";
 
   @Inject
   private PatientRepository patientRepository;
@@ -57,14 +59,14 @@ public class FlagRepositoryTest extends RepositoryTestSupport {
     return patient;
   }
 
-  private Flag createFlag(FlagCodeEnum code, UnitedStatesPatient patient) {
+  private Flag createFlag(String code, UnitedStatesPatient patient) {
     PeriodDt period = new PeriodDt();
     period.setStart(new Date(), TemporalPrecisionEnum.DAY);
 
     Flag flag = new Flag()
         .setStatus(FlagStatusEnum.ACTIVE)
         .setPeriod(period)
-        .setCode(new CodeableConceptDt(code.getSystem(), code.getCode()))
+        .setCode(new CodeableConceptDt(code, code))
         .setPatient(new ResourceReferenceDt(patient));
     return flag;
   }
@@ -74,10 +76,10 @@ public class FlagRepositoryTest extends RepositoryTestSupport {
     UnitedStatesPatient patient = createPatient();
     patientRepository.save(patient);
 
-    Flag flag1 = createFlag(FlagCodeEnum.ADVANCE_DIRECTIVE, patient);
+    Flag flag1 = createFlag(ADVANCE_DIRECTIVE, patient);
     flagRepository.save(flag1);
 
-    Flag flag2 = createFlag(FlagCodeEnum.PHYSICIAN_ORDERS_FOR_LIFE_SUSTAINING_TREATMENT, patient);
+    Flag flag2 = createFlag(PHYSICIAN_ORDERS_FOR_LIFE_SUSTAINING_TREATMENT, patient);
     flagRepository.save(flag2);
 
     Id<UnitedStatesPatient> patientId = Ids.toPrimaryKey(patient.getId());

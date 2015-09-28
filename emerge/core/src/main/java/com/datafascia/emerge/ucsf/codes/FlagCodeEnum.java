@@ -1,8 +1,9 @@
 // Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.domain.fhir;
+package com.datafascia.emerge.ucsf.codes;
 
 import com.datafascia.common.persist.CodeToEnumMapper;
+import com.datafascia.domain.fhir.SystemDefinedCode;
 import java.util.Optional;
 
 /**

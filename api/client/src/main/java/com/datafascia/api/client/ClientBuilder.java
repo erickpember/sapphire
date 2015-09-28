@@ -38,6 +38,7 @@ public class ClientBuilder {
 
   /**
    * Constructs a ClientBuilder.
+   *
    * @param apiEndpoint The FHIR API endpoint to connect to.
    * @param username The username to authenticate with.
    * @param password The password to authenticate with.
@@ -75,6 +76,10 @@ public class ClientBuilder {
 
   public MedicationClient getMedicationClient() {
     return new MedicationClient(client);
+  }
+
+  public PractitionerClient getPractitionerClient() {
+    return new PractitionerClient(client);
   }
 
   /**

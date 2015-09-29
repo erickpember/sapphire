@@ -28,7 +28,7 @@ public class PharmacologicVtePpxAdministered {
   public static boolean pharmacologicVtePpxAdministered(ClientBuilder client, String encounterId) {
     boolean administered = false;
     List<MedicationAdministration> administrations = client.getMedicationAdministrationClient()
-        .getMedicationAdministrations(encounterId);
+        .search(encounterId);
 
     // Check if any recent VTE prophylactic administrations have been made.
     for (MedicationAdministration administration : administrations) {

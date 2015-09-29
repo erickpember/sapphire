@@ -47,7 +47,7 @@ public class AntiCoagulation {
     }
 
     List<MedicationAdministration> administrations = client.getMedicationAdministrationClient()
-        .getMedicationAdministrations(encounterId);
+        .search(encounterId);
 
     // Check if any recent administrations have been made that are anticoagulants.
     for (MedicationAdministration administration : administrations) {

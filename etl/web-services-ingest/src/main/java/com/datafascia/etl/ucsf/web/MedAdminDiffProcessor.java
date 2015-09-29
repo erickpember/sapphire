@@ -397,12 +397,12 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
           prescriptionId, encounterId, populateMedication(droolNorm),
           droolNorm.getMedsSets(), clientBuilder);
       MedicationAdministration existingAdministration = clientBuilder
-          .getMedicationAdministrationClient().getMedicationAdministration(adminId, encounterId,
+          .getMedicationAdministrationClient().get(adminId, encounterId,
               prescriptionId);
       if (existingAdministration != null) {
         medAdmin.setId(existingAdministration.getId());
         clientBuilder.getMedicationAdministrationClient()
-            .updateMedicationAdministration(medAdmin);
+            .update(medAdmin);
       } else {
         log.warn(
             "Could not find administration [{}] for prescriptionId [{}] and encounterId [{}]."
@@ -411,14 +411,14 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
             adminId,
             prescriptionId,
             encounterId);
-        clientBuilder.getMedicationAdministrationClient().saveAdministration(medAdmin);
+        clientBuilder.getMedicationAdministrationClient().save(medAdmin);
       }
     } else {
       // We have a new administration. Populate a MedicationAdministration and save it.
       MedicationAdministration medAdmin = UcsfMedicationUtils
           .populateAdministration(admin, adminId, prescriptionId, encounterId,
               populateMedication(droolNorm), droolNorm.getMedsSets(), clientBuilder);
-      medAdmin = clientBuilder.getMedicationAdministrationClient().saveAdministration(medAdmin);
+      medAdmin = clientBuilder.getMedicationAdministrationClient().save(medAdmin);
       diffListener.newAdmin(medAdmin);
     }
   }

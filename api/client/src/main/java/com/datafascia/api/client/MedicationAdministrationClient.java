@@ -31,7 +31,7 @@ public class MedicationAdministrationClient extends BaseClient<MedicationAdminis
    * @return
    *     Medication administrations for a given encounter.
    */
-  public List<MedicationAdministration> getMedicationAdministrations(String encounterId) {
+  public List<MedicationAdministration> search(String encounterId) {
     Bundle results = client.search().forResource(MedicationAdministration.class)
         .where(new StringClientParam(MedicationAdministration.SP_ENCOUNTER)
             .matches()
@@ -46,13 +46,16 @@ public class MedicationAdministrationClient extends BaseClient<MedicationAdminis
   /**
    * Returns a MedicationAdministration for a given order ID and admin ID.
    *
-   * @param adminId The medication administration ID.
-   * @param encounterId The ID of the parent encounter.
-   * @param prescriptionId The prescription ID.
-   * @return A MedicationAdministrationClient
+   * @param adminId
+   *    The medication administration ID.
+   * @param encounterId
+   *    The ID of the parent encounter.
+   * @param prescriptionId
+   *    The prescription ID.
+   * @return
+   *    A MedicationAdministrationClient
    */
-  public MedicationAdministration getMedicationAdministration(String adminId,
-      String encounterId, String prescriptionId) {
+  public MedicationAdministration get(String adminId, String encounterId, String prescriptionId) {
     Bundle results = client.search().forResource(MedicationAdministration.class)
         .where(new StringClientParam(MedicationAdministration.SP_RES_ID)
             .matches()
@@ -75,12 +78,14 @@ public class MedicationAdministrationClient extends BaseClient<MedicationAdminis
   /**
    * Returns a MedicationAdministration for a given identifier.
    *
-   * @param adminId The resource ID.
-   * @param encounterId The ID of the parent encounter.
-   * @return A MedicationAdministration
+   * @param adminId
+   *    The resource ID.
+   * @param encounterId
+   *    The ID of the parent encounter.
+   * @return
+   *    A medication administration for a given identifier.
    */
-  public MedicationAdministration getMedicationAdministration(String adminId,
-      String encounterId) {
+  public MedicationAdministration get(String adminId, String encounterId) {
     Bundle results = client.search().forResource(MedicationAdministration.class)
         .where(new StringClientParam(MedicationAdministration.SP_RES_ID)
             .matches()
@@ -100,10 +105,12 @@ public class MedicationAdministrationClient extends BaseClient<MedicationAdminis
   /**
    * Save a given MedicationAdministration.
    *
-   * @param administration The MedicationAdministration to save.
-   * @return The MedicationAdministration with populated native ID.
+   * @param administration
+   *    The MedicationAdministration to save.
+   * @return
+   *    The MedicationAdministration with populated native ID.
    */
-  public MedicationAdministration saveAdministration(MedicationAdministration administration) {
+  public MedicationAdministration save(MedicationAdministration administration) {
     MethodOutcome outcome = client.create().resource(administration).execute();
     administration.setId(outcome.getId());
     return administration;
@@ -112,9 +119,10 @@ public class MedicationAdministrationClient extends BaseClient<MedicationAdminis
   /**
    * Updates a MedicationAdministration.
    *
-   * @param admin The MedicationAdministration to update.
+   * @param admin
+   *    The MedicationAdministration to update.
    */
-  public void updateMedicationAdministration(MedicationAdministration admin) {
+  public void update(MedicationAdministration admin) {
     client.update().resource(admin).execute();
   }
 }

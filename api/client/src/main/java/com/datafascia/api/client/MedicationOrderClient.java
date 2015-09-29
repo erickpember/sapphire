@@ -8,6 +8,8 @@ import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.IGenericClient;
 import ca.uhn.fhir.rest.gclient.StringClientParam;
+import com.google.common.base.Strings;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -69,26 +71,46 @@ public class MedicationOrderClient extends BaseClient<MedicationOrder> {
   }
 
   /**
-   * Fetches a list of MedicationOrder resources
+   * Searches MedicationOrders
    *
    * @param encounterId
-   *     the encounter identifier linked to the MedicationOrder resources
-   * @return MedicationOrder list
+   *     The ID of the encounter to which the medication orders belong.
+   * @return
+   *     Medication orders for this encounter
    */
-  public List<MedicationOrder> list(String encounterId) {
-    Bundle bundle = client.search().forResource(MedicationOrder.class)
+  public List<MedicationOrder> search(String encounterId) {
+    return search(encounterId, null);
+  }
+
+  /**
+   * Searches MedicationOrders
+   *
+   * @param encounterId
+   *     The ID of the encounter to which the medicationOrders belong.
+   * @param status
+   *     Status of medicationOrder, optional.
+   * @return
+   *     Medication orders for this encounter and status
+   */
+  public List<MedicationOrder> search(String encounterId, String status) {
+    Bundle results = client.search().forResource(MedicationOrder.class)
         .where(new StringClientParam(MedicationOrder.SP_ENCOUNTER)
             .matches()
             .value(encounterId))
         .execute();
 
-    List<MedicationOrder> prescriptions =
-        bundle.getResources(MedicationOrder.class);
-    while (bundle.getLinkNext().isEmpty() == false) {
-      bundle = client.loadPage().next(bundle).execute();
-      prescriptions.addAll(bundle.getResources(MedicationOrder.class));
+    List<MedicationOrder> medicationOrders = extractBundle(results, MedicationOrder.class);
+
+    if (!Strings.isNullOrEmpty(status)) {
+      List<MedicationOrder> filteredResults = new ArrayList<>();
+      for (MedicationOrder medicationOrder : medicationOrders) {
+        if (medicationOrder.getStatus().equalsIgnoreCase(status)) {
+          filteredResults.add(medicationOrder);
+        }
+      }
+      medicationOrders = filteredResults;
     }
 
-    return prescriptions;
+    return medicationOrders;
   }
 }

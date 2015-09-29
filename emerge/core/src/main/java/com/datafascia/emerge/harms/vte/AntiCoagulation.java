@@ -27,7 +27,7 @@ public class AntiCoagulation {
   public static AnticoagulationTypeEnum getAnticoagulationTypeForEncounter(ClientBuilder client,
       String encounterId) {
     List<MedicationOrder> medicationOrders = client.getMedicationOrderClient()
-        .list(encounterId);
+        .search(encounterId);
 
     // First check active prescriptions for the anticoagulants.
     for (MedicationOrder medicationOrder : medicationOrders) {

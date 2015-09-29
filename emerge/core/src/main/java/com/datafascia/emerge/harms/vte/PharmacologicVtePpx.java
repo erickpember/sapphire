@@ -25,7 +25,7 @@ public class PharmacologicVtePpx {
     String type = null;
 
     List<MedicationOrder> medicationOrders = client.getMedicationOrderClient()
-        .list(encounterId);
+        .search(encounterId);
     for (MedicationOrder medicationOrder : medicationOrders) {
       if (medicationOrder.getStatusElement().getValueAsEnum() == MedicationOrderStatusEnum.ACTIVE) {
         String medicationOrderIdentifier = medicationOrder.getIdentifierFirstRep().getValue();

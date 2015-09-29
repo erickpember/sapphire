@@ -63,7 +63,7 @@ public class UcsfMedicationUtils {
    * @param orderId The ID of the prescription.
    * @param encounterId The encounter.
    * @param med The medication.
-   * @param medsSet A list of medication group sets.
+   * @param medsSet A search of medication group sets.
    * @param clientBuilder The resource client builder.
    * @return The populated administration.
    * @throws java.sql.SQLException When there is a problem communicating with SQL.
@@ -195,7 +195,7 @@ public class UcsfMedicationUtils {
    * Extract the ingredient codes from an order.
    *
    * @param json The JSONObject representing the order.
-   * @return A list of ingredient codes.
+   * @return A search of ingredient codes.
    */
   public static List<String> extractRxNormIngredients(JSONObject json) {
     ArrayList<String> ingredients = new ArrayList<>();

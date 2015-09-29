@@ -23,7 +23,7 @@ public class SupOrderStatus {
    */
   public static boolean supOrderStatus(ClientBuilder client, String encounterId) {
     return client.getMedicationOrderClient()
-        .list(encounterId).stream()
+        .search(encounterId).stream()
         .filter(order -> order.getIdentifierFirstRep().getValue()
             .equals(STRESS_ULCER_PROPHYLACTICS.getCode()))
         .anyMatch(order -> order.getStatusElement().getValueAsEnum()

@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.harms.vae;
 
+
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
@@ -33,7 +34,7 @@ public class RecentStressUlcerProphylaxisAdministration {
   public static boolean recentStressUlcerProphylaxisAdministration(ClientBuilder client,
       String encounterId, Date startTime) {
     List<MedicationAdministration> admins = client.getMedicationAdministrationClient()
-        .getMedicationAdministrations(encounterId)
+        .search(encounterId)
         .stream().filter(admin -> MedicationAdministrationUtils.isAfter(admin, startTime))
         .filter(medicationAdministration -> medicationAdministration.getStatusElement()
             .getValueAsEnum().equals(MedicationAdministrationStatusEnum.IN_PROGRESS)

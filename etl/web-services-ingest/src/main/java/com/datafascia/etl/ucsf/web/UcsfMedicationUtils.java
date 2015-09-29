@@ -107,7 +107,7 @@ public class UcsfMedicationUtils {
 
     String timeTaken = adminJson.get("AdministrationTime").toString();
     Instant timeTakenInstant = UcsfWebGetProcessor.epicDateToInstant(timeTaken);
-    DateTimeDt timeTakeneDt = new DateTimeDt(Date.from(timeTakenInstant));
+    DateTimeDt timeTakenDt = new DateTimeDt(Date.from(timeTakenInstant));
 
     String dose = adminJson.get("Dose").toString();
     String[] doseUnitParts = adminJson.get("DoseUnit").toString().split("\\^");
@@ -136,7 +136,7 @@ public class UcsfMedicationUtils {
       }
     }
 
-    admin.setEffectiveTime(timeTakeneDt);
+    admin.setEffectiveTime(timeTakenDt);
 
     log.info("Populated admin with encounter " + admin.getEncounter().getReference().getIdPart());
 

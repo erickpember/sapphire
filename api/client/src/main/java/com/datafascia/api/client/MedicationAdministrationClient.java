@@ -8,6 +8,8 @@ import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.IGenericClient;
 import ca.uhn.fhir.rest.gclient.StringClientParam;
+import com.google.common.base.Strings;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -32,15 +34,40 @@ public class MedicationAdministrationClient extends BaseClient<MedicationAdminis
    *     Medication administrations for a given encounter.
    */
   public List<MedicationAdministration> search(String encounterId) {
+    return search(encounterId, null);
+  }
+
+  /**
+   * Searches medication administrations by encounter and status
+   *
+   * @param encounterId
+   *     The ID of the encounter to which the medicationAdministrations belong.
+   * @param status
+   *    Status of medicationAdministration, optional.
+   * @return
+   *    A list of MedicationAdministrations for the encounter and status.
+   */
+  public List<MedicationAdministration> search(String encounterId, String status) {
     Bundle results = client.search().forResource(MedicationAdministration.class)
         .where(new StringClientParam(MedicationAdministration.SP_ENCOUNTER)
             .matches()
             .value(encounterId))
         .execute();
-    List<MedicationAdministration> administrations = extractBundle(results,
+
+    List<MedicationAdministration> medicationAdministrations = extractBundle(results,
         MedicationAdministration.class);
 
-    return administrations;
+    if (!Strings.isNullOrEmpty(status)) {
+      List<MedicationAdministration> filteredResults = new ArrayList<>();
+      for (MedicationAdministration medicationAdministration : medicationAdministrations) {
+        if (medicationAdministration.getStatus().equalsIgnoreCase(status)) {
+          filteredResults.add(medicationAdministration);
+        }
+      }
+      medicationAdministrations = filteredResults;
+    }
+
+    return medicationAdministrations;
   }
 
   /**

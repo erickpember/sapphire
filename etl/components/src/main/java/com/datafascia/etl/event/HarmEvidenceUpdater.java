@@ -13,6 +13,7 @@ import com.datafascia.emerge.ucsf.DemographicData;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.MedicalData;
 import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
+import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -25,6 +26,9 @@ import javax.inject.Inject;
  * Updates harm evidence for a patient in response to an event.
  */
 public class HarmEvidenceUpdater {
+
+  @Inject
+  private Clock clock;
 
   @Inject
   private HarmEvidenceRepository harmEvidenceRepository;
@@ -56,15 +60,15 @@ public class HarmEvidenceUpdater {
   }
 
   private static String formatInstant(Instant instant) {
-    return DateTimeFormatter.ISO_INSTANT.format(instant);
+    return instant.toString();
   }
 
   private static String formatDateTime(Date date) {
     return formatInstant(date.toInstant());
   }
 
-  private static String formatNow() {
-    return formatInstant(Instant.now());
+  private String formatNow() {
+    return formatInstant(Instant.now(clock));
   }
 
   private static String formatLocalDate(Date date) {
@@ -107,10 +111,12 @@ public class HarmEvidenceUpdater {
     demographicData
         .withPatientName(
             HumanNames.toFullName(patient.getNameFirstRep()))
-        .withRace(
-            formatRace(patient))
         .withGender(
             formatGender(patient))
+        .withRace(
+            formatRace(patient))
+        .withRoomNumber(
+            formatRoomNumber(location))
         .withUpdateTime(
             formatNow());
 

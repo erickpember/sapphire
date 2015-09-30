@@ -14,9 +14,14 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.google.inject.Provides;
+import com.google.inject.util.Modules;
 import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.util.TimeZone;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.testng.annotations.BeforeMethod;
@@ -26,9 +31,12 @@ import org.testng.annotations.BeforeMethod;
  */
 public class HL7MessageProcessorTestSupport {
 
+  private static final ZoneId ZONE_ID = ZoneId.of("America/Los_Angeles");
+
   private static class TestModule extends AbstractModule {
     @Override
     protected void configure() {
+      bind(Clock.class).toInstance(Clock.fixed(Instant.now(), ZONE_ID));
     }
 
     @Provides
@@ -58,8 +66,11 @@ public class HL7MessageProcessorTestSupport {
 
   @BeforeMethod
   public void injectMembers() throws Exception {
+    TimeZone.setDefault(TimeZone.getTimeZone(ZONE_ID));
+
     Injector injector = Guice.createInjector(
-        new TestModule(), new ConfigureModule(), new ComponentsModule());
+        Modules.override(new ConfigureModule(), new ComponentsModule())
+            .with(new TestModule()));
     injector.injectMembers(this);
   }
 

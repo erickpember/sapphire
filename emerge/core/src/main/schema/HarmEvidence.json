@@ -114,6 +114,10 @@
         "admissionWeight": {
           "type": "number",
           "description": "An explanation about the purpose of this instance described by this schema."
+        },
+        "roomNumber": {
+          "type": "string",
+          "description": "Where the patient is located."
         }
       }
     },
@@ -433,7 +437,7 @@
                 }
               }
             },
-            "benzo": {
+            "sedative": {
               "type": "object",
               "description": "An explanation about the purpose of this instance described by this schema.",
               "properties": {
@@ -450,6 +454,10 @@
                       "drug": {
                         "type": "string",
                         "description": "An explanation about the purpose of this instance described by this schema."
+                      },
+                      "dosageRoute": {
+                        "type": "string",
+                        "description": "How the medication is administered."
                       },
                       "updateTime": {
                         "type": "string",

@@ -11,6 +11,7 @@ import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
 
 /**
  * MedicationAdministration helper methods
@@ -88,6 +89,69 @@ public class MedicationAdministrationUtils {
         .filter(medicationAdministration -> medicationAdministration.getStatusElement().
             getValueAsEnum().equals(MedicationAdministrationStatusEnum.IN_PROGRESS))
         .filter(medicationAdministration -> dosageOverZero(medicationAdministration)).isPresent();
+  }
+
+  /**
+   * Returns true if there exists a MedicationAdministration for a given encounter for
+   * a given Meds Set name with
+   *   - Status: In Progress or Completed
+   *   - Dosage.quantity > 0
+   *   - Reason Not Given is null
+   *   - Inside a given time frame.
+   *
+   * @param encounterId
+   *    encounter to search for medication administrations
+   * @param client
+   *    API client
+   * @param timeFrame
+   *    Time window constraint for search.
+   * @param medsSet
+   *    Meds group name that UCSF uses.
+   * @return
+   *    True if there is a medicationAdministration that matches criteria for in progress
+   *    infusion.
+   */
+  public static boolean beenAdministered(ClientBuilder client, String encounterId,
+      PeriodDt timeFrame, String medsSet) {
+    List<MedicationAdministration> medicationAdministrations = client.
+        getMedicationAdministrationClient().search(encounterId);
+    medicationAdministrations.addAll(client.getMedicationAdministrationClient()
+        .search(encounterId));
+    return medicationAdministrations.stream()
+        .filter(medicationAdministration -> medicationAdministration.getStatusElement().
+            getValueAsEnum().equals(MedicationAdministrationStatusEnum.IN_PROGRESS)
+            || medicationAdministration.getStatusElement().getValueAsEnum()
+            .equals(MedicationAdministrationStatusEnum.COMPLETED))
+        .filter(admin -> admin.getIdentifierFirstRep().getValue().equals(medsSet))
+        .filter(medicationAdministration -> dosageOverZero(medicationAdministration))
+        .filter(medicationAdministration -> insideTimeFrame(medicationAdministration, timeFrame))
+        .anyMatch(medicationAdministration -> dosageOverZero(medicationAdministration));
+  }
+
+  /**
+   * Returns true if a specified medication administration is inside a specified time window.
+   *
+   * @param admin
+   *     Medication administration resource.
+   * @param timeFrame
+   *     Time window constraint for search.
+   * @return
+   *     True if the supplied administration is inside the specified time window.
+   */
+  public static boolean insideTimeFrame(MedicationAdministration admin, PeriodDt timeFrame) {
+    IDatatype effectiveTime = admin.getEffectiveTime();
+    if (effectiveTime instanceof TimingDt) {
+      return ((TimingDt) effectiveTime).getEventFirstRep().getValue().after(timeFrame.getStart())
+          && ((TimingDt) effectiveTime).getEventFirstRep().getValue().before(timeFrame.getEnd());
+    } else if (effectiveTime instanceof PeriodDt) {
+      return ((PeriodDt) effectiveTime).getStart().after(timeFrame.getStart())
+          && ((PeriodDt) effectiveTime).getEnd().before(timeFrame.getEnd());
+    } else if (effectiveTime instanceof DateTimeDt) {
+      return ((DateTimeDt) effectiveTime).getValue().after(timeFrame.getStart())
+          && ((DateTimeDt) effectiveTime).getValue().before(timeFrame.getEnd());
+    } else {
+      throw new RuntimeException("Unexpected type: " + effectiveTime.getClass().getCanonicalName());
+    }
   }
 
   /**

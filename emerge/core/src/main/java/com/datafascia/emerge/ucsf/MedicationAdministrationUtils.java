@@ -44,6 +44,28 @@ public class MedicationAdministrationUtils {
   }
 
   /**
+   * Returns false if there exists a MedicationAdministration for a given encounter with
+   *   - Status: In Progress
+   *   - Dosage.quantity > 0
+   *   - Identifier that is present in a list of known Continuous MedSets, except PCAs
+   *
+   * Otherwise returns true.
+   *
+   * @param encounterId
+   *    encounter to search for medication administrations
+   * @param client
+   *    API client
+   * @param medsSet
+   *    Meds group name that UCSF uses.
+   * @return
+   *    True if there is not a medicationAdministration that matches criteria for in progress
+   *    infusion.
+   */
+  public static boolean notInfusing(ClientBuilder client, String encounterId, String medsSet) {
+    return !activelyInfusing(client, encounterId, medsSet);
+  }
+
+  /**
    * Given an encounter and a Meds Set group name, return true if, of the administrations
    * for this encounter and meds set, the freshest administration has a status of in-progress
    * and a dosage over zero.

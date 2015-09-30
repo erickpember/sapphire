@@ -2,13 +2,13 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.event;
 
-import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Flag;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.dstu2.valueset.FlagStatusEnum;
+import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.emerge.ucsf.codes.FlagCodeEnum;
 import java.util.ArrayList;
@@ -20,8 +20,8 @@ import java.util.List;
 public class FlagBuilder {
 
   private static final String ADVANCE_DIRECTIVE = "230218701ADPOA";
+  private static final String PATIENT_CARE_CONFERENCE_NOTE = "1000002";
   private static final String PHYSICIAN_ORDERS_FOR_LIFE_SUSTAINING_TREATMENT = "230218701POLST";
-  private static final String PATIENT_CARE_CONFERENCE_NOTE = "10000002";
 
   private final UnitedStatesPatient patient;
   private final List<Flag> flags = new ArrayList<>();
@@ -36,9 +36,9 @@ public class FlagBuilder {
     this.patient = patient;
   }
 
-  private void addFlag(FlagCodeEnum code, Observation observation) {
+  private void addFlag(FlagCodeEnum code, DateTimeDt periodStart) {
     PeriodDt period = new PeriodDt();
-    period.setStart(observation.getIssued(), TemporalPrecisionEnum.DAY);
+    period.setStart(periodStart);
 
     Flag flag = new Flag()
         .setStatus(FlagStatusEnum.ACTIVE)
@@ -47,6 +47,27 @@ public class FlagBuilder {
         .setSubject(new ResourceReferenceDt(patient));
 
     flags.add(flag);
+  }
+
+  private void addFlag(FlagCodeEnum code, Observation observation) {
+    addFlag(code, (DateTimeDt) observation.getEffective());
+  }
+
+  /**
+   * Adds flag if the document type is recognized.
+   *
+   * @param documentType
+   *     TXA-2 field value
+   * @param periodStart
+   *     period start
+   * @return builder
+   */
+  public FlagBuilder addDocumentType(String documentType, DateTimeDt periodStart) {
+    if (PATIENT_CARE_CONFERENCE_NOTE.equals(documentType)) {
+      addFlag(FlagCodeEnum.PATIENT_CARE_CONFERENCE_NOTE, periodStart);
+    }
+
+    return this;
   }
 
   /**

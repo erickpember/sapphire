@@ -6,26 +6,8 @@ import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Location;
 import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
-import com.datafascia.common.accumulo.AccumuloConfiguration;
-import com.datafascia.common.accumulo.ConnectorFactory;
-import com.datafascia.common.configuration.guice.ConfigureModule;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
-import com.datafascia.domain.persist.EncounterRepository;
-import com.datafascia.domain.persist.LocationRepository;
-import com.datafascia.domain.persist.PatientRepository;
-import com.datafascia.etl.inject.ComponentsModule;
-import com.google.common.io.Resources;
-import com.google.inject.AbstractModule;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
-import com.google.inject.Provides;
-import java.io.IOException;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import javax.inject.Inject;
-import javax.inject.Singleton;
-import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -34,50 +16,7 @@ import static org.testng.Assert.assertEquals;
  * {@link HL7MessageProcessor} test
  */
 @Test(singleThreaded = true)
-public class HL7MessageProcessorTest {
-
-  private static class TestModule extends AbstractModule {
-    @Override
-    protected void configure() {
-    }
-
-    @Provides
-    @Singleton
-    public ConnectorFactory connectorFactory() {
-      return new ConnectorFactory(
-          AccumuloConfiguration.builder()
-          .instance(ConnectorFactory.MOCK_INSTANCE)
-          .zooKeepers("")
-          .user("root")
-          .password("secret")
-          .build());
-    }
-  }
-
-  @Inject
-  private HL7MessageProcessor hl7MessageProcessor;
-
-  @Inject
-  private EncounterRepository encounterRepository;
-
-  @Inject
-  private LocationRepository locationRepository;
-
-  @Inject
-  private PatientRepository patientRepository;
-
-  @BeforeMethod
-  public void injectMembers() throws Exception {
-    Injector injector = Guice.createInjector(
-        new TestModule(), new ConfigureModule(), new ComponentsModule());
-    injector.injectMembers(this);
-  }
-
-  private void processMessage(String hl7File) throws IOException {
-    URL url = HL7MessageProcessorTest.class.getResource(hl7File);
-    String message = Resources.toString(url, StandardCharsets.UTF_8).replace('\n', '\r');
-    hl7MessageProcessor.accept(message.getBytes(StandardCharsets.UTF_8));
-  }
+public class HL7MessageProcessorTest extends HL7MessageProcessorTestSupport {
 
   @Test
   public void ADT_A01_should_create_encounter_in_progress() throws Exception {

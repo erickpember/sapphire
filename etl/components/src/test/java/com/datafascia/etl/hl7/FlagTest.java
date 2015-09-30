@@ -4,7 +4,9 @@ package com.datafascia.etl.hl7;
 
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
+import com.datafascia.domain.persist.FlagRepository;
 import com.datafascia.emerge.ucsf.codes.FlagCodeEnum;
+import javax.inject.Inject;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertTrue;
@@ -14,6 +16,9 @@ import static org.testng.Assert.assertTrue;
  */
 @Test(singleThreaded = true)
 public class FlagTest extends HL7MessageProcessorTestSupport {
+
+  @Inject
+  private FlagRepository flagRepository;
 
   private boolean flagExists(FlagCodeEnum flagCode) {
     Id<UnitedStatesPatient> patientId = Id.of("97546762");

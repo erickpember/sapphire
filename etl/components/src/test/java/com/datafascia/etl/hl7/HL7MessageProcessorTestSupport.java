@@ -6,7 +6,6 @@ import com.datafascia.common.accumulo.AccumuloConfiguration;
 import com.datafascia.common.accumulo.ConnectorFactory;
 import com.datafascia.common.configuration.guice.ConfigureModule;
 import com.datafascia.domain.persist.EncounterRepository;
-import com.datafascia.domain.persist.FlagRepository;
 import com.datafascia.domain.persist.LocationRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.etl.inject.ComponentsModule;
@@ -56,9 +55,6 @@ public class HL7MessageProcessorTestSupport {
 
   @Inject
   protected PatientRepository patientRepository;
-
-  @Inject
-  protected FlagRepository flagRepository;
 
   @BeforeMethod
   public void injectMembers() throws Exception {

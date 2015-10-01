@@ -97,6 +97,31 @@ public class ProcedureRequestUtils {
             .getValueAsEnum().equals(ProcedureRequestStatusEnum.IN_PROGRESS)).isPresent();
   }
 
+   /**
+   * Given an encounter and a Procedure type code, find the freshest match that is also
+   * scheduled after now. If the freshest is in progress, return true.
+   * and a dosage over zero.
+   *
+   * @param encounterId
+   *    encounter to search for procedure requests
+   * @param client
+   *    API client
+   * @param procedureCode
+   *    Code field in ProcedureRequest, identifies the type of procedure for this search.
+   * @return
+   *    True if the freshest procedure request scheduled in the future for this encounter and code
+   *    and has a status of in progress.
+   */
+  public static boolean futureNonMedicationOrder(ClientBuilder client, String encounterId,
+      String procedureCode) {
+    return client.getProcedureRequestClient()
+        .searchProcedureRequest(encounterId, procedureCode, null).stream()
+        .filter(request -> afterNow(request))
+        .max(new ProcedureRequestScheduledComparator())
+        .filter(request -> request.getStatusElement()
+            .getValueAsEnum().equals(ProcedureRequestStatusEnum.IN_PROGRESS)).isPresent();
+  }
+
   /**
    * Returns true if a specified procedure request is scheduled before now.
    *
@@ -114,6 +139,28 @@ public class ProcedureRequestUtils {
       return ((PeriodDt) scheduled).getStart().before(now);
     } else if (scheduled instanceof DateTimeDt) {
       return ((DateTimeDt) scheduled).getValue().before(now);
+    } else {
+      throw new RuntimeException("Unexpected type: " + scheduled.getClass().getCanonicalName());
+    }
+  }
+
+  /**
+   * Returns true if a specified procedure request is scheduled after now.
+   *
+   * @param request
+   *     Procedure request resource.
+   * @return
+   *     True if the supplied request is scheduled after now.
+   */
+  public static boolean afterNow(ProcedureRequest request) {
+    Date now = new Date();
+    IDatatype scheduled = request.getScheduled();
+    if (scheduled instanceof TimingDt) {
+      return ((TimingDt) scheduled).getEventFirstRep().getValue().after(now);
+    } else if (scheduled instanceof PeriodDt) {
+      return ((PeriodDt) scheduled).getStart().after(now);
+    } else if (scheduled instanceof DateTimeDt) {
+      return ((DateTimeDt) scheduled).getValue().after(now);
     } else {
       throw new RuntimeException("Unexpected type: " + scheduled.getClass().getCanonicalName());
     }

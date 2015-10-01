@@ -3,6 +3,8 @@
 package com.datafascia.emerge.ucsf;
 
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
+import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
+import com.datafascia.api.client.ClientBuilder;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -41,5 +43,28 @@ public class ProcedureRequestUtils {
       List<ProcedureRequest> procedureRequests) {
     return procedureRequests.stream()
         .sorted().collect(Collectors.toList());
+  }
+
+  /**
+   * Given an encounter and a Procedure type code, find the freshest. If the freshest
+   * is in progress, return true.
+   *
+   * @param encounterId
+   *    encounter to search for procedure requests
+   * @param client
+   *    API client
+   * @param procedureCode
+   *    Code field in ProcedureRequest, identifies the type of procedure for this search.
+   * @return
+   *    True if the freshest procedure request for this encounter and code has a status of
+   *    in progress.
+   */
+  public static boolean activeNonMedicationOrder(ClientBuilder client, String encounterId,
+      String procedureCode) {
+    return client.getProcedureRequestClient()
+        .searchProcedureRequest(encounterId, procedureCode, null).stream()
+        .max(new ProcedureRequestScheduledComparator())
+        .filter(request -> request.getStatusElement()
+            .getValueAsEnum().equals(ProcedureRequestStatusEnum.IN_PROGRESS)).isPresent();
   }
 }

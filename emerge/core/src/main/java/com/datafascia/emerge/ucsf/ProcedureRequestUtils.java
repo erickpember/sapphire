@@ -9,6 +9,7 @@ import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -164,5 +165,32 @@ public class ProcedureRequestUtils {
     } else {
       throw new RuntimeException("Unexpected type: " + scheduled.getClass().getCanonicalName());
     }
+  }
+
+  /**
+   * Returns the procedure requests for a given encounter with the given code and after the given
+   * time.
+   *
+   * @param client
+   *     The client to use.
+   * @param encounterId
+   *     The encounter to search by.
+   * @param code
+   *     The code to search by.
+   * @param date
+   *     The lower time bound.
+   * @return A list of procedure requests.
+   */
+  public static List<ProcedureRequest> getByCodeAfterTime(ClientBuilder client,
+      String encounterId, String code, Date date) {
+    List<ProcedureRequest> requests
+        = client.getProcedureRequestClient().searchProcedureRequest(encounterId, code, null);
+    List<ProcedureRequest> returnList = new ArrayList<>();
+    for (ProcedureRequest req : requests) {
+      if (req.getOrderedOn().after(date)) {
+        returnList.add(req);
+      }
+    }
+    return returnList;
   }
 }

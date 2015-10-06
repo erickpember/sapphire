@@ -35,7 +35,7 @@ public class HarmEvidenceRepository extends ReflectEntityStoreRepository {
   }
 
   private static Id<HarmEvidence> generateId(HarmEvidence record) {
-    return Id.of(record.getPatientID());
+    return Id.of(record.getDemographicData().getMedicalRecordNumber());
   }
 
   /**

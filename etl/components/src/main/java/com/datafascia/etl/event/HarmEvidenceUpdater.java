@@ -59,16 +59,8 @@ public class HarmEvidenceUpdater {
     }
   }
 
-  private static String formatInstant(Instant instant) {
-    return instant.toString();
-  }
-
-  private static String formatDateTime(Date date) {
-    return formatInstant(date.toInstant());
-  }
-
-  private String formatNow() {
-    return formatInstant(Instant.now(clock));
+  private Date formatNow() {
+    return Date.from(Instant.now(clock));
   }
 
   private static String formatLocalDate(Date date) {
@@ -92,8 +84,10 @@ public class HarmEvidenceUpdater {
     Optional<HarmEvidence> optionalHarmEvidence = harmEvidenceRepository.read(patientId);
     if (!optionalHarmEvidence.isPresent()) {
       return new HarmEvidence()
-          .withDemographicData(new DemographicData())
-          .withMedicalData(new MedicalData());
+          .withDemographicData(
+              new DemographicData())
+          .withMedicalData(
+              new MedicalData());
     }
     return optionalHarmEvidence.get();
   }
@@ -102,15 +96,14 @@ public class HarmEvidenceUpdater {
       UnitedStatesPatient patient, Location location, Encounter encounter) {
 
     HarmEvidence harmEvidence = getHarmEvidence(patient.getId().getIdPart())
-        .withPatientID(
-            patient.getIdentifierFirstRep().getValue())
         .withEncounterID(
             encounter.getIdentifierFirstRep().getValue());
 
-    DemographicData demographicData = harmEvidence.getDemographicData();
-    demographicData
+    DemographicData demographicData = harmEvidence.getDemographicData()
         .withPatientName(
             HumanNames.toFullName(patient.getNameFirstRep()))
+        .withMedicalRecordNumber(
+            patient.getIdentifierFirstRep().getValue())
         .withGender(
             formatGender(patient))
         .withRace(
@@ -122,7 +115,7 @@ public class HarmEvidenceUpdater {
 
     if (!encounter.getPeriod().getStartElement().isEmpty()) {
       demographicData.setICUadmitDate(
-          formatDateTime(encounter.getPeriod().getStartElement().getValue()));
+          encounter.getPeriod().getStartElement().getValue());
     }
 
     if (!patient.getBirthDateElement().isEmpty()) {

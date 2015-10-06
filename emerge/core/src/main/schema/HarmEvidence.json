@@ -5,25 +5,28 @@
   "definitions": {
     "Practitioner": {
       "type": "object",
-      "description": "An explanation about the purpose of this instance described by this schema.",
+      "javaType": "com.datafascia.emerge.ucsf.Practitioner",
+      "description": "Care team member",
       "properties": {
         "name": {
           "type": "string",
-          "description": "An explanation about the purpose of this instance described by this schema."
+          "description": "Full name in the format First Middle_1 Middle_2 ... Last, where the Middle names are omitted if they do not exist. The name issued on the first submission for a given care team member must be used in all subsequent submissions"
         },
         "addedToCareTeam": {
           "type": "string",
+          "format": "date-time",
           "description": "An explanation about the purpose of this instance described by this schema."
         },
         "updateTime": {
           "type": "string",
           "format": "date-time",
-          "description": "When this data was updated"
+          "description": "When this value was updated"
         }
       }
     },
     "TimestampedBoolean": {
       "type": "object",
+      "javaType": "com.datafascia.emerge.ucsf.TimestampedBoolean",
       "properties": {
         "value": {
           "type": "boolean"
@@ -35,8 +38,24 @@
         }
       }
     },
+    "TimestampedMaybe": {
+      "type": "object",
+      "javaType": "com.datafascia.emerge.ucsf.TimestampedMaybe",
+      "description": "enum of Yes, No, Contraindicated, Not Documented",
+      "properties": {
+        "value": {
+          "type": "string",
+          "enum": [ "Yes", "No", "Contraindicated", "Not Documented" ]
+        },
+        "updateTime": {
+          "type": "string",
+          "description": "When the value was updated"
+        }
+      }
+    },
     "TimestampedNumber": {
       "type": "object",
+      "javaType": "com.datafascia.emerge.ucsf.TimestampedNumber",
       "properties": {
         "value": {
           "type": "number"
@@ -50,6 +69,7 @@
     },
     "TimestampedString": {
       "type": "object",
+      "javaType": "com.datafascia.emerge.ucsf.TimestampedString",
       "properties": {
         "value": {
           "type": "string"
@@ -66,10 +86,6 @@
   "type": "object",
   "description": "Demographic and safety checklist data intended for consumption by Emerge at UCSF.",
   "properties": {
-    "patientID": {
-      "type": "string",
-      "description": "Institution assigned patient identifier. For example, medical record number."
-    },
     "encounterID": {
       "type": "string",
       "description": "Institution assigned encounter identifier. For example, visit number."
@@ -80,14 +96,20 @@
       "properties": {
         "updateTime": {
           "type": "string",
-          "description": "An explanation about the purpose of this instance described by this schema."
+          "format": "date-time",
+          "description": "When this value was updated"
         },
         "patientName": {
           "type": "string",
-          "description": "An explanation about the purpose of this instance described by this schema."
+          "description": "Full name in the format First Middle_1 Middle_2 ... Last, where the Middle names are omitted if they do not exist"
+        },
+        "medicalRecordNumber": {
+          "type": "string",
+          "description": "Institution assigned patient identifier"
         },
         "ICUadmitDate": {
           "type": "string",
+          "format": "date-time",
           "description": "An explanation about the purpose of this instance described by this schema."
         },
         "readmission": {
@@ -96,6 +118,7 @@
         },
         "dateOfBirth": {
           "type": "string",
+          "format": "date",
           "description": "An explanation about the purpose of this instance described by this schema."
         },
         "gender": {
@@ -143,6 +166,7 @@
                     },
                     "dataEntryTime": {
                       "type": "string",
+                      "format": "date-time",
                       "description": "An explanation about the purpose of this instance described by this schema."
                     }
                   }
@@ -156,19 +180,22 @@
                       "description": "An explanation about the purpose of this instance described by this schema.",
                       "properties": {
                         "painMin": {
-                          "type": "string",
+                          "type": "integer",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         },
                         "startOfTimePeriod": {
                           "type": "string",
+                          "format": "date-time",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         },
                         "timeOfCalculation": {
                           "type": "string",
+                          "format": "date-time",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         },
                         "endOfTimePeriod": {
                           "type": "string",
+                          "format": "date-time",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         }
                       }
@@ -179,10 +206,11 @@
                       "properties": {
                         "timeOfDataAquisition": {
                           "type": "string",
+                          "format": "date-time",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         },
                         "painScore": {
-                          "type": "string",
+                          "type": "integer",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         }
                       }
@@ -193,18 +221,21 @@
                       "properties": {
                         "startOfTimePeriod": {
                           "type": "string",
+                          "format": "date-time",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         },
                         "painMax": {
-                          "type": "string",
+                          "type": "integer",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         },
                         "timeOfCalculation": {
                           "type": "string",
+                          "format": "date-time",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         },
                         "endOfTimePeriod": {
                           "type": "string",
+                          "format": "date-time",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         }
                       }
@@ -220,19 +251,22 @@
                       "description": "An explanation about the purpose of this instance described by this schema.",
                       "properties": {
                         "painMin": {
-                          "type": "string",
+                          "type": "integer",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         },
                         "startOfTimePeriod": {
                           "type": "string",
+                          "format": "date-time",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         },
                         "timeOfCalculation": {
                           "type": "string",
+                          "format": "date-time",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         },
                         "endOfTimePeriod": {
                           "type": "string",
+                          "format": "date-time",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         }
                       }
@@ -243,10 +277,11 @@
                       "properties": {
                         "timeOfDataAquisition": {
                           "type": "string",
+                          "format": "date-time",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         },
                         "painScore": {
-                          "type": "string",
+                          "type": "integer",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         }
                       }
@@ -257,18 +292,21 @@
                       "properties": {
                         "startOfTimePeriod": {
                           "type": "string",
+                          "format": "date-time",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         },
                         "painMax": {
-                          "type": "string",
+                          "type": "integer",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         },
                         "timeOfCalculation": {
                           "type": "string",
+                          "format": "date-time",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         },
                         "endOfTimePeriod": {
                           "type": "string",
+                          "format": "date-time",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         }
                       }
@@ -284,19 +322,22 @@
                       "description": "An explanation about the purpose of this instance described by this schema.",
                       "properties": {
                         "painMin": {
-                          "type": "string",
+                          "type": "integer",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         },
                         "startOfTimePeriod": {
                           "type": "string",
+                          "format": "date-time",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         },
                         "timeOfCalculation": {
                           "type": "string",
+                          "format": "date-time",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         },
                         "endOfTimePeriod": {
                           "type": "string",
+                          "format": "date-time",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         }
                       }
@@ -307,10 +348,11 @@
                       "properties": {
                         "timeOfDataAquisition": {
                           "type": "string",
+                          "format": "date-time",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         },
                         "painScore": {
-                          "type": "string",
+                          "type": "integer",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         }
                       }
@@ -321,18 +363,21 @@
                       "properties": {
                         "startOfTimePeriod": {
                           "type": "string",
+                          "format": "date-time",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         },
                         "painMax": {
-                          "type": "string",
+                          "type": "integer",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         },
                         "timeOfCalculation": {
                           "type": "string",
+                          "format": "date-time",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         },
                         "endOfTimePeriod": {
                           "type": "string",
+                          "format": "date-time",
                           "description": "An explanation about the purpose of this instance described by this schema."
                         }
                       }
@@ -355,6 +400,7 @@
                     },
                     "dataEntryTime": {
                       "type": "string",
+                      "format": "date-time",
                       "description": "An explanation about the purpose of this instance described by this schema."
                     }
                   }
@@ -364,19 +410,22 @@
                   "description": "An explanation about the purpose of this instance described by this schema.",
                   "properties": {
                     "RASSMin": {
-                      "type": "string",
+                      "type": "integer",
                       "description": "An explanation about the purpose of this instance described by this schema."
                     },
                     "startOfTimePeriod": {
                       "type": "string",
+                      "format": "date-time",
                       "description": "An explanation about the purpose of this instance described by this schema."
                     },
                     "timeOfCalculation": {
                       "type": "string",
+                      "format": "date-time",
                       "description": "An explanation about the purpose of this instance described by this schema."
                     },
                     "endOfTimePeriod": {
                       "type": "string",
+                      "format": "date-time",
                       "description": "An explanation about the purpose of this instance described by this schema."
                     }
                   }
@@ -386,11 +435,12 @@
                   "description": "An explanation about the purpose of this instance described by this schema.",
                   "properties": {
                     "RASSScore": {
-                      "type": "string",
+                      "type": "integer",
                       "description": "An explanation about the purpose of this instance described by this schema."
                     },
                     "timeOfDataAquisition": {
                       "type": "string",
+                      "format": "date-time",
                       "description": "An explanation about the purpose of this instance described by this schema."
                     }
                   }
@@ -401,18 +451,21 @@
                   "properties": {
                     "startOfTimePeriod": {
                       "type": "string",
+                      "format": "date-time",
                       "description": "An explanation about the purpose of this instance described by this schema."
                     },
                     "RASSMax": {
-                      "type": "string",
+                      "type": "integer",
                       "description": "An explanation about the purpose of this instance described by this schema."
                     },
                     "timeOfCalculation": {
                       "type": "string",
+                      "format": "date-time",
                       "description": "An explanation about the purpose of this instance described by this schema."
                     },
                     "endOfTimePeriod": {
                       "type": "string",
+                      "format": "date-time",
                       "description": "An explanation about the purpose of this instance described by this schema."
                     }
                   }
@@ -425,14 +478,17 @@
               "properties": {
                 "result": {
                   "type": "string",
+                  "enum": [ "Negative", "Positive", "Not Completed", "UTA" ],
                   "description": "An explanation about the purpose of this instance described by this schema."
                 },
                 "utaReason": {
                   "type": "string",
+                  "enum": [ "RASS Score -4 or -5", "Language Barrier", "Developmental Delay" ],
                   "description": "An explanation about the purpose of this instance described by this schema."
                 },
                 "updateTime": {
                   "type": "string",
+                  "format": "date-time",
                   "description": "An explanation about the purpose of this instance described by this schema."
                 }
               }
@@ -453,14 +509,28 @@
                     "properties": {
                       "drug": {
                         "type": "string",
+                        "enum": [
+                          "Lorazepam ",
+                          "Midazolam",
+                          "Clonazepam",
+                          "Diazepam",
+                          "Chloradiazepoxide",
+                          "Alprazalom"
+                        ],
                         "description": "An explanation about the purpose of this instance described by this schema."
                       },
                       "dosageRoute": {
                         "type": "string",
+                        "enum": [
+                          "Intermittent IV",
+                          "Intermittent Enteral",
+                          "Continuous Infusion IV"
+                        ],
                         "description": "How the medication is administered."
                       },
                       "updateTime": {
                         "type": "string",
+                        "format": "date-time",
                         "description": "An explanation about the purpose of this instance described by this schema."
                       }
                     }
@@ -480,6 +550,17 @@
             },
             "notCandidateReason": {
               "type": "string",
+              "enum": [
+                "Off Sedation",
+                "Receiving NMBA",
+                "Other",
+                "Therapeutic Hypothermia",
+                "Status Epilepticus",
+                "Respiratory Instability",
+                "RASS 2+ or Greater",
+                "Withdrawal Seizure Risk",
+                "Hemodynamic Instability"
+              ],
               "description": "An explanation about the purpose of this instance described by this schema."
             },
             "performed": {
@@ -488,6 +569,7 @@
             },
             "updateTime": {
               "type": "string",
+              "format": "date-time",
               "description": "An explanation about the purpose of this instance described by this schema."
             }
           }
@@ -502,10 +584,12 @@
               "properties": {
                 "performed": {
                   "type": "string",
+                  "enum": [ "Yes", "No", "N/A" ],
                   "description": "An explanation about the purpose of this instance described by this schema."
                 },
                 "updateTime": {
                   "type": "string",
+                  "format": "date-time",
                   "description": "An explanation about the purpose of this instance described by this schema."
                 }
               }
@@ -519,14 +603,55 @@
                 "properties": {
                   "type": {
                     "type": "string",
+                    "enum": [
+                      "CVC Single Lumen",
+                      "Tunneled CVC Single Lumen",
+                      "Non-tunneled CVC Single Lumen",
+                      "CVC Double Lumen",
+                      "Tunneled CVC Double Lumen",
+                      "Non-tunneled CVC Double Lumen",
+                      "CVC Triple Lumen",
+                      "Tunneled CVC Triple Lumen",
+                      "Non-tunneled CVC Triple Lumen",
+                      "CVC Quadruple Lumen",
+                      "Tunneled CVC Quadruple Lumen",
+                      "Non-tunneled CVC Quadruple Lumen",
+                      "Hemodialysis/Pheresis Catheter",
+                      "Tunneled Hemodialysis/Pheresis Catheter",
+                      "Double Lumen Hemodialysis/Pheresis Catheter",
+                      "Tunneled Double Lumen Hemodialysis/Pheresis Catheter",
+                      "Non-tunneled Double Lumen Hemodialysis/Pheresis Catheter",
+                      "Triple Lumen Hemodialysis/Pheresis Catheter",
+                      "Tunneled Triple Lumen Hemodialysis/Pheresis Catheter",
+                      "Non-tunneled Triple Lumen Hemodialysis/Pheresis Catheter",
+                      "Introducer",
+                      "MAC Introducer",
+                      "PSI Introducer",
+                      "Pulmonary Artery Catheter",
+                      "PICC Single Lumen",
+                      "PICC Double Lumen",
+                      "PICC Triple Lumen",
+                      "Implanted Port Single Lumen",
+                      "Implanted Port Double Lumen"
+                    ],
                     "description": "An explanation about the purpose of this instance described by this schema."
                   },
                   "site": {
                     "type": "string",
+                    "enum": [
+                      "Internal Jugular",
+                      "Subclavian",
+                      "Femoral",
+                      "Upper Arm",
+                      "Chest",
+                      "Other",
+                      "Unknown"
+                    ],
                     "description": "An explanation about the purpose of this instance described by this schema."
                   },
                   "side": {
                     "type": "string",
+                    "enum": [ "Left", "Right" ],
                     "description": "An explanation about the purpose of this instance described by this schema."
                   },
                   "days": {
@@ -535,6 +660,7 @@
                   },
                   "updateTime": {
                     "type": "string",
+                    "format": "date-time",
                     "description": "An explanation about the purpose of this instance described by this schema."
                   }
                 }
@@ -552,26 +678,61 @@
               "properties": {
                 "updateTime": {
                   "type": "string",
+                  "format": "date-time",
                   "description": "An explanation about the purpose of this instance described by this schema."
                 },
                 "levelMobilityAchieved": {
                   "type": "string",
+                  "enum": [
+                    "No Activity or Passive ROM Only",
+                    "Bed Exercises or Sitting edge of bed <5 minutes, cycle or Active ROM",
+                    "Tilt Table",
+                    "Sitting edge of bed with any level of assist for > 5 minutes",
+                    "Passive Transfer to Chair",
+                    "Active Transfer to Chair with any level of assist",
+                    "Stand with weight support device",
+                    "Stand >10 sec with any assistive device or level of assist",
+                    "Walking 5-200 ft with any device or any level of assistance",
+                    "Walking 201-400ft with any device or level of assist, or wheelchair mobility",
+                    "Walking >400ft with or without device, supervision level"
+                  ],
                   "description": "An explanation about the purpose of this instance described by this schema."
                 },
                 "mobilityScoreTime": {
                   "type": "string",
+                  "format": "date-time",
                   "description": "An explanation about the purpose of this instance described by this schema."
                 },
                 "clinicianType": {
                   "type": "string",
+                  "enum": [ "PT", "OT", "RN" ],
                   "description": "An explanation about the purpose of this instance described by this schema."
                 },
                 "assistDevice": {
                   "type": "string",
+                  "enum": [
+                    "Not Documented",
+                    "Ceiling Lift",
+                    "Vertical dependent lift",
+                    "Neuro Chair",
+                    "Lateral Transfer Device",
+                    "Wheelchair",
+                    "Sit-to-stand Device (Powered)",
+                    "Sit-to-stand Device (Non-powered)",
+                    "Toilet Riser",
+                    "Shower chair",
+                    "Gait Belt",
+                    "Walker",
+                    "Crutches",
+                    "Cane",
+                    "Other",
+                    "None"
+                  ],
                   "description": "An explanation about the purpose of this instance described by this schema."
                 },
                 "numberOfAssists": {
                   "type": "string",
+                  "enum": [ "Not Documented", "None", "1", "2", "3+" ],
                   "description": "An explanation about the purpose of this instance described by this schema."
                 }
               }
@@ -588,10 +749,12 @@
               "properties": {
                 "updateTime": {
                   "type": "string",
+                  "format": "date-time",
                   "description": "An explanation about the purpose of this instance described by this schema."
                 },
                 "patientCareConferenceNoteTime": {
                   "type": "string",
+                  "format": "date-time",
                   "description": "An explanation about the purpose of this instance described by this schema."
                 },
                 "value": {
@@ -606,6 +769,7 @@
               "properties": {
                 "updateTime": {
                   "type": "string",
+                  "format": "date-time",
                   "description": "An explanation about the purpose of this instance described by this schema."
                 },
                 "adValue": {
@@ -626,13 +790,16 @@
                   "format": "date-time",
                   "description": "When the value was updated"
                 },
-                "orderedDateTime": {
-                  "type": "string",
-                  "format": "date-time",
-                  "description": "Procedure request scheduled date time"
-                },
                 "value": {
-                  "type": "string"
+                  "type": "string",
+                  "enum": [
+                    "Attending Partial Code",
+                    "Attending DNR/DNI",
+                    "Resident DNR/DNI",
+                    "Resident Partial Code",
+                    "Full Code",
+                    "No Current Code Status"
+                  ]
                 }
               }
             }
@@ -651,6 +818,7 @@
               "properties": {
                 "updateTime": {
                   "type": "string",
+                  "format": "date-time",
                   "description": "An explanation about the purpose of this instance described by this schema."
                 },
                 "value": {
@@ -659,6 +827,10 @@
                 },
                 "reason": {
                   "type": "string",
+                  "enum": [
+                    "High risk of skin breakdown or arterial insufficiency",
+                    "Amputations"
+                  ],
                   "description": "An explanation about the purpose of this instance described by this schema."
                 }
               }
@@ -673,14 +845,38 @@
               "$ref": "#/definitions/TimestampedBoolean"
             },
             "anticoagulationType": {
-              "$ref": "#/definitions/TimestampedString"
+              "updateTime": {
+                "type": "string",
+                "format": "date-time",
+                "description": "An explanation about the purpose of this instance described by this schema."
+              },
+              "value": {
+                "type": "string",
+                "enum": [
+                  "Continuous Infusion Heparain IV",
+                  "Continuous Infusion Argatroban IV",
+                  "Continuous Infusion Bivalirudian IV",
+                  "Intermittent Enoxaparin SC",
+                  "Intermittent Dabigatran Enteral",
+                  "Intermittent Apixaban Enteral",
+                  "Intermittent Rivaroxaban Enteral",
+                  "Intermittent Edoxaban Enteral",
+                  "Intermittent Fondaparinux SC",
+                  "Intermittent Warfarin Enteral"
+                ],
+                "description": "An explanation about the purpose of this instance described by this schema."
+              }
             },
+            "pharmacologicVTEProphylaxisType": {
+              "$ref": "#/definitions/TimestampedString"
+	        },
             "pharmacologicVTEProphylaxisContraindicated": {
               "type": "object",
               "description": "An explanation about the purpose of this instance described by this schema.",
               "properties": {
                 "updateTime": {
                   "type": "string",
+                  "format": "date-time",
                   "description": "An explanation about the purpose of this instance described by this schema."
                 },
                 "value": {
@@ -689,15 +885,19 @@
                 },
                 "reason": {
                   "type": "string",
+                  "enum": [
+                    "High risk or recurrent CNS procedure/drain",
+                    "Allergy to heparin or HIT",
+                    "Platelet Count >50,000",
+                    "INR >1.5",
+                    "aPTT Ratio >1.5"
+                  ],
                   "description": "An explanation about the purpose of this instance described by this schema."
                 }
               }
             },
             "pharmacologicVTEProphylaxisOrdered": {
               "$ref": "#/definitions/TimestampedBoolean"
-            },
-            "pharmacologicVTRProphylaxisType": {
-              "$ref": "#/definitions/TimestampedString"
             },
             "pharmacologicVTEProphylaxisAdministered": {
               "$ref": "#/definitions/TimestampedBoolean"
@@ -712,10 +912,7 @@
               "$ref": "#/definitions/TimestampedBoolean"
             },
             "discreteHOBGreaterThan30Deg": {
-              "$ref": "#/definitions/TimestampedBoolean"
-            },
-            "continuousHOB": {
-              "$ref": "#/definitions/TimestampedNumber"
+              "$ref": "#/definitions/TimestampedMaybe"
             },
             "supOrderStatus": {
               "$ref": "#/definitions/TimestampedBoolean"
@@ -727,22 +924,45 @@
               "$ref": "#/definitions/TimestampedBoolean"
             },
             "ventilationMode": {
-              "$ref": "#/definitions/TimestampedString"
+              "type": "object",
+              "description": "An explanation about the purpose of this instance described by this schema.",
+              "properties": {
+                "updateTime": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                },
+                "value": {
+                  "type": "string",
+                   "enum": [
+                     "Volume Control (AC)",
+                     "Synchronous Intermittent Mandatory Ventilation (SIMV)",
+                     "Pressure Support (PS)",
+                     "Volume Support (VS)",
+                     "Pressure Control (PC)",
+                     "Pressure Regulated Volume Control (PRVC)",
+                     "Airway Pressure Release Ventilation (APRV)",
+                     "High Frequency Oscillation (HFO)",
+                     "Other"
+                   ],
+                  "description": "An explanation about the purpose of this instance described by this schema."
+                }
+              }
             },
             "current Tidal Volume ": {
               "$ref": "#/definitions/TimestampedNumber"
             },
             "subglotticSuctionSurgicalAirway": {
-              "$ref": "#/definitions/TimestampedString"
+              "$ref": "#/definitions/TimestampedMaybe"
             },
             "subglotticSuctionNonSurgicalAirway ": {
               "$ref": "#/definitions/TimestampedBoolean"
             },
             "subglotticSuctionUse": {
-              "$ref": "#/definitions/TimestampedString"
+              "$ref": "#/definitions/TimestampedMaybe"
             },
             "oralCare": {
-              "$ref": "#/definitions/TimestampedString"
+              "$ref": "#/definitions/TimestampedMaybe"
             },
             "inlineSuction": {
               "$ref": "#/definitions/TimestampedBoolean"
@@ -753,14 +973,24 @@
               "properties": {
                 "updateTime": {
                   "type": "string",
+                  "format": "date-time",
                   "description": "An explanation about the purpose of this instance described by this schema."
                 },
                 "value": {
                   "type": "string",
+                  "enum": [ "Given", "Not Given", "Contraindicated" ],
                   "description": "An explanation about the purpose of this instance described by this schema."
                 },
                 "contraindicatedReason": {
                   "type": "string",
+                  "enum": [
+                    "FiO2 > 50%",
+                    "PEEP > 8",
+                    "Receiving NMBA",
+                    "Limited Respiratory Effort",
+                    "Clinically Unstable",
+                    "Other"
+                  ],
                   "description": "An explanation about the purpose of this instance described by this schema."
                 }
               }

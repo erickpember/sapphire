@@ -1,37 +1,30 @@
 // Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.etl.event;
+package com.datafascia.etl.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Location;
 import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
-import com.datafascia.common.persist.Id;
 import com.datafascia.domain.fhir.HumanNames;
 import com.datafascia.domain.fhir.RaceEnum;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.emerge.ucsf.DemographicData;
 import com.datafascia.emerge.ucsf.HarmEvidence;
-import com.datafascia.emerge.ucsf.MedicalData;
-import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
-import java.util.Optional;
 import javax.inject.Inject;
 
 /**
- * Updates harm evidence for a patient in response to an event.
+ * Updates demographic data for a patient.
  */
-public class HarmEvidenceUpdater {
+public class DemographicDataUpdater {
 
   @Inject
   private Clock clock;
-
-  @Inject
-  private HarmEvidenceRepository harmEvidenceRepository;
 
   private static RaceEnum getRace(UnitedStatesPatient patient) {
     for (RaceEnum race : patient.getRace().getValueAsEnum()) {
@@ -72,6 +65,7 @@ public class HarmEvidenceUpdater {
     return (patient.getGenderElement().getValueAsEnum() == AdministrativeGenderEnum.FEMALE)
         ? DemographicData.Gender.FEMALE : DemographicData.Gender.MALE;
   }
+
   private static String formatRoomNumber(Location location) {
     String[] locationParts = location.getIdentifierFirstRep().getValue().split("\\^");
     String room = locationParts[1];
@@ -79,25 +73,25 @@ public class HarmEvidenceUpdater {
     return room + '-' + bed;
   }
 
-  private HarmEvidence getHarmEvidence(String inputPatientId) {
-    Id<HarmEvidence> patientId = Id.of(inputPatientId);
-    Optional<HarmEvidence> optionalHarmEvidence = harmEvidenceRepository.read(patientId);
-    if (!optionalHarmEvidence.isPresent()) {
-      return new HarmEvidence()
-          .withDemographicData(
-              new DemographicData())
-          .withMedicalData(
-              new MedicalData());
-    }
-    return optionalHarmEvidence.get();
-  }
+  /**
+   * Updates demographic data.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param patient
+   *     patient
+   * @param location
+   *     location
+   * @param encounter
+   *     encounter
+   */
+  public void update(
+      HarmEvidence harmEvidence,
+      UnitedStatesPatient patient,
+      Location location,
+      Encounter encounter) {
 
-  private HarmEvidence updateHarmEvidence(
-      UnitedStatesPatient patient, Location location, Encounter encounter) {
-
-    HarmEvidence harmEvidence = getHarmEvidence(patient.getId().getIdPart())
-        .withEncounterID(
-            encounter.getIdentifierFirstRep().getValue());
+    harmEvidence.setEncounterID(encounter.getIdentifierFirstRep().getValue());
 
     DemographicData demographicData = harmEvidence.getDemographicData()
         .withPatientName(
@@ -122,36 +116,5 @@ public class HarmEvidenceUpdater {
       demographicData.setDateOfBirth(
           formatLocalDate(patient.getBirthDateElement().getValue()));
     }
-
-    return harmEvidence;
-  }
-
-  /**
-   * Admits patient.
-   *
-   * @param patient
-   *     patient
-   * @param location
-   *     location
-   * @param encounter
-   *     encounter
-   */
-  public void admitPatient(
-      UnitedStatesPatient patient, Location location, Encounter encounter) {
-
-    HarmEvidence harmEvidence = updateHarmEvidence(patient, location, encounter);
-    harmEvidenceRepository.save(harmEvidence);
-  }
-
-  /**
-   * Discharges patient.
-   *
-   * @param encounter
-   *     encounter
-   */
-  public void dischargePatient(Encounter encounter) {
-    String patientIdString = encounter.getPatient().getReference().getIdPart();
-    Id<HarmEvidence> patientId = Id.of(patientIdString);
-    harmEvidenceRepository.delete(patientId);
   }
 }

@@ -5,6 +5,7 @@ package com.datafascia.etl.event;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.persist.EncounterRepository;
+import com.datafascia.etl.harm.HarmEvidenceUpdater;
 import com.datafascia.etl.hl7.EncounterStatusTransition;
 import java.util.Optional;
 import javax.inject.Inject;

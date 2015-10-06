@@ -9,6 +9,7 @@ import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.LocationRepository;
 import com.datafascia.domain.persist.PatientRepository;
+import com.datafascia.etl.harm.HarmEvidenceUpdater;
 import com.datafascia.etl.hl7.EncounterStatusTransition;
 import javax.inject.Inject;
 

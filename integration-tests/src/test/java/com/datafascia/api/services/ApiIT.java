@@ -30,18 +30,16 @@ import com.datafascia.domain.fhir.RaceEnum;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.dropwizard.testing.DropwizardTestApp;
 import com.google.common.io.Resources;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import com.neovisionaries.i18n.LanguageCode;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.accumulo.core.client.Instance;
-import org.apache.accumulo.minicluster.MiniAccumuloInstance;
 import org.hl7.fhir.instance.model.api.IIdType;
-import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 
 /**
@@ -54,50 +52,31 @@ public class ApiIT {
 
   public static final DropwizardTestApp<APIConfiguration> app = new DropwizardTestApp<>(
       APIService.class, apiConfiguration());
-  public static String fhirServer = null;
-  private static final FhirContext ctx = FhirContext.forDstu2();
-  public static IGenericClient client;
 
-  /**
-   * Prepare the integration test to run.
-   *
-   * @throws Exception
-   */
+  @Inject
+  private FhirContext fhirContext;
+
+  protected static IGenericClient client;
+
   @BeforeSuite
-  public void before() throws Exception {
+  public void beforeSuite() throws Exception {
     // Delay to allow time for Accumulo mini-cluster to start.
     TimeUnit.SECONDS.sleep(3);
 
+    Injector injector = Guice.createInjector(new TestModule());
+    injector.injectMembers(this);
+
     app.start();
     log.info("Started Dropwizard application listening on port {}", app.getLocalPort());
-    fhirServer = "http://localhost:" + app.getLocalPort() + "/fhir";
+    String apiEndpoint = "http://localhost:" + app.getLocalPort() + "/fhir";
 
-    client = ctx.newRestfulGenericClient(fhirServer);
+    client = fhirContext.newRestfulGenericClient(apiEndpoint);
 
     addStaticData();
   }
 
-  @AfterSuite
-  public static void after() throws Exception {
-  }
-
-  private static String getZooKeepers() {
-    String instanceName = "integration-test";
-    try {
-      Instance instance = new MiniAccumuloInstance(
-          instanceName,
-          new File("target/accumulo-maven-plugin/" + instanceName));
-      return instance.getZooKeepers();
-    } catch (FileNotFoundException e) {
-      throw new IllegalStateException("Cannot get Accumulo instance", e);
-    }
-  }
-
-  /**
-   * @return the API configuration to use as a file
-   */
   private static String apiConfiguration() {
-    String zooKeepers = getZooKeepers();
+    String zooKeepers = TestAccumuloInstance.getZooKeepers();
     System.setProperty("dw.accumulo.zooKeepers", zooKeepers);
     System.setProperty("dw.kafkaConfig.zookeeperConnect", zooKeepers);
 

@@ -15,6 +15,7 @@ logging:
   loggers:
     com.datafascia: DEBUG
     io.dropwizard.jersey.jackson: DEBUG
+    org.apache: ERROR
 
 server:
   applicationConnectors:

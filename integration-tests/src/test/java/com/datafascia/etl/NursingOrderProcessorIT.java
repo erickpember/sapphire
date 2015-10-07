@@ -14,8 +14,6 @@ import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.services.ApiIT;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.etl.ucsf.web.NursingOrdersProcessor;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -44,12 +42,6 @@ public class NursingOrderProcessorIT extends ApiIT {
   private NursingOrdersProcessor processor;
   private ClientBuilder clientBuilder;
   private Encounter transientEncounter;
-
-  @BeforeClass
-  public void beforeRepositoryTestSupport() throws Exception {
-    Injector injector = Guice.createInjector(new TestModule());
-    injector.injectMembers(this);
-  }
 
   @BeforeClass
   public void setup() throws Exception {

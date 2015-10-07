@@ -21,8 +21,6 @@ import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.etl.ucsf.web.MedAdminDiffListener;
 import com.datafascia.etl.ucsf.web.MedAdminDiffProcessor;
 import com.datafascia.etl.ucsf.web.UcsfWebGetProcessor;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -68,12 +66,6 @@ public class MedAdminDiffProcessorIT extends ApiIT implements MedAdminDiffListen
 
   @Inject
   private AccumuloReflectEntityStore entityStore;
-
-  @BeforeClass
-  public void beforeRepositoryTestSupport() throws Exception {
-    Injector injector = Guice.createInjector(new TestModule());
-    injector.injectMembers(this);
-  }
 
   @BeforeClass
   public void setup() throws Exception {

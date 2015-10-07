@@ -23,20 +23,18 @@ import ca.uhn.fhir.model.primitive.DecimalDt;
 import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.IGenericClient;
-import com.datafascia.api.configurations.APIConfiguration;
+import com.datafascia.common.configuration.guice.ConfigureModule;
+import com.datafascia.common.inject.Injectors;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.domain.fhir.Languages;
 import com.datafascia.domain.fhir.RaceEnum;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
-import com.datafascia.dropwizard.testing.DropwizardTestApp;
-import com.google.common.io.Resources;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import com.neovisionaries.i18n.LanguageCode;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.instance.model.api.IIdType;
@@ -52,9 +50,6 @@ public class ApiIT {
   protected static final String FHIR_USERNAME = "testuser";
   protected static final String FHIR_PASSWORD = "supersecret";
 
-  public static final DropwizardTestApp<APIConfiguration> app = new DropwizardTestApp<>(
-      APIService.class, apiConfiguration());
-
   @Inject
   private FhirContext fhirContext;
 
@@ -62,26 +57,13 @@ public class ApiIT {
 
   @BeforeSuite
   public void beforeSuite() throws Exception {
-    // Delay to allow time for Accumulo mini-cluster to start.
-    TimeUnit.SECONDS.sleep(3);
-
-    Injector injector = Guice.createInjector(new TestModule());
+    Injector injector = Guice.createInjector(new ConfigureModule(), new TestModule());
+    Injectors.setInjector(injector);
     injector.injectMembers(this);
-
-    app.start();
-    log.info("Started Dropwizard application listening on port {}", app.getLocalPort());
 
     client = fhirContext.newRestfulGenericClient(API_ENDPOINT_URL);
 
     addStaticData();
-  }
-
-  private static String apiConfiguration() {
-    String zooKeepers = TestAccumuloInstance.getZooKeepers();
-    System.setProperty("dw.accumulo.zooKeepers", zooKeepers);
-    System.setProperty("dw.kafkaConfig.zookeeperConnect", zooKeepers);
-
-    return Resources.getResource("api-server.yml").getFile();
   }
 
   /**

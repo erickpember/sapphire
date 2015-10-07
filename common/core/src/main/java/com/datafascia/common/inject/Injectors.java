@@ -35,18 +35,6 @@ public class Injectors {
     Injectors.overrides = overrides;
   }
 
-  /**
-   * Gets a Guice injector.
-   *
-   * @return injector
-   */
-  public static synchronized Injector getInjector() {
-    if (injector == null) {
-      injector = createInjector();
-    }
-    return injector;
-  }
-
   private static Injector createInjector() {
     ServiceLoader<Module> serviceLoader = ServiceLoader.load(Module.class);
     List<Module> modules = Lists.newArrayList(serviceLoader.iterator());
@@ -62,6 +50,28 @@ public class Injectors {
       log.info("Creating injector from modules {}", modules);
       return Guice.createInjector(modules);
     }
+  }
+
+  /**
+   * Gets a Guice injector.
+   *
+   * @return injector
+   */
+  public static synchronized Injector getInjector() {
+    if (injector == null) {
+      injector = createInjector();
+    }
+    return injector;
+  }
+
+  /**
+   * Sets Guice injector.
+   *
+   * @param aInjector
+   *     to set
+   */
+  public static synchronized void setInjector(Injector aInjector) {
+    injector = aInjector;
   }
 
   /**

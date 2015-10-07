@@ -15,7 +15,6 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
-import static com.datafascia.api.services.ApiIT.client;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.fail;
 
@@ -23,7 +22,7 @@ import static org.testng.Assert.fail;
  * Integration tests for practitioner resources.
  */
 @Slf4j
-public class PractitionerIT extends ApiIT {
+public class PractitionerIT extends ApiTestSupport {
   private static final String PRACTITIONER1 = "UCSPractitioner1-6789";
   private static final String PRACTITIONER2 = "UCSPractitioner2-6789";
 

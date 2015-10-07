@@ -33,7 +33,7 @@ import static org.testng.Assert.fail;
  * Integration tests for MedicationOrder resources.
  */
 @Slf4j
-public class MedicationOrderIT extends ApiIT {
+public class MedicationOrderIT extends ApiTestSupport {
   /**
    * Validates MedicationPrescription retrieval.
    *

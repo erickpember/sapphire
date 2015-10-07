@@ -11,7 +11,7 @@ import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import com.datafascia.api.client.ClientBuilder;
-import com.datafascia.api.services.ApiIT;
+import com.datafascia.api.services.ApiTestSupport;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.etl.ucsf.web.NursingOrdersProcessor;
 import java.io.FileInputStream;
@@ -38,7 +38,7 @@ import static org.testng.Assert.assertTrue;
  * Integration tests for the NursingOrderProcessor.
  */
 @Slf4j
-public class NursingOrderProcessorIT extends ApiIT {
+public class NursingOrderProcessorIT extends ApiTestSupport {
   private NursingOrdersProcessor processor;
   private ClientBuilder clientBuilder;
   private Encounter transientEncounter;

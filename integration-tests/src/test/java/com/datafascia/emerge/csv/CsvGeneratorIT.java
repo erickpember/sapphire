@@ -3,7 +3,7 @@
 package com.datafascia.emerge.csv;
 
 import au.com.bytecode.opencsv.CSVReader;
-import com.datafascia.api.services.ApiIT;
+import com.datafascia.api.services.ApiTestSupport;
 import java.io.FileReader;
 import java.net.URI;
 import org.testng.annotations.Test;
@@ -11,7 +11,7 @@ import org.testng.annotations.Test;
 /**
  * A test to ensure functionality of the CSV generation command.
  */
-public class CsvGeneratorIT extends ApiIT {
+public class CsvGeneratorIT extends ApiTestSupport {
 
   private static final String DEMOGRAPHIC_CSV_FILE =
       "/tmp/datafascia-test/emerge-demographic.csv";

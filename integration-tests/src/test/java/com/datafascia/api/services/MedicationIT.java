@@ -17,7 +17,7 @@ import static org.testng.Assert.assertTrue;
  * Integration tests for medication resources.
  */
 @Slf4j
-public class MedicationIT extends ApiIT {
+public class MedicationIT extends ApiTestSupport {
 
   @Test
   public void should_read_medication() throws Exception {

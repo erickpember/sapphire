@@ -18,7 +18,7 @@ import static org.testng.Assert.assertTrue;
  * Integration tests for encounter resources.
  */
 @Slf4j
-public class EncounterIT extends ApiIT {
+public class EncounterIT extends ApiTestSupport {
 
   @Test
   public void should_search_encounters_by_status() throws Exception {

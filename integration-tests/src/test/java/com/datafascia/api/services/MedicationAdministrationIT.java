@@ -37,7 +37,7 @@ import static org.testng.Assert.fail;
  * Integration tests for medicationAdministration resources.
  */
 @Slf4j
-public class MedicationAdministrationIT extends ApiIT {
+public class MedicationAdministrationIT extends ApiTestSupport {
   /**
    * Validates MedicationAdministration retrieval.
    *

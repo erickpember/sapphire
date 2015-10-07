@@ -19,7 +19,7 @@ import static org.testng.Assert.assertTrue;
  * Integration tests for location resources.
  */
 @Slf4j
-public class LocationIT extends ApiIT {
+public class LocationIT extends ApiTestSupport {
   // Used to encode URL arguments to bypass problems with URL-illegal characters.
   private static final BaseEncoding ENCODING = BaseEncoding.base64Url().omitPadding();
 

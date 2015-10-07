@@ -14,7 +14,7 @@ import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import com.datafascia.api.client.ClientBuilder;
-import com.datafascia.api.services.ApiIT;
+import com.datafascia.api.services.ApiTestSupport;
 import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.persist.entity.AccumuloReflectEntityStore;
 import com.datafascia.domain.fhir.IdentifierSystems;
@@ -54,7 +54,7 @@ import static org.testng.Assert.fail;
  * A test class for the MedAdminDiffProcessor
  */
 @Slf4j
-public class MedAdminDiffProcessorIT extends ApiIT implements MedAdminDiffListener {
+public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminDiffListener {
   private MedAdminDiffProcessor processor;
   private ClientBuilder clientBuilder;
 

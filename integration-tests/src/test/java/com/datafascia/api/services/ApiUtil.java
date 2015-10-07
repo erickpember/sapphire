@@ -6,7 +6,7 @@ import ca.uhn.fhir.model.api.Bundle;
 import ca.uhn.fhir.model.api.IResource;
 import java.util.List;
 
-import static com.datafascia.api.services.ApiIT.client;
+import static com.datafascia.api.services.ApiTestSupport.client;
 
 /**
  * Helper methods for API access.

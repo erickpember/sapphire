@@ -27,7 +27,6 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
-import static com.datafascia.api.services.ApiIT.client;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -36,7 +35,7 @@ import static org.testng.Assert.fail;
  * Integration tests for observation resources.
  */
 @Slf4j
-public class ObservationIT extends ApiIT {
+public class ObservationIT extends ApiTestSupport {
   private static final String NUMERICAL_PAIN_LEVEL_LOW = "numericalPainLevelLow";
   private static final String NUMERICAL_PAIN_LEVEL_HIGH = "numericalPainLevelHigh";
 

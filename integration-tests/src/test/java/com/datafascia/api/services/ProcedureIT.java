@@ -36,7 +36,7 @@ import static org.testng.Assert.fail;
  * Integration tests for procedure resources.
  */
 @Slf4j
-public class ProcedureIT extends ApiIT {
+public class ProcedureIT extends ApiTestSupport {
   private static final String TYPE_CODE1 = "typeCode1";
   private static final String TYPE_CODE2 = "typeCode2";
 

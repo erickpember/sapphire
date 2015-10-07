@@ -51,10 +51,10 @@ import org.hl7.fhir.instance.model.api.IIdType;
 import org.testng.annotations.BeforeSuite;
 
 /**
- * Integration test for the various API resources
+ * Common implementation for integration tests that call the API server.
  */
 @Slf4j
-public class ApiIT {
+public abstract class ApiTestSupport {
 
   protected static final String API_ENDPOINT_URL = "http://localhost:9090/fhir";
   protected static final String FHIR_USERNAME = "testuser";

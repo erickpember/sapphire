@@ -22,7 +22,7 @@ import static org.testng.Assert.fail;
  * Integration tests for patient resources
  */
 @Slf4j
-public class PatientIT extends ApiIT {
+public class PatientIT extends ApiTestSupport {
   /**
    * Fetch admitted patients and validate them.
    *

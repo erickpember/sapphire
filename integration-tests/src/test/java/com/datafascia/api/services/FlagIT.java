@@ -30,7 +30,7 @@ import static org.testng.Assert.fail;
  * Integration tests for flag resources.
  */
 @Slf4j
-public class FlagIT extends ApiIT {
+public class FlagIT extends ApiTestSupport {
   private static final String ADVANCE_DIRECTIVE = "230218701ADPOA";
   private static final String PHYSICIAN_ORDERS_FOR_LIFE_SUSTAINING_TREATMENT = "230218701POLST";
 

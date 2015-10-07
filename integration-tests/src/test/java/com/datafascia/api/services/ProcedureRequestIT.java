@@ -25,7 +25,6 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
-import static com.datafascia.api.services.ApiIT.client;
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
@@ -34,7 +33,7 @@ import static org.testng.Assert.fail;
  * Integration tests for ProcedureRequest resources.
  */
 @Slf4j
-public class ProcedureRequestIT extends ApiIT {
+public class ProcedureRequestIT extends ApiTestSupport {
   /**
    * Validates ProcedureRequest retrieval.
    *

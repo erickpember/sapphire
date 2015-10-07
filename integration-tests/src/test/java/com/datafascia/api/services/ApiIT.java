@@ -47,6 +47,8 @@ import org.testng.annotations.BeforeSuite;
  */
 @Slf4j
 public class ApiIT {
+
+  protected static final String API_ENDPOINT_URL = "http://localhost:9090/fhir";
   protected static final String FHIR_USERNAME = "testuser";
   protected static final String FHIR_PASSWORD = "supersecret";
 
@@ -68,9 +70,8 @@ public class ApiIT {
 
     app.start();
     log.info("Started Dropwizard application listening on port {}", app.getLocalPort());
-    String apiEndpoint = "http://localhost:" + app.getLocalPort() + "/fhir";
 
-    client = fhirContext.newRestfulGenericClient(apiEndpoint);
+    client = fhirContext.newRestfulGenericClient(API_ENDPOINT_URL);
 
     addStaticData();
   }

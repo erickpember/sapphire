@@ -54,7 +54,7 @@ public class FhirClient {
    *     the user's password
    */
   public FhirClient(String apiEndpoint, String user, String passwd) {
-    client = ctx.newRestfulGenericClient(apiEndpoint + "/fhir");
+    client = ctx.newRestfulGenericClient(apiEndpoint);
     client.registerInterceptor(new BasicAuthInterceptor(user, passwd));
   }
 

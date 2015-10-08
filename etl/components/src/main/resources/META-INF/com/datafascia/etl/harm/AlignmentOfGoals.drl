@@ -19,6 +19,15 @@ then
   alignmentOfGoalsUpdater.update(harmEvidence, $flag, $encounter);
 end
 
+rule "Update patient care conference note"
+when
+  Event( type == EventType.UPDATE_FLAG )
+  $flag: Flag( code.codingFirstRep.code == "PATIENT_CARE_CONFERENCE_NOTE" )
+  $encounter: Encounter()
+then
+  alignmentOfGoalsUpdater.update(harmEvidence, $flag, $encounter);
+end
+
 rule "Update physician orders for life sustaining treatment"
 when
   Event( type == EventType.UPDATE_FLAG )

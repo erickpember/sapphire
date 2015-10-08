@@ -5,6 +5,7 @@ package com.datafascia.etl.harm;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Flag;
 import com.datafascia.emerge.harms.aog.ADPOLSTImpl;
+import com.datafascia.emerge.harms.aog.PatientCareConferenceNoteImpl;
 import com.datafascia.emerge.ucsf.ADPOLST;
 import com.datafascia.emerge.ucsf.AOG;
 import com.datafascia.emerge.ucsf.HarmEvidence;
@@ -25,6 +26,9 @@ public class AlignmentOfGoalsUpdater {
 
   @Inject
   private ADPOLSTImpl adpolstImpl;
+
+  @Inject
+  private PatientCareConferenceNoteImpl patientCareConferenceNoteImpl;
 
   private static AOG getAOG(HarmEvidence harmEvidence) {
     MedicalData medicalData = harmEvidence.getMedicalData();
@@ -54,6 +58,14 @@ public class AlignmentOfGoalsUpdater {
     adpolst.setUpdateTime(Date.from(Instant.now(clock)));
   }
 
+  private void updatePatientCareConferenceNote(HarmEvidence harmEvidence, String patientId) {
+    patientCareConferenceNoteImpl.findPatientCareConferenceNote(patientId)
+        .ifPresent(note -> {
+            note.setUpdateTime(Date.from(Instant.now(clock)));
+            getAOG(harmEvidence).setPatientCareConferenceNote(note);
+          });
+  }
+
   private void updatePhysicianOrdersForLifeSustainingTreatment(
       HarmEvidence harmEvidence, String patientId) {
 
@@ -80,6 +92,9 @@ public class AlignmentOfGoalsUpdater {
             switch (flagCode) {
               case ADVANCE_DIRECTIVE:
                 updateAdvanceDirective(harmEvidence, patientId);
+                break;
+              case PATIENT_CARE_CONFERENCE_NOTE:
+                updatePatientCareConferenceNote(harmEvidence, patientId);
                 break;
               case PHYSICIAN_ORDERS_FOR_LIFE_SUSTAINING_TREATMENT:
                 updatePhysicianOrdersForLifeSustainingTreatment(harmEvidence, patientId);

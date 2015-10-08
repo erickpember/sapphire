@@ -5,6 +5,7 @@ package com.datafascia.etl.harm.alignmentofgoals;
 import com.datafascia.common.persist.Id;
 import com.datafascia.emerge.ucsf.ADPOLST;
 import com.datafascia.emerge.ucsf.HarmEvidence;
+import com.datafascia.emerge.ucsf.PatientCareConferenceNote;
 import com.datafascia.etl.harm.HarmEvidenceTestSupport;
 import java.time.Instant;
 import java.util.Date;
@@ -39,6 +40,19 @@ public class AlignmentOfGoalsIT extends HarmEvidenceTestSupport {
     ADPOLST adpolst = harmEvidence.getMedicalData().getAOG().getADPOLST();
     assertTrue(adpolst.isAdValue());
     assertEquals(adpolst.getUpdateTime(), Date.from(Instant.now(clock)));
+  }
+
+  @Test
+  public void should_export_patient_care_conference_note() throws Exception {
+    processMessage("patient-care-conference-note.hl7");
+
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    PatientCareConferenceNote note =
+        harmEvidence.getMedicalData().getAOG().getPatientCareConferenceNote();
+    assertTrue(note.isValue());
+    assertEquals(
+        note.getPatientCareConferenceNoteTime().toInstant().toString(), "2015-02-26T22:22:25Z");
+    assertEquals(note.getUpdateTime(), Date.from(Instant.now(clock)));
   }
 
   @Test

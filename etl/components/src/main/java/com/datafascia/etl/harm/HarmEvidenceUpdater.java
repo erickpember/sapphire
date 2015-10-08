@@ -3,6 +3,7 @@
 package com.datafascia.etl.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import ca.uhn.fhir.model.dstu2.resource.Flag;
 import ca.uhn.fhir.model.dstu2.resource.Location;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
@@ -17,6 +18,7 @@ import java.util.Optional;
 import javax.inject.Inject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.StatelessKieSession;
@@ -24,6 +26,7 @@ import org.kie.api.runtime.StatelessKieSession;
 /**
  * Updates harm evidence for a patient in response to an event.
  */
+@Slf4j
 public class HarmEvidenceUpdater {
 
   /**
@@ -31,7 +34,8 @@ public class HarmEvidenceUpdater {
    */
   public enum EventType {
     ADMIT_PATIENT,
-    DISCHARGE_PATIENT
+    DISCHARGE_PATIENT,
+    UPDATE_FLAG
   }
 
   /**
@@ -48,6 +52,9 @@ public class HarmEvidenceUpdater {
 
   @Inject
   private DemographicDataUpdater demographicDataUpdater;
+
+  @Inject
+  private AlignmentOfGoalsUpdater alignmentOfGoalsUpdater;
 
   private StatelessKieSession session;
 
@@ -66,17 +73,25 @@ public class HarmEvidenceUpdater {
     if (!optionalHarmEvidence.isPresent()) {
       return new HarmEvidence()
           .withDemographicData(
-              new DemographicData())
+              new DemographicData()
+                  .withMedicalRecordNumber(inputPatientId))
           .withMedicalData(
               new MedicalData());
     }
-    return optionalHarmEvidence.get();
+
+    HarmEvidence harmEvidence = optionalHarmEvidence.get();
+    if (harmEvidence.getMedicalData() == null) {
+      harmEvidence.setMedicalData(new MedicalData());
+    }
+
+    return harmEvidence;
   }
 
   private HarmEvidence execute(
       EventType eventType, Encounter encounter, Object... additionalFacts) {
 
     session.setGlobal("demographicDataUpdater", demographicDataUpdater);
+    session.setGlobal("alignmentOfGoalsUpdater", alignmentOfGoalsUpdater);
 
     String patientId = encounter.getPatient().getReference().getIdPart();
     HarmEvidence harmEvidence = getHarmEvidence(patientId);
@@ -120,5 +135,18 @@ public class HarmEvidenceUpdater {
     String patientIdString = encounter.getPatient().getReference().getIdPart();
     Id<HarmEvidence> patientId = Id.of(patientIdString);
     harmEvidenceRepository.delete(patientId);
+  }
+
+  /**
+   * Updates flag.
+   *
+   * @param flag
+   *     flag
+   * @param encounter
+   *     encounter
+   */
+  public void updateFlag(Flag flag, Encounter encounter) {
+    HarmEvidence harmEvidence = execute(EventType.UPDATE_FLAG, encounter, flag);
+    harmEvidenceRepository.save(harmEvidence);
   }
 }

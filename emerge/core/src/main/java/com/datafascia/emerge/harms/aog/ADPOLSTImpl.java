@@ -4,42 +4,48 @@ package com.datafascia.emerge.harms.aog;
 
 import ca.uhn.fhir.model.dstu2.resource.Flag;
 import com.datafascia.api.client.ClientBuilder;
-import com.datafascia.emerge.ucsf.ADPOLST;
 import com.datafascia.emerge.ucsf.FlagUtils;
 import com.datafascia.emerge.ucsf.codes.FlagCodeEnum;
 import java.util.List;
-import java.util.Optional;
+import javax.inject.Inject;
 
 /**
  * AD/POLST Implementation
  */
 public class ADPOLSTImpl {
 
+  @Inject
+  private ClientBuilder apiClient;
+
   /**
-   * Alignment of Goals AD/POLST Implementation
+   * Checks if an active advance directive exists for the patient.
    *
-   * @param client
-   *     API client
    * @param patientId
    *     patient to search
-   * @return
-   *     ADPOLST object if either active AD flag or active POLST flag exists, otherwise empty
+   * @return true if found
    */
-  public static Optional<ADPOLST> adPolst(ClientBuilder client, String patientId) {
-    ADPOLST adPolst = new ADPOLST();
-
-    List<Flag> ads = client.getFlagClient().searchFlag(
+  public boolean haveAdvanceDirective(String patientId) {
+    List<Flag> ads = apiClient.getFlagClient().searchFlag(
         patientId, FlagCodeEnum.ADVANCE_DIRECTIVE.getCode(), null);
     if (!ads.isEmpty()) {
-      adPolst.setAdValue(FlagUtils.isActive(FlagUtils.findFreshestFlag(ads)));
+      return FlagUtils.isActive(FlagUtils.findFreshestFlag(ads));
     }
+    return false;
+  }
 
-    List<Flag> polsts = client.getFlagClient().searchFlag(
+  /**
+   * Checks if an active physician orders for life sustaining treatment exists for the patient.
+   *
+   * @param patientId
+   *     patient to search
+   * @return true if found
+   */
+  public boolean havePhysicianOrdersForLifeSustainingTreatment(String patientId) {
+    List<Flag> polsts = apiClient.getFlagClient().searchFlag(
         patientId, FlagCodeEnum.PHYSICIAN_ORDERS_FOR_LIFE_SUSTAINING_TREATMENT.getCode(), null);
     if (!polsts.isEmpty()) {
-      adPolst.setPolstValue(FlagUtils.isActive(FlagUtils.findFreshestFlag(polsts)));
+      return FlagUtils.isActive(FlagUtils.findFreshestFlag(polsts));
     }
-
-    return (ads.isEmpty() && polsts.isEmpty()) ? Optional.empty() : Optional.of(adPolst);
+    return false;
   }
 }

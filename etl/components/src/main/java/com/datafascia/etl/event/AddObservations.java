@@ -13,6 +13,7 @@ import com.datafascia.domain.persist.FlagRepository;
 import com.datafascia.domain.persist.ObservationRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.domain.persist.ProcedureRepository;
+import com.datafascia.etl.harm.HarmEvidenceUpdater;
 import java.util.List;
 import javax.inject.Inject;
 
@@ -30,6 +31,9 @@ public class AddObservations {
   @Inject
   private ProcedureRepository procedureRepository;
 
+  @Inject
+  private HarmEvidenceUpdater harmEvidenceUpdater;
+
   private static UnitedStatesPatient getPatient(String patientIdentifier) {
     UnitedStatesPatient patient = new UnitedStatesPatient();
     patient.addIdentifier()
@@ -38,11 +42,13 @@ public class AddObservations {
     return patient;
   }
 
-  private static Encounter getEncounter(String encounterIdentifier) {
+  private static Encounter getEncounter(String encounterIdentifier, UnitedStatesPatient patient) {
     Encounter encounter = new Encounter();
     encounter.addIdentifier()
         .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue(encounterIdentifier);
     encounter.setId(new IdDt(EncounterRepository.generateId(encounter).toString()));
+
+    encounter.setPatient(new ResourceReferenceDt(patient));
     return encounter;
   }
 
@@ -60,7 +66,7 @@ public class AddObservations {
       List<Observation> observations, String patientIdentifier, String encounterIdentifier) {
 
     UnitedStatesPatient patient = getPatient(patientIdentifier);
-    Encounter encounter = getEncounter(encounterIdentifier);
+    Encounter encounter = getEncounter(encounterIdentifier, patient);
 
     FlagBuilder flagBuilder = new FlagBuilder(patient);
     ProcedureBuilder procedureBuilder = new ProcedureBuilder(encounter);
@@ -76,7 +82,10 @@ public class AddObservations {
     }
 
     flagBuilder.build()
-        .forEach(flag -> flagRepository.save(flag));
+        .forEach(flag -> {
+            flagRepository.save(flag);
+            harmEvidenceUpdater.updateFlag(flag, encounter);
+          });
 
     procedureBuilder.build()
         .ifPresent(procedure -> procedureRepository.save(procedure));

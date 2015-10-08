@@ -1,0 +1,29 @@
+// Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
+// For license information, please contact http://datafascia.com/contact
+package com.datafascia.etl.harm;
+
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import ca.uhn.fhir.model.dstu2.resource.Flag;
+import com.datafascia.etl.harm.HarmEvidenceUpdater.Event;
+import com.datafascia.etl.harm.HarmEvidenceUpdater.EventType;
+
+global com.datafascia.emerge.ucsf.HarmEvidence harmEvidence;
+global com.datafascia.etl.harm.AlignmentOfGoalsUpdater alignmentOfGoalsUpdater;
+
+rule "Update advance directive"
+when
+  Event( type == EventType.UPDATE_FLAG )
+  $flag: Flag( code.codingFirstRep.code == "AD" )
+  $encounter: Encounter()
+then
+  alignmentOfGoalsUpdater.update(harmEvidence, $flag, $encounter);
+end
+
+rule "Update physician orders for life sustaining treatment"
+when
+  Event( type == EventType.UPDATE_FLAG )
+  $flag: Flag( code.codingFirstRep.code == "POLST" )
+  $encounter: Encounter()
+then
+  alignmentOfGoalsUpdater.update(harmEvidence, $flag, $encounter);
+end

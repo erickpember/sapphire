@@ -23,19 +23,29 @@ import ca.uhn.fhir.model.primitive.DecimalDt;
 import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.IGenericClient;
+import com.datafascia.common.accumulo.ConnectorFactory;
 import com.datafascia.common.configuration.guice.ConfigureModule;
 import com.datafascia.common.inject.Injectors;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.domain.fhir.Languages;
 import com.datafascia.domain.fhir.RaceEnum;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
+import com.datafascia.etl.inject.ComponentsModule;
+import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Provides;
+import com.google.inject.util.Modules;
 import com.neovisionaries.i18n.LanguageCode;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.TimeZone;
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.testng.annotations.BeforeSuite;
@@ -49,6 +59,20 @@ public class ApiIT {
   protected static final String API_ENDPOINT_URL = "http://localhost:9090/fhir";
   protected static final String FHIR_USERNAME = "testuser";
   protected static final String FHIR_PASSWORD = "supersecret";
+  private static final ZoneId ZONE_ID = ZoneId.of("America/Los_Angeles");
+
+  private static class TestModule extends AbstractModule {
+    @Override
+    protected void configure() {
+      bind(Clock.class).toInstance(Clock.fixed(Instant.now(), ZONE_ID));
+    }
+
+    @Provides
+    @Singleton
+    public ConnectorFactory connectorFactory() {
+      return new ConnectorFactory(TestAccumuloInstance.getConfiguration());
+    }
+  }
 
   @Inject
   private FhirContext fhirContext;
@@ -57,7 +81,11 @@ public class ApiIT {
 
   @BeforeSuite
   public void beforeSuite() throws Exception {
-    Injector injector = Guice.createInjector(new ConfigureModule(), new TestModule());
+    TimeZone.setDefault(TimeZone.getTimeZone(ZONE_ID));
+
+    Injector injector = Guice.createInjector(
+        Modules.override(new ConfigureModule(), new ComponentsModule())
+            .with(new TestModule()));
     Injectors.setInjector(injector);
     injector.injectMembers(this);
 

@@ -7,7 +7,6 @@ import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.parser.CanonicalModelClassFactory;
 import ca.uhn.hl7v2.parser.Parser;
-import com.codahale.metrics.MetricRegistry;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
 import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.ConnectorFactory;
@@ -35,16 +34,29 @@ public class ComponentsModule extends AbstractModule {
 
   @Override
   protected void configure() {
-    bind(AuthorizationsSupplier.class).to(FixedAuthorizationsSupplier.class);
-    bind(AvroSchemaRegistry.class).to(MemorySchemaRegistry.class).in(Singleton.class);
-    bind(Clock.class).toInstance(Clock.system(ZoneId.of("America/Los_Angeles")));
-    bind(ColumnVisibilityPolicy.class).to(FixedColumnVisibilityPolicy.class);
-    bind(FhirContext.class).in(Singleton.class);
-    bind(FhirEntityStore.class).to(AccumuloFhirEntityStore.class).in(Singleton.class);
-    bind(MetricRegistry.class).in(Singleton.class);
-    bind(ReflectEntityStore.class).to(AccumuloReflectEntityStore.class).in(Singleton.class);
+    bind(AuthorizationsSupplier.class)
+        .to(FixedAuthorizationsSupplier.class)
+        .in(Singleton.class);
+    bind(AvroSchemaRegistry.class)
+        .to(MemorySchemaRegistry.class)
+        .in(Singleton.class);
+    bind(Clock.class)
+        .toInstance(Clock.system(ZoneId.of("America/Los_Angeles")));
+    bind(ColumnVisibilityPolicy.class)
+        .to(FixedColumnVisibilityPolicy.class)
+        .in(Singleton.class);
+    bind(FhirContext.class)
+        .toInstance(FhirContext.forDstu2());
+    bind(FhirEntityStore.class)
+        .to(AccumuloFhirEntityStore.class)
+        .in(Singleton.class);
+    bind(ReflectEntityStore.class)
+        .to(AccumuloReflectEntityStore.class)
+        .in(Singleton.class);
 
-    bindConstant().annotatedWith(Names.named("entityTableNamePrefix")).to(Tables.ENTITY_PREFIX);
+    bindConstant()
+        .annotatedWith(Names.named("entityTableNamePrefix"))
+        .to(Tables.ENTITY_PREFIX);
   }
 
   @Provides @Singleton

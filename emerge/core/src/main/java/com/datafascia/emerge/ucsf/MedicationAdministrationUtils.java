@@ -221,12 +221,23 @@ public class MedicationAdministrationUtils {
   /**
    * Returns true if a specified medication administration has a nonzero dosage.
    *
-   * @param admin
+   * @param administration
    *     Medication administration resource.
    * @return
    *     True if the supplied administration has a nonzero dosage.
    */
-  public static boolean dosageOverZero(MedicationAdministration admin) {
-    return admin.getDosage().getQuantity().getValue().compareTo(BigDecimal.ZERO) > 0;
+  public static boolean dosageOverZero(MedicationAdministration administration) {
+    return administration.getDosage().getQuantity().getValue().compareTo(BigDecimal.ZERO) > 0;
+  }
+
+  /**
+   * Returns the effective date of a medication administration.
+   *
+   * @param administration
+   *     The administration to pull from.
+   * @return The effective date.
+   */
+  public static Date getEffectiveDate(MedicationAdministration administration) {
+    return ((DateTimeDt) administration.getEffectiveTime()).getValue();
   }
 }

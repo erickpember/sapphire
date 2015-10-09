@@ -4,7 +4,11 @@ package com.datafascia.etl.hl7;
 
 import com.datafascia.common.nifi.DependencyInjectingProcessor;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.io.ByteStreams;
+import com.google.common.io.CharStreams;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -57,6 +61,10 @@ public class ProcessHL7 extends DependencyInjectingProcessor {
     return Collections.emptyList();
   }
 
+  private String readString(InputStream input) throws IOException {
+    return CharStreams.toString(new InputStreamReader(input, StandardCharsets.UTF_8));
+  }
+
   @Override
   public void onTrigger(ProcessContext context, ProcessSession session) throws ProcessException {
     FlowFile messageFlowFile = session.get();
@@ -65,9 +73,9 @@ public class ProcessHL7 extends DependencyInjectingProcessor {
     }
 
     try {
-      AtomicReference<byte[]> messageReference = new AtomicReference<>();
-      session.read(messageFlowFile, input -> messageReference.set(ByteStreams.toByteArray(input)));
-      byte[] message = messageReference.get();
+      AtomicReference<String> messageReference = new AtomicReference<>();
+      session.read(messageFlowFile, input -> messageReference.set(readString(input)));
+      String message = messageReference.get();
 
       hl7MessageProcessor.accept(message);
 

@@ -37,7 +37,7 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
 
   protected void processMessage(String hl7File) throws IOException {
     URL url = getClass().getResource(hl7File);
-    String message = Resources.toString(url, StandardCharsets.UTF_8).replace('\n', '\r');
-    hl7MessageProcessor.accept(message.getBytes(StandardCharsets.UTF_8));
+    String hl7 = Resources.toString(url, StandardCharsets.UTF_8).replace('\n', '\r');
+    hl7MessageProcessor.accept(hl7);
   }
 }

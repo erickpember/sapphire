@@ -5,14 +5,13 @@ package com.datafascia.etl.hl7;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.parser.Parser;
-import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 import javax.inject.Inject;
 
 /**
  * Updates application state in response to HL7 message.
  */
-public class HL7MessageProcessor implements Consumer<byte[]> {
+public class HL7MessageProcessor implements Consumer<String> {
 
   @Inject
   private Parser parser;
@@ -20,18 +19,13 @@ public class HL7MessageProcessor implements Consumer<byte[]> {
   @Inject
   private MessageRouter messageRouter;
 
-  private Message parseHL7(byte[] bytes) {
-    String hl7 = new String(bytes, StandardCharsets.UTF_8);
+  @Override
+  public void accept(String hl7) {
     try {
-      return parser.parse(hl7);
+      Message message = parser.parse(hl7);
+      messageRouter.accept(message);
     } catch (HL7Exception e) {
       throw new IllegalStateException("Cannot parse HL7 " + hl7, e);
     }
-  }
-
-  @Override
-  public void accept(byte[] bytes) {
-    Message message = parseHL7(bytes);
-    messageRouter.accept(message);
   }
 }

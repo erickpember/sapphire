@@ -32,6 +32,27 @@ public class ObservationUtils {
   }
 
   /**
+   * A date comparator for Observation Objects that handles nulls.
+   *
+   * @param left
+   *     The observation in question.
+   * @param right
+   *     The observation we're comparing it to.
+   * @return
+   *     True if left is newer than right, or right is null. Otherwise false.
+   */
+  public static boolean firstIsFresher(Observation left, Observation right) {
+    if (left == null) {
+      return false;
+    }
+    if (right == null) {
+      return true;
+    }
+    ObservationEffectiveComparator comparator = new ObservationEffectiveComparator();
+    return comparator.compare(left, right) > 0;
+  }
+
+  /**
    * Finds freshest observation for a given Encounter and Code.
    *
    * @param client

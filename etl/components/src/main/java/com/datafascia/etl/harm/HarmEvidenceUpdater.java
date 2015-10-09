@@ -56,15 +56,14 @@ public class HarmEvidenceUpdater {
   @Inject
   private AlignmentOfGoalsUpdater alignmentOfGoalsUpdater;
 
-  private StatelessKieSession session;
+  private KieContainer container;
 
   /**
    * Constructor
    */
   public HarmEvidenceUpdater() {
     KieServices services = KieServices.Factory.get();
-    KieContainer container = services.getKieClasspathContainer();
-    session = container.newStatelessKieSession("harmEvidence");
+    container = services.getKieClasspathContainer();
   }
 
   private HarmEvidence getHarmEvidence(String inputPatientId) {
@@ -90,6 +89,7 @@ public class HarmEvidenceUpdater {
   private HarmEvidence execute(
       EventType eventType, Encounter encounter, Object... additionalFacts) {
 
+    StatelessKieSession session = container.newStatelessKieSession("harmEvidence");
     session.setGlobal("demographicDataUpdater", demographicDataUpdater);
     session.setGlobal("alignmentOfGoalsUpdater", alignmentOfGoalsUpdater);
 

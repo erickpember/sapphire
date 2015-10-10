@@ -2,16 +2,24 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.event;
 
+import ca.uhn.fhir.model.api.ResourceMetadataKeyEnum;
 import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.dstu2.resource.Procedure;
+import ca.uhn.fhir.model.dstu2.valueset.ProcedureStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
+import ca.uhn.fhir.model.primitive.InstantDt;
 import ca.uhn.fhir.model.primitive.StringDt;
 import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.domain.fhir.Dates;
+import com.datafascia.emerge.ucsf.codes.ProcedureCategoryEnum;
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.time.ZoneId;
+import java.util.Date;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -39,7 +47,9 @@ public class ProcedureBuilderTest {
 
   @Test
   public void should_create_line_procedure() {
-    ProcedureBuilder procedureBuilder = new ProcedureBuilder(new Encounter());
+    Clock clock = Clock.fixed(Instant.now(), ZoneId.of("America/Los_Angeles"));
+
+    ProcedureBuilder procedureBuilder = new ProcedureBuilder(new Encounter(), clock);
     addObservation(procedureBuilder, "304890077", "Placement Date", "20150208");
     addObservation(procedureBuilder, "304890078", "Placement Time", "181900");
     addObservation(procedureBuilder, "304890094", "Lumens", "2");
@@ -57,9 +67,18 @@ public class ProcedureBuilderTest {
 
     assertEquals(procedure.getCode().getCodingFirstRep().getCode(), "Tunneled CVC Single Lumen");
     CodeableConceptDt bodySite = procedure.getBodySiteFirstRep();
-    assertEquals(bodySite.getCodingFirstRep().getCode(), "Femoral (Left)");
-    DateTimeDt performed = Dates.toDateTime(
+    assertEquals(bodySite.getCodingFirstRep().getCode(), "Femoral");
+    CodeableConceptDt orientation = procedure.getBodySite().get(1);
+    assertEquals(orientation.getCodingFirstRep().getCode(), "Left");
+    DateTimeDt expectedPerformed = Dates.toDateTime(
         LocalDate.parse("2015-02-08"), LocalTime.parse("18:19:00"));
-    assertEquals(procedure.getPerformed(), performed);
+    assertEquals(procedure.getPerformed(), expectedPerformed);
+    InstantDt updated = ResourceMetadataKeyEnum.UPDATED.get(procedure);
+    assertEquals(updated.getValue(), Date.from(Instant.now(clock)));
+
+    assertEquals(procedure.getStatusElement().getValueAsEnum(), ProcedureStatusEnum.IN_PROGRESS);
+    CodeableConceptDt category = procedure.getCategory();
+    assertEquals(
+        category.getCodingFirstRep().getCode(), ProcedureCategoryEnum.CENTRAL_LINE.getCode());
   }
 }

@@ -23,6 +23,10 @@ public class CodingSystems {
   public static final String BODY_SITE =
       "http://datafascia.com/coding/BodySite";
 
+  /** dataFascia invented this coding system for body orientation */
+  public static final String BODY_ORIENTATION =
+      "http://datafascia.com/coding/BodyOrientation";
+
   /** dataFascia invented this coding system for UCSF medication group name */
   public static final String UCSF_MEDICATION_GROUP_NAME =
       "http://datafascia.com/coding/UcsfMedicationGroupName";

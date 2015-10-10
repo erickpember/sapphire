@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.event;
 
+import ca.uhn.fhir.model.api.ResourceMetadataKeyEnum;
 import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
@@ -9,12 +10,17 @@ import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.dstu2.resource.Procedure;
 import ca.uhn.fhir.model.dstu2.valueset.ProcedureStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
+import ca.uhn.fhir.model.primitive.InstantDt;
 import ca.uhn.fhir.model.primitive.StringDt;
 import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.domain.fhir.Dates;
+import com.datafascia.emerge.ucsf.codes.ProcedureCategoryEnum;
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -22,6 +28,24 @@ import java.util.StringJoiner;
 
 /**
  * Creates procedure from observations.
+ * <p>
+ * Represents a central line insertion in these procedure properties:
+ * <dl>
+ *   <dt>code.coding(0).code
+ *   <dd>line type
+ *   <dt>bodySite(0).coding(0).code
+ *   <dd>body site
+ *   <dt>bodySite(1).coding(0).code
+ *   <dd>body orientation
+ *   <dt>performedDateTime
+ *   <dd>when line placement was performed
+ *   <dt>meta.lastUpdated
+ *   <dd>when content of this resource changed
+ *   <dt>category.coding(0).code
+ *   <dd>CENTRAL_LINE
+ *   <dt>status
+ *   <dd>indicates line is active
+ * </dl>
  */
 public class ProcedureBuilder {
 
@@ -66,6 +90,7 @@ public class ProcedureBuilder {
   private static final String TUNNELED = "Tunneled";
 
   private final Encounter encounter;
+  private final Clock clock;
   private final Map<String, Observation> codeToObservationMap = new HashMap<>();
 
   /**
@@ -73,9 +98,12 @@ public class ProcedureBuilder {
    *
    * @param encounter
    *    encounter while procedure was performed
+   * @param clock
+   *    to read current time from
    */
-  public ProcedureBuilder(Encounter encounter) {
+  public ProcedureBuilder(Encounter encounter, Clock clock) {
     this.encounter = encounter;
+    this.clock = clock;
   }
 
   /**
@@ -105,7 +133,7 @@ public class ProcedureBuilder {
         .map(observation -> ((StringDt) observation.getValue()).getValue());
   }
 
-  private String extractLineName(LineType basicLineType) {
+  private String extractLineType(LineType basicLineType) {
     if (basicLineType == LineType.HEMODIALYSIS_PHERESIS_CATHETER) {
       String lumens = getValue(LINE_LUMENS).orElse("");
       switch (lumens) {
@@ -163,7 +191,7 @@ public class ProcedureBuilder {
     return UNKNOWN;
   }
 
-  private String extractLineLocation(LineType basicLineType) {
+  private String extractLineBodySite(LineType basicLineType) {
     String location0 = getValue(LINE_LOCATION0).orElse("");
 
     switch (basicLineType) {
@@ -287,7 +315,7 @@ public class ProcedureBuilder {
     return Optional.of(Dates.toDateTime(placementDate.get(), placementTime));
   }
 
-  private static String computeLineProcedureType(String... parts) {
+  private static String computeLineProcedureCode(String... parts) {
     StringJoiner procedureCode = new StringJoiner(" ");
     for (String part : parts) {
       if (!part.equals(UNKNOWN)) {
@@ -298,58 +326,58 @@ public class ProcedureBuilder {
     return procedureCode.toString();
   }
 
-  private static String computeLineProcedureBodySite(String location, String orientation) {
-    String bodySite;
-    if (location.equals(UNKNOWN) || orientation.equals(UNKNOWN)) {
-      bodySite = UNKNOWN;
-    } else if (location.equals(OTHER) || orientation.equals(OTHER)) {
-      bodySite = OTHER;
-    } else {
-      bodySite = location + " (" + orientation + ")";
-    }
-
-    return bodySite;
-  }
-
   private Optional<Procedure> toLineProcedure() {
-    Optional<Observation> lineType = getObservation(LINE_TYPE0, LINE_TYPE9);
-    if (!lineType.isPresent()) {
+    Optional<Observation> inputLineType = getObservation(LINE_TYPE0, LINE_TYPE9);
+    if (!inputLineType.isPresent()) {
       return Optional.empty();
     }
 
-    String text = lineType.get().getCode().getText();
-    int basicNameIndex = text.indexOf('-');
-    if (basicNameIndex < 0) {
-      throw new IllegalStateException(text + " does not contain -");
+    String inputText = inputLineType.get().getCode().getText();
+    int inputCodeStart = inputText.indexOf('-');
+    if (inputCodeStart < 0) {
+      throw new IllegalStateException(inputText + " does not contain -");
     }
-    String basicName = text.substring(basicNameIndex + 1);
-    boolean removed = basicName.startsWith(REMOVED);
+    String inputCode = inputText.substring(inputCodeStart + 1);
+    boolean removed = inputCode.startsWith(REMOVED);
     if (removed) {
-      basicName = basicName.substring(REMOVED.length());
+      inputCode = inputCode.substring(REMOVED.length());
     }
 
-    Optional<LineType> optionalLineType = LineType.of(basicName);
+    Optional<LineType> optionalLineType = LineType.of(inputCode);
     if (!optionalLineType.isPresent()) {
       return Optional.empty();
     }
     LineType basicLineType = optionalLineType.get();
 
-    String lineName = extractLineName(basicLineType);
-    String orientation = extractLineOrientation(basicLineType);
-    String location = extractLineLocation(basicLineType);
     String tunneledStatus = extractLineTunneledStatus(basicLineType);
+    String lineType = extractLineType(basicLineType);
+    String bodySite = extractLineBodySite(basicLineType);
+    String orientation = extractLineOrientation(basicLineType);
     Optional<DateTimeDt> placementDateTime = extractLinePlacementDateTime();
 
     Procedure procedure = new Procedure()
-        .setStatus(removed ? ProcedureStatusEnum.COMPLETED : ProcedureStatusEnum.IN_PROGRESS)
-        .setCode(new CodeableConceptDt(
-            CodingSystems.PROCEDURE, computeLineProcedureType(tunneledStatus, lineName)))
-        .setEncounter(new ResourceReferenceDt(encounter));
-    procedure.addBodySite(new CodeableConceptDt(
-        CodingSystems.BODY_SITE, computeLineProcedureBodySite(location, orientation)));
+        .setStatus(
+            removed ? ProcedureStatusEnum.COMPLETED : ProcedureStatusEnum.IN_PROGRESS)
+        .setCategory(
+            ProcedureCategoryEnum.CENTRAL_LINE.toCodeableConcept())
+        .setCode(
+            new CodeableConceptDt(
+                CodingSystems.PROCEDURE, computeLineProcedureCode(tunneledStatus, lineType)))
+        .setEncounter(
+            new ResourceReferenceDt(encounter))
+        .addBodySite(
+            new CodeableConceptDt(
+                CodingSystems.BODY_SITE, bodySite))
+        .addBodySite(
+            new CodeableConceptDt(
+                CodingSystems.BODY_ORIENTATION, orientation));
     if (placementDateTime.isPresent()) {
       procedure.setPerformed(placementDateTime.get());
     }
+
+    InstantDt updated = new InstantDt(Date.from(Instant.now(clock)));
+    ResourceMetadataKeyEnum.UPDATED.put(procedure, updated);
+
     return Optional.of(procedure);
   }
 

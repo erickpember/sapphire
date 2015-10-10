@@ -14,6 +14,7 @@ import com.datafascia.domain.persist.ObservationRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.domain.persist.ProcedureRepository;
 import com.datafascia.etl.harm.HarmEvidenceUpdater;
+import java.time.Clock;
 import java.util.List;
 import javax.inject.Inject;
 
@@ -21,6 +22,9 @@ import javax.inject.Inject;
  * Adds observations.
  */
 public class AddObservations {
+
+  @Inject
+  private Clock clock;
 
   @Inject
   private ObservationRepository observationRepository;
@@ -69,7 +73,7 @@ public class AddObservations {
     Encounter encounter = getEncounter(encounterIdentifier, patient);
 
     FlagBuilder flagBuilder = new FlagBuilder(patient);
-    ProcedureBuilder procedureBuilder = new ProcedureBuilder(encounter);
+    ProcedureBuilder procedureBuilder = new ProcedureBuilder(encounter, clock);
 
     for (Observation observation : observations) {
       observation

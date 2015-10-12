@@ -25,7 +25,13 @@ public enum ObservationCodeEnum implements SystemDefinedCode<String> {
   AIRWAY_DEVICE("3045000461"),
   INR("INR"),
   PLT("PLT"),
-  PTT("PTT");
+  PTT("PTT"),
+  SBT("304890064"),
+  SBT_CONTRAINDICATED("304890063"),
+  PRESSURE_SUPPORT("304890067"),
+  FIO2("304890068"),
+  PEEP("304890066"),
+  TRAIN_OF_FOUR("304500964");
 
   private static final String SYSTEM = "http://datafascia.com/code/Observation";
 

@@ -129,6 +129,70 @@ public class MedicationAdministrationUtils {
   }
 
   /**
+   * Returns true if there exists a MedicationAdministration for a given encounter for
+   * a given Meds Set name with
+   *   - Status: In Progress or Completed
+   *   - Inside a given time frame.
+   *
+   * @param encounterId
+   *    encounter to search for medication administrations
+   * @param client
+   *    API client
+   * @param timeFrame
+   *    Time window constraint for search.
+   * @param medsSet
+   *    Meds group name that UCSF uses.
+   * @return
+   *    True if there is a medicationAdministration that matches criteria for in progress
+   *    or completed administration.
+   */
+  public static boolean inProgressOrCompletedInTimeFrame(ClientBuilder client, String encounterId,
+      PeriodDt timeFrame, String medsSet) {
+    List<MedicationAdministration> medicationAdministrations = client.
+        getMedicationAdministrationClient().search(encounterId);
+    medicationAdministrations.addAll(client.getMedicationAdministrationClient()
+        .search(encounterId));
+    return medicationAdministrations.stream()
+        .filter(medicationAdministration -> medicationAdministration.getStatusElement().
+            getValueAsEnum().equals(MedicationAdministrationStatusEnum.IN_PROGRESS)
+            || medicationAdministration.getStatusElement().getValueAsEnum()
+            .equals(MedicationAdministrationStatusEnum.COMPLETED))
+        .filter(admin -> admin.getIdentifierFirstRep().getValue().equals(medsSet))
+        .anyMatch(medicationAdministration -> insideTimeFrame(medicationAdministration, timeFrame));
+  }
+
+  /**
+   * Returns true if there exists a MedicationAdministration for a given encounter for
+   * a given Meds Set name with
+   *   - Status: In Progress
+   *   - Inside a given time frame.
+   *
+   * @param encounterId
+   *    encounter to search for medication administrations
+   * @param client
+   *    API client
+   * @param timeFrame
+   *    Time window constraint for search.
+   * @param medsSet
+   *    Meds group name that UCSF uses.
+   * @return
+   *    True if there is a medicationAdministration that matches criteria for in progress
+   *    administration.
+   */
+  public static boolean inProgressInTimeFrame(ClientBuilder client, String encounterId,
+      PeriodDt timeFrame, String medsSet) {
+    List<MedicationAdministration> medicationAdministrations = client.
+        getMedicationAdministrationClient().search(encounterId);
+    medicationAdministrations.addAll(client.getMedicationAdministrationClient()
+        .search(encounterId));
+    return medicationAdministrations.stream()
+        .filter(medicationAdministration -> medicationAdministration.getStatusElement().
+            getValueAsEnum().equals(MedicationAdministrationStatusEnum.IN_PROGRESS))
+        .filter(admin -> admin.getIdentifierFirstRep().getValue().equals(medsSet))
+        .anyMatch(medicationAdministration -> insideTimeFrame(medicationAdministration, timeFrame));
+  }
+
+  /**
    * Returns true if a specified medication administration is inside a specified time window.
    *
    * @param admin

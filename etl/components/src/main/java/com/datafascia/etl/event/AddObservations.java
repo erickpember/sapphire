@@ -92,7 +92,10 @@ public class AddObservations {
           });
 
     procedureBuilder.build()
-        .ifPresent(procedure -> procedureRepository.save(procedure));
+        .ifPresent(procedure -> {
+            procedureRepository.save(procedure);
+            harmEvidenceUpdater.updateProcedure(procedure, encounter);
+          });
 
     harmEvidenceUpdater.updateObservations(observations, encounter);
   }

@@ -6,6 +6,7 @@ import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Flag;
 import ca.uhn.fhir.model.dstu2.resource.Location;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
+import ca.uhn.fhir.model.dstu2.resource.Procedure;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.emerge.ucsf.DemographicData;
@@ -37,8 +38,9 @@ public class HarmEvidenceUpdater {
   public enum EventType {
     ADMIT_PATIENT,
     DISCHARGE_PATIENT,
+    UPDATE_FLAG,
     UPDATE_OBSERVATIONS,
-    UPDATE_FLAG
+    UPDATE_PROCEDURE
   }
 
   /**
@@ -55,6 +57,9 @@ public class HarmEvidenceUpdater {
 
   @Inject
   private DemographicDataUpdater demographicDataUpdater;
+
+  @Inject
+  private CentralLineAssociatedBloodStreamInfectionUpdater clabsiUpdater;
 
   @Inject
   private AlignmentOfGoalsUpdater alignmentOfGoalsUpdater;
@@ -100,6 +105,7 @@ public class HarmEvidenceUpdater {
 
     StatelessKieSession session = container.newStatelessKieSession("harmEvidence");
     session.setGlobal("demographicDataUpdater", demographicDataUpdater);
+    session.setGlobal("centralLineAssociatedBloodStreamInfectionUpdater", clabsiUpdater);
     session.setGlobal("alignmentOfGoalsUpdater", alignmentOfGoalsUpdater);
     session.setGlobal("ventilatorAssociatedEventUpdater", ventilatorAssociatedEventUpdater);
 
@@ -178,6 +184,19 @@ public class HarmEvidenceUpdater {
    */
   public void updateFlag(Flag flag, Encounter encounter) {
     HarmEvidence harmEvidence = execute(EventType.UPDATE_FLAG, encounter, flag);
+    harmEvidenceRepository.save(harmEvidence);
+  }
+
+  /**
+   * Updates procedure.
+   *
+   * @param procedure
+   *     procedure
+   * @param encounter
+   *     encounter
+   */
+  public void updateProcedure(Procedure procedure, Encounter encounter) {
+    HarmEvidence harmEvidence = execute(EventType.UPDATE_PROCEDURE, encounter, procedure);
     harmEvidenceRepository.save(harmEvidence);
   }
 }

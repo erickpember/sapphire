@@ -654,9 +654,10 @@
                     "enum": [ "Left", "Right" ],
                     "description": "An explanation about the purpose of this instance described by this schema."
                   },
-                  "days": {
-                    "type": "integer",
-                    "description": "An explanation about the purpose of this instance described by this schema."
+                  "insertionDate": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "When the central line placement was performed"
                   },
                   "updateTime": {
                     "type": "string",

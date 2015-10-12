@@ -21,6 +21,8 @@ public enum ObservationCodeEnum implements SystemDefinedCode<String> {
   VENT_MODE("304890046"),
   BREATH_TYPE("304890047"),
   NON_INVASIVE_DEVICE_MODE("3045000561"),
+  INLINE_PLACEMENT("304890061"),
+  AIRWAY_DEVICE("3045000461"),
   INR("INR"),
   PLT("PLT"),
   PTT("PTT");

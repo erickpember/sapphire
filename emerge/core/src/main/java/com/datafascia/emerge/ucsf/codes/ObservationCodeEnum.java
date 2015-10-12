@@ -25,7 +25,7 @@ public enum ObservationCodeEnum implements SystemDefinedCode<String> {
   PLT("PLT"),
   PTT("PTT");
 
-  private static final String SYSTEM = "http://datafascia.com/code/MedicationOrder";
+  private static final String SYSTEM = "http://datafascia.com/code/Observation";
 
   private final String code;
 

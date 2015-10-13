@@ -5,6 +5,7 @@ package com.datafascia.etl.harm;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Flag;
 import ca.uhn.fhir.model.dstu2.resource.Location;
+import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.emerge.ucsf.DemographicData;
@@ -13,6 +14,7 @@ import com.datafascia.emerge.ucsf.MedicalData;
 import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -35,6 +37,7 @@ public class HarmEvidenceUpdater {
   public enum EventType {
     ADMIT_PATIENT,
     DISCHARGE_PATIENT,
+    UPDATE_OBSERVATIONS,
     UPDATE_FLAG
   }
 
@@ -55,6 +58,9 @@ public class HarmEvidenceUpdater {
 
   @Inject
   private AlignmentOfGoalsUpdater alignmentOfGoalsUpdater;
+
+  @Inject
+  private VentilatorAssociatedEventUpdater ventilatorAssociatedEventUpdater;
 
   private KieContainer container;
 
@@ -86,12 +92,16 @@ public class HarmEvidenceUpdater {
     return harmEvidence;
   }
 
-  private HarmEvidence execute(
-      EventType eventType, Encounter encounter, Object... additionalFacts) {
+  private HarmEvidence executeWithObservations(
+      EventType eventType,
+      Encounter encounter,
+      List<Observation> observations,
+      Object... additionalFacts) {
 
     StatelessKieSession session = container.newStatelessKieSession("harmEvidence");
     session.setGlobal("demographicDataUpdater", demographicDataUpdater);
     session.setGlobal("alignmentOfGoalsUpdater", alignmentOfGoalsUpdater);
+    session.setGlobal("ventilatorAssociatedEventUpdater", ventilatorAssociatedEventUpdater);
 
     String patientId = encounter.getPatient().getReference().getIdPart();
     HarmEvidence harmEvidence = getHarmEvidence(patientId);
@@ -100,10 +110,17 @@ public class HarmEvidenceUpdater {
     List<Object> facts = new ArrayList<>();
     facts.add(new Event(eventType));
     facts.add(encounter);
+    facts.addAll(observations);
     facts.addAll(Arrays.asList(additionalFacts));
 
     session.execute(facts);
     return harmEvidence;
+  }
+
+  private HarmEvidence execute(
+      EventType eventType, Encounter encounter, Object... additionalFacts) {
+
+    return executeWithObservations(eventType, encounter, Collections.emptyList(), additionalFacts);
   }
 
   /**
@@ -135,6 +152,20 @@ public class HarmEvidenceUpdater {
     String patientIdString = encounter.getPatient().getReference().getIdPart();
     Id<HarmEvidence> patientId = Id.of(patientIdString);
     harmEvidenceRepository.delete(patientId);
+  }
+
+  /**
+   * Updates observations.
+   *
+   * @param observations
+   *     observations
+   * @param encounter
+   *     encounter
+   */
+  public void updateObservations(List<Observation> observations, Encounter encounter) {
+    HarmEvidence harmEvidence = executeWithObservations(
+        EventType.UPDATE_OBSERVATIONS, encounter, observations);
+    harmEvidenceRepository.save(harmEvidence);
   }
 
   /**

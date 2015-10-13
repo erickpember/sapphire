@@ -18,8 +18,6 @@ import javax.inject.Inject;
  */
 public class VentilationModeImpl {
 
-  private static final String NULL_RESULT = "";
-
   @Inject
   private ClientBuilder apiClient;
 
@@ -27,8 +25,8 @@ public class VentilationModeImpl {
    * Computes VAE Ventilation Mode
    *
    * @param encounterId
-   *     Relevant encounter ID.
-   * @return Ventilation mode for the specified encounter.
+   *     relevant encounter ID.
+   * @return ventilation mode for the specified encounter, or {@code null} if not found
    */
   public String getVentilationMode(String encounterId) {
     Observation freshestVentMode = ObservationUtils.findFreshestObservationForCode(
@@ -71,7 +69,7 @@ public class VentilationModeImpl {
       }
     }
 
-    return NULL_RESULT;
+    return null;
   }
 
   /**

@@ -14,28 +14,23 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 /**
- * Implements VAE Harm Ventilation Mode
+ * Computes VAE Ventilation Mode
  */
-public class VentilatedMode {
+public class VentilationModeImpl {
 
   private static final String NULL_RESULT = "";
-
-  // Private constructor disallows creating instances of this class.
-  private VentilatedMode() {
-  }
 
   @Inject
   private ClientBuilder apiClient;
 
   /**
-   * Implements VAE Harm Ventilation Mode
+   * Computes VAE Ventilation Mode
    *
    * @param encounterId
    *     Relevant encounter ID.
-   * @return
-   *     Ventilation mode for the specified encounter.
+   * @return Ventilation mode for the specified encounter.
    */
-  public String ventilationMode(String encounterId) {
+  public String getVentilationMode(String encounterId) {
     Observation freshestVentMode = ObservationUtils.findFreshestObservationForCode(
         apiClient, encounterId, ObservationCodeEnum.VENT_MODE.getCode());
 
@@ -45,7 +40,7 @@ public class VentilatedMode {
     Observation freshestNonInvasiveDeviceMode = ObservationUtils.findFreshestObservationForCode(
         apiClient, encounterId, ObservationCodeEnum.NON_INVASIVE_DEVICE_MODE.getCode());
 
-    Optional<String> result = Optional.empty();
+    Optional<String> result;
 
     // For when either breath type or vent mode are fresher than non-invasive device mode
     if (freshestBreathType != null && freshestVentMode != null && (ObservationUtils.firstIsFresher(

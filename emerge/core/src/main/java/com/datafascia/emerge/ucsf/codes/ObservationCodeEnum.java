@@ -31,7 +31,8 @@ public enum ObservationCodeEnum implements SystemDefinedCode<String> {
   PRESSURE_SUPPORT("304890067"),
   FIO2("304890068"),
   PEEP("304890066"),
-  TRAIN_OF_FOUR("304500964");
+  TRAIN_OF_FOUR("304500964"),
+  HEIGHT_OF_BED("304890036");
 
   private static final String SYSTEM = "http://datafascia.com/code/Observation";
 

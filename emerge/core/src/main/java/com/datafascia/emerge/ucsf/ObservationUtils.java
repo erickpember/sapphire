@@ -2,12 +2,15 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.ucsf;
 
+import ca.uhn.fhir.model.api.IDatatype;
+import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
+import ca.uhn.fhir.model.dstu2.composite.TimingDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Observation helper methods
@@ -88,8 +91,8 @@ public class ObservationUtils {
     List<Observation> observations = client.getObservationClient()
         .searchObservation(encounterId, code, null);
 
-    Observation freshtestObservation = ObservationUtils.findFreshestObservation(observations);
-    return getEffectiveDate(freshtestObservation).after(date) ? freshtestObservation : null;
+    Observation freshestObservation = ObservationUtils.findFreshestObservation(observations);
+    return getEffectiveDate(freshestObservation).after(date) ? freshestObservation : null;
   }
 
   /**
@@ -107,15 +110,49 @@ public class ObservationUtils {
    */
   public static List<Observation> getObservationByCodeAfterTime(ClientBuilder client,
       String encounterId, String code, Date date) {
-    List<Observation> observations
-        = client.getObservationClient().searchObservation(encounterId, code, null);
-    List<Observation> returnList = new ArrayList<>();
-    for (Observation obv : observations) {
-      if (getEffectiveDate(obv).after(date)) {
-        returnList.add(obv);
-      }
-    }
-    return returnList;
+    return client.getObservationClient().searchObservation(encounterId, code, null).stream().filter(
+        observation -> isAfter(observation, date)).collect(Collectors.toList());
+  }
+
+  /**
+   * Returns the observations for a given encounter with the given code inside a specified time
+   * frame.
+   *
+   * @param client
+   *     The client to use.
+   * @param encounterId
+   *     The encounter to search by.
+   * @param code
+   *     The code to search by.
+   * @param timeFrame
+   *     Time window constraint for search.
+   * @return
+   *     A list of observations.
+   */
+  public static List<Observation> searchByCodeInTimeFrame(ClientBuilder client,
+      String encounterId, String code, PeriodDt timeFrame) {
+    return client.getObservationClient().searchObservation(encounterId, code, null).stream().filter(
+        observation -> insideTimeFrame(observation, timeFrame)).collect(Collectors.toList());
+  }
+
+  /**
+   * Returns the most recent observation for a given encounter with the given code inside
+   * a specified time frame.
+   *
+   * @param client
+   *     The client to use.
+   * @param encounterId
+   *     The encounter to search by.
+   * @param code
+   *     The code to search by.
+   * @param timeFrame
+   *     Time window constraint for search.
+   * @return
+   *     The most recent observation that fits the conditions.
+   */
+  public static Observation getFreshestByCodeInTimeFrame(ClientBuilder client,
+      String encounterId, String code, PeriodDt timeFrame) {
+    return findFreshestObservation(searchByCodeInTimeFrame(client, encounterId, code, timeFrame));
   }
 
   /**
@@ -148,5 +185,54 @@ public class ObservationUtils {
         .filter(observation -> observation.getValue().toString().equals(value))
         .max(new ObservationEffectiveComparator())
         .orElse(null);
+  }
+
+  /**
+   * Returns true if a specified observation is inside a specified time window.
+   *
+   * @param observation
+   *     Observation  resource.
+   * @param timeFrame
+   *     Time window constraint for search.
+   * @return
+   *     True if the supplied  is inside the specified time window.
+   */
+  public static boolean insideTimeFrame(Observation observation, PeriodDt timeFrame) {
+    IDatatype effectiveTime = observation.getEffective();
+    if (effectiveTime instanceof TimingDt) {
+      return ((TimingDt) effectiveTime).getEventFirstRep().getValue().after(timeFrame.getStart())
+          && ((TimingDt) effectiveTime).getEventFirstRep().getValue().before(timeFrame.getEnd());
+    } else if (effectiveTime instanceof PeriodDt) {
+      return ((PeriodDt) effectiveTime).getStart().after(timeFrame.getStart())
+          && ((PeriodDt) effectiveTime).getEnd().before(timeFrame.getEnd());
+    } else if (effectiveTime instanceof DateTimeDt) {
+      return ((DateTimeDt) effectiveTime).getValue().after(timeFrame.getStart())
+          && ((DateTimeDt) effectiveTime).getValue().before(timeFrame.getEnd());
+    } else {
+      throw new RuntimeException("Unexpected type: " + effectiveTime.getClass().getCanonicalName());
+    }
+  }
+
+  /**
+   * Returns true if a specified observation  is after a specified time.
+   *
+   * @param observation
+   *     Observation  resource.
+   * @param startTime
+   *     Start time for search.
+   * @return
+   *     True if the supplied 's effective time is after the specified start time.
+   */
+  public static boolean isAfter(Observation observation, Date startTime) {
+    IDatatype effectiveTime = observation.getEffective();
+    if (effectiveTime instanceof TimingDt) {
+      return ((TimingDt) effectiveTime).getEventFirstRep().getValue().after(startTime);
+    } else if (effectiveTime instanceof PeriodDt) {
+      return ((PeriodDt) effectiveTime).getStart().after(startTime);
+    } else if (effectiveTime instanceof DateTimeDt) {
+      return ((DateTimeDt) effectiveTime).getValue().after(startTime);
+    } else {
+      throw new RuntimeException("Unexpected type: " + effectiveTime.getClass().getCanonicalName());
+    }
   }
 }

@@ -1,14 +1,14 @@
 // Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.etl.hl7;
+package com.datafascia.etl.harm.demographic;
 
 import com.datafascia.common.persist.Id;
 import com.datafascia.emerge.ucsf.DemographicData;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
+import com.datafascia.etl.harm.HarmEvidenceTestSupport;
 import java.time.Clock;
 import java.time.Instant;
-import java.util.Date;
 import java.util.Optional;
 import javax.inject.Inject;
 import org.testng.annotations.Test;
@@ -18,10 +18,10 @@ import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 /**
- * Tests {@link HL7MessageProcessor} saves HarmEvidence resources.
+ * Tests demographic data is exported.
  */
 @Test(singleThreaded = true)
-public class HarmEvidenceTest extends HL7MessageProcessorTestSupport {
+public class DemographicIT extends HarmEvidenceTestSupport {
 
   private static final String PATIENT_IDENTIFIER = "97546762";
 
@@ -31,12 +31,8 @@ public class HarmEvidenceTest extends HL7MessageProcessorTestSupport {
   @Inject
   private HarmEvidenceRepository harmEvidenceRepository;
 
-  private static String formatDateTime(Date date) {
-    return date.toInstant().toString();
-  }
-
   @Test
-  public void should_save_demographic_data() throws Exception {
+  public void should_export_demographic_data() throws Exception {
     processMessage("ADT_A01.hl7");
 
     Id<HarmEvidence> patientId = Id.of(PATIENT_IDENTIFIER);
@@ -45,7 +41,7 @@ public class HarmEvidenceTest extends HL7MessageProcessorTestSupport {
 
     assertEquals(demographicData.getPatientName(), "ONE A NATUS-ADULT");
     assertEquals(demographicData.getMedicalRecordNumber(), PATIENT_IDENTIFIER);
-    assertEquals(formatDateTime(demographicData.getICUadmitDate()), "2014-10-01T19:01:00Z");
+    assertEquals(demographicData.getICUadmitDate().toInstant().toString(), "2014-10-01T19:01:00Z");
     assertEquals(demographicData.getDateOfBirth(), "1984-10-01");
     assertEquals(demographicData.getGender(), DemographicData.Gender.FEMALE);
     assertEquals(demographicData.getRace(), "W");
@@ -54,7 +50,7 @@ public class HarmEvidenceTest extends HL7MessageProcessorTestSupport {
   }
 
   @Test
-  public void should_delete() throws Exception {
+  public void should_delete_harm_evidence() throws Exception {
     processMessage("ADT_A01.hl7");
 
     Id<HarmEvidence> patientId = Id.of(PATIENT_IDENTIFIER);

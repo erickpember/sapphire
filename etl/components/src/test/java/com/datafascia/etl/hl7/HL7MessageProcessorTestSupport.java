@@ -8,6 +8,7 @@ import com.datafascia.common.configuration.guice.ConfigureModule;
 import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.LocationRepository;
 import com.datafascia.domain.persist.PatientRepository;
+import com.datafascia.etl.harm.HarmEvidenceUpdater;
 import com.datafascia.etl.inject.ComponentsModule;
 import com.google.common.io.Resources;
 import com.google.inject.AbstractModule;
@@ -26,6 +27,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import org.testng.annotations.BeforeMethod;
 
+import static org.mockito.Mockito.mock;
+
 /**
  * Common implementation for tests using {@link HL7MessageProcessor}
  */
@@ -36,7 +39,10 @@ public class HL7MessageProcessorTestSupport {
   private static class TestModule extends AbstractModule {
     @Override
     protected void configure() {
-      bind(Clock.class).toInstance(Clock.fixed(Instant.now(), ZONE_ID));
+      bind(Clock.class)
+          .toInstance(Clock.fixed(Instant.now(), ZONE_ID));
+      bind(HarmEvidenceUpdater.class)
+          .toInstance(mock(HarmEvidenceUpdater.class));
     }
 
     @Provides

@@ -7,6 +7,7 @@ import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.composite.TimingDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
+import ca.uhn.fhir.model.primitive.StringDt;
 import com.datafascia.api.client.ClientBuilder;
 import java.util.Date;
 import java.util.List;
@@ -164,6 +165,17 @@ public class ObservationUtils {
    */
   public static Date getEffectiveDate(Observation ob) {
     return ((DateTimeDt) ob.getEffective()).getValue();
+  }
+
+  /**
+   * Gets observation value as a string.
+   *
+   * @param observation
+   *     The observation to pull from.
+   * @return observation value
+   */
+  public static String getValueAsString(Observation observation) {
+    return ((StringDt) observation.getValue()).getValue();
   }
 
   /**

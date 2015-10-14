@@ -38,6 +38,7 @@ public class HarmEvidenceUpdater {
   public enum EventType {
     ADMIT_PATIENT,
     DISCHARGE_PATIENT,
+    TIMER,
     UPDATE_FLAG,
     UPDATE_OBSERVATIONS,
     UPDATE_PROCEDURE
@@ -63,6 +64,9 @@ public class HarmEvidenceUpdater {
 
   @Inject
   private AlignmentOfGoalsUpdater alignmentOfGoalsUpdater;
+
+  @Inject
+  private VenousThromboembolismUpdater venousThromboembolismUpdater;
 
   @Inject
   private VentilatorAssociatedEventUpdater ventilatorAssociatedEventUpdater;
@@ -107,6 +111,7 @@ public class HarmEvidenceUpdater {
     session.setGlobal("demographicDataUpdater", demographicDataUpdater);
     session.setGlobal("centralLineAssociatedBloodStreamInfectionUpdater", clabsiUpdater);
     session.setGlobal("alignmentOfGoalsUpdater", alignmentOfGoalsUpdater);
+    session.setGlobal("venousThromboembolismUpdater", venousThromboembolismUpdater);
     session.setGlobal("ventilatorAssociatedEventUpdater", ventilatorAssociatedEventUpdater);
 
     String patientId = encounter.getPatient().getReference().getIdPart();
@@ -158,6 +163,17 @@ public class HarmEvidenceUpdater {
     String patientIdString = encounter.getPatient().getReference().getIdPart();
     Id<HarmEvidence> patientId = Id.of(patientIdString);
     harmEvidenceRepository.delete(patientId);
+  }
+
+  /**
+   * Performs logic in response to timer event.
+   *
+   * @param encounter
+   *     encounter
+   */
+  public void processTimer(Encounter encounter) {
+    HarmEvidence harmEvidence = execute(EventType.TIMER, encounter);
+    harmEvidenceRepository.save(harmEvidence);
   }
 
   /**

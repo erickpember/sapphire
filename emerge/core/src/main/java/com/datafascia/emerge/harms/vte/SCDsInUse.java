@@ -5,43 +5,69 @@ package com.datafascia.emerge.harms.vte;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
+import java.time.Clock;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import javax.inject.Inject;
 
 /**
- * Class to determine if SCDs are in use.
+ * Determines if sequential compression devices are in use.
  */
 public class SCDsInUse {
 
+  @Inject
+  private Clock clock;
+
+  @Inject
+  private ClientBuilder apiClient;
+
+  private Date getEndOfLastShift() {
+    ZonedDateTime now = ZonedDateTime.now(clock);
+    int nowHour = now.getHour();
+    int lastShiftEndHour = (nowHour > 7 && nowHour < 19) ? 7 : 19;
+    ZonedDateTime lastShiftEnd = ZonedDateTime.of(
+        now.getYear(),
+        now.getMonthValue(),
+        now.getDayOfMonth(),
+        lastShiftEndHour,
+        0,
+        0,
+        0,
+        clock.getZone());
+    return Date.from(lastShiftEnd.toInstant());
+  }
+
   /**
-   * Determines if SCDs are in use.
+   * Determines if sequential compression devices are in use.
    *
-   * @param client The client builder to use.
-   * @param encounterId The encounter to check.
-   * @return If SCDs are in use.
+   * @param encounterId
+   *     encounter to check.
+   * @return true if SCDs are in use
    */
-  public static boolean SCDsInUse(ClientBuilder client, String encounterId) {
+  public boolean isSCDsInUse(String encounterId) {
     Date endOfLastShift = getEndOfLastShift();
 
-    List<Observation> mechanicalProphylaxisDevicesFull = client.getObservationClient()
+    List<Observation> mechanicalProphylaxisDevicesFull = apiClient.getObservationClient()
         .searchObservation(encounterId, "304890073", null);
 
-    List<Observation> mechanicalProphylaxisInterventionsFull = client.getObservationClient()
+    List<Observation> mechanicalProphylaxisInterventionsFull = apiClient.getObservationClient()
         .searchObservation(encounterId, "304890074", null);
 
     // Get observations since the end of the last nursing shift.
     List<Observation> mechanicalProphylaxisDevices = new ArrayList<>();
     for (Observation observation : mechanicalProphylaxisDevicesFull) {
-      if (observation.getIssued().after(endOfLastShift)) {
+      Date effective = ObservationUtils.getEffectiveDate(observation);
+      if (effective.after(endOfLastShift)) {
         mechanicalProphylaxisDevices.add(observation);
       }
     }
 
     List<Observation> mechanicalProphylaxisInterventions = new ArrayList<>();
     for (Observation observation : mechanicalProphylaxisInterventionsFull) {
-      if (observation.getIssued().after(endOfLastShift)) {
+      Date effective = ObservationUtils.getEffectiveDate(observation);
+      if (effective.after(endOfLastShift)) {
         mechanicalProphylaxisInterventions.add(observation);
       }
     }
@@ -49,37 +75,16 @@ public class SCDsInUse {
     // Get freshest iterations of the observations.
     Observation freshestMechanicalProphylaxisDevice = ObservationUtils
         .findFreshestObservation(mechanicalProphylaxisDevices);
+    String freshestMechanicalProphylaxisDeviceValue =
+        ObservationUtils.getValueAsString(freshestMechanicalProphylaxisDevice);
 
     Observation freshestMechanicalProphylaxisIntervention = ObservationUtils
         .findFreshestObservation(mechanicalProphylaxisInterventions);
+    String freshestMechanicalProphylaxisInterventionValue =
+        ObservationUtils.getValueAsString(freshestMechanicalProphylaxisIntervention);
 
-    if (freshestMechanicalProphylaxisDevice.getValue().equals("Sequential compression device(s)")
-        && (freshestMechanicalProphylaxisIntervention.getValue().equals("On right lower extremity")
-        || freshestMechanicalProphylaxisIntervention.getValue().equals("On left lower extremity")))
-    {
-      return true;
-    }
-
-    return false;
-  }
-
-  /**
-   * Returns the time the last shift ended.
-   *
-   * @return The time the last shift ended.
-   */
-  private static Date getEndOfLastShift() {
-    Calendar calendar = Calendar.getInstance();
-
-    calendar.set(Calendar.MINUTE, 0);
-
-    int nowHour = calendar.get(Calendar.HOUR_OF_DAY);
-    if (nowHour > 7 && nowHour < 19) {
-      calendar.set(Calendar.HOUR, 7);
-      return calendar.getTime();
-    } else {
-      calendar.set(Calendar.HOUR, 19);
-      return calendar.getTime();
-    }
+    return freshestMechanicalProphylaxisDeviceValue.equals("Sequential compression device(s)")
+        && (freshestMechanicalProphylaxisInterventionValue.equals("On left lower extremity")
+         || freshestMechanicalProphylaxisInterventionValue.equals("On right lower extremity"));
   }
 }

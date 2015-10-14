@@ -1,0 +1,18 @@
+// Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
+// For license information, please contact http://datafascia.com/contact
+package com.datafascia.etl.harm;
+
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import com.datafascia.etl.harm.HarmEvidenceUpdater.Event;
+import com.datafascia.etl.harm.HarmEvidenceUpdater.EventType;
+
+global com.datafascia.emerge.ucsf.HarmEvidence harmEvidence;
+global com.datafascia.etl.harm.VenousThromboembolismUpdater venousThromboembolismUpdater;
+
+rule "Update SCDs in use"
+when
+  Event( type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  venousThromboembolismUpdater.updateScdsInUse(harmEvidence, $encounter);
+end

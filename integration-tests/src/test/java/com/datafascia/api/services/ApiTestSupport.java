@@ -64,7 +64,8 @@ public abstract class ApiTestSupport {
   private static class TestModule extends AbstractModule {
     @Override
     protected void configure() {
-      bind(Clock.class).toInstance(Clock.fixed(Instant.now(), ZONE_ID));
+      bind(Clock.class)
+          .toInstance(Clock.fixed(Instant.parse("2014-09-29T23:48:59Z"), ZONE_ID));
     }
 
     @Provides

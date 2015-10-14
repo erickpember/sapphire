@@ -9,6 +9,7 @@ import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
 import com.datafascia.emerge.ucsf.codes.MaybeEnum;
+import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
@@ -55,7 +56,7 @@ public class DiscreteHOBGreaterThan30DegImpl {
     betweenSeventyFiveAndFifteenMinutesAgo.setEnd(new DateTimeDt(fifteenMinutesAgo));
 
     Observation freshestDiscreteHOB = ObservationUtils.getFreshestByCodeAfterTime(apiClient,
-        encounterId, encounterId, oneHourAgo);
+        encounterId, ObservationCodeEnum.HEIGHT_OF_BED.getCode(), oneHourAgo);
 
     if (freshestDiscreteHOB != null) {
       switch (freshestDiscreteHOB.getValue().toString()) {
@@ -76,8 +77,8 @@ public class DiscreteHOBGreaterThan30DegImpl {
     }
 
     Observation freshestDiscreteHOBFromPast75Minutes = ObservationUtils
-        .getFreshestByCodeInTimeFrame(apiClient, encounterId, encounterId,
-            betweenSeventyFiveAndFifteenMinutesAgo);
+        .getFreshestByCodeInTimeFrame(apiClient, encounterId, ObservationCodeEnum.HEIGHT_OF_BED
+            .getCode(), betweenSeventyFiveAndFifteenMinutesAgo);
 
     if (freshestDiscreteHOBFromPast75Minutes != null) {
       switch (freshestDiscreteHOBFromPast75Minutes.getValue().toString()) {

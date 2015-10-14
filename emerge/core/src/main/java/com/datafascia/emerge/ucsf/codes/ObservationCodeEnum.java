@@ -33,7 +33,8 @@ public enum ObservationCodeEnum implements SystemDefinedCode<String> {
   PEEP("304890066"),
   TRAIN_OF_FOUR("304500964"),
   HEIGHT_OF_BED("304890036"),
-  SUBGLOTTIC_SUCTION("304890059");
+  SUBGLOTTIC_SUCTION("304890059"),
+  ORAL_CARE("304890060");
 
   private static final String SYSTEM = "http://datafascia.com/code/Observation";
 

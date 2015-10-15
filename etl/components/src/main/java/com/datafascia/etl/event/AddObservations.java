@@ -87,15 +87,15 @@ public class AddObservations {
 
     flagBuilder.build()
         .forEach(flag -> {
-            flagRepository.save(flag);
-            harmEvidenceUpdater.updateFlag(flag, encounter);
-          });
+          flagRepository.save(flag);
+          harmEvidenceUpdater.updateFlag(flag, encounter);
+        });
 
     procedureBuilder.build()
         .ifPresent(procedure -> {
-            procedureRepository.save(procedure);
-            harmEvidenceUpdater.updateProcedure(procedure, encounter);
-          });
+          procedureRepository.save(procedure);
+          harmEvidenceUpdater.updateProcedure(procedure, encounter);
+        });
 
     harmEvidenceUpdater.updateObservations(observations, encounter);
   }

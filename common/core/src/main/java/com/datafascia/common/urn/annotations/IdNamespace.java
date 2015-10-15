@@ -21,12 +21,12 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface IdNamespace {
   /**
-   * Hardcoded version for compatibility tests
+   * @return hardcoded version for compatibility tests
    */
   int version() default 1;
 
   /**
-   * The namespace
+   * @return namespace
    */
   String value();
 }

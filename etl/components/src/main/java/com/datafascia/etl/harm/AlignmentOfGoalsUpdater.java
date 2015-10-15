@@ -61,9 +61,9 @@ public class AlignmentOfGoalsUpdater {
   private void updatePatientCareConferenceNote(HarmEvidence harmEvidence, String patientId) {
     patientCareConferenceNoteImpl.findPatientCareConferenceNote(patientId)
         .ifPresent(note -> {
-            note.setUpdateTime(Date.from(Instant.now(clock)));
-            getAOG(harmEvidence).setPatientCareConferenceNote(note);
-          });
+          note.setUpdateTime(Date.from(Instant.now(clock)));
+          getAOG(harmEvidence).setPatientCareConferenceNote(note);
+        });
   }
 
   private void updatePhysicianOrdersForLifeSustainingTreatment(
@@ -89,17 +89,17 @@ public class AlignmentOfGoalsUpdater {
 
     FlagCodeEnum.of(flag.getCode().getCodingFirstRep().getCode())
         .ifPresent(flagCode -> {
-            switch (flagCode) {
-              case ADVANCE_DIRECTIVE:
-                updateAdvanceDirective(harmEvidence, patientId);
-                break;
-              case PATIENT_CARE_CONFERENCE_NOTE:
-                updatePatientCareConferenceNote(harmEvidence, patientId);
-                break;
-              case PHYSICIAN_ORDERS_FOR_LIFE_SUSTAINING_TREATMENT:
-                updatePhysicianOrdersForLifeSustainingTreatment(harmEvidence, patientId);
-                break;
-            }
-          });
+          switch (flagCode) {
+            case ADVANCE_DIRECTIVE:
+              updateAdvanceDirective(harmEvidence, patientId);
+              break;
+            case PATIENT_CARE_CONFERENCE_NOTE:
+              updatePatientCareConferenceNote(harmEvidence, patientId);
+              break;
+            case PHYSICIAN_ORDERS_FOR_LIFE_SUSTAINING_TREATMENT:
+              updatePhysicianOrdersForLifeSustainingTreatment(harmEvidence, patientId);
+              break;
+          }
+        });
   }
 }

@@ -139,9 +139,9 @@ public class ArchiveIngestMessage extends DependencyInjectingProcessor {
     }
 
     session.read(flowFile, input -> {
-        byte[] payload = ByteStreams.toByteArray(input);
-        saveIngestMessage(ByteBuffer.wrap(payload));
-      });
+      byte[] payload = ByteStreams.toByteArray(input);
+      saveIngestMessage(ByteBuffer.wrap(payload));
+    });
 
     session.transfer(flowFile, SUCCESS);
   }

@@ -56,7 +56,7 @@
       <property name="option" value="bottom"/>
     </module>
 
-    <!-- Do not allow static imports -->
+    <!-- Do not allow wildcard imports -->
     <module name="AvoidStarImport"/>
 
     <!-- Do not allow empty statements -->

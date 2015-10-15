@@ -68,8 +68,8 @@ public class AddFlag {
         .addDocumentType(documentType, activityDateTime);
     flagBuilder.build()
         .forEach(flag -> {
-            flagRepository.save(flag);
-            harmEvidenceUpdater.updateFlag(flag, encounter);
-          });
+          flagRepository.save(flag);
+          harmEvidenceUpdater.updateFlag(flag, encounter);
+        });
   }
 }

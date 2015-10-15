@@ -606,7 +606,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-checkstyle-plugin</artifactId>
-        <version>2.15</version>
+        <version>2.16</version>
         <configuration>
           <configLocation>datafascia/checkstyle.xml</configLocation>
           <headerLocation>datafascia/License.txt</headerLocation>
@@ -630,7 +630,7 @@
           <dependency>
             <groupId>com.puppycrawl.tools</groupId>
             <artifactId>checkstyle</artifactId>
-            <version>6.3</version>
+            <version>6.11.2</version>
           </dependency>
         </dependencies>
       </plugin>

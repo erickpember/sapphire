@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 public @interface ConfigurationNode {
 
   /**
-   * key to node in hierarchical configuration
+   * @return key to node in hierarchical configuration
    */
   String value();
 }

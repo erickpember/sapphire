@@ -117,8 +117,8 @@ public class PatientRepository extends FhirEntityStoreRepository {
    */
   public void delete(Id<UnitedStatesPatient> patientId) {
     read(patientId).ifPresent(patient -> {
-        patient.setActive(false);
-        save(patient);
-      });
+      patient.setActive(false);
+      save(patient);
+    });
   }
 }

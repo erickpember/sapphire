@@ -17,7 +17,7 @@ import java.lang.annotation.Target;
 public @interface Configure {
 
   /**
-   * name of configuration property to read value from
+   * @return name of configuration property to read value from
    */
   String property() default "";
 }

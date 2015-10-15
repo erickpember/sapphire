@@ -83,8 +83,8 @@ public class SCDsInUse {
     String freshestMechanicalProphylaxisInterventionValue =
         ObservationUtils.getValueAsString(freshestMechanicalProphylaxisIntervention);
 
-    return freshestMechanicalProphylaxisDeviceValue.equals("Sequential compression device(s)")
-        && (freshestMechanicalProphylaxisInterventionValue.equals("On left lower extremity")
-         || freshestMechanicalProphylaxisInterventionValue.equals("On right lower extremity"));
+    return "Sequential compression device(s)".equals(freshestMechanicalProphylaxisDeviceValue)
+        && ("On left lower extremity".equals(freshestMechanicalProphylaxisInterventionValue)
+         || "On right lower extremity".equals(freshestMechanicalProphylaxisInterventionValue));
   }
 }

@@ -171,10 +171,14 @@ public class ObservationUtils {
    * Gets observation value as a string.
    *
    * @param observation
-   *     The observation to pull from.
-   * @return observation value
+   *     observation to pull from
+   * @return observation value, or {@code null} if observation is null
    */
   public static String getValueAsString(Observation observation) {
+    if (observation == null) {
+      return null;
+    }
+
     return ((StringDt) observation.getValue()).getValue();
   }
 

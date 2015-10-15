@@ -13,6 +13,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -32,7 +33,17 @@ public class VenousThromboembolismIT extends HarmEvidenceTestSupport {
   }
 
   @Test
-  public void should_export_scds_in_use() throws Exception {
+  public void should_export_scds_in_use_false() throws Exception {
+    harmEvidenceUpdater.processTimer(getEncounter());
+
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    TimestampedBoolean scdsInUse = harmEvidence.getMedicalData().getVTE().getSCDsInUse();
+    assertFalse(scdsInUse.isValue());
+    assertEquals(scdsInUse.getUpdateTime(), Date.from(Instant.now(clock)));
+  }
+
+  @Test
+  public void should_export_scds_in_use_true() throws Exception {
     processMessage("sequential-compression-devices.hl7");
     harmEvidenceUpdater.processTimer(getEncounter());
 

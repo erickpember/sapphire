@@ -78,7 +78,7 @@ public class HarmEvidenceUpdater {
    */
   public HarmEvidenceUpdater() {
     KieServices services = KieServices.Factory.get();
-    container = services.getKieClasspathContainer();
+    container = services.newKieClasspathContainer();
   }
 
   private HarmEvidence getHarmEvidence(String inputPatientId) {

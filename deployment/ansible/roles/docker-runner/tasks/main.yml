@@ -178,7 +178,7 @@
 - name: Copy NiFi flow configuration
   copy:
     src: "{{ playbook_dir }}/roles/df-etl/files/{{ item }}"
-    dest: "/etc/dF/nifi/conf/{{ item }}"
+    dest: "/etc/dF/nifi/{{ item }}"
   with_items:
     - medadmin-webgetconfig.yml
     - nursingorder-webgetconfig.yml

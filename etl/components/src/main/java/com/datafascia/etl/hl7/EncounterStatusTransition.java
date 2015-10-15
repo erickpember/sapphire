@@ -40,7 +40,7 @@ public class EncounterStatusTransition {
    */
   public EncounterStatusTransition() {
     KieServices services = KieServices.Factory.get();
-    KieContainer container = services.getKieClasspathContainer();
+    KieContainer container = services.newKieClasspathContainer();
     session = container.newStatelessKieSession("encounterStatus");
   }
 

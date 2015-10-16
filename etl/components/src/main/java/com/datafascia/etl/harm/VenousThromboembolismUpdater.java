@@ -4,8 +4,10 @@ package com.datafascia.etl.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import com.datafascia.emerge.harms.vte.Anticoagulation;
+import com.datafascia.emerge.harms.vte.LowerExtremitySCDsContraindicatedImpl;
 import com.datafascia.emerge.harms.vte.SCDsInUse;
 import com.datafascia.emerge.ucsf.HarmEvidence;
+import com.datafascia.emerge.ucsf.LowerExtremitySCDsContraindicated;
 import com.datafascia.emerge.ucsf.MedicalData;
 import com.datafascia.emerge.ucsf.TimestampedBoolean;
 import com.datafascia.emerge.ucsf.VTE;
@@ -26,6 +28,9 @@ public class VenousThromboembolismUpdater {
 
   @Inject
   private Anticoagulation anticoagulation;
+
+  @Inject
+  private LowerExtremitySCDsContraindicatedImpl lowerExtremitySCDsContraindicatedImpl;
 
   @Inject
   private SCDsInUse scdsInUseImpl;
@@ -57,6 +62,32 @@ public class VenousThromboembolismUpdater {
         .withValue(anticoagulation.isAnticoagulated(encounterId))
         .withUpdateTime(Date.from(Instant.now(clock)));
     vte.setOnSystemicAnticoagulation(anticoagulated);
+  }
+
+  /**
+   * Updates lower extremity SCDs contraindicated.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateLowerExtremitySCDsContraindicated(
+      HarmEvidence harmEvidence, Encounter encounter) {
+
+    VTE vte = getVTE(harmEvidence);
+
+    String encounterId = encounter.getId().getIdPart();
+    String reason = lowerExtremitySCDsContraindicatedImpl.getLowerExtremitySCDsContraindicated(
+        encounterId);
+
+    LowerExtremitySCDsContraindicated lowerExtremitySCDsContraindicated =
+        new LowerExtremitySCDsContraindicated()
+        .withValue(reason != null)
+        .withReason(
+            (reason != null) ? LowerExtremitySCDsContraindicated.Reason.fromValue(reason) : null)
+        .withUpdateTime(Date.from(Instant.now(clock)));
+    vte.setLowerExtremitySCDsContraindicated(lowerExtremitySCDsContraindicated);
   }
 
   /**

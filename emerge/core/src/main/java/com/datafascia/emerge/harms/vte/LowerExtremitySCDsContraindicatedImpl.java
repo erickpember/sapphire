@@ -7,21 +7,25 @@ import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
 import com.datafascia.api.client.ClientBuilder;
 import java.util.List;
+import javax.inject.Inject;
 
 /**
  * Utilities for Lower Extremity SCD
  */
-public class LowerExtremitySCD {
+public class LowerExtremitySCDsContraindicatedImpl {
+
+  @Inject
+  private ClientBuilder apiClient;
 
   /**
-   * Lower Extremity SCDs Contraindicated Implementation
+   * Gets Lower Extremity SCDs Contraindicated.
    *
-   * @param client ClientBuilder to use.
-   * @param encounterId Encounter to search.
+   * @param encounterId
+   *     Encounter to search.
    * @return A reason for lower extremity SCDs contraindicated, or null if none.
    */
-  public static String lowerExtremitySCDsContraindicated(ClientBuilder client, String encounterId) {
-    List<ProcedureRequest> requests = client.getProcedureRequestClient()
+  public String getLowerExtremitySCDsContraindicated(String encounterId) {
+    List<ProcedureRequest> requests = apiClient.getProcedureRequestClient()
         .getProcedureRequest(encounterId);
 
     for (ProcedureRequest request : requests) {

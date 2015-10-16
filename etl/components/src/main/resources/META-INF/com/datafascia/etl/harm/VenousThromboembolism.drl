@@ -15,5 +15,6 @@ when
   $encounter: Encounter()
 then
   venousThromboembolismUpdater.updateOnSystemicAnticoagulation(harmEvidence, $encounter);
+  venousThromboembolismUpdater.updateLowerExtremitySCDsContraindicated(harmEvidence, $encounter);
   venousThromboembolismUpdater.updateScdsInUse(harmEvidence, $encounter);
 end

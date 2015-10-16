@@ -137,6 +137,24 @@ public class ObservationUtils {
   }
 
   /**
+   * Returns the observations for a given encounter inside a specified time frame.
+   *
+   * @param client
+   *     The client to use.
+   * @param encounterId
+   *     The encounter to search by.
+   * @param timeFrame
+   *     Time window constraint for search.
+   * @return
+   *     A list of observations.
+   */
+  public static List<Observation> searchByTimeFrame(ClientBuilder client,
+      String encounterId, PeriodDt timeFrame) {
+    return client.getObservationClient().searchObservation(encounterId, null, null).stream().filter(
+        observation -> insideTimeFrame(observation, timeFrame)).collect(Collectors.toList());
+  }
+
+  /**
    * Returns the most recent observation for a given encounter with the given code inside
    * a specified time frame.
    *

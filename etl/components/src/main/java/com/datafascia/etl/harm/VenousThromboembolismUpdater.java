@@ -3,6 +3,7 @@
 package com.datafascia.etl.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import com.datafascia.emerge.harms.vte.Anticoagulation;
 import com.datafascia.emerge.harms.vte.SCDsInUse;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.MedicalData;
@@ -24,6 +25,9 @@ public class VenousThromboembolismUpdater {
   private Clock clock;
 
   @Inject
+  private Anticoagulation anticoagulation;
+
+  @Inject
   private SCDsInUse scdsInUseImpl;
 
   private static VTE getVTE(HarmEvidence harmEvidence) {
@@ -35,6 +39,24 @@ public class VenousThromboembolismUpdater {
     }
 
     return vte;
+  }
+
+  /**
+   * Updates on systemic anticoagulation.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateOnSystemicAnticoagulation(HarmEvidence harmEvidence, Encounter encounter) {
+    VTE vte = getVTE(harmEvidence);
+
+    String encounterId = encounter.getId().getIdPart();
+    TimestampedBoolean anticoagulated = new TimestampedBoolean()
+        .withValue(anticoagulation.isAnticoagulated(encounterId))
+        .withUpdateTime(Date.from(Instant.now(clock)));
+    vte.setOnSystemicAnticoagulation(anticoagulated);
   }
 
   /**

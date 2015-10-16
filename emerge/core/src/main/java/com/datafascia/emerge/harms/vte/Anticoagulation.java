@@ -11,22 +11,25 @@ import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.harms.HarmsLookups;
 import java.util.List;
+import javax.inject.Inject;
 
 /**
- * Harms logic for VTE anti-coagulation.
+ * Harms logic for VTE anticoagulation.
  */
-public class AntiCoagulation {
+public class Anticoagulation {
+
+  @Inject
+  private ClientBuilder apiClient;
 
   /**
-   * What type of anti-coagulant is in use for this encounter. Null if none.
+   * Gets type of anticoagulant in use for an encounter.
    *
-   * @param client The client builder to use.
-   * @param encounterId The encounter to check.
-   * @return The anti-coagulant type. Null if none.
+   * @param encounterId
+   *     encounter to search
+   * @return anticoagulant type, or {@code null} if none.
    */
-  public static AnticoagulationTypeEnum getAnticoagulationTypeForEncounter(ClientBuilder client,
-      String encounterId) {
-    List<MedicationOrder> medicationOrders = client.getMedicationOrderClient()
+  public AnticoagulationTypeEnum getAnticoagulationTypeForEncounter(String encounterId) {
+    List<MedicationOrder> medicationOrders = apiClient.getMedicationOrderClient()
         .search(encounterId);
 
     // First check active prescriptions for the anticoagulants.
@@ -34,7 +37,7 @@ public class AntiCoagulation {
       if (medicationOrder.getStatusElement().getValueAsEnum() == MedicationOrderStatusEnum.ACTIVE) {
         ResourceReferenceDt medicationReference =
             (ResourceReferenceDt) medicationOrder.getMedication();
-        Medication medication = client.getMedicationClient()
+        Medication medication = apiClient.getMedicationClient()
             .getMedication(medicationReference.getReference().getIdPart());
         String medName = medication.getCode().getText();
 
@@ -46,19 +49,19 @@ public class AntiCoagulation {
       }
     }
 
-    List<MedicationAdministration> administrations = client.getMedicationAdministrationClient()
+    List<MedicationAdministration> administrations = apiClient.getMedicationAdministrationClient()
         .search(encounterId);
 
     // Check if any recent administrations have been made that are anticoagulants.
     for (MedicationAdministration administration : administrations) {
       ResourceReferenceDt prescriptionReference = administration.getPrescription();
 
-      MedicationOrder medicationOrder = client.getMedicationOrderClient()
+      MedicationOrder medicationOrder = apiClient.getMedicationOrderClient()
           .read(prescriptionReference.getReference().getIdPart(), encounterId);
       ResourceReferenceDt medicationReference =
           (ResourceReferenceDt) medicationOrder.getMedication();
 
-      Medication medication = client.getMedicationClient()
+      Medication medication = apiClient.getMedicationClient()
           .getMedication(medicationReference.getReference().getIdPart());
       String medName = medication.getCode().getText();
 
@@ -71,7 +74,7 @@ public class AntiCoagulation {
 
           // If INR is greater than 1.5, then it's still active. Otherwise, return null.
           if (medName.equals("Warfarin")) {
-            if (HarmsLookups.inrOver1point5(client, encounterId)) {
+            if (HarmsLookups.inrOver1point5(apiClient, encounterId)) {
               return at;
             } else {
               return null;
@@ -87,13 +90,13 @@ public class AntiCoagulation {
   }
 
   /**
-   * Is the patient on an anti-coagulant?
+   * Checks if the patient on an anticoagulant.
    *
-   * @param client The client builder to use.
-   * @param encounterId The encounter ID to use.
-   * @return If the patient is anti-coagulated.
+   * @param encounterId
+   *     encounter ID to search
+   * @return true if the patient is anticoagulated.
    */
-  public static boolean isAntiCoagulated(ClientBuilder client, String encounterId) {
-    return getAnticoagulationTypeForEncounter(client, encounterId) != null;
+  public boolean isAnticoagulated(String encounterId) {
+    return getAnticoagulationTypeForEncounter(encounterId) != null;
   }
 }

@@ -156,7 +156,7 @@ public class NursingOrdersProcessor extends DependencyInjectingProcessor {
         .setValue(orderId);
 
     if (status.equalsIgnoreCase("2^SENT")) {
-      procedureRequest.setStatus(ProcedureRequestStatusEnum.PROPOSED);
+      procedureRequest.setStatus(ProcedureRequestStatusEnum.IN_PROGRESS);
     } else if (status.equalsIgnoreCase("6^HOLDING FOR REFERRAL")) {
       procedureRequest.setStatus(ProcedureRequestStatusEnum.PROPOSED);
     } else if (status.equalsIgnoreCase("7^DENIED APPROVAL")) {

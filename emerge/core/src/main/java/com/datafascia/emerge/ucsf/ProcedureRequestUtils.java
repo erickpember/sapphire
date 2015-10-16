@@ -74,7 +74,7 @@ public class ProcedureRequestUtils {
             .getValueAsEnum().equals(ProcedureRequestStatusEnum.IN_PROGRESS)).isPresent();
   }
 
-   /**
+  /**
    * Given an encounter and a Procedure type code, find the freshest match that is scheduled before
    * now. If the freshest is in progress, return true.
    *
@@ -92,13 +92,25 @@ public class ProcedureRequestUtils {
       String procedureCode) {
     return client.getProcedureRequestClient()
         .searchProcedureRequest(encounterId, procedureCode, null).stream()
-        .filter(request -> beforeNow(request))
         .max(new ProcedureRequestScheduledComparator())
-        .filter(request -> request.getStatusElement()
-            .getValueAsEnum().equals(ProcedureRequestStatusEnum.IN_PROGRESS)).isPresent();
+        .filter(request -> isCurrent(request))
+        .isPresent();
   }
 
-   /**
+  /**
+   * Given a procedure request return true if it is dated before now and is in progress.
+   *
+   * @param request
+   *    The request in question.
+   * @return
+   *    True if the request is before now and in progress. Otherwise false.
+   */
+  public static boolean isCurrent(ProcedureRequest request) {
+    return (request != null && beforeNow(request) && request.getStatusElement()
+        .getValueAsEnum().equals(ProcedureRequestStatusEnum.IN_PROGRESS));
+  }
+
+  /**
    * Given an encounter and a Procedure type code, find the freshest match that is also
    * scheduled after now. If the freshest is in progress, return true.
    * and a dosage over zero.

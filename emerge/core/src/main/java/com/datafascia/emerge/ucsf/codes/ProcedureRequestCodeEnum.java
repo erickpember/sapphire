@@ -14,7 +14,16 @@ public enum ProcedureRequestCodeEnum implements SystemDefinedCode<String> {
   ATTENDING_DNR_DNI("Attending DNR/DNI"),
   RESIDENT_DNR_DNI("Resident DNR/DNI"),
   RESIDENT_PARTIAL("Resident Partial Code"),
-  FULL("Full Code");
+  FULL("Full Code"),
+  TARGET_RASS_0_ALERT_AND_CALM("Target RASS 0: Alert and Calm (acceptable range -1 to +1)"),
+  TARGET_RASS_NEG1_DROWSY("Target RASS -1: Drowsy (acceptable range -2 to 0)"),
+  TARGET_RASS_NEG2_LIGHT_SEDATION("Target RASS -2: Light Sedation (acceptable range -3 to -1)"),
+  TARGET_RASS_NEG2_MODERATE_SEDATION(
+      "Target RASS -3: Moderate Sedation (acceptable range -4 to -2)"),
+  TARGET_RASS_NEG4_DEEP_SEDATION("Target RASS -4: Deep Sedation (acceptable range -5 to -3)"),
+  TARGET_RASS_NEG5_UNAROUSABLE("Target RASS -5: Unarousable (acceptable range -5 to -4)"),
+  TARGET_RASS_NA_NMBA("Target RASS N/A: Patient on NMBA"),
+  TARGET_RASS_NA_SEIZURES_STATUS_EPILEPTICUS("Target RASS N/A: Seizures/Status Epilepticus");
 
   private static final String SYSTEM = "http://datafascia.com/code/ProcedureRequest";
 

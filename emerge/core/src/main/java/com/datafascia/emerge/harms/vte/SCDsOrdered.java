@@ -9,14 +9,23 @@ import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ProcedureUtils;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import javax.inject.Inject;
 
 /**
  * VTE SCDs Ordered Implementation
  */
 public class SCDsOrdered {
+
+  @Inject
+  private Clock clock;
+
+  @Inject
+  private ClientBuilder apiClient;
 
   private static Optional<DateTimeDt> getStartTime(ProcedureRequest request) {
     if (request != null) {
@@ -33,20 +42,16 @@ public class SCDsOrdered {
   /**
    * SCDs Ordered Implementation
    *
-   * @param client
-   *     the FHIR client used to query Topaz
    * @param encounterId
-   *     the Encounter to search
-   * @return ordered
-   *     indicates whether SCDs have been ordered
+   *     encounter to search
+   * @return true if SCDs have been ordered
    */
-  public static boolean scdsOrdered(ClientBuilder client, String encounterId) {
+  public boolean isSCDsOrdered(String encounterId) {
     boolean ordered = false;
-    Date now = new Date();
 
-    List<ProcedureRequest> requests = client.getProcedureRequestClient()
-        .searchProcedureRequest
-            (encounterId, null, ProcedureRequestStatusEnum.IN_PROGRESS.getCode());
+    List<ProcedureRequest> requests = apiClient.getProcedureRequestClient()
+        .searchProcedureRequest(
+            encounterId, null, ProcedureRequestStatusEnum.IN_PROGRESS.getCode());
 
     Optional<DateTimeDt> placeStart =
         getStartTime(ProcedureUtils.findFreshestPlaceSCDs(requests));
@@ -55,6 +60,7 @@ public class SCDsOrdered {
     Optional<DateTimeDt> removeStart =
         getStartTime(ProcedureUtils.findFreshestRemoveSCDs(requests));
 
+    Date now = Date.from(Instant.now(clock));
     if (!removeStart.isPresent()) {
       if ((placeStart.isPresent() && !now.before(placeStart.get().getValue())) ||
           (maintainStart.isPresent() && !now.before(maintainStart.get().getValue()))) {

@@ -6,6 +6,7 @@ import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import com.datafascia.emerge.harms.vte.Anticoagulation;
 import com.datafascia.emerge.harms.vte.LowerExtremitySCDsContraindicatedImpl;
 import com.datafascia.emerge.harms.vte.SCDsInUse;
+import com.datafascia.emerge.harms.vte.SCDsOrdered;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.LowerExtremitySCDsContraindicated;
 import com.datafascia.emerge.ucsf.MedicalData;
@@ -34,6 +35,9 @@ public class VenousThromboembolismUpdater {
 
   @Inject
   private SCDsInUse scdsInUseImpl;
+
+  @Inject
+  private SCDsOrdered scdsOrderedImpl;
 
   private static VTE getVTE(HarmEvidence harmEvidence) {
     MedicalData medicalData = harmEvidence.getMedicalData();
@@ -106,5 +110,23 @@ public class VenousThromboembolismUpdater {
         .withValue(scdsInUseImpl.isSCDsInUse(encounterId))
         .withUpdateTime(Date.from(Instant.now(clock)));
     vte.setSCDsInUse(scdsInUse);
+  }
+
+  /**
+   * Updates SCDs ordered.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateScdsOrdered(HarmEvidence harmEvidence, Encounter encounter) {
+    VTE vte = getVTE(harmEvidence);
+
+    String encounterId = encounter.getId().getIdPart();
+    TimestampedBoolean scdsOrdered = new TimestampedBoolean()
+        .withValue(scdsOrderedImpl.isSCDsOrdered(encounterId))
+        .withUpdateTime(Date.from(Instant.now(clock)));
+    vte.setSCDsOrdered(scdsOrdered);
   }
 }

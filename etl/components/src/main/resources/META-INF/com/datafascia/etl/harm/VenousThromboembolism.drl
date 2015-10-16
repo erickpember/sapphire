@@ -17,4 +17,5 @@ then
   venousThromboembolismUpdater.updateOnSystemicAnticoagulation(harmEvidence, $encounter);
   venousThromboembolismUpdater.updateLowerExtremitySCDsContraindicated(harmEvidence, $encounter);
   venousThromboembolismUpdater.updateScdsInUse(harmEvidence, $encounter);
+  venousThromboembolismUpdater.updateScdsOrdered(harmEvidence, $encounter);
 end

@@ -18,49 +18,37 @@ import java.util.Optional;
 public class PractitionerUtils {
 
   /**
-   * Gets the most recent practitioner in a given role for an encounter.
+   * Gets the name for a given practitioner.
    *
-   * @param encounter The encounter to check.
-   * @param role The role to look for.
-   * @param client The client to use.
+   * @param prac The practitioner from which to fetch.
    * @return The optional name of the practitioner.
    */
-  public static Optional<String> getMostRecentPractitionerNameForRole(Encounter encounter,
-      PractitionerRoleEnum role, ClientBuilder client) {
-    List<Participant> participants = encounter.getParticipant();
-
-    String name = null;
-    Date lastDate = null;
-    for (Participant par : participants) {
-      if (par.getIndividual().getReference().getResourceType()
-          .equals(Practitioner.class.getSimpleName())) {
-        Practitioner prac
-            = client.getPractitionerClient().getPractitioner(
-                par.getIndividual().getReference().getIdPart());
-        if (prac.getIdentifierFirstRep().getValue().equals(role.getCode())) {
-          if (lastDate == null || par.getPeriod().getStart().after(lastDate)) {
-            lastDate = par.getPeriod().getStart();
-            name = HumanNames.toFullName(prac.getName());
-          }
-        }
-      }
-    }
-
-    return Optional.of(name);
+  public static Optional<String> getNameForPractitioner(Practitioner prac) {
+    return Optional.of(HumanNames.toFullName(prac.getName()));
   }
 
   /**
-   * Gets the start time of the last period of a given role
+   * Gets the start time a given participant.
    *
-   * @param encounter The encounter to check.
-   * @param role The role to look for.
-   * @param client The client to use.
-   * @return The start time of the last period of a given role.
+   * @param par to Participant from which to fetch.
+   * @return The start time of the participant.
    */
-  public static Optional<Date> getMostRecentPractitionerStartTimeForRole(Encounter encounter,
+  public static Optional<Date> getStartTimeForParticipant(Participant par) {
+    return Optional.of(par.getPeriod().getStart());
+  }
+
+  /**
+   * Gets the most recent practitioner for a given role.
+   * @param encounter The encounter to query with.
+   * @param role The role to check.
+   * @param client The client to use.
+   * @return The most recent practitioner for the role.
+   */
+  public static Optional<Participant> getMostRecentPractitionerForRole(Encounter encounter,
       PractitionerRoleEnum role, ClientBuilder client) {
     List<Participant> participants = encounter.getParticipant();
 
+    Participant lastPractitioner = null;
     Date lastDate = null;
     for (Participant par : participants) {
       if (par.getIndividual().getReference().getResourceType()
@@ -71,11 +59,12 @@ public class PractitionerUtils {
         if (prac.getIdentifierFirstRep().getValue().equals(role.getCode())) {
           if (lastDate == null || par.getPeriod().getStart().after(lastDate)) {
             lastDate = par.getPeriod().getStart();
+            lastPractitioner = par;
           }
         }
       }
     }
 
-    return Optional.of(lastDate);
+    return Optional.of(lastPractitioner);
   }
 }

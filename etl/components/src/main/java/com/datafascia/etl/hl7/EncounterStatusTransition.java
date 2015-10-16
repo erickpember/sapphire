@@ -33,15 +33,14 @@ public class EncounterStatusTransition {
   @Inject
   private EncounterRepository encounterRepository;
 
-  private StatelessKieSession session;
+  private KieContainer container;
 
   /**
    * Constructor
    */
   public EncounterStatusTransition() {
     KieServices services = KieServices.Factory.get();
-    KieContainer container = services.newKieClasspathContainer();
-    session = container.newStatelessKieSession("encounterStatus");
+    container = services.newKieClasspathContainer();
   }
 
   private EncounterStateEnum readCurrentStatus(Encounter encounter) {
@@ -64,6 +63,7 @@ public class EncounterStatusTransition {
   public void updateEncounterStatus(String triggerEvent, Encounter encounter) {
     encounter.setStatus(readCurrentStatus(encounter));
 
+    StatelessKieSession session = container.newStatelessKieSession("encounterStatus");
     session.execute(Arrays.asList(new MessageType(triggerEvent), encounter));
 
     encounter.setStatus(MoreObjects.firstNonNull(

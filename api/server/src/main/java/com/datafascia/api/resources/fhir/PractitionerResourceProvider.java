@@ -13,23 +13,21 @@ import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.annotation.Update;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.param.StringParam;
+import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
-import com.datafascia.common.fhir.DependencyInjectingResourceProvider;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.persist.PractitionerRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Practitioner resource endpoint
  */
-@Slf4j
-public class PractitionerResourceProvider extends DependencyInjectingResourceProvider {
+public class PractitionerResourceProvider implements IResourceProvider {
 
   @Inject
   private PractitionerRepository practitionerRepository;

@@ -11,7 +11,7 @@ import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.param.StringParam;
-import com.datafascia.common.fhir.DependencyInjectingResourceProvider;
+import ca.uhn.fhir.rest.server.IResourceProvider;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.ProcedureRepository;
@@ -19,25 +19,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Procedure resource endpoint
  */
-@NoArgsConstructor @Slf4j
-public class ProcedureResourceProvider extends DependencyInjectingResourceProvider {
+public class ProcedureResourceProvider implements IResourceProvider {
 
   @Inject
   private EncounterRepository encounterRepository;
 
   @Inject
   private ProcedureRepository procedureRepository;
-
-  @Override
-  protected void onInjected() {
-    log.info("procedureRepository {}", procedureRepository);
-  }
 
   /**
    * The getResourceType method comes from IResourceProvider, and must be overridden to indicate

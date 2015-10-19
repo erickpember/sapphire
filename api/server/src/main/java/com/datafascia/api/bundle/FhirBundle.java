@@ -4,6 +4,7 @@ package com.datafascia.api.bundle;
 
 import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.api.servlets.FhirServlet;
+import com.google.inject.Injector;
 import io.dropwizard.ConfiguredBundle;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
@@ -15,20 +16,32 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class FhirBundle implements ConfiguredBundle<APIConfiguration> {
+
+  private Injector injector;
+
+  /**
+   * Constructor
+   *
+   * @param injector
+   *     Guice injector
+   */
+  public FhirBundle(Injector injector) {
+    this.injector = injector;
+  }
+
   @Override
-  public void run(final APIConfiguration configuration, final Environment environment)
-      throws Exception {
+  public void initialize(Bootstrap<?> bootstrap) {
+  }
+
+  @Override
+  public void run(APIConfiguration configuration, Environment environment) {
     log.info("Initializing Hapi Fhir bundle for Dropwizard.");
-    FhirServlet fhirServlet = new FhirServlet();
+    FhirServlet fhirServlet = new FhirServlet(injector);
     final ServletRegistration.Dynamic fhirServletRegistratration =
         environment.servlets().addServlet("fhir", fhirServlet);
     fhirServletRegistratration.setAsyncSupported(true);
     fhirServletRegistratration.addMapping("/fhir/*");
     fhirServletRegistratration.setInitParameter("com.sun.jersey.config.property.packages",
         "com.datafascia.api.resources.fhir");
-  }
-
-  @Override
-  public void initialize(final Bootstrap<?> bootstrap) {
   }
 }

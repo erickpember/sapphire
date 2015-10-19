@@ -14,35 +14,27 @@ import ca.uhn.fhir.rest.annotation.Update;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.param.NumberParam;
 import ca.uhn.fhir.rest.param.StringParam;
+import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import com.datafascia.common.api.ApiParams;
-import com.datafascia.common.fhir.DependencyInjectingResourceProvider;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.persist.PatientRepository;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Patient resource endpoint
  */
-@NoArgsConstructor @Slf4j
-public class PatientResourceProvider extends DependencyInjectingResourceProvider {
+public class PatientResourceProvider implements IResourceProvider {
 
   public static final int MAX_DEFAULT_PATIENT_RESULTS = 100000;
 
   @Inject
   private PatientRepository patientRepository;
-
-  @Override
-  protected void onInjected() {
-    log.info("patientRepository {}", patientRepository);
-  }
 
   /**
    * The getResourceType method comes from IResourceProvider, and must be overridden to indicate

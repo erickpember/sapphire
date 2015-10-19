@@ -10,8 +10,8 @@ import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.param.StringParam;
+import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
-import com.datafascia.common.fhir.DependencyInjectingResourceProvider;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.ObservationRepository;
@@ -19,25 +19,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * Observation resource endpoint
  */
-@NoArgsConstructor @Slf4j
-public class ObservationResourceProvider extends DependencyInjectingResourceProvider {
+public class ObservationResourceProvider implements IResourceProvider {
 
   @Inject
   private EncounterRepository encounterRepository;
 
   @Inject
   private ObservationRepository observationRepository;
-
-  @Override
-  protected void onInjected() {
-    log.info("observationRepository {}", observationRepository);
-  }
 
   /**
    * The getResourceType method comes from IResourceProvider, and must be overridden to indicate

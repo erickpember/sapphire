@@ -12,9 +12,9 @@ import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.annotation.Update;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.param.StringParam;
+import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
-import com.datafascia.common.fhir.DependencyInjectingResourceProvider;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.fhir.Ids;
 import com.datafascia.domain.persist.EncounterRepository;
@@ -30,7 +30,7 @@ import lombok.extern.slf4j.Slf4j;
  * {@link MedicationOrder} resource provider
  */
 @NoArgsConstructor @Slf4j
-public class MedicationOrderResourceProvider extends DependencyInjectingResourceProvider {
+public class MedicationOrderResourceProvider implements IResourceProvider {
 
   @Inject
   private EncounterRepository encounterRepository;

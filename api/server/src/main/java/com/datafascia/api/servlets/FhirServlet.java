@@ -16,6 +16,7 @@ import com.datafascia.api.resources.fhir.PatientResourceProvider;
 import com.datafascia.api.resources.fhir.PractitionerResourceProvider;
 import com.datafascia.api.resources.fhir.ProcedureRequestResourceProvider;
 import com.datafascia.api.resources.fhir.ProcedureResourceProvider;
+import com.google.inject.Injector;
 import java.util.Arrays;
 import javax.servlet.ServletException;
 
@@ -23,11 +24,19 @@ import javax.servlet.ServletException;
  * Front controller that forwards FHIR resource requests to providers.
  */
 public class FhirServlet extends RestfulServer {
+
+  private Injector injector;
+
   /**
    * Constructor
+   *
+   * @param injector
+   *     Guice injector
    */
-  public FhirServlet() {
-    super(FhirContext.forDstu2());
+  public FhirServlet(Injector injector) {
+    super(injector.getInstance(FhirContext.class));
+
+    this.injector = injector;
   }
 
   /**
@@ -41,17 +50,17 @@ public class FhirServlet extends RestfulServer {
   protected void initialize() throws ServletException {
     // Configure resource providers.
     setResourceProviders(Arrays.asList(
-        new EncounterResourceProvider(),
-        new FlagResourceProvider(),
-        new LocationResourceProvider(),
-        new MedicationAdministrationResourceProvider(),
-        new MedicationOrderResourceProvider(),
-        new MedicationResourceProvider(),
-        new ObservationResourceProvider(),
-        new ProcedureResourceProvider(),
-        new ProcedureRequestResourceProvider(),
-        new PatientResourceProvider(),
-        new PractitionerResourceProvider()));
+        injector.getInstance(EncounterResourceProvider.class),
+        injector.getInstance(FlagResourceProvider.class),
+        injector.getInstance(LocationResourceProvider.class),
+        injector.getInstance(MedicationAdministrationResourceProvider.class),
+        injector.getInstance(MedicationOrderResourceProvider.class),
+        injector.getInstance(MedicationResourceProvider.class),
+        injector.getInstance(ObservationResourceProvider.class),
+        injector.getInstance(ProcedureResourceProvider.class),
+        injector.getInstance(ProcedureRequestResourceProvider.class),
+        injector.getInstance(PatientResourceProvider.class),
+        injector.getInstance(PractitionerResourceProvider.class)));
 
     /*
      * Tells HAPI to use content types which are not technically FHIR compliant when a browser is

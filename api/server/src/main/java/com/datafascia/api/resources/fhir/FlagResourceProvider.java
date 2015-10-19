@@ -9,7 +9,7 @@ import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.param.StringParam;
-import com.datafascia.common.fhir.DependencyInjectingResourceProvider;
+import ca.uhn.fhir.rest.server.IResourceProvider;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.fhir.Ids;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
@@ -25,7 +25,7 @@ import lombok.extern.slf4j.Slf4j;
  * Flag resource endpoint
  */
 @Slf4j
-public class FlagResourceProvider extends DependencyInjectingResourceProvider {
+public class FlagResourceProvider implements IResourceProvider {
 
   @Inject
   private PatientRepository patientRepository;

@@ -13,9 +13,9 @@ import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.annotation.Update;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.param.StringParam;
+import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
-import com.datafascia.common.fhir.DependencyInjectingResourceProvider;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.fhir.Ids;
 import com.datafascia.domain.persist.EncounterRepository;
@@ -24,25 +24,17 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
-import lombok.NoArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * MedicationAdministration resource endpoint
  */
-@NoArgsConstructor @Slf4j
-public class MedicationAdministrationResourceProvider extends DependencyInjectingResourceProvider {
+public class MedicationAdministrationResourceProvider implements IResourceProvider {
 
   @Inject
   private EncounterRepository encounterRepository;
 
   @Inject
   private MedicationAdministrationRepository medicationAdministrationRepository;
-
-  @Override
-  protected void onInjected() {
-    log.info("medicationAdministrationRepository {}", medicationAdministrationRepository);
-  }
 
   /**
    * The getResourceType method comes from IResourceProvider, and must be overridden to indicate

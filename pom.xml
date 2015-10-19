@@ -37,7 +37,7 @@
     <commons-lang3.version>3.3.2</commons-lang3.version>
     <unitsofmeasure.version>0.7.1</unitsofmeasure.version>
     <drools.version>6.2.0.Final</drools.version>
-    <dropwizard.version>0.8.0</dropwizard.version>
+    <dropwizard.version>0.8.3</dropwizard.version>
     <guava.version>18.0</guava.version>
     <guice.version>4.0</guice.version>
     <hadoop.version>2.2.0</hadoop.version>
@@ -206,6 +206,12 @@
         <groupId>com.googlecode.json-simple</groupId>
         <artifactId>json-simple</artifactId>
         <version>1.1.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>com.hubspot.dropwizard</groupId>
+        <artifactId>dropwizard-guice</artifactId>
+        <version>0.8.3.0</version>
       </dependency>
 
       <dependency>

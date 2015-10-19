@@ -123,6 +123,43 @@ public class PainUtils {
   }
 
   /**
+   * Given a list of observations, returns the freshest of a list of observations
+   * that contains one of four codes indicating a verbal pain score.
+   * In the event there are multiple simultaneous freshest observations, the one with the highest
+   * score is returned.
+   *
+   * @param observations
+   *     observations to search
+   * @return Freshest observation found with the code. {@code null} if not found.
+   */
+  public static Observation freshestHighestVerbalPainScore(List<Observation> observations) {
+    observations.sort(new ObservationEffectiveComparator().reversed());
+
+    Observation result = null;
+    ObservationEffectiveComparator comparator = new ObservationEffectiveComparator();
+
+    for (Observation observation : observations) {
+      switch (observation.getCode().getCodingFirstRep().getCode()) {
+        case "304890012":
+        case "304890013":
+        case "304890014":
+        case "304890015":
+          // In the event of simultaneous observations, get the highest pain level of those.
+          if (result == null || (getVerbalPainScoreFromValue(observation) != null && comparator
+              .compare(observation, result) == 0 && getVerbalPainScoreFromValue(observation)
+              > getVerbalPainScoreFromValue(result))) {
+            result = observation;
+          } else if (comparator.compare(observation, result) < 0) {
+            // we are now in older observations, give up
+            break;
+          }
+      }
+    }
+
+    return null;
+  }
+
+  /**
    * Given a list of observations, returns the observation with the lowest pain score.
    *
    * @param observations
@@ -251,5 +288,90 @@ public class PainUtils {
     return ObservationUtils.searchByTimeFrame(apiClient, encounterId, currentOrPriorShift).stream()
         .filter(observation -> codes.contains(ObservationUtils.getValueAsString(observation)))
         .collect(Collectors.toList());
+  }
+
+  /**
+   * Finds the highest verbal pain level in observations.
+   *
+   * @param observations
+   *     observations to search
+   * @return Observation with the highest numerical level of pain found in verbal observations.
+   */
+  public static Observation highestVerbalPainScore(List<Observation> observations) {
+
+    Observation result = null;
+
+    for (Observation observation : observations) {
+      switch (observation.getCode().getCodingFirstRep().getCode()) {
+        case "304890012":
+        case "304890013":
+        case "304890014":
+        case "304890015":
+          // In the event of simultaneous observations, get the highest pain level of those.
+          if (result == null || (getVerbalPainScoreFromValue(observation) != null
+              && getVerbalPainScoreFromValue(observation) > getVerbalPainScoreFromValue(result))) {
+            result = observation;
+          }
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Finds the lowest verbal pain level in observations.
+   *
+   * @param observations
+   *     observations to search
+   * @return Observation with the lowest numerical level of pain found in verbal observations.
+   */
+  public static Observation lowestVerbalPainScore(List<Observation> observations) {
+
+    Observation result = null;
+
+    for (Observation observation : observations) {
+      switch (observation.getCode().getCodingFirstRep().getCode()) {
+        case "304890012":
+        case "304890013":
+        case "304890014":
+        case "304890015":
+          // In the event of simultaneous observations, get the lowest pain level of those.
+          if (result == null || (getVerbalPainScoreFromValue(observation) != null
+              && getVerbalPainScoreFromValue(observation) < getVerbalPainScoreFromValue(result))) {
+            result = observation;
+          }
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Translates verbal descriptors of pain assessments to numerical values.
+   *
+   * @param observation
+   *     An observation containing a verbal descriptor of pain assessment.
+   * @return
+   *     Numerical value of pain assessment, or {@code null} if not found
+   */
+  public static Integer getVerbalPainScoreFromValue(Observation observation) {
+    if (observation == null || Strings.isNullOrEmpty(
+        ObservationUtils.getValueAsString(observation))) {
+      return null;
+    }
+    switch (ObservationUtils.getValueAsString(observation)) {
+      case "None":
+        return 0;
+      case "Mild":
+        return 1;
+      case "Moderate":
+        return 5;
+      case "Severe":
+        return 7;
+      default:
+        log.warn("Unexpected verbal pain level found: " + ObservationUtils.getValueAsString(
+            observation));
+        return null;
+    }
   }
 }

@@ -95,7 +95,7 @@ public class PainUtils {
    *     observations to search
    * @return Freshest observation found with the code. {@code null} if not found.
    */
-  public static Observation freshestNumericalPainScore(List<Observation> observations) {
+  public static Observation freshestHighestNumericalPainScore(List<Observation> observations) {
     observations.sort(new ObservationEffectiveComparator().reversed());
 
     Observation result = null;
@@ -120,6 +120,62 @@ public class PainUtils {
     }
 
     return null;
+  }
+
+  /**
+   * Given a list of observations, returns the observation with the lowest pain score.
+   *
+   * @param observations
+   *     observations to search
+   * @return Lowest scoring observation found with the code. {@code null} if not found.
+   */
+  public static Observation lowestNumericalPainScore(List<Observation> observations) {
+
+    Observation result = null;
+
+    for (Observation observation : observations) {
+      switch (observation.getCode().getCodingFirstRep().getCode()) {
+        case "304890008":
+        case "304890009":
+        case "304890010":
+        case "304890011":
+          // In the event of simultaneous observations, get the highest pain level of those.
+          if (result == null || (getPainScoreFromValue(observation) != null
+              && getPainScoreFromValue(observation) < getPainScoreFromValue(result))) {
+            result = observation;
+          }
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Given a list of observations, returns the observation with the highest pain score.
+   *
+   * @param observations
+   *     observations to search
+   * @return Lowest scoring observation found with the code. {@code null} if not found.
+   */
+  public static Observation highestNumericalPainScore(List<Observation> observations) {
+
+    Observation result = null;
+
+    for (Observation observation : observations) {
+      switch (observation.getCode().getCodingFirstRep().getCode()) {
+        case "304890008":
+        case "304890009":
+        case "304890010":
+        case "304890011":
+          // In the event of simultaneous observations, get the highest pain level of those.
+          if (result == null || (getPainScoreFromValue(observation) != null
+              && getPainScoreFromValue(observation) > getPainScoreFromValue(result))) {
+            result = observation;
+          }
+      }
+    }
+
+    return result;
   }
 
   /**

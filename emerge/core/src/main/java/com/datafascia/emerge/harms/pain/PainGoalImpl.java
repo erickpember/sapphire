@@ -70,7 +70,7 @@ public class PainGoalImpl {
     }
 
     if (freshestType.equals("Numerical Level of Pain Assessments")) {
-      Observation freshestNumericalPainScore = PainUtils.freshestNumericalPainScore(
+      Observation freshestNumericalPainScore = PainUtils.freshestHighestNumericalPainScore(
           observationsSinceMidnight);
 
       switch (freshestNumericalPainScore.getCode().getText()) {

@@ -23,4 +23,6 @@ then
   venousThromboembolismUpdater.updatePharmacologicVTEProphylaxisContraindicated(
       harmEvidence, $encounter);
   venousThromboembolismUpdater.updatePharmacologicVTEProphylaxisOrdered(harmEvidence, $encounter);
+  venousThromboembolismUpdater.updatePharmacologicVTEProphylaxisAdministered(
+      harmEvidence, $encounter);
 end

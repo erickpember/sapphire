@@ -7,6 +7,7 @@ import com.datafascia.emerge.harms.vte.Anticoagulation;
 import com.datafascia.emerge.harms.vte.AnticoagulationTypeEnum;
 import com.datafascia.emerge.harms.vte.LowerExtremitySCDsContraindicatedImpl;
 import com.datafascia.emerge.harms.vte.PharmacologicVteProphylaxis;
+import com.datafascia.emerge.harms.vte.PharmacologicVteProphylaxisAdministered;
 import com.datafascia.emerge.harms.vte.ProphylaxisContraindicated;
 import com.datafascia.emerge.harms.vte.SCDsInUse;
 import com.datafascia.emerge.harms.vte.SCDsOrdered;
@@ -50,6 +51,9 @@ public class VenousThromboembolismUpdater {
 
   @Inject
   private ProphylaxisContraindicated prophylaxisContraindicated;
+
+  @Inject
+  private PharmacologicVteProphylaxisAdministered pharmacologicVteProphylaxisAdministered;
 
   private static VTE getVTE(HarmEvidence harmEvidence) {
     MedicalData medicalData = harmEvidence.getMedicalData();
@@ -227,5 +231,27 @@ public class VenousThromboembolismUpdater {
         .withValue(pharmacologicVteProphylaxis.isPharmacologicVteProphylaxisOrdered(encounterId))
         .withUpdateTime(Date.from(Instant.now(clock)));
     vte.setPharmacologicVTEProphylaxisOrdered(pharmacologicVteProphylaxisOrdered);
+  }
+
+  /**
+   * Updates pharmacologic VTE prophylaxis administered.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updatePharmacologicVTEProphylaxisAdministered(
+      HarmEvidence harmEvidence, Encounter encounter) {
+
+    VTE vte = getVTE(harmEvidence);
+
+    String encounterId = encounter.getId().getIdPart();
+    TimestampedBoolean prophylaxisAdministered = new TimestampedBoolean()
+        .withValue(
+            pharmacologicVteProphylaxisAdministered.isPharmacologicVteProphylaxisAdministered(
+                encounterId))
+        .withUpdateTime(Date.from(Instant.now(clock)));
+    vte.setPharmacologicVTEProphylaxisAdministered(prophylaxisAdministered);
   }
 }

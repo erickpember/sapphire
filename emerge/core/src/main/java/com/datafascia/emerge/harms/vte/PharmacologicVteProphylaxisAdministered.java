@@ -10,35 +10,38 @@ import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.harms.HarmsLookups;
 import java.util.List;
+import javax.inject.Inject;
 
 /**
  * Pharmacologic VTE Prophylaxis Administered implementation
  */
-public class PharmacologicVtePpxAdministered {
+public class PharmacologicVteProphylaxisAdministered {
+
+  @Inject
+  private ClientBuilder apiClient;
+
   /**
-   * Pharmacologic VTE Prophylaxis Administered Implementation
+   * Checks if pharmacologic VTE prophylaxis was administered
    *
-   * @param client
-   *     the FHIR client used to query Topaz
    * @param encounterId
-   *     the Encounter to search
-   * @return administered
-   *     indicates whether VTE prophylaxis have been administered
+   *     encounter to search
+   * @return true if VTE prophylaxis was administered
    */
-  public static boolean pharmacologicVtePpxAdministered(ClientBuilder client, String encounterId) {
+  public boolean isPharmacologicVteProphylaxisAdministered(String encounterId) {
     boolean administered = false;
-    List<MedicationAdministration> administrations = client.getMedicationAdministrationClient()
+
+    List<MedicationAdministration> administrations = apiClient.getMedicationAdministrationClient()
         .search(encounterId);
 
     // Check if any recent VTE prophylactic administrations have been made.
     for (MedicationAdministration administration : administrations) {
       ResourceReferenceDt prescriptionReference = administration.getPrescription();
-      MedicationOrder medicationOrder = client.getMedicationOrderClient()
+      MedicationOrder medicationOrder = apiClient.getMedicationOrderClient()
           .read(prescriptionReference.getReference().getIdPart(), encounterId);
 
       ResourceReferenceDt medicationReference =
           (ResourceReferenceDt) medicationOrder.getMedication();
-      Medication medication = client.getMedicationClient()
+      Medication medication = apiClient.getMedicationClient()
           .getMedication(medicationReference.getReference().getIdPart());
 
       String medicationName = medication.getCode().getText();

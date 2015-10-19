@@ -10,35 +10,49 @@ import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.harms.HarmsLookups;
 import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
+import javax.inject.Inject;
 
 /**
  * Pharmacologic VTE Prophylaxis Contraindicated Implementation
  */
 public class ProphylaxisContraindicated {
-  private static final String NULL_RESULT = "No EHR mechanical VTE prophylaxis contraindication";
+
+  @Inject
+  private Clock clock;
+
+  @Inject
+  private ClientBuilder apiClient;
+
+  private static Date toDate(IDatatype value) {
+    return ((DateTimeDt) value).getValue();
+  }
 
   /**
-   * Pharmacologic VTE Prophylaxis Contraindicated Implementation
+   * Gets pharmacologic VTE prophylaxis contraindicated reason
    *
-   * @param client
-   *     API client
    * @param encounterId
    *     encounter to search
-   * @return Pharmacologic VTE Prophylaxis Contraindicated value
-   **/
-  public static String prophylaxisContraindicated(ClientBuilder client, String encounterId) {
+   * @return pharmacologic VTE prophylaxis contraindicated reason, or {@code null} if not found
+   */
+  public String getProphylaxisContraindicatedReason(String encounterId) {
     String type = "VTE Ppx Contraindications";
-    List<ProcedureRequest> inProgressPpxRequests = client.getProcedureRequestClient()
+    List<ProcedureRequest> inProgressPpxRequests = apiClient.getProcedureRequestClient()
         .searchProcedureRequest(encounterId, type,
             ProcedureRequestStatusEnum.IN_PROGRESS.getCode());
     ProcedureRequest freshestInProgressPpxRequest = ProcedureRequestUtils.
         findFreshestProcedureRequest(inProgressPpxRequests);
+    if (freshestInProgressPpxRequest == null) {
+      return null;
+    }
 
     // if the request happens after now, throw it out
-    if (toDate(freshestInProgressPpxRequest.getScheduled()).compareTo(new Date()) > 0) {
-      return NULL_RESULT;
+    Date now = Date.from(Instant.now(clock));
+    if (toDate(freshestInProgressPpxRequest.getScheduled()).after(now)) {
+      return null;
     }
 
     List<AnnotationDt> notes = freshestInProgressPpxRequest.getNotes();
@@ -51,22 +65,18 @@ public class ProphylaxisContraindicated {
       }
     }
 
-    if (HarmsLookups.plateletCountLessThan50000(client, encounterId)) {
+    if (HarmsLookups.plateletCountLessThan50000(apiClient, encounterId)) {
       return "Platelet count <50,000";
     }
 
-    if (HarmsLookups.inrOver1point5(client, encounterId)) {
+    if (HarmsLookups.inrOver1point5(apiClient, encounterId)) {
       return "INR >1.5";
     }
 
-    if (HarmsLookups.aPttRatioOver1point3(client, encounterId)) {
+    if (HarmsLookups.aPttRatioOver1point3(apiClient, encounterId)) {
       return "aPTT Ratio >1.3";
     }
 
-    return NULL_RESULT;
-  }
-
-  private static Date toDate(IDatatype value) {
-    return ((DateTimeDt) value).getValue();
+    return null;
   }
 }

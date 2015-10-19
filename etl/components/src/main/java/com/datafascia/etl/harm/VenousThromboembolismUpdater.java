@@ -7,12 +7,14 @@ import com.datafascia.emerge.harms.vte.Anticoagulation;
 import com.datafascia.emerge.harms.vte.AnticoagulationTypeEnum;
 import com.datafascia.emerge.harms.vte.LowerExtremitySCDsContraindicatedImpl;
 import com.datafascia.emerge.harms.vte.PharmacologicVteProphylaxis;
+import com.datafascia.emerge.harms.vte.ProphylaxisContraindicated;
 import com.datafascia.emerge.harms.vte.SCDsInUse;
 import com.datafascia.emerge.harms.vte.SCDsOrdered;
 import com.datafascia.emerge.ucsf.AnticoagulationType;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.LowerExtremitySCDsContraindicated;
 import com.datafascia.emerge.ucsf.MedicalData;
+import com.datafascia.emerge.ucsf.PharmacologicVTEProphylaxisContraindicated;
 import com.datafascia.emerge.ucsf.TimestampedBoolean;
 import com.datafascia.emerge.ucsf.TimestampedString;
 import com.datafascia.emerge.ucsf.VTE;
@@ -45,6 +47,9 @@ public class VenousThromboembolismUpdater {
 
   @Inject
   private SCDsOrdered scdsOrderedImpl;
+
+  @Inject
+  private ProphylaxisContraindicated prophylaxisContraindicated;
 
   private static VTE getVTE(HarmEvidence harmEvidence) {
     MedicalData medicalData = harmEvidence.getMedicalData();
@@ -176,6 +181,32 @@ public class VenousThromboembolismUpdater {
         .withValue(pharmacologicVteProphylaxis.getPharmacologicVteProphylaxisType(encounterId))
         .withUpdateTime(Date.from(Instant.now(clock)));
     vte.setPharmacologicVTEProphylaxisType(pharmacologicVteProphylaxisType);
+  }
+
+  /**
+   * Updates lower extremity SCDs contraindicated.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updatePharmacologicVTEProphylaxisContraindicated(
+      HarmEvidence harmEvidence, Encounter encounter) {
+
+    VTE vte = getVTE(harmEvidence);
+
+    String encounterId = encounter.getId().getIdPart();
+    String reason = prophylaxisContraindicated.getProphylaxisContraindicatedReason(encounterId);
+
+    PharmacologicVTEProphylaxisContraindicated pharmacologicVTEProphylaxisContraindicated =
+        new PharmacologicVTEProphylaxisContraindicated()
+        .withValue(reason != null)
+        .withReason((reason != null)
+            ? PharmacologicVTEProphylaxisContraindicated.Reason.fromValue(reason)
+            : null)
+        .withUpdateTime(Date.from(Instant.now(clock)));
+    vte.setPharmacologicVTEProphylaxisContraindicated(pharmacologicVTEProphylaxisContraindicated);
   }
 
   /**

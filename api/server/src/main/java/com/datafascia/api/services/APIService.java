@@ -17,7 +17,9 @@ import com.hubspot.dropwizard.guice.GuiceBundle;
 import io.dropwizard.Application;
 import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
+import java.text.SimpleDateFormat;
 import java.util.EnumSet;
+import java.util.TimeZone;
 import javax.servlet.DispatcherType;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.web.servlet.ShiroFilter;
@@ -86,11 +88,16 @@ public class APIService extends Application<APIConfiguration> {
   }
 
   /**
-   * Setup application specific Jackson filters, rules etc.
+   * Configure application specific Jackson filters, rules etc.
    *
-   * @param mapper the Jackson object mapper used by application
+   * @param objectMapper
+   *     Jackson object mapper used by application
    */
-  private void setupJackson(ObjectMapper mapper) {
-    mapper.findAndRegisterModules();
+  private void setupJackson(ObjectMapper objectMapper) {
+    objectMapper.findAndRegisterModules();
+
+    SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssX");
+    dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+    objectMapper.setDateFormat(dateFormat);
   }
 }

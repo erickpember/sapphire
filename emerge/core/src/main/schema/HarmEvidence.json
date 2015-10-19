@@ -846,26 +846,28 @@
               "$ref": "#/definitions/TimestampedBoolean"
             },
             "anticoagulationType": {
-              "updateTime": {
-                "type": "string",
-                "format": "date-time",
-                "description": "An explanation about the purpose of this instance described by this schema."
-              },
-              "value": {
-                "type": "string",
-                "enum": [
-                  "Continuous Infusion Heparain IV",
-                  "Continuous Infusion Argatroban IV",
-                  "Continuous Infusion Bivalirudian IV",
-                  "Intermittent Enoxaparin SC",
-                  "Intermittent Dabigatran Enteral",
-                  "Intermittent Apixaban Enteral",
-                  "Intermittent Rivaroxaban Enteral",
-                  "Intermittent Edoxaban Enteral",
-                  "Intermittent Fondaparinux SC",
-                  "Intermittent Warfarin Enteral"
-                ],
-                "description": "An explanation about the purpose of this instance described by this schema."
+              "type": "object",
+              "properties": {
+                "updateTime": {
+                  "type": "string",
+                  "format": "date-time",
+                  "description": "When the value was updated"
+                },
+                "value": {
+                  "type": "string",
+                  "enum": [
+                    "Continuous Infusion Heparain IV",
+                    "Continuous Infusion Argatroban IV",
+                    "Continuous Infusion Bivalirudian IV",
+                    "Intermittent Enoxaparin SC",
+                    "Intermittent Dabigatran Enteral",
+                    "Intermittent Apixaban Enteral",
+                    "Intermittent Rivaroxaban Enteral",
+                    "Intermittent Edoxaban Enteral",
+                    "Intermittent Fondaparinux SC",
+                    "Intermittent Warfarin Enteral"
+                  ]
+                }
               }
             },
             "pharmacologicVTEProphylaxisType": {

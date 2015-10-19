@@ -14,6 +14,7 @@ import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.LowerExtremitySCDsContraindicated;
 import com.datafascia.emerge.ucsf.MedicalData;
 import com.datafascia.emerge.ucsf.TimestampedBoolean;
+import com.datafascia.emerge.ucsf.TimestampedString;
 import com.datafascia.emerge.ucsf.VTE;
 import java.time.Clock;
 import java.time.Instant;
@@ -155,6 +156,26 @@ public class VenousThromboembolismUpdater {
             (value != null) ? AnticoagulationType.Value.fromValue(value.getCode()) : null)
         .withUpdateTime(Date.from(Instant.now(clock)));
     vte.setAnticoagulationType(anticoagulationType);
+  }
+
+  /**
+   * Updates pharmacologic VTE prophylaxis type.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updatePharmacologicVTEProphylaxisType(
+      HarmEvidence harmEvidence, Encounter encounter) {
+
+    VTE vte = getVTE(harmEvidence);
+
+    String encounterId = encounter.getId().getIdPart();
+    TimestampedString pharmacologicVteProphylaxisType = new TimestampedString()
+        .withValue(pharmacologicVteProphylaxis.getPharmacologicVteProphylaxisType(encounterId))
+        .withUpdateTime(Date.from(Instant.now(clock)));
+    vte.setPharmacologicVTEProphylaxisType(pharmacologicVteProphylaxisType);
   }
 
   /**

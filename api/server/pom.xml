@@ -32,7 +32,7 @@
     </dependency>
     <dependency>
       <groupId>${project.groupId}</groupId>
-      <artifactId>df-domain-core</artifactId>
+      <artifactId>df-emerge-core</artifactId>
       <version>${project.version}</version>
     </dependency>
 

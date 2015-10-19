@@ -3,19 +3,20 @@
   "id": "http://datafascia.com/schema/emerge",
 
   "type": "object",
-  "description": "An explanation about the purpose of this instance described by this schema.",
+  "description": "Bundle of harm evidence records",
   "properties": {
     "EmergeDataFeed": {
       "type": "object",
-      "description": "An explanation about the purpose of this instance described by this schema.",
+      "description": "Bundle of harm evidence records",
       "properties": {
         "timeOfDataFeed": {
           "type": "string",
-          "description": "An explanation about the purpose of this instance described by this schema."
+          "format": "date-time",
+          "description": "When this bundle was created"
         },
         "EmergePatients": {
           "type": "array",
-          "description": "An explanation about the purpose of this instance described by this schema.",
+          "description": "Harm evidence records",
           "items": {
             "$ref": "HarmEvidence.json"
           }

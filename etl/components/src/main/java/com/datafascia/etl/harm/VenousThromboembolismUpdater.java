@@ -5,6 +5,7 @@ package com.datafascia.etl.harm;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import com.datafascia.emerge.harms.vte.Anticoagulation;
 import com.datafascia.emerge.harms.vte.LowerExtremitySCDsContraindicatedImpl;
+import com.datafascia.emerge.harms.vte.PharmacologicVteProphylaxis;
 import com.datafascia.emerge.harms.vte.SCDsInUse;
 import com.datafascia.emerge.harms.vte.SCDsOrdered;
 import com.datafascia.emerge.ucsf.HarmEvidence;
@@ -29,6 +30,9 @@ public class VenousThromboembolismUpdater {
 
   @Inject
   private Anticoagulation anticoagulation;
+
+  @Inject
+  private PharmacologicVteProphylaxis pharmacologicVteProphylaxis;
 
   @Inject
   private LowerExtremitySCDsContraindicatedImpl lowerExtremitySCDsContraindicatedImpl;
@@ -128,5 +132,25 @@ public class VenousThromboembolismUpdater {
         .withValue(scdsOrderedImpl.isSCDsOrdered(encounterId))
         .withUpdateTime(Date.from(Instant.now(clock)));
     vte.setSCDsOrdered(scdsOrdered);
+  }
+
+  /**
+   * Updates pharmacologic VTE prophylaxis ordered.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updatePharmacologicVTEProphylaxisOrdered(
+      HarmEvidence harmEvidence, Encounter encounter) {
+
+    VTE vte = getVTE(harmEvidence);
+
+    String encounterId = encounter.getId().getIdPart();
+    TimestampedBoolean pharmacologicVteProphylaxisOrdered = new TimestampedBoolean()
+        .withValue(pharmacologicVteProphylaxis.isPharmacologicVteProphylaxisOrdered(encounterId))
+        .withUpdateTime(Date.from(Instant.now(clock)));
+    vte.setPharmacologicVTEProphylaxisOrdered(pharmacologicVteProphylaxisOrdered);
   }
 }

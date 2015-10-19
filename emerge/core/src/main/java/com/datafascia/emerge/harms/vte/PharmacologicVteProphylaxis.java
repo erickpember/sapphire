@@ -6,25 +6,27 @@ import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationOrderStatusEnum;
 import com.datafascia.api.client.ClientBuilder;
 import java.util.List;
+import javax.inject.Inject;
 
 /**
- * Pharmacologic VTE Prophylaxis Ordered implementation
+ * Pharmacologic VTE Prophylaxis implementation
  */
-public class PharmacologicVtePpx {
+public class PharmacologicVteProphylaxis {
+
+  @Inject
+  private ClientBuilder apiClient;
+
   /**
-   * Pharmacologic VTE Prophylaxis Type Implementation
+   * Gets Pharmacologic VTE Prophylaxis Type
    *
-   * @param client
-   *     the FHIR client used to search Topaz
    * @param encounterId
-   *     the Encounter to search
-   * @return type
-   *     the specific pharmacologic VTE prophylaxis ordered
+   *     encounter to search
+   * @return pharmacologic VTE prophylaxis type ordered, or {@code null} if not found
    */
-  public static String pharmacologicVtePpxType(ClientBuilder client, String encounterId) {
+  public String getPharmacologicVteProphylaxisType(String encounterId) {
     String type = null;
 
-    List<MedicationOrder> medicationOrders = client.getMedicationOrderClient()
+    List<MedicationOrder> medicationOrders = apiClient.getMedicationOrderClient()
         .search(encounterId);
     for (MedicationOrder medicationOrder : medicationOrders) {
       if (medicationOrder.getStatusElement().getValueAsEnum() == MedicationOrderStatusEnum.ACTIVE) {
@@ -39,16 +41,13 @@ public class PharmacologicVtePpx {
   }
 
   /**
-   * Pharmacologic VTE Prophylaxis Type Implementation
+   * Checks if Pharmacologic VTE Prophylaxis was ordered
    *
-   * @param client
-   *     the FHIR client used to query Topaz
    * @param encounterId
-   *     the Encounter to search
-   * @return type
-   *     the specific pharmacologic VTE prophylaxis ordered
+   *     encounter to search
+   * @return true if pharmacologic VTE prophylaxis was ordered
    */
-  public static boolean pharmacologicVtePpxOrdered(ClientBuilder client, String encounterId) {
-    return pharmacologicVtePpxType(client, encounterId) != null;
+  public boolean isPharmacologicVteProphylaxisOrdered(String encounterId) {
+    return getPharmacologicVteProphylaxisType(encounterId) != null;
   }
 }

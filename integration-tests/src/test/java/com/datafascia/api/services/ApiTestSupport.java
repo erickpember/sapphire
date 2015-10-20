@@ -23,6 +23,7 @@ import ca.uhn.fhir.model.primitive.DecimalDt;
 import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.IGenericClient;
+import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.common.accumulo.ConnectorFactory;
 import com.datafascia.common.configuration.guice.ConfigureModule;
 import com.datafascia.common.inject.Injectors;
@@ -30,7 +31,9 @@ import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.domain.fhir.Languages;
 import com.datafascia.domain.fhir.RaceEnum;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
+import com.datafascia.dropwizard.testing.DropwizardTestApp;
 import com.datafascia.etl.inject.ComponentsModule;
+import com.google.common.io.Resources;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -48,6 +51,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.instance.model.api.IIdType;
+import org.testng.annotations.AfterSuite;
 import org.testng.annotations.BeforeSuite;
 
 /**
@@ -75,6 +79,9 @@ public abstract class ApiTestSupport {
     }
   }
 
+  private static final DropwizardTestApp<APIConfiguration> app = new DropwizardTestApp<>(
+      APIService.class, getConfigurationFileName());
+
   @Inject
   private FhirContext fhirContext;
 
@@ -90,9 +97,25 @@ public abstract class ApiTestSupport {
     Injectors.setInjector(injector);
     injector.injectMembers(this);
 
+    app.start();
+    log.info("Started Dropwizard application listening on port {}", app.getLocalPort());
+
     client = fhirContext.newRestfulGenericClient(API_ENDPOINT_URL);
 
     addStaticData();
+  }
+
+  @AfterSuite
+  public void afterSuite() throws Exception {
+    app.stop();
+  }
+
+  private static String getConfigurationFileName() {
+    String zooKeepers = TestAccumuloInstance.getZooKeepers();
+    System.setProperty("dw.accumulo.zooKeepers", zooKeepers);
+    System.setProperty("dw.kafkaConfig.zookeeperConnect", zooKeepers);
+
+    return Resources.getResource("api-server.yml").getFile();
   }
 
   /**

@@ -148,35 +148,6 @@
       </plugin>
 
       <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>copy</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>df-api-server</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>${project.groupId}</groupId>
-                  <artifactId>df-common-test</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.apache.accumulo</groupId>
-                  <artifactId>accumulo-minicluster</artifactId>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
         <groupId>org.apache.accumulo</groupId>
         <artifactId>accumulo-maven-plugin</artifactId>
         <version>${accumulo.version}</version>
@@ -190,36 +161,6 @@
             <goals>
               <goal>start</goal>
               <goal>stop</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>com.bazaarvoice.maven.plugins</groupId>
-        <artifactId>process-exec-maven-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>start-api-server</id>
-            <phase>pre-integration-test</phase>
-            <goals>
-              <goal>start</goal>
-            </goals>
-            <configuration>
-              <arguments>
-                <argument>java</argument>
-                <argument>-classpath</argument>
-                <argument>${project.build.testOutputDirectory}:${project.build.directory}/dependency/*</argument>
-                <argument>com.datafascia.api.services.APIServiceRunner</argument>
-              </arguments>
-              <workingDir>..</workingDir>
-            </configuration>
-          </execution>
-          <execution>
-            <id>stop-all</id>
-            <phase>post-integration-test</phase>
-            <goals>
-              <goal>stop-all</goal>
             </goals>
           </execution>
         </executions>

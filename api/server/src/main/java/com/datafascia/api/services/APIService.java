@@ -64,7 +64,7 @@ public class APIService extends Application<APIConfiguration> {
     bootstrap.addBundle(guiceBundle);
 
     bootstrap.addBundle(new AtmosphereBundle());
-    bootstrap.addBundle(new FhirBundle(guiceBundle.getInjector()));
+    bootstrap.addBundle(guiceBundle.getInjector().getInstance(FhirBundle.class));
   }
 
   @Override

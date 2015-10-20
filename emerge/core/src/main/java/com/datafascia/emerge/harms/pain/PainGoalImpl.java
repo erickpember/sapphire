@@ -7,7 +7,6 @@ import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
-import com.datafascia.emerge.ucsf.PainUtils;
 import com.datafascia.emerge.ucsf.ShiftUtils;
 import java.time.Clock;
 import java.time.ZonedDateTime;

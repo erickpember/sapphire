@@ -4,6 +4,7 @@ package com.datafascia.etl.harm.ventilatorassociatedevent;
 
 import com.datafascia.common.persist.Id;
 import com.datafascia.emerge.ucsf.HarmEvidence;
+import com.datafascia.emerge.ucsf.TimestampedBoolean;
 import com.datafascia.emerge.ucsf.VentilationMode;
 import com.datafascia.etl.harm.HarmEvidenceTestSupport;
 import java.time.Instant;
@@ -13,6 +14,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 
 /**
  * Tests ventilator associated event data is exported.
@@ -28,6 +30,16 @@ public class VentilatorAssociatedEventIT extends HarmEvidenceTestSupport {
   @AfterMethod
   public void dischargePatient() throws Exception {
     processMessage("ADT_A03.hl7");
+  }
+
+  @Test
+  public void should_export_ventilated() throws Exception {
+    processMessage("ventilated-true.hl7");
+
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    TimestampedBoolean ventilated = harmEvidence.getMedicalData().getVAE().getVentilated();
+    assertTrue(ventilated.isValue());
+    assertEquals(ventilated.getUpdateTime(), Date.from(Instant.now(clock)));
   }
 
   @Test

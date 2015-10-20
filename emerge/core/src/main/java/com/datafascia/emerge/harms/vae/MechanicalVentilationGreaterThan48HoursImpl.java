@@ -17,12 +17,12 @@ import lombok.extern.slf4j.Slf4j;
  */
 @Slf4j
 public class MechanicalVentilationGreaterThan48HoursImpl {
-  // Private constructor disallows creating instances of this class.
-  private MechanicalVentilationGreaterThan48HoursImpl() {
-  }
 
   @Inject
   private ClientBuilder apiClient;
+
+  @Inject
+  private Ventilated ventilatedImpl;
 
   private static final boolean DEFAULT_RESULT = true;
 
@@ -42,7 +42,7 @@ public class MechanicalVentilationGreaterThan48HoursImpl {
     Date fortyEightHoursAgo = cal.getTime();
 
     // grouping of negative short-circuit logic
-    if (!Ventilated.ventilated(apiClient, encounterId)) {
+    if (!ventilatedImpl.isVentilated(encounterId)) {
       return false;
     }
 

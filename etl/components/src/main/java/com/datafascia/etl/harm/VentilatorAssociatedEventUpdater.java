@@ -3,9 +3,11 @@
 package com.datafascia.etl.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import com.datafascia.emerge.harms.vae.Ventilated;
 import com.datafascia.emerge.harms.vae.VentilationModeImpl;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.MedicalData;
+import com.datafascia.emerge.ucsf.TimestampedBoolean;
 import com.datafascia.emerge.ucsf.VAE;
 import com.datafascia.emerge.ucsf.VentilationMode;
 import java.time.Clock;
@@ -22,6 +24,9 @@ public class VentilatorAssociatedEventUpdater {
   private Clock clock;
 
   @Inject
+  private Ventilated ventilatedImpl;
+
+  @Inject
   private VentilationModeImpl ventilationModeImpl;
 
   private static VAE getVAE(HarmEvidence harmEvidence) {
@@ -33,6 +38,24 @@ public class VentilatorAssociatedEventUpdater {
     }
 
     return vae;
+  }
+
+  /**
+   * Updates ventilated.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateVentilated(HarmEvidence harmEvidence, Encounter encounter) {
+    String encounterId = encounter.getId().getIdPart();
+
+    TimestampedBoolean ventilated = new TimestampedBoolean()
+        .withValue(ventilatedImpl.isVentilated(encounterId))
+        .withUpdateTime(Date.from(Instant.now(clock)));
+
+    getVAE(harmEvidence).setVentilated(ventilated);
   }
 
   /**

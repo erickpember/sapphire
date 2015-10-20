@@ -5,6 +5,7 @@ package com.datafascia.emerge.ucsf;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import com.google.common.base.Strings;
 import java.util.Arrays;
 import java.util.List;
@@ -209,6 +210,52 @@ public class PainUtils {
               && getPainScoreFromValue(observation) > getPainScoreFromValue(result))) {
             result = observation;
           }
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Given a list of observations, returns the observation with the lowest CPOT level.
+   *
+   * @param observations
+   *     observations to search
+   * @return Lowest scoring observation found with the code. {@code null} if not found.
+   */
+  public static Observation lowestCpotLevel(List<Observation> observations) {
+    Observation result = null;
+
+    for (Observation observation : observations) {
+      if (observation.getCode().getCodingFirstRep().getCode()
+          .equals(ObservationCodeEnum.CPOT.getCode())) {
+        if (result == null || (getPainScoreFromValue(observation) != null
+            && getPainScoreFromValue(observation) < getPainScoreFromValue(result))) {
+          result = observation;
+        }
+      }
+    }
+
+    return result;
+  }
+
+  /**
+   * Given a list of observations, returns the observation with the highest CPOT level.
+   *
+   * @param observations
+   *     observations to search
+   * @return Lowest scoring observation found with the code. {@code null} if not found.
+   */
+  public static Observation highestCpotLevel(List<Observation> observations) {
+    Observation result = null;
+
+    for (Observation observation : observations) {
+      if (observation.getCode().getCodingFirstRep().getCode()
+          .equals(ObservationCodeEnum.CPOT.getCode())) {
+        if (result == null || (getPainScoreFromValue(observation) != null
+            && getPainScoreFromValue(observation) > getPainScoreFromValue(result))) {
+          result = observation;
+        }
       }
     }
 

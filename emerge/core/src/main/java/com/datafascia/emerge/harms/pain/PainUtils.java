@@ -179,7 +179,6 @@ public class PainUtils {
         case "304890009":
         case "304890010":
         case "304890011":
-          // In the event of simultaneous observations, get the highest pain level of those.
           if (result == null || (getPainScoreFromValue(observation) != null
               && getPainScoreFromValue(observation) < getPainScoreFromValue(result))) {
             result = observation;
@@ -207,7 +206,6 @@ public class PainUtils {
         case "304890009":
         case "304890010":
         case "304890011":
-          // In the event of simultaneous observations, get the highest pain level of those.
           if (result == null || (getPainScoreFromValue(observation) != null
               && getPainScoreFromValue(observation) > getPainScoreFromValue(result))) {
             result = observation;
@@ -356,7 +354,6 @@ public class PainUtils {
         case "304890013":
         case "304890014":
         case "304890015":
-          // In the event of simultaneous observations, get the highest pain level of those.
           if (result == null || (getVerbalPainScoreFromValue(observation) != null
               && getVerbalPainScoreFromValue(observation) > getVerbalPainScoreFromValue(result))) {
             result = observation;
@@ -384,7 +381,6 @@ public class PainUtils {
         case "304890013":
         case "304890014":
         case "304890015":
-          // In the event of simultaneous observations, get the lowest pain level of those.
           if (result == null || (getVerbalPainScoreFromValue(observation) != null
               && getVerbalPainScoreFromValue(observation) < getVerbalPainScoreFromValue(result))) {
             result = observation;

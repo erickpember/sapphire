@@ -111,9 +111,10 @@ public class PainUtils {
         case "304890010":
         case "304890011":
           // In the event of simultaneous observations, get the highest pain level of those.
-          if (result == null || (getPainScoreFromValue(observation) != null && comparator.compare(
-              observation, result) == 0 && getPainScoreFromValue(observation)
-              > getPainScoreFromValue(result))) {
+          if (getPainScoreFromValue(observation) != null
+              && getPainScoreFromValue(observation) != 11
+              && (result == null || (comparator.compare(observation, result) == 0
+              && getPainScoreFromValue(observation) > getPainScoreFromValue(result)))) {
             result = observation;
           } else if (comparator.compare(observation, result) < 0) {
             // we are now in older observations, give up
@@ -122,7 +123,7 @@ public class PainUtils {
       }
     }
 
-    return null;
+    return result;
   }
 
   /**
@@ -148,9 +149,10 @@ public class PainUtils {
         case "304890014":
         case "304890015":
           // In the event of simultaneous observations, get the highest pain level of those.
-          if (result == null || (getVerbalPainScoreFromValue(observation) != null && comparator
-              .compare(observation, result) == 0 && getVerbalPainScoreFromValue(observation)
-              > getVerbalPainScoreFromValue(result))) {
+          if (getVerbalPainScoreFromValue(observation) != null
+              && getVerbalPainScoreFromValue(observation) != 11
+              && (result == null || (comparator.compare(observation, result) == 0
+              && getVerbalPainScoreFromValue(observation) > getVerbalPainScoreFromValue(result)))) {
             result = observation;
           } else if (comparator.compare(observation, result) < 0) {
             // we are now in older observations, give up
@@ -159,7 +161,7 @@ public class PainUtils {
       }
     }
 
-    return null;
+    return result;
   }
 
   /**
@@ -179,8 +181,8 @@ public class PainUtils {
         case "304890009":
         case "304890010":
         case "304890011":
-          if (result == null || (getPainScoreFromValue(observation) != null
-              && getPainScoreFromValue(observation) < getPainScoreFromValue(result))) {
+          if (getPainScoreFromValue(observation) != null && (result == null
+              || getPainScoreFromValue(observation) < getPainScoreFromValue(result))) {
             result = observation;
           }
       }
@@ -354,8 +356,9 @@ public class PainUtils {
         case "304890013":
         case "304890014":
         case "304890015":
-          if (result == null || (getVerbalPainScoreFromValue(observation) != null
-              && getVerbalPainScoreFromValue(observation) > getVerbalPainScoreFromValue(result))) {
+          if ((getVerbalPainScoreFromValue(observation) != null
+              && getVerbalPainScoreFromValue(observation) != 11) && (result == null
+              || getVerbalPainScoreFromValue(observation) > getVerbalPainScoreFromValue(result))) {
             result = observation;
           }
       }
@@ -381,8 +384,9 @@ public class PainUtils {
         case "304890013":
         case "304890014":
         case "304890015":
-          if (result == null || (getVerbalPainScoreFromValue(observation) != null
-              && getVerbalPainScoreFromValue(observation) < getVerbalPainScoreFromValue(result))) {
+          if (getVerbalPainScoreFromValue(observation) != null && (result == null
+              || getVerbalPainScoreFromValue(
+                  observation) < getVerbalPainScoreFromValue(result))) {
             result = observation;
           }
       }

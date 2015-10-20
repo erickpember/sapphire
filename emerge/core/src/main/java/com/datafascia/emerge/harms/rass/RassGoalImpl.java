@@ -1,6 +1,6 @@
 // Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.emerge.harms.pain;
+package com.datafascia.emerge.harms.rass;
 
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import com.datafascia.api.client.ClientBuilder;

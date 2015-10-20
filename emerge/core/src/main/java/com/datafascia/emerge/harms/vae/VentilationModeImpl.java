@@ -10,7 +10,9 @@ import com.datafascia.emerge.ucsf.codes.ventilation.BreathTypeEnum;
 import com.datafascia.emerge.ucsf.codes.ventilation.NonInvasiveDeviceModeEnum;
 import com.datafascia.emerge.ucsf.codes.ventilation.VentModeEmergeEnum;
 import com.datafascia.emerge.ucsf.codes.ventilation.VentModeObservationEnum;
+import com.google.common.collect.ImmutableSet;
 import java.util.Optional;
+import java.util.Set;
 import javax.inject.Inject;
 
 /**
@@ -18,8 +20,24 @@ import javax.inject.Inject;
  */
 public class VentilationModeImpl {
 
+  private static final Set<String> RELEVANT_OBSERVATION_CODES = ImmutableSet.of(
+      ObservationCodeEnum.VENT_MODE.getCode(),
+      ObservationCodeEnum.BREATH_TYPE.getCode(),
+      ObservationCodeEnum.NON_INVASIVE_DEVICE_MODE.getCode());
+
   @Inject
   private ClientBuilder apiClient;
+
+  /**
+   * Checks if observation is relevant to ventilation mode.
+   *
+   * @param observation
+   *     observation
+   * @return true if observation is relevant to ventilation mode
+   */
+  public static boolean isRelevant(Observation observation) {
+    return RELEVANT_OBSERVATION_CODES.contains(observation.getCode().getCodingFirstRep().getCode());
+  }
 
   /**
    * Computes VAE Ventilation Mode

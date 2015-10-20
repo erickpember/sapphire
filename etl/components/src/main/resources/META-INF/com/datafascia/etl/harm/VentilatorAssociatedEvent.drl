@@ -4,6 +4,7 @@ package com.datafascia.etl.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
+import com.datafascia.emerge.harms.vae.VentilationModeImpl;
 import com.datafascia.etl.harm.HarmEvidenceUpdater.Event;
 import com.datafascia.etl.harm.HarmEvidenceUpdater.EventType;
 
@@ -13,8 +14,9 @@ global com.datafascia.etl.harm.VentilatorAssociatedEventUpdater ventilatorAssoci
 rule "Update ventilation mode"
 when
   Event( type == EventType.UPDATE_OBSERVATIONS )
-  Observation( ["304890046", "304890047", "3045000561"] contains code.codingFirstRep.code )
+  $observation: Observation()
+  eval( VentilationModeImpl.isRelevant($observation) )
   $encounter: Encounter()
 then
-  ventilatorAssociatedEventUpdater.update(harmEvidence, $encounter);
+  ventilatorAssociatedEventUpdater.updateVentilationMode(harmEvidence, $encounter);
 end

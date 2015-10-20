@@ -35,34 +35,22 @@ public class VentilatorAssociatedEventUpdater {
     return vae;
   }
 
-  private static VentilationMode getVentilationMode(HarmEvidence harmEvidence) {
-    VAE vae = getVAE(harmEvidence);
-    VentilationMode ventilationMode = vae.getVentilationMode();
-    if (ventilationMode == null) {
-      ventilationMode = new VentilationMode();
-      vae.setVentilationMode(ventilationMode);
-    }
-
-    return ventilationMode;
-  }
-
-  private void updateVentilationMode(HarmEvidence harmEvidence, String encounterId) {
-    VentilationMode ventilationMode = getVentilationMode(harmEvidence);
-    String value = ventilationModeImpl.getVentilationMode(encounterId);
-    ventilationMode.setValue((value == null) ? null : VentilationMode.Value.fromValue(value));
-    ventilationMode.setUpdateTime(Date.from(Instant.now(clock)));
-  }
-
   /**
-   * Updates ventilator associated event data.
+   * Updates ventilation mode.
    *
    * @param harmEvidence
    *     to modify
    * @param encounter
    *     encounter
    */
-  public void update(HarmEvidence harmEvidence, Encounter encounter) {
+  public void updateVentilationMode(HarmEvidence harmEvidence, Encounter encounter) {
     String encounterId = encounter.getId().getIdPart();
-    updateVentilationMode(harmEvidence, encounterId);
+    String value = ventilationModeImpl.getVentilationMode(encounterId);
+
+    VentilationMode ventilationMode = new VentilationMode()
+        .withValue((value == null) ? null : VentilationMode.Value.fromValue(value))
+        .withUpdateTime(Date.from(Instant.now(clock)));
+
+    getVAE(harmEvidence).setVentilationMode(ventilationMode);
   }
 }

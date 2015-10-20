@@ -26,7 +26,6 @@ public class DailySpontaneousBreathingTrial {
   @Inject
   private ClientBuilder apiClient;
 
-  private static final BigDecimal FOUR = new BigDecimal("4");
   private static final BigDecimal FIVE = new BigDecimal("5");
   private static final BigDecimal EIGHT = new BigDecimal("8");
   private static final BigDecimal FIFTY = new BigDecimal("50");
@@ -72,7 +71,7 @@ public class DailySpontaneousBreathingTrial {
     }
 
     if (freshestPressureSupport != null && freshestPEEP != null && freshestFIO2 != null
-        && ((QuantityDt) freshestPressureSupport.getValue()).getValue().compareTo(FOUR) < 0
+        && ((QuantityDt) freshestPressureSupport.getValue()).getValue().compareTo(FIVE) < 0
         && ((QuantityDt) freshestPEEP.getValue()).getValue().compareTo(FIVE) < 0
         && ((QuantityDt) freshestFIO2.getValue()).getValue().compareTo(FIFTY) < 0) {
       return DailySBTValueEnum.GIVEN.getCode();

@@ -4,6 +4,7 @@ package com.datafascia.etl.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import com.datafascia.emerge.harms.vae.DiscreteHeadOfBedGreaterThan30Degrees;
+import com.datafascia.emerge.harms.vae.StressUlcerProphylacticsOrder;
 import com.datafascia.emerge.harms.vae.Ventilated;
 import com.datafascia.emerge.harms.vae.VentilationModeImpl;
 import com.datafascia.emerge.ucsf.HarmEvidence;
@@ -30,6 +31,9 @@ public class VentilatorAssociatedEventUpdater {
 
   @Inject
   private DiscreteHeadOfBedGreaterThan30Degrees discreteHeadOfBedGreaterThan30DegreesImpl;
+
+  @Inject
+  private StressUlcerProphylacticsOrder stressUlcerProphylacticsOrderImpl;
 
   @Inject
   private VentilationModeImpl ventilationModeImpl;
@@ -81,6 +85,24 @@ public class VentilatorAssociatedEventUpdater {
         .withUpdateTime(Date.from(Instant.now(clock)));
 
     getVAE(harmEvidence).setDiscreteHOBGreaterThan30Deg(hobGreaterThan30Deg);
+  }
+
+  /**
+   * Updates stress ulcer prophylaxis order.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateStressUlcerProphylaxisOrder(HarmEvidence harmEvidence, Encounter encounter) {
+    String encounterId = encounter.getId().getIdPart();
+
+    TimestampedBoolean order = new TimestampedBoolean()
+        .withValue(stressUlcerProphylacticsOrderImpl.haveStressUlcerProphylacticsOrder(encounterId))
+        .withUpdateTime(Date.from(Instant.now(clock)));
+
+    getVAE(harmEvidence).setSupOrderStatus(order);
   }
 
   /**

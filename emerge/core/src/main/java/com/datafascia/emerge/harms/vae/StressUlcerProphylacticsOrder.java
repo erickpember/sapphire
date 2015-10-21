@@ -4,26 +4,29 @@ package com.datafascia.emerge.harms.vae;
 
 import ca.uhn.fhir.model.dstu2.valueset.MedicationOrderStatusEnum;
 import com.datafascia.api.client.ClientBuilder;
+import javax.inject.Inject;
 
 import static com.datafascia.emerge.ucsf.codes.MedicationOrderEnum.STRESS_ULCER_PROPHYLACTICS;
 
 /**
- * VAE Harm Stress Ulcer Prophylactics Order Status implementation
+ * VAE Stress Ulcer Prophylactics Order Status implementation
  */
-public class SupOrderStatus {
+public class StressUlcerProphylacticsOrder {
+
+  @Inject
+  private ClientBuilder apiClient;
+
   /**
-   * VAE Harm Stress Ulcer Prophylactics Order Status Implementation
+   * Checks if there is an active or draft order for stress ulcer prophylaxis.
    *
-   * @param client
-   *     the FHIR client used to query Topaz
    * @param encounterId
-   *     the Encounter to search
-   * @return
-   *     True if there is an active or draft order for stress ulcer prophylaxis.
+   *     encounter to search
+   * @return true if there is an active or draft order for stress ulcer prophylaxis.
    */
-  public static boolean supOrderStatus(ClientBuilder client, String encounterId) {
-    return client.getMedicationOrderClient()
-        .search(encounterId).stream()
+  public boolean haveStressUlcerProphylacticsOrder(String encounterId) {
+    return apiClient.getMedicationOrderClient()
+        .search(encounterId)
+        .stream()
         .filter(order -> order.getIdentifierFirstRep().getValue()
             .equals(STRESS_ULCER_PROPHYLACTICS.getCode()))
         .anyMatch(order -> order.getStatusElement().getValueAsEnum()

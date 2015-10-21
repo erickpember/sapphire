@@ -31,6 +31,14 @@ then
   ventilatorAssociatedEventUpdater.updateDiscreteHOBGreaterThan30Deg(harmEvidence, $encounter);
 end
 
+rule "Update stress ulcer prophylaxis order"
+when
+  Event( type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateStressUlcerProphylaxisOrder(harmEvidence, $encounter);
+end
+
 rule "Update ventilation mode"
 when
   Event( type == EventType.UPDATE_OBSERVATIONS )

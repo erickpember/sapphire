@@ -48,6 +48,15 @@ then
       harmEvidence, $encounter);
 end
 
+rule "Update recent stress ulcer prophylaxis administration"
+when
+  Event( type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateRecentStressUlcerProphylaxisAdministration(
+      harmEvidence, $encounter);
+end
+
 rule "Update ventilation mode"
 when
   Event( type == EventType.UPDATE_OBSERVATIONS )

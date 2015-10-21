@@ -5,6 +5,7 @@ package com.datafascia.etl.harm;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import com.datafascia.emerge.harms.vae.DiscreteHeadOfBedGreaterThan30Degrees;
 import com.datafascia.emerge.harms.vae.MechanicalVentilationGreaterThan48Hours;
+import com.datafascia.emerge.harms.vae.RecentStressUlcerProphylaxisAdministration;
 import com.datafascia.emerge.harms.vae.StressUlcerProphylacticsOrder;
 import com.datafascia.emerge.harms.vae.Ventilated;
 import com.datafascia.emerge.harms.vae.VentilationModeImpl;
@@ -38,6 +39,9 @@ public class VentilatorAssociatedEventUpdater {
 
   @Inject
   private MechanicalVentilationGreaterThan48Hours mechanicalVentilationGreaterThan48HoursImpl;
+
+  @Inject
+  private RecentStressUlcerProphylaxisAdministration recentStressUlcerProphylaxisAdministration;
 
   @Inject
   private VentilationModeImpl ventilationModeImpl;
@@ -129,6 +133,26 @@ public class VentilatorAssociatedEventUpdater {
         .withUpdateTime(Date.from(Instant.now(clock)));
 
     getVAE(harmEvidence).setMechanicalVentilationGreaterThan48Hours(mechanicalVentilation);
+  }
+
+  /**
+   * Updates recent stress ulcer prophylaxis administration.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateRecentStressUlcerProphylaxisAdministration(
+      HarmEvidence harmEvidence, Encounter encounter) {
+
+    String encounterId = encounter.getId().getIdPart();
+
+    TimestampedBoolean administration = new TimestampedBoolean()
+        .withValue(recentStressUlcerProphylaxisAdministration.test(encounterId))
+        .withUpdateTime(Date.from(Instant.now(clock)));
+
+    getVAE(harmEvidence).setRecentStressUlcerProphylaxisAdministration(administration);
   }
 
   /**

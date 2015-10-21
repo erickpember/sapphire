@@ -2,10 +2,14 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.ucsf;
 
+import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationOrderStatusEnum;
+import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
+import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * MedicationOrder helper methods
@@ -50,5 +54,47 @@ public class MedicationOrderUtils {
     return medicationOrders.stream()
         .max(new MedicationOrderDateWrittenComparator())
         .orElse(null);
+  }
+
+  /**
+   * Finds any MedicationOrder for status of either Active or Draft with a date written before
+   * a given time.
+   *
+   * @param encounterId
+   *    encounter to search for medication orders
+   * @param client
+   *    API client
+   * @param medication
+   *     Medication identifier, AKA MedsSet, optional.
+   * @param startTime
+   *     Start time for search.
+   * @return
+   *    freshest medicationOrder for status of either Active or Draft,
+   *    or {@code null} if no match is found.
+   */
+  public static List<MedicationOrder> findActiveOrDraftOrderForMedicationBeforeTime(
+      ClientBuilder client, String encounterId, String medication, Date startTime) {
+    List<MedicationOrder> medicationOrders = client.getMedicationOrderClient().search(encounterId,
+        MedicationOrderStatusEnum.ACTIVE.getCode(), medication);
+    medicationOrders.addAll(client.getMedicationOrderClient().search(encounterId,
+        MedicationOrderStatusEnum.DRAFT.getCode(), medication));
+    return medicationOrders.stream()
+        .filter(order -> isBefore(order, startTime))
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Returns true if a specified medicationOrder  is before a specified time.
+   *
+   * @param medicationOrder
+   *     MedicationOrder resource.
+   * @param startTime
+   *     Start time for search.
+   * @return
+   *     True if the medication order's date written time is before the specified start time.
+   */
+  public static boolean isBefore(MedicationOrder medicationOrder, Date startTime) {
+    IDatatype effectiveTime = medicationOrder.getDateWrittenElement();
+    return ((DateTimeDt) effectiveTime).getValue().before(startTime);
   }
 }

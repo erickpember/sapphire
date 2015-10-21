@@ -11,6 +11,7 @@ import ca.uhn.fhir.rest.gclient.StringClientParam;
 import com.google.common.base.Strings;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Client utilities for medication orders.
@@ -112,5 +113,26 @@ public class MedicationOrderClient extends BaseClient<MedicationOrder> {
     }
 
     return medicationOrders;
+  }
+
+  /**
+   * Searches MedicationOrders
+   *
+   * @param encounterId
+   *     The ID of the encounter to which the medicationOrders belong.
+   * @param status
+   *     Status of medicationOrder, optional.
+   * @param identifier
+   *     Medication identifier, AKA MedsSet, optional.
+   * @return
+   *     Medication orders for this encounter and status
+   */
+  public List<MedicationOrder> search(String encounterId, String status, String identifier) {
+    if (identifier == null) {
+      return search(encounterId, status);
+    } else {
+      return search(encounterId, status).stream().filter(order -> order.getIdentifierFirstRep()
+          .getValue().equals(identifier)).collect(Collectors.toList());
+    }
   }
 }

@@ -39,6 +39,15 @@ then
   ventilatorAssociatedEventUpdater.updateStressUlcerProphylaxisOrder(harmEvidence, $encounter);
 end
 
+rule "Update mechanical ventilation greater than 48 hours"
+when
+  Event( type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateMechanicalVentilationGreaterThan48Hours(
+      harmEvidence, $encounter);
+end
+
 rule "Update ventilation mode"
 when
   Event( type == EventType.UPDATE_OBSERVATIONS )

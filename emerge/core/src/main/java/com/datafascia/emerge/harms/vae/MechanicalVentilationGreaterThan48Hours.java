@@ -6,17 +6,20 @@ import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
-import java.util.Calendar;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
-import lombok.extern.slf4j.Slf4j;
 
 /**
- * Mechanical Ventilation >48 Hours Implementation
+ * Mechanical ventilation greater than 48 hours implementation
  */
-@Slf4j
-public class MechanicalVentilationGreaterThan48HoursImpl {
+public class MechanicalVentilationGreaterThan48Hours {
+
+  @Inject
+  private Clock clock;
 
   @Inject
   private ClientBuilder apiClient;
@@ -27,19 +30,15 @@ public class MechanicalVentilationGreaterThan48HoursImpl {
   private static final boolean DEFAULT_RESULT = true;
 
   /**
-   * Mechanical Ventilation >48 Hours Implementation
-   * Returns whether the observations for a given encounter indicate mechanical ventilation in the
-   * past 48 hours.
+   * Checks if there is mechanical ventilation greater than 48 hours.
    *
    * @param encounterId
-   *    The encounter to check.
-   * @return
-   *    True if there is an observation in this encounter that meets the conditions.
+   *     encounter to check
+   * @return true if there is an observation in this encounter that meets the conditions
    */
-  public boolean getMechanicalVentilationGreaterThan48Hours(String encounterId) {
-    Calendar cal = Calendar.getInstance();
-    cal.add(Calendar.HOUR, -48);
-    Date fortyEightHoursAgo = cal.getTime();
+  public boolean isMechanicalVentilationGreaterThan48Hours(String encounterId) {
+    Instant now = Instant.now(clock);
+    Date fortyEightHoursAgo = Date.from(now.minus(48, ChronoUnit.HOURS));
 
     // grouping of negative short-circuit logic
     if (!ventilatedImpl.isVentilated(encounterId)) {

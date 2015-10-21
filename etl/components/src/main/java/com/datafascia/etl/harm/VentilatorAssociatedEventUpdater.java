@@ -4,6 +4,7 @@ package com.datafascia.etl.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import com.datafascia.emerge.harms.vae.DiscreteHeadOfBedGreaterThan30Degrees;
+import com.datafascia.emerge.harms.vae.MechanicalVentilationGreaterThan48Hours;
 import com.datafascia.emerge.harms.vae.StressUlcerProphylacticsOrder;
 import com.datafascia.emerge.harms.vae.Ventilated;
 import com.datafascia.emerge.harms.vae.VentilationModeImpl;
@@ -34,6 +35,9 @@ public class VentilatorAssociatedEventUpdater {
 
   @Inject
   private StressUlcerProphylacticsOrder stressUlcerProphylacticsOrderImpl;
+
+  @Inject
+  private MechanicalVentilationGreaterThan48Hours mechanicalVentilationGreaterThan48HoursImpl;
 
   @Inject
   private VentilationModeImpl ventilationModeImpl;
@@ -103,6 +107,28 @@ public class VentilatorAssociatedEventUpdater {
         .withUpdateTime(Date.from(Instant.now(clock)));
 
     getVAE(harmEvidence).setSupOrderStatus(order);
+  }
+
+  /**
+   * Updates mechanical ventilation greater than 48 hours.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateMechanicalVentilationGreaterThan48Hours(
+      HarmEvidence harmEvidence, Encounter encounter) {
+
+    String encounterId = encounter.getId().getIdPart();
+
+    TimestampedBoolean mechanicalVentilation = new TimestampedBoolean()
+        .withValue(
+            mechanicalVentilationGreaterThan48HoursImpl.isMechanicalVentilationGreaterThan48Hours(
+                encounterId))
+        .withUpdateTime(Date.from(Instant.now(clock)));
+
+    getVAE(harmEvidence).setMechanicalVentilationGreaterThan48Hours(mechanicalVentilation);
   }
 
   /**

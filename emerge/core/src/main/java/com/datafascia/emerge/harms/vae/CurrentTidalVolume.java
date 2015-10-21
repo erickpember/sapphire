@@ -17,7 +17,7 @@ import lombok.extern.slf4j.Slf4j;
  * Computes VAE Harm Current Tidal Volume
  */
 @Slf4j
-public class CurrentTidalVolumeImpl {
+public class CurrentTidalVolume {
 
   @Inject
   private ClientBuilder apiClient;

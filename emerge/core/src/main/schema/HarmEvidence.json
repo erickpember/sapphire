@@ -49,6 +49,7 @@
         },
         "updateTime": {
           "type": "string",
+          "format": "date-time",
           "description": "When the value was updated"
         }
       }

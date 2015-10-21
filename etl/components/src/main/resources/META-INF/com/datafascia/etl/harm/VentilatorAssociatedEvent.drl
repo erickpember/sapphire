@@ -4,6 +4,7 @@ package com.datafascia.etl.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
+import com.datafascia.emerge.harms.vae.DiscreteHeadOfBedGreaterThan30Degrees;
 import com.datafascia.emerge.harms.vae.Ventilated;
 import com.datafascia.emerge.harms.vae.VentilationModeImpl;
 import com.datafascia.etl.harm.HarmEvidenceUpdater.Event;
@@ -15,18 +16,25 @@ global com.datafascia.etl.harm.VentilatorAssociatedEventUpdater ventilatorAssoci
 rule "Update ventilated"
 when
   Event( type == EventType.UPDATE_OBSERVATIONS )
-  $observation: Observation()
-  eval( Ventilated.isRelevant($observation) )
+  $observation: Observation( Ventilated.isRelevant($observation) )
   $encounter: Encounter()
 then
   ventilatorAssociatedEventUpdater.updateVentilated(harmEvidence, $encounter);
 end
 
+rule "Update head of bed angle greater than or equal to 30 degrees"
+when
+  Event( type == EventType.UPDATE_OBSERVATIONS )
+  $observation: Observation( DiscreteHeadOfBedGreaterThan30Degrees.isRelevant($observation) )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateDiscreteHOBGreaterThan30Deg(harmEvidence, $encounter);
+end
+
 rule "Update ventilation mode"
 when
   Event( type == EventType.UPDATE_OBSERVATIONS )
-  $observation: Observation()
-  eval( VentilationModeImpl.isRelevant($observation) )
+  $observation: Observation( VentilationModeImpl.isRelevant($observation) )
   $encounter: Encounter()
 then
   ventilatorAssociatedEventUpdater.updateVentilationMode(harmEvidence, $encounter);

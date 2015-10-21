@@ -91,6 +91,9 @@ public class ObservationUtils {
       String encounterId, String code, Date date) {
     List<Observation> observations = client.getObservationClient()
         .searchObservation(encounterId, code, null);
+    if (observations.isEmpty()) {
+      return null;
+    }
 
     Observation freshestObservation = ObservationUtils.findFreshestObservation(observations);
     return getEffectiveDate(freshestObservation).after(date) ? freshestObservation : null;

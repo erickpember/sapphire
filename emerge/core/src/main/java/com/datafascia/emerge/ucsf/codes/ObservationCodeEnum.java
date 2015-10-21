@@ -32,7 +32,7 @@ public enum ObservationCodeEnum implements SystemDefinedCode<String> {
   FIO2("304890068"),
   PEEP("304890066"),
   TRAIN_OF_FOUR("304500964"),
-  HEIGHT_OF_BED("304890036"),
+  HEAD_OF_BED("304890036"),
   SUBGLOTTIC_SUCTION("304890059"),
   ORAL_CARE("304890060");
 

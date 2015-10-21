@@ -3,11 +3,13 @@
 package com.datafascia.etl.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import com.datafascia.emerge.harms.vae.DiscreteHeadOfBedGreaterThan30Degrees;
 import com.datafascia.emerge.harms.vae.Ventilated;
 import com.datafascia.emerge.harms.vae.VentilationModeImpl;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.MedicalData;
 import com.datafascia.emerge.ucsf.TimestampedBoolean;
+import com.datafascia.emerge.ucsf.TimestampedMaybe;
 import com.datafascia.emerge.ucsf.VAE;
 import com.datafascia.emerge.ucsf.VentilationMode;
 import java.time.Clock;
@@ -25,6 +27,9 @@ public class VentilatorAssociatedEventUpdater {
 
   @Inject
   private Ventilated ventilatedImpl;
+
+  @Inject
+  private DiscreteHeadOfBedGreaterThan30Degrees discreteHeadOfBedGreaterThan30DegreesImpl;
 
   @Inject
   private VentilationModeImpl ventilationModeImpl;
@@ -56,6 +61,26 @@ public class VentilatorAssociatedEventUpdater {
         .withUpdateTime(Date.from(Instant.now(clock)));
 
     getVAE(harmEvidence).setVentilated(ventilated);
+  }
+
+  /**
+   * Updates head of bed angle greater than or equal to 30 degrees.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateDiscreteHOBGreaterThan30Deg(HarmEvidence harmEvidence, Encounter encounter) {
+    String encounterId = encounter.getId().getIdPart();
+    String value = discreteHeadOfBedGreaterThan30DegreesImpl.getHeadOfBedGreaterThan30Degrees(
+        encounterId).getCode();
+
+    TimestampedMaybe hobGreaterThan30Deg = new TimestampedMaybe()
+        .withValue(TimestampedMaybe.Value.fromValue(value))
+        .withUpdateTime(Date.from(Instant.now(clock)));
+
+    getVAE(harmEvidence).setDiscreteHOBGreaterThan30Deg(hobGreaterThan30Deg);
   }
 
   /**

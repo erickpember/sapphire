@@ -74,6 +74,10 @@ public class ClientBuilder {
     return new ProcedureRequestClient(client);
   }
 
+  public ProcedureClient getProcedureClient() {
+    return new ProcedureClient(client);
+  }
+
   public MedicationClient getMedicationClient() {
     return new MedicationClient(client);
   }

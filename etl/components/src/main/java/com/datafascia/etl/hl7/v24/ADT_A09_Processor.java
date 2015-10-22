@@ -6,6 +6,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v24.message.ADT_A09;
 import com.datafascia.etl.hl7.MessageProcessor;
+import java.util.Collections;
 import lombok.extern.slf4j.Slf4j;
 import org.kohsuke.MetaInfServices;
 
@@ -28,7 +29,7 @@ public class ADT_A09_Processor extends AdmitDischargeProcessor {
     try {
       String triggerEvent = message.getMSH().getMessageType().getTriggerEvent().getValue();
       if (triggerEvent.equals("A12")) {
-        admitPatient(message.getMSH(), message.getPID(), message.getPV1());
+        admitPatient(message.getMSH(), message.getPID(), message.getPV1(), Collections.emptyList());
         addObservations(message, message.getPID(), message.getPV1());
       } else {
         addObservations(message, message.getPID(), message.getPV1());

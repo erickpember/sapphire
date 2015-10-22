@@ -26,7 +26,7 @@ public class ADT_A06_Processor extends AdmitDischargeProcessor {
     ADT_A06 message = (ADT_A06) input;
 
     try {
-      admitPatient(message.getMSH(), message.getPID(), message.getPV1());
+      admitPatient(message.getMSH(), message.getPID(), message.getPV1(), message.getROLAll());
       addObservations(message, message.getPID(), message.getPV1());
     } catch (HL7Exception e) {
       log.error("Failed to process message {}", message);

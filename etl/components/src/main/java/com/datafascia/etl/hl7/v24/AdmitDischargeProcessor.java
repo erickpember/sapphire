@@ -2,20 +2,26 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.hl7.v24;
 
+import ca.uhn.fhir.model.dstu2.composite.HumanNameDt;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Location;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
+import ca.uhn.fhir.model.dstu2.resource.Practitioner;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
+import ca.uhn.hl7v2.model.v24.datatype.XCN;
 import ca.uhn.hl7v2.model.v24.datatype.XPN;
 import ca.uhn.hl7v2.model.v24.segment.MSH;
 import ca.uhn.hl7v2.model.v24.segment.PID;
 import ca.uhn.hl7v2.model.v24.segment.PV1;
+import ca.uhn.hl7v2.model.v24.segment.ROL;
 import ca.uhn.hl7v2.util.Terser;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
+import com.datafascia.emerge.ucsf.valueset.PractitionerRoleEnum;
 import com.datafascia.etl.event.AddObservations;
+import com.datafascia.etl.event.AddParticipant;
 import com.datafascia.etl.event.AdmitPatient;
 import com.datafascia.etl.event.DischargePatient;
 import com.datafascia.etl.hl7.GenderFormatter;
@@ -32,6 +38,9 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
 
   @Inject
   private AdmitPatient admitPatient;
+
+  @Inject
+  private AddParticipant addParticipant;
 
   @Inject
   private DischargePatient dischargePatient;
@@ -88,6 +97,49 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
     return encounter;
   }
 
+  private HumanNameDt toHumanName(XCN xcn) throws HL7Exception {
+    HumanNameDt humanName = new HumanNameDt();
+
+    if (!xcn.getGivenName().isEmpty()) {
+      humanName.addGiven(xcn.getGivenName().getValue());
+    }
+
+    if (!xcn.getSecondAndFurtherGivenNamesOrInitialsThereof().isEmpty()) {
+      humanName.addGiven(xcn.getSecondAndFurtherGivenNamesOrInitialsThereof().getValue());
+    }
+
+    if (!xcn.getFamilyName().isEmpty()) {
+      humanName.addFamily(xcn.getFamilyName().getSurname().getValue());
+    }
+
+    return humanName;
+  }
+
+  private Practitioner toPractitioner(ROL rol) throws HL7Exception {
+    XCN rolePerson = rol.getRolePerson(0);
+
+    Practitioner practitioner = new Practitioner()
+        .setName(toHumanName(rolePerson));
+    practitioner.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_PRACTITIONER)
+        .setValue(rolePerson.getIDNumber().getValue());
+
+    practitioner.addPractitionerRole().getRole().addCoding()
+        .setSystem(PractitionerRoleEnum.PRIMARY_ATTENDING.getSystem())
+        .setCode(rol.getRoleROL().getIdentifier().getValue());
+
+    return practitioner;
+  }
+
+  private Encounter.Participant toParticipant(ROL rol) throws HL7Exception {
+    PeriodDt period = new PeriodDt()
+        .setStart(toDateTime(rol.getRoleBeginDateTime()))
+        .setEnd(toDateTime(rol.getRoleEndDateTime()));
+    Encounter.Participant participant = new Encounter.Participant()
+        .setPeriod(period);
+    return participant;
+  }
+
   /**
    * Admits patient.
    *
@@ -97,14 +149,22 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
    *     PID segment
    * @param pv1
    *     PV1 segment
+   * @param rolList
+   *     ROL list
    * @throws HL7Exception if HL7 message is malformed
    */
-  protected void admitPatient(MSH msh, PID pid, PV1 pv1) throws HL7Exception {
+  protected void admitPatient(MSH msh, PID pid, PV1 pv1, List<ROL> rolList) throws HL7Exception {
     UnitedStatesPatient patient = toPatient(pid);
     Location location = toLocation(pv1);
     Encounter encounter = toEncounter(pv1);
     admitPatient.accept(
         msh.getMessageType().getTriggerEvent().getValue(), patient, location, encounter);
+
+    for (ROL rol : rolList) {
+      Practitioner practitioner = toPractitioner(rol);
+      Encounter.Participant participant = toParticipant(rol);
+      addParticipant.accept(practitioner, participant, encounter);
+    }
   }
 
   /**

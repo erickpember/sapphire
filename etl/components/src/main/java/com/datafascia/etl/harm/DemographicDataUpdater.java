@@ -10,6 +10,7 @@ import com.datafascia.domain.fhir.RaceEnum;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.emerge.ucsf.DemographicData;
 import com.datafascia.emerge.ucsf.HarmEvidence;
+import java.lang.NumberFormatException;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -70,7 +71,13 @@ public class DemographicDataUpdater {
     String[] locationParts = location.getIdentifierFirstRep().getValue().split("\\^");
     String room = locationParts[1];
     String bed = locationParts[2];
-    return room + '-' + bed;
+
+    try {
+      String zeroPadRoomNumber = String.format("%04d", Integer.parseInt(room));
+      return zeroPadRoomNumber + '-' + bed;
+    } catch (NumberFormatException e) {
+      return room + '-' + bed;
+    }
   }
 
   /**

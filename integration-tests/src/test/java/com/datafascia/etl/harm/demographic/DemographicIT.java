@@ -45,7 +45,7 @@ public class DemographicIT extends HarmEvidenceTestSupport {
     assertEquals(demographicData.getDateOfBirth(), "1984-10-01");
     assertEquals(demographicData.getGender(), DemographicData.Gender.FEMALE);
     assertEquals(demographicData.getRace(), "W");
-    assertEquals(demographicData.getRoomNumber(), "A6597-28");
+    assertEquals(demographicData.getRoomNumber(), "0009-A");
     assertEquals(demographicData.getUpdateTime().toInstant(), Instant.now(clock));
   }
 

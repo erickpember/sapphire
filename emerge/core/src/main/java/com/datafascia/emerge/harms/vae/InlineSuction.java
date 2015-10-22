@@ -16,9 +16,9 @@ import lombok.extern.slf4j.Slf4j;
  * In-line Suction Implementation
  */
 @Slf4j
-public class InlineSuctionImpl {
+public class InlineSuction {
   // Private constructor disallows creating instances of this class.
-  private InlineSuctionImpl() {
+  private InlineSuction() {
   }
 
   @Inject

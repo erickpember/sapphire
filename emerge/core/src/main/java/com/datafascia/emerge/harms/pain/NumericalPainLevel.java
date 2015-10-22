@@ -18,7 +18,8 @@ import lombok.Data;
 /**
  * Implements the Pain and Delirium Numerical Pain Level
  */
-public class NumericalPainLevelImpl {
+public class NumericalPainLevel {
+
   private enum MinOrMax {
     MIN, MAX
   }

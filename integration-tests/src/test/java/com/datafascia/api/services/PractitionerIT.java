@@ -16,6 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 /**
@@ -44,7 +45,7 @@ public class PractitionerIT extends ApiTestSupport {
     Bundle results = client.search().forResource(Practitioner.class).execute();
 
     List<IResource> practitioners = ApiUtil.extractBundle(results, Practitioner.class);
-    assertEquals(practitioners.size(), 2, "No-argument search failed.");
+    assertTrue(practitioners.size() >= 2, "No-argument search failed.");
     for (IResource resource : practitioners) {
       Practitioner result = (Practitioner) resource;
       switch (result.getIdentifierFirstRep().getValue()) {
@@ -54,8 +55,6 @@ public class PractitionerIT extends ApiTestSupport {
         case PRACTITIONER2:
           assertEquals(result.getId().getIdPart(), practitioner2.getId().getIdPart());
           break;
-        default:
-          fail("unexpected practitioner id:" + result.getIdentifierFirstRep().getValue());
       }
     }
 

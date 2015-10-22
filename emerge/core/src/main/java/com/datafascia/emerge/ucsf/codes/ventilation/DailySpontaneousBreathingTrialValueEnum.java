@@ -2,38 +2,30 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.ucsf.codes.ventilation;
 
+import com.datafascia.common.persist.Code;
 import com.datafascia.common.persist.CodeToEnumMapper;
-import com.datafascia.domain.fhir.SystemDefinedCode;
 import java.util.Optional;
 
 /**
  * Enumerates the value field for the daily spontaneous breathing trial for Emerge.
  */
-public enum DailySBTValueEnum implements SystemDefinedCode<String> {
+public enum DailySpontaneousBreathingTrialValueEnum implements Code<String> {
   GIVEN("Given"),
   NOT_GIVEN("Not Given"),
   CONTRAINDICATED("Contraindicated");
 
-  private static final String SYSTEM
-      = "http://datafascia.com/code/DailySpontaneousBreathingTrialValue";
-
   private final String code;
 
-  private static final CodeToEnumMapper<String, DailySBTValueEnum>
-      CODE_TO_ENUM_MAPPER = new CodeToEnumMapper<>(DailySBTValueEnum.class);
+  private static final CodeToEnumMapper<String, DailySpontaneousBreathingTrialValueEnum>
+      CODE_TO_ENUM_MAPPER = new CodeToEnumMapper<>(DailySpontaneousBreathingTrialValueEnum.class);
 
-  DailySBTValueEnum(String code) {
+  DailySpontaneousBreathingTrialValueEnum(String code) {
     this.code = code;
   }
 
   @Override
   public String getCode() {
     return code;
-  }
-
-  @Override
-  public String getSystem() {
-    return SYSTEM;
   }
 
   /**
@@ -43,7 +35,7 @@ public enum DailySBTValueEnum implements SystemDefinedCode<String> {
    *     input code
    * @return optional enum constant, empty if code is unknown
    */
-  public static Optional<DailySBTValueEnum> of(String code) {
+  public static Optional<DailySpontaneousBreathingTrialValueEnum> of(String code) {
     return CODE_TO_ENUM_MAPPER.of(code);
   }
 }

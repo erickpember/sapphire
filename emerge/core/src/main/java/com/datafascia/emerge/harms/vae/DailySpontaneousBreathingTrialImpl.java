@@ -10,98 +10,110 @@ import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
-import com.datafascia.emerge.ucsf.codes.ventilation.DailySBTContraindicatedEnum;
-import com.datafascia.emerge.ucsf.codes.ventilation.DailySBTValueEnum;
+import com.datafascia.emerge.ucsf.codes.ventilation.DailySpontaneousBreathingTrialContraindicatedEnum;
+import com.datafascia.emerge.ucsf.codes.ventilation.DailySpontaneousBreathingTrialValueEnum;
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import javax.inject.Inject;
 
 /**
- * Implements Daily Spontaneous Breathing Trial
+ * Implements daily spontaneous breathing trial
  */
 public class DailySpontaneousBreathingTrialImpl {
-  @Inject
-  private ClientBuilder apiClient;
 
   private static final BigDecimal FIVE = new BigDecimal("5");
   private static final BigDecimal EIGHT = new BigDecimal("8");
   private static final BigDecimal FIFTY = new BigDecimal("50");
+  private static final List<String> HAVE_THESE_BEEN_ADMINISTERED = Arrays.asList(
+      "Intermittent Cisatracurium IV",
+      "Intermittent Vecuronium IV",
+      "Intermittent Rocuronium IV",
+      "Intermittent Pancuronium IV");
+  private static final List<String> ARE_THESE_IN_PROGRESS = Arrays.asList(
+      "Continuous Infusion Lorazepam IV",
+      "Continuous Infusion Midazolam IV");
 
-  // Private constructor disallows creating instances of this class.
-  private DailySpontaneousBreathingTrialImpl() {
-  }
+  @Inject
+  private Clock clock;
+
+  @Inject
+  private ClientBuilder apiClient;
 
   /**
-   * Implements the value field of Daily Spontaneous Breathing Trial
+   * Gets value field of daily spontaneous breathing trial.
    *
    * @param encounterId
-   *     Relevant encounter ID.
+   *     encounter to search
    * @return
    *     Whether the trial was given, not given or contraindicated.
    */
-  public String value(String encounterId) {
-    Calendar cal = Calendar.getInstance();
-    cal.add(Calendar.HOUR, -25);
-    Date twentyFiveHoursAgo = cal.getTime();
+  public DailySpontaneousBreathingTrialValueEnum getValue(String encounterId) {
+    Instant now = Instant.now(clock);
+    Date effectiveLowerBound = Date.from(now.minus(25, ChronoUnit.HOURS));
 
-    Observation freshestSBTAdmin = ObservationUtils.getFreshestByCodeAfterTime(apiClient,
+    Observation freshestSBTAdmin = ObservationUtils.getFreshestByCodeAfterTime(
+        apiClient,
         encounterId,
-        ObservationCodeEnum.SBT.getCode(), twentyFiveHoursAgo);
+        ObservationCodeEnum.SPONTANEOUS_BREATHING_TRIAL.getCode(),
+        effectiveLowerBound);
 
-    Observation freshestPressureSupport = ObservationUtils.getFreshestByCodeAfterTime(apiClient,
+    Observation freshestPressureSupport = ObservationUtils.getFreshestByCodeAfterTime(
+        apiClient,
         encounterId,
-        ObservationCodeEnum.PRESSURE_SUPPORT.getCode(), twentyFiveHoursAgo);
+        ObservationCodeEnum.PRESSURE_SUPPORT.getCode(),
+        effectiveLowerBound);
 
-    Observation freshestFIO2 = ObservationUtils.getFreshestByCodeAfterTime(apiClient, encounterId,
-        ObservationCodeEnum.FIO2.getCode(), twentyFiveHoursAgo);
+    Observation freshestFIO2 = ObservationUtils.getFreshestByCodeAfterTime(
+        apiClient,
+        encounterId,
+        ObservationCodeEnum.FIO2.getCode(),
+        effectiveLowerBound);
 
-    Observation freshestPEEP = ObservationUtils.getFreshestByCodeAfterTime(apiClient, encounterId,
-        ObservationCodeEnum.PEEP.getCode(), twentyFiveHoursAgo);
+    Observation freshestPEEP = ObservationUtils.getFreshestByCodeAfterTime(
+        apiClient,
+        encounterId,
+        ObservationCodeEnum.PEEP.getCode(),
+        effectiveLowerBound);
 
     if (freshestSBTAdmin != null && freshestSBTAdmin.getValue().toString().equals("Yes")) {
-      switch (freshestSBTAdmin.getValue().toString()) {
-        case "Yes":
-          return DailySBTValueEnum.GIVEN.getCode();
-        case "No":
-          return DailySBTValueEnum.NOT_GIVEN.getCode();
-      }
+      return DailySpontaneousBreathingTrialValueEnum.GIVEN;
     }
 
     if (freshestPressureSupport != null && freshestPEEP != null && freshestFIO2 != null
         && ((QuantityDt) freshestPressureSupport.getValue()).getValue().compareTo(FIVE) < 0
         && ((QuantityDt) freshestPEEP.getValue()).getValue().compareTo(FIVE) < 0
         && ((QuantityDt) freshestFIO2.getValue()).getValue().compareTo(FIFTY) < 0) {
-      return DailySBTValueEnum.GIVEN.getCode();
+      return DailySpontaneousBreathingTrialValueEnum.GIVEN;
     }
 
-    return DailySBTValueEnum.CONTRAINDICATED.getCode();
+    return DailySpontaneousBreathingTrialValueEnum.CONTRAINDICATED;
   }
 
   /**
-   * Implements the contraindicated field of Daily Spontaneous Breathing Trial
+   * Gets contraindicated reason field of daily spontaneous breathing trial.
    *
    * @param encounterId
-   *     Relevant encounter ID.
-   * @return
-   *     Why the spontaneous breathing trial is contraindicated.
+   *     encounter to search
+   * @return optional contraindicated reason, empty if not found
    */
-  public String contraindicated(String encounterId) {
-    Calendar cal = Calendar.getInstance();
+  public Optional<DailySpontaneousBreathingTrialContraindicatedEnum> getContraindicatedReason(
+      String encounterId) {
 
-    Date now = cal.getTime();
-    cal.add(Calendar.HOUR, -2);
-    Date twoHoursAgo = cal.getTime();
-    cal.add(Calendar.HOUR, -23);
-    Date twentyFiveHoursAgo = cal.getTime();
-    PeriodDt lastTwoHours = new PeriodDt().setStart(new DateTimeDt(twoHoursAgo)).setEnd(
-        new DateTimeDt(now));
+    Instant now = Instant.now(clock);
+    Date twoHoursAgo = Date.from(now.minus(2, ChronoUnit.HOURS));
+    Date twentyFiveHoursAgo = Date.from(now.minus(25, ChronoUnit.HOURS));
+    PeriodDt lastTwoHours = new PeriodDt()
+        .setStart(new DateTimeDt(twoHoursAgo))
+        .setEnd(new DateTimeDt(Date.from(now)));
 
-    Observation freshestTrainOfFour = ObservationUtils.getFreshestByCodeAfterTime(apiClient,
-        encounterId,
-        ObservationCodeEnum.TRAIN_OF_FOUR.getCode(), twentyFiveHoursAgo);
+    Observation freshestTrainOfFour = ObservationUtils.getFreshestByCodeAfterTime(
+        apiClient, encounterId, ObservationCodeEnum.TRAIN_OF_FOUR.getCode(), twentyFiveHoursAgo);
 
     if (freshestTrainOfFour != null) {
       switch (freshestTrainOfFour.getValue().toString()) {
@@ -109,67 +121,65 @@ public class DailySpontaneousBreathingTrialImpl {
         case "1":
         case "2":
         case "3":
-          return DailySBTContraindicatedEnum.RECEIVING_NMBA.getCode();
+          return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.RECEIVING_NMBA);
       }
     }
 
-    Observation freshestSBTContraindication = ObservationUtils.getFreshestByCodeAfterTime(apiClient,
-        encounterId, ObservationCodeEnum.SBT_CONTRAINDICATED.getCode(), twentyFiveHoursAgo);
+    Observation freshestSBTContraindication = ObservationUtils.getFreshestByCodeAfterTime(
+        apiClient,
+        encounterId,
+        ObservationCodeEnum.SPONTANEOUS_BREATHING_TRIAL_CONTRAINDICATED.getCode(),
+        twentyFiveHoursAgo);
 
     if (freshestSBTContraindication != null) {
       if (freshestSBTContraindication.getValue().toString().equals("Clinically Unstable")) {
-        return DailySBTContraindicatedEnum.CLINICALLY_UNSTABLE.getCode();
+        return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.CLINICALLY_UNSTABLE);
       }
 
       if (freshestSBTContraindication.getValue().toString().equals("Other (see comment)")) {
-        return DailySBTContraindicatedEnum.OTHER.getCode();
+        return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.OTHER);
       }
     }
 
-    Observation freshestPEEP = ObservationUtils.getFreshestByCodeAfterTime(apiClient, encounterId,
-        ObservationCodeEnum.PEEP.getCode(), twentyFiveHoursAgo);
+    Observation freshestPEEP = ObservationUtils.getFreshestByCodeAfterTime(
+        apiClient, encounterId, ObservationCodeEnum.PEEP.getCode(), twentyFiveHoursAgo);
 
     if (freshestPEEP != null && ((QuantityDt) freshestPEEP.getValue()).getValue().compareTo(EIGHT)
         > 0) {
-      return DailySBTContraindicatedEnum.PEEP_OVER_8.getCode();
+      return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.PEEP_OVER_8);
     }
 
-    Observation freshestFIO2 = ObservationUtils.getFreshestByCodeAfterTime(apiClient, encounterId,
-        ObservationCodeEnum.FIO2.getCode(), twentyFiveHoursAgo);
+    Observation freshestFIO2 = ObservationUtils.getFreshestByCodeAfterTime(
+        apiClient, encounterId, ObservationCodeEnum.FIO2.getCode(), twentyFiveHoursAgo);
 
     if (freshestFIO2 != null && ((QuantityDt) freshestFIO2.getValue()).getValue().compareTo(FIFTY)
         > 0) {
-      return DailySBTContraindicatedEnum.FIO2_OVER_50.getCode();
+      return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.FIO2_OVER_50);
     }
 
     if (freshestPEEP != null && freshestFIO2 != null && freshestSBTContraindication != null
         && freshestSBTContraindication.getValue().toString().equals("Respiratory Status")
         && ((QuantityDt) freshestFIO2.getValue()).getValue().compareTo(FIFTY) < 0
         && ((QuantityDt) freshestPEEP.getValue()).getValue().compareTo(EIGHT) < 0) {
-      return DailySBTContraindicatedEnum.OTHER.getCode();
+      return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.OTHER);
     }
 
-    List<String> haveTheseBeenAdministered = Arrays.asList("Intermittent Cisatracurium IV",
-        "Intermittent Vecuronium IV", "Intermittent Rocuronium IV", "Intermittent Pancuronium IV");
-
-    for (String medsSet : haveTheseBeenAdministered) {
-      if (MedicationAdministrationUtils.inProgressOrCompletedInTimeFrame(apiClient, encounterId,
-          lastTwoHours,
-          medsSet)) {
-        return DailySBTContraindicatedEnum.RECEIVING_NMBA.getCode();
+    for (String medsSet : HAVE_THESE_BEEN_ADMINISTERED) {
+      boolean administered = MedicationAdministrationUtils.inProgressOrCompletedInTimeFrame(
+          apiClient, encounterId, lastTwoHours, medsSet);
+      if (administered) {
+        return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.RECEIVING_NMBA);
       }
     }
 
-    List<String> areTheseInProgress = Arrays.asList("Continuous Infusion Lorazepam IV",
-        "Continuous Infusion Midazolam IV");
-
-    for (String medsSet : areTheseInProgress) {
-      if (MedicationAdministrationUtils.inProgressInTimeFrame(apiClient, encounterId, lastTwoHours,
-          medsSet)) {
-        return DailySBTContraindicatedEnum.RECEIVING_NMBA.getCode();
+    for (String medsSet : ARE_THESE_IN_PROGRESS) {
+      boolean inProgress = MedicationAdministrationUtils.inProgressInTimeFrame(
+          apiClient, encounterId, lastTwoHours, medsSet);
+      if (inProgress) {
+        return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.RECEIVING_NMBA);
       }
     }
 
-    return null;
+    return Optional.empty();
   }
 }

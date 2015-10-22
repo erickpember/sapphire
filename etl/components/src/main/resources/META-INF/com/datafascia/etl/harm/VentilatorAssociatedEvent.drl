@@ -97,3 +97,11 @@ when
 then
   ventilatorAssociatedEventUpdater.updateInlineSuction(harmEvidence, $encounter);
 end
+
+rule "Update daily spontaneous breathing trial"
+when
+  Event( type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateDailySpontaneousBreathingTrial(harmEvidence, $encounter);
+end

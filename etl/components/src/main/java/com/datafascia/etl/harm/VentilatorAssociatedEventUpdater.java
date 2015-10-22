@@ -4,6 +4,7 @@ package com.datafascia.etl.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import com.datafascia.emerge.harms.vae.CurrentTidalVolume;
+import com.datafascia.emerge.harms.vae.DailySpontaneousBreathingTrialImpl;
 import com.datafascia.emerge.harms.vae.DiscreteHeadOfBedGreaterThan30Degrees;
 import com.datafascia.emerge.harms.vae.InlineSuction;
 import com.datafascia.emerge.harms.vae.MechanicalVentilationGreaterThan48Hours;
@@ -13,6 +14,7 @@ import com.datafascia.emerge.harms.vae.StressUlcerProphylacticsOrder;
 import com.datafascia.emerge.harms.vae.SubglotticSuctionUse;
 import com.datafascia.emerge.harms.vae.Ventilated;
 import com.datafascia.emerge.harms.vae.VentilationModeImpl;
+import com.datafascia.emerge.ucsf.DailySpontaneousBreathingTrial;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.MedicalData;
 import com.datafascia.emerge.ucsf.TimestampedBoolean;
@@ -20,9 +22,11 @@ import com.datafascia.emerge.ucsf.TimestampedInteger;
 import com.datafascia.emerge.ucsf.TimestampedMaybe;
 import com.datafascia.emerge.ucsf.VAE;
 import com.datafascia.emerge.ucsf.VentilationMode;
+import com.datafascia.emerge.ucsf.codes.ventilation.DailySpontaneousBreathingTrialContraindicatedEnum;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Optional;
 import javax.inject.Inject;
 
 /**
@@ -62,6 +66,9 @@ public class VentilatorAssociatedEventUpdater {
 
   @Inject
   private InlineSuction inlineSuction;
+
+  @Inject
+  private DailySpontaneousBreathingTrialImpl dailySpontaneousBreathingTrial;
 
   private static VAE getVAE(HarmEvidence harmEvidence) {
     MedicalData medicalData = harmEvidence.getMedicalData();
@@ -263,5 +270,32 @@ public class VentilatorAssociatedEventUpdater {
         .withUpdateTime(Date.from(Instant.now(clock)));
 
     getVAE(harmEvidence).setInlineSuction(newInlineSuction);
+  }
+
+  /**
+   * Updates daily spontaneous breathing trial.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateDailySpontaneousBreathingTrial(HarmEvidence harmEvidence, Encounter encounter) {
+    String encounterId = encounter.getId().getIdPart();
+    String value = dailySpontaneousBreathingTrial.getValue(encounterId).getCode();
+    Optional<DailySpontaneousBreathingTrialContraindicatedEnum> optionalContraindicatedReason =
+        dailySpontaneousBreathingTrial.getContraindicatedReason(encounterId);
+
+    DailySpontaneousBreathingTrial newBreathingTrial = new DailySpontaneousBreathingTrial()
+        .withValue(
+            DailySpontaneousBreathingTrial.Value.fromValue(value))
+        .withContraindicatedReason(
+            optionalContraindicatedReason.map(reason ->
+                DailySpontaneousBreathingTrial.ContraindicatedReason.fromValue(reason.getCode()))
+            .orElse(null))
+        .withUpdateTime(
+            Date.from(Instant.now(clock)));
+
+    getVAE(harmEvidence).setDailySpontaneousBreathingTrial(newBreathingTrial);
   }
 }

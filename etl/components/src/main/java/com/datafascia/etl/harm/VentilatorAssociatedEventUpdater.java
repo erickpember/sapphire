@@ -6,6 +6,7 @@ import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import com.datafascia.emerge.harms.vae.CurrentTidalVolume;
 import com.datafascia.emerge.harms.vae.DiscreteHeadOfBedGreaterThan30Degrees;
 import com.datafascia.emerge.harms.vae.MechanicalVentilationGreaterThan48Hours;
+import com.datafascia.emerge.harms.vae.OralCare;
 import com.datafascia.emerge.harms.vae.RecentStressUlcerProphylaxisAdministration;
 import com.datafascia.emerge.harms.vae.StressUlcerProphylacticsOrder;
 import com.datafascia.emerge.harms.vae.SubglotticSuctionUse;
@@ -54,6 +55,9 @@ public class VentilatorAssociatedEventUpdater {
 
   @Inject
   private SubglotticSuctionUse subglotticSuctionUse;
+
+  @Inject
+  private OralCare oralCare;
 
   private static VAE getVAE(HarmEvidence harmEvidence) {
     MedicalData medicalData = harmEvidence.getMedicalData();
@@ -218,5 +222,24 @@ public class VentilatorAssociatedEventUpdater {
         .withUpdateTime(Date.from(Instant.now(clock)));
 
     getVAE(harmEvidence).setSubglotticSuctionUse(newSubglotticSuctionUse);
+  }
+
+  /**
+   * Updates oral care.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateOralCare(HarmEvidence harmEvidence, Encounter encounter) {
+    String encounterId = encounter.getId().getIdPart();
+    String value = oralCare.apply(encounterId).getCode();
+
+    TimestampedMaybe newOralCare = new TimestampedMaybe()
+        .withValue(TimestampedMaybe.Value.fromValue(value))
+        .withUpdateTime(Date.from(Instant.now(clock)));
+
+    getVAE(harmEvidence).setOralCare(newOralCare);
   }
 }

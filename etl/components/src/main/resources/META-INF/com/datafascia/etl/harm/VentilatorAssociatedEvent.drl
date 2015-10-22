@@ -81,3 +81,11 @@ when
 then
   ventilatorAssociatedEventUpdater.updateSubglotticSuctionUse(harmEvidence, $encounter);
 end
+
+rule "Update oral care"
+when
+  Event( type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateOralCare(harmEvidence, $encounter);
+end

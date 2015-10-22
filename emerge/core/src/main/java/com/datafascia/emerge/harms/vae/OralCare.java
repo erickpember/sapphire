@@ -3,66 +3,74 @@
 package com.datafascia.emerge.harms.vae;
 
 import ca.uhn.fhir.model.dstu2.resource.Observation;
-import ca.uhn.fhir.model.primitive.StringDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.codes.MaybeEnum;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
-import java.util.Arrays;
-import java.util.Calendar;
+import com.google.common.collect.ImmutableSet;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * VAE Harm Oral Care Implementation
+ * Checks for oral care
  */
 @Slf4j
 public class OralCare {
+
+  @Inject
+  private Clock clock;
+
   @Inject
   private ClientBuilder apiClient;
 
-  private static final String DEFAULT_RESULT = MaybeEnum.NOT_DOCUMENTED.getCode();
-  private static final List<String> YES_VALUES = Arrays.asList("Teeth brushed with CHG",
-      "Suction toothette with H. Peroxide", "Mouth swabbed", "Teeth brushed");
-  private static final List<String> NO_VALUES = Arrays.asList("Patient refused", "Other (Comment)");
-  private static final List<String> CONTRAINDICATED_VALUES = Arrays.asList(
+  private static final Set<String> YES_VALUES = ImmutableSet.of(
+      "Teeth brushed with CHG",
+      "Suction toothette with H. Peroxide",
+      "Mouth swabbed",
+      "Teeth brushed");
+  private static final Set<String> NO_VALUES = ImmutableSet.of(
+      "Patient refused",
+      "Other (Comment)");
+  private static final Set<String> CONTRAINDICATED_VALUES = ImmutableSet.of(
       "Contraindicated (bleeding, “no oral care” order)",
       "Patient unavailable (off unit, procedure in progress)");
 
   /**
-   * VAE Harm Oral Care Implementation
-   * Returns whether the encounter contains an Observation that indicates oral care in the last 7
-   * hours.
+   * Checks for oral care.
    *
    * @param encounterId
-   *    The encounter to check.
+   *     encounter to search
    * @return
-   *    "Yes", "No", "Not Documented" or "Contraindicated" depending on the answer to the question.
+   *     "Yes", "No", "Not Documented" or "Contraindicated" depending on condition
    */
-  public String getOralCare(String encounterId) {
-    Calendar cal = Calendar.getInstance();
-    cal.add(Calendar.HOUR, -7);
-    Date sevenHoursAgo = cal.getTime();
+  public MaybeEnum apply(String encounterId) {
+    Instant now = Instant.now(clock);
+    Date effectiveLowerBound = Date.from(now.minus(7, ChronoUnit.HOURS));
 
-    Observation freshestOralCareAction = ObservationUtils.getFreshestByCodeAfterTime(apiClient,
-        encounterId, ObservationCodeEnum.ORAL_CARE.getCode(), sevenHoursAgo);
+    Observation freshestOralCareAction = ObservationUtils.getFreshestByCodeAfterTime(
+        apiClient,
+        encounterId,
+        ObservationCodeEnum.ORAL_CARE.getCode(),
+        effectiveLowerBound);
 
     if (freshestOralCareAction != null) {
-      if (YES_VALUES.contains(((StringDt) freshestOralCareAction.getValue()).getValue())) {
-        return MaybeEnum.YES.getCode();
-      } else if (NO_VALUES.contains(((StringDt) freshestOralCareAction.getValue()).getValue())) {
-        return MaybeEnum.NO.getCode();
-      } else if (CONTRAINDICATED_VALUES.contains(((StringDt) freshestOralCareAction.getValue())
-          .getValue())) {
-        return MaybeEnum.CONTRAINDICATED.getCode();
+      String value = freshestOralCareAction.getValue().toString();
+      if (YES_VALUES.contains(value)) {
+        return MaybeEnum.YES;
+      } else if (NO_VALUES.contains(value)) {
+        return MaybeEnum.NO;
+      } else if (CONTRAINDICATED_VALUES.contains(value)) {
+        return MaybeEnum.CONTRAINDICATED;
       } else {
-        log.warn("Unrecognized value for oral care observation: " + freshestOralCareAction
-            .getValue());
+        log.warn("Unrecognized value for oral care observation [{}]", value);
       }
     }
 
-    return DEFAULT_RESULT;
+    return MaybeEnum.NOT_DOCUMENTED;
   }
 }

@@ -10,7 +10,7 @@ import com.datafascia.emerge.ucsf.codes.painAndDelerium.SedativeOrderDosageRoute
 import com.datafascia.emerge.ucsf.codes.painAndDelerium.SedativeOrderDrugEnum;
 import com.google.common.collect.ImmutableSet;
 import java.time.Clock;
-import java.time.ZonedDateTime;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -43,7 +43,7 @@ public class SedativeOrder {
   private ClientBuilder apiClient;
 
   @Inject
-  private static Clock clock;
+  private Clock clock;
 
   /**
    * Result container for sedative orders.
@@ -65,7 +65,7 @@ public class SedativeOrder {
    * @return Drug name, route and order status, empty if not found.
    */
   public Optional<OrderResult> getValue(String encounterId, String medication) {
-    ZonedDateTime now = ZonedDateTime.now(clock);
+    Date now = Date.from(Instant.now(clock));
     OrderResult result = OrderResult.builder()
         .dosageRoute(null)
         .drug(null)
@@ -77,7 +77,7 @@ public class SedativeOrder {
             apiClient,
             encounterId,
             medication,
-            Date.from(now.toInstant()));
+            now);
     medOrders.sort(new MedicationOrderDateWrittenComparator().reversed());
 
     for (MedicationOrder order : medOrders) {

@@ -59,3 +59,11 @@ when
 then
   painAndDeliriumUpdater.updateCam(harmEvidence, $encounter);
 end
+
+rule "Update Sedative"
+when
+  Event( type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  painAndDeliriumUpdater.updateSedative(harmEvidence, $encounter);
+end

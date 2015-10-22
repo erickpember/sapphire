@@ -3,6 +3,7 @@
 package com.datafascia.etl.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import com.datafascia.emerge.harms.pain.BenzodiazepineAvoidance;
 import com.datafascia.emerge.harms.pain.CamResult;
 import com.datafascia.emerge.harms.pain.CamUtaReason;
 import com.datafascia.emerge.harms.pain.CpotImpl;
@@ -11,6 +12,8 @@ import com.datafascia.emerge.harms.pain.CpotImpl.MinimumOrMaximumCpotLevel;
 import com.datafascia.emerge.harms.pain.NumericalPainLevel;
 import com.datafascia.emerge.harms.pain.NumericalPainLevel.CurrentPainLevel;
 import com.datafascia.emerge.harms.pain.NumericalPainLevel.MinimumOrMaximumPainLevel;
+import com.datafascia.emerge.harms.pain.SedativeOrder;
+import com.datafascia.emerge.harms.pain.SedativeOrder.OrderResult;
 import com.datafascia.emerge.harms.pain.VerbalPainLevel;
 import com.datafascia.emerge.harms.rass.RassGoalImpl;
 import com.datafascia.emerge.harms.rass.RassLevel;
@@ -34,13 +37,22 @@ import com.datafascia.emerge.ucsf.Delirium;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.MedicalData;
 import com.datafascia.emerge.ucsf.Numerical;
+import com.datafascia.emerge.ucsf.Order;
 import com.datafascia.emerge.ucsf.Pain;
 import com.datafascia.emerge.ucsf.RASS;
 import com.datafascia.emerge.ucsf.RassGoal;
+import com.datafascia.emerge.ucsf.Sedative;
+import com.datafascia.emerge.ucsf.TimestampedBoolean;
 import com.datafascia.emerge.ucsf.Verbal;
+import com.datafascia.emerge.ucsf.codes.MedsSetEnum;
+import com.google.common.collect.ImmutableSet;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import javax.inject.Inject;
 
 /**
@@ -71,6 +83,12 @@ public class PainAndDeliriumUpdater {
 
   @Inject
   private CamUtaReason camUtaReasonImpl;
+
+  @Inject
+  private BenzodiazepineAvoidance benzodiazepineAvoidanceImpl;
+
+  @Inject
+  private SedativeOrder sedativeOrderImpl;
 
   private static Pain getPain(HarmEvidence harmEvidence) {
     MedicalData medicalData = harmEvidence.getMedicalData();
@@ -280,5 +298,53 @@ public class PainAndDeliriumUpdater {
         .withUtaReason((camUtaReason != null) ? Cam.UtaReason.fromValue(camUtaReason) : null);
 
     getDelirium(harmEvidence).setCam(cam);
+  }
+
+  /**
+   * Updates Sedative.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateSedative(HarmEvidence harmEvidence, Encounter encounter) {
+    String encounterId = encounter.getId().getIdPart();
+
+    List<Order> orders = new ArrayList<>();
+    Set<String> BENZODIAZEPINE_NAMES = ImmutableSet.of(
+        MedsSetEnum.INTERMITTENT_LORAZEPAM_IV.getCode(),
+        MedsSetEnum.INTERMITTENT_LORAZEPAM_ENTERAL.getCode(),
+        MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode(),
+        MedsSetEnum.INTERMITTENT_MIDAZOLAM_IV.getCode(),
+        MedsSetEnum.CONTINUOUS_INFUSION_MIDAZOLAM_IV.getCode(),
+        MedsSetEnum.INTERMITTENT_CLONAZEPAM_ENTERAL.getCode(),
+        MedsSetEnum.INTERMITTENT_DIAZEPAM_IV.getCode(),
+        MedsSetEnum.INTERMITTENT_DIAZEPAM_ENTERAL.getCode(),
+        MedsSetEnum.INTERMITTENT_CHLORADIAZEPOXIDE_ENTERAL.getCode(),
+        MedsSetEnum.INTERMITTENT_ALPRAZALOM_ENTERAL.getCode());
+
+    for (String medsSet : BENZODIAZEPINE_NAMES) {
+      Optional<OrderResult> result = sedativeOrderImpl.getValue(encounterId, medsSet);
+      if (result.isPresent()) {
+        Order order = new Order()
+            .withDosageRoute((result.get().getDosageRoute() != null) ? Order.DosageRoute.fromValue(
+                        result.get().getDosageRoute()) : null)
+            .withDrug((result.get().getDrug() != null) ? Order.Drug
+                    .fromValue(result.get().getDrug()) : null)
+            .withUpdateTime(Date.from(Instant.now(clock)));
+        orders.add(order);
+      }
+    }
+
+    TimestampedBoolean benzodiazepineContraindicated = new TimestampedBoolean()
+        .withValue(benzodiazepineAvoidanceImpl
+            .isBenzodiazepineAvoidanceContraindicated(encounterId))
+        .withUpdateTime(Date.from(Instant.now(clock)));
+
+    Sedative sedative = new Sedative().withContraindicated(benzodiazepineContraindicated)
+        .withOrders(orders);
+
+    getDelirium(harmEvidence).setSedative(sedative);
   }
 }

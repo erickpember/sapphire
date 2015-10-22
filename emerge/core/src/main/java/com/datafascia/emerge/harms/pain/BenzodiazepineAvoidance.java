@@ -7,22 +7,24 @@ import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import java.util.List;
+import javax.inject.Inject;
 
 /**
  * Utilities related to benzodiazepine avoidance.
  */
 public class BenzodiazepineAvoidance {
 
+  @Inject
+  private ClientBuilder apiClient;
+
   /**
    * Determines whether benzodiazepine avoidance is contraindicated.
    *
-   * @param client The client to use.
    * @param encounterId The encounter to check.
    * @return Whether benzodiazepine avoidance is contraindicated.
    */
-  public static boolean benzodiazepineAvoidanceContraindicated(ClientBuilder client,
-      String encounterId) {
-    List<Observation> observations = client.getObservationClient().searchObservation(encounterId,
+  public boolean isBenzodiazepineAvoidanceContraindicated(String encounterId) {
+    List<Observation> observations = apiClient.getObservationClient().searchObservation(encounterId,
         ObservationCodeEnum.BENZODIAZEPINE_AVOIDANCE.getCode(), null);
 
     for (Observation observation : observations) {

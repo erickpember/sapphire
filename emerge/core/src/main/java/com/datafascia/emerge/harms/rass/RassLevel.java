@@ -19,7 +19,7 @@ import lombok.Data;
 /**
  * Implement the Pain and Delirium Current, Minimum and Maximum RASS Levels
  */
-public class RassLevelsImpl {
+public class RassLevel {
   private enum MinOrMax {
     MIN, MAX
   }

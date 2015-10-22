@@ -19,7 +19,7 @@ import lombok.extern.slf4j.Slf4j;
  * VAE Harm Oral Care Implementation
  */
 @Slf4j
-public class OralCareImpl {
+public class OralCare {
   @Inject
   private ClientBuilder apiClient;
 

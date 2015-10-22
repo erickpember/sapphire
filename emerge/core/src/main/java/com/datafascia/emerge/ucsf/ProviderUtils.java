@@ -4,7 +4,7 @@ package com.datafascia.emerge.ucsf;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import com.datafascia.api.client.ClientBuilder;
-import com.datafascia.domain.fhir.PractitionerRoleEnum;
+import com.datafascia.emerge.ucsf.valueset.PractitionerRoleEnum;
 import java.util.List;
 
 /**
@@ -31,7 +31,7 @@ public class ProviderUtils {
     for (Encounter.Participant participant : sortedParticipants) {
       if (participant.getIndividual().getReference().getResourceType().equals("Practitioner")
           && participant.getIndividual().getReference().getValue()
-          .equals(PractitionerRoleEnum.ROLE_ATTENDING_PROVIDER.getCode())) {
+          .equals(PractitionerRoleEnum.ATTENDING_PROVIDER.getCode())) {
         return participant;
       }
     }

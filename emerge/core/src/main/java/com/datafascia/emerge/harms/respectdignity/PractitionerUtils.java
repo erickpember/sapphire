@@ -7,7 +7,7 @@ import ca.uhn.fhir.model.dstu2.resource.Encounter.Participant;
 import ca.uhn.fhir.model.dstu2.resource.Practitioner;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.domain.fhir.HumanNames;
-import com.datafascia.domain.fhir.PractitionerRoleEnum;
+import com.datafascia.emerge.ucsf.valueset.PractitionerRoleEnum;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;

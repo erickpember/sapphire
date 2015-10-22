@@ -6,7 +6,7 @@ import ca.uhn.fhir.model.dstu2.resource.Encounter.Participant;
 import ca.uhn.fhir.model.dstu2.resource.Practitioner;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.domain.fhir.HumanNames;
-import com.datafascia.domain.fhir.PractitionerRoleEnum;
+import com.datafascia.emerge.ucsf.valueset.PractitionerRoleEnum;
 import java.util.Date;
 import java.util.Optional;
 
@@ -25,7 +25,7 @@ public class ICUAttending {
   public static Date getICUAttendingPeriod(ClientBuilder client, String encounterId) {
     Optional<Participant> participant = PractitionerUtils.getMostRecentPractitionerForRole(
         client.getEncounterClient().getEncounter(encounterId),
-        PractitionerRoleEnum.ROLE_ICU_ATTENDING,
+        PractitionerRoleEnum.ICU_ATTENDING,
         client);
     if (participant.isPresent()) {
       return participant.get().getPeriod().getStart();
@@ -43,7 +43,7 @@ public class ICUAttending {
   public static String getICUAttendingName(ClientBuilder client, String encounterId) {
     Optional<Participant> participant = PractitionerUtils.getMostRecentPractitionerForRole(
         client.getEncounterClient().getEncounter(encounterId),
-        PractitionerRoleEnum.ROLE_ICU_ATTENDING,
+        PractitionerRoleEnum.ICU_ATTENDING,
         client);
     if (participant.isPresent()) {
       Practitioner practitioner = client.getPractitionerClient().getPractitioner(

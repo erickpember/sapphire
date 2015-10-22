@@ -7,10 +7,13 @@ import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
+import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
+import com.google.common.collect.ImmutableSet;
 import java.time.Clock;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import javax.inject.Inject;
 import lombok.Builder;
 import lombok.Data;
@@ -22,6 +25,12 @@ public class VerbalPainLevel {
   private enum MinOrMax {
     MIN, MAX
   }
+
+  private static final Set<String> RELEVANT_OBSERVATION_CODES = ImmutableSet.of(
+      ObservationCodeEnum.VERBAL_PAIN_01.getCode(),
+      ObservationCodeEnum.VERBAL_PAIN_02.getCode(),
+      ObservationCodeEnum.VERBAL_PAIN_03.getCode(),
+      ObservationCodeEnum.VERBAL_PAIN_04.getCode());
 
   @Inject
   private ClientBuilder apiClient;
@@ -47,6 +56,17 @@ public class VerbalPainLevel {
     private Date timeOfCalculation;
     private Date startOfTimePeriod;
     private Date endOfTimePeriod;
+  }
+
+  /**
+   * Checks if observation is relevant to verbal pain score.
+   *
+   * @param observation
+   *     the observation to check
+   * @return true if observation is relevant to verbal pain score.
+   */
+  public static boolean isRelevant(Observation observation) {
+    return RELEVANT_OBSERVATION_CODES.contains(observation.getCode().getCodingFirstRep().getCode());
   }
 
   /**

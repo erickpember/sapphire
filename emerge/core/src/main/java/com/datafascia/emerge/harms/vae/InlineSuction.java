@@ -6,49 +6,51 @@ import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
-import java.util.Calendar;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * In-line Suction Implementation
+ * Checks if there is inline suction
  */
 @Slf4j
 public class InlineSuction {
-  // Private constructor disallows creating instances of this class.
-  private InlineSuction() {
-  }
+
+  @Inject
+  private Clock clock;
 
   @Inject
   private ClientBuilder apiClient;
 
-  private static final boolean DEFAULT_RESULT = false;
-
   /**
-   * In-line Suction Implementation
-   * Returns whether the encounter contains an Observation that indicates in-line suction
+   * Checks if there is inline suction.
    *
    * @param encounterId
-   *    The encounter to check.
-   * @return
-   *    True if there is in-line suction for this encounter.
+   *     encounter to search
+   * @return true if there is inline suction for this encounter
    */
-  public boolean getInlineSuction(String encounterId) {
-    Calendar cal = Calendar.getInstance();
+  public boolean test(String encounterId) {
+    Instant now = Instant.now(clock);
+    Date effectiveLowerBound = Date.from(now.minus(13, ChronoUnit.HOURS));
 
-    cal.add(Calendar.HOUR, -13);
-    Date thirteenHoursAgo = cal.getTime();
+    Observation freshestInlinePlacement = ObservationUtils.findFreshestObservationForCode(
+        apiClient,
+        ObservationCodeEnum.INLINE_PLACEMENT.getCode(),
+        encounterId);
 
-    Observation freshestInlinePlacement = ObservationUtils.findFreshestObservationForCode(apiClient,
-        ObservationCodeEnum.INLINE_PLACEMENT.getCode(), encounterId);
-
-    List<Observation> airwayDevices = ObservationUtils.getObservationByCodeAfterTime(apiClient,
-        encounterId, ObservationCodeEnum.AIRWAY_DEVICE.getCode(), thirteenHoursAgo);
+    List<Observation> airwayDevices = ObservationUtils.getObservationByCodeAfterTime(
+        apiClient,
+        encounterId,
+        ObservationCodeEnum.AIRWAY_DEVICE.getCode(),
+        effectiveLowerBound);
 
     if (freshestInlinePlacement != null) {
-      switch (freshestInlinePlacement.getValue().toString()) {
+      String value = freshestInlinePlacement.getValue().toString();
+      switch (value) {
         case "Placed":
         case "Changed":
           return true;
@@ -62,8 +64,7 @@ public class InlineSuction {
           }
           return false;
         default:
-          log.warn("Unexpected value for inline placement observation found: "
-              + freshestInlinePlacement.getValue().toString());
+          log.warn("Unexpected value for inline placement observation [{}]", value);
       }
     }
 
@@ -73,6 +74,6 @@ public class InlineSuction {
       }
     }
 
-    return DEFAULT_RESULT;
+    return false;
   }
 }

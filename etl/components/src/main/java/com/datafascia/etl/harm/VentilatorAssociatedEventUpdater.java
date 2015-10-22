@@ -5,6 +5,7 @@ package com.datafascia.etl.harm;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import com.datafascia.emerge.harms.vae.CurrentTidalVolume;
 import com.datafascia.emerge.harms.vae.DiscreteHeadOfBedGreaterThan30Degrees;
+import com.datafascia.emerge.harms.vae.InlineSuction;
 import com.datafascia.emerge.harms.vae.MechanicalVentilationGreaterThan48Hours;
 import com.datafascia.emerge.harms.vae.OralCare;
 import com.datafascia.emerge.harms.vae.RecentStressUlcerProphylaxisAdministration;
@@ -58,6 +59,9 @@ public class VentilatorAssociatedEventUpdater {
 
   @Inject
   private OralCare oralCare;
+
+  @Inject
+  private InlineSuction inlineSuction;
 
   private static VAE getVAE(HarmEvidence harmEvidence) {
     MedicalData medicalData = harmEvidence.getMedicalData();
@@ -241,5 +245,23 @@ public class VentilatorAssociatedEventUpdater {
         .withUpdateTime(Date.from(Instant.now(clock)));
 
     getVAE(harmEvidence).setOralCare(newOralCare);
+  }
+
+  /**
+   * Updates inline suction.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateInlineSuction(HarmEvidence harmEvidence, Encounter encounter) {
+    String encounterId = encounter.getId().getIdPart();
+
+    TimestampedBoolean newInlineSuction = new TimestampedBoolean()
+        .withValue(inlineSuction.test(encounterId))
+        .withUpdateTime(Date.from(Instant.now(clock)));
+
+    getVAE(harmEvidence).setInlineSuction(newInlineSuction);
   }
 }

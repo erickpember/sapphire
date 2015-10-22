@@ -272,4 +272,22 @@ public class ObservationUtils {
       throw new RuntimeException("Unexpected type: " + effectiveTime.getClass().getCanonicalName());
     }
   }
+
+  /**
+   * Returns the airway name for an observation.
+   * @param observation The observation to pull from.
+   * @return The airway name for an observation.
+   */
+  public static String airwayName(Observation observation) {
+    String[] identifierParts = observation.getIdentifierFirstRep().getValue().split("^");
+    if (identifierParts.length > 1) {
+      String[] propertyParts = identifierParts[2].split("-");
+
+      if (propertyParts.length > 1) {
+        return propertyParts[2];
+      }
+    }
+
+    return null;
+  }
 }

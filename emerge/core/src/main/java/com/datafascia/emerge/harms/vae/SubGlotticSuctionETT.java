@@ -8,17 +8,17 @@ import com.datafascia.emerge.ucsf.ObservationUtils;
 import java.util.List;
 
 /**
- * Tools for tracheostomy.
+ * Utilities for Sub-Glottic Suction ETT
  */
-public class Tracheostomy {
+public class SubGlotticSuctionETT {
   /**
-   * Determines whether a tracheostomy is active for a given encounter.
+   * Determines whether a subglottic suction ETT is active for a given encounter.
    *
    * @param client The client to use.
    * @param encounterId The encounter to query.
-   * @return Whether a tracheostomy is active for the given encounter.
+   * @return Whether a subglottic suction ETT is active for the given encounter.
    */
-  public static boolean tracheostomy(ClientBuilder client, String encounterId) {
+  public static boolean subglotticSuctionEtt(ClientBuilder client, String encounterId) {
     List<Observation> airwayDevices = client.getObservationClient().searchObservation(encounterId,
         "304894155", null);
 
@@ -36,11 +36,11 @@ public class Tracheostomy {
       airwaySubglotticSuctionCapabilityStatus = "Absent";
     }
 
-    boolean tracheostomy = false;
-    if (airway.equals("Surgical Airway") && airwaySubglotticSuctionCapabilityStatus != null
+    if (airway.equals("Non-Surgical Airway")
         && airwaySubglotticSuctionCapabilityStatus.equals("Present")) {
-      tracheostomy = true;
+      return true;
     }
-    return tracheostomy;
+
+    return false;
   }
 }

@@ -4,6 +4,7 @@ package com.datafascia.etl.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
+import com.datafascia.emerge.harms.pain.CamResult;
 import com.datafascia.emerge.harms.pain.CpotImpl;
 import com.datafascia.emerge.harms.pain.NumericalPainLevel;
 import com.datafascia.emerge.harms.pain.VerbalPainLevel;
@@ -48,4 +49,13 @@ when
   $encounter: Encounter()
 then
   painAndDeliriumUpdater.updateRass(harmEvidence, $encounter);
+end
+
+rule "Update Cam"
+when
+  Event( type == EventType.UPDATE_OBSERVATIONS )
+  $observation: Observation( CamResult.isRelevant($observation) )
+  $encounter: Encounter()
+then
+  painAndDeliriumUpdater.updateCam(harmEvidence, $encounter);
 end

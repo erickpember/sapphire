@@ -3,6 +3,8 @@
 package com.datafascia.etl.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import com.datafascia.emerge.harms.pain.CamResult;
+import com.datafascia.emerge.harms.pain.CamUtaReason;
 import com.datafascia.emerge.harms.pain.CpotImpl;
 import com.datafascia.emerge.harms.pain.CpotImpl.CurrentCpotLevel;
 import com.datafascia.emerge.harms.pain.CpotImpl.MinimumOrMaximumCpotLevel;
@@ -14,6 +16,7 @@ import com.datafascia.emerge.harms.rass.RassGoalImpl;
 import com.datafascia.emerge.harms.rass.RassLevel;
 import com.datafascia.emerge.harms.rass.RassLevel.CurrentRassLevel;
 import com.datafascia.emerge.harms.rass.RassLevel.MinimumOrMaximumRassLevel;
+import com.datafascia.emerge.ucsf.Cam;
 import com.datafascia.emerge.ucsf.Cpot;
 import com.datafascia.emerge.ucsf.CurrentScore;
 import com.datafascia.emerge.ucsf.CurrentScore_;
@@ -62,6 +65,12 @@ public class PainAndDeliriumUpdater {
 
   @Inject
   private CpotImpl cpotImpl;
+
+  @Inject
+  private CamResult camResultImpl;
+
+  @Inject
+  private CamUtaReason camUtaReasonImpl;
 
   private static Pain getPain(HarmEvidence harmEvidence) {
     MedicalData medicalData = harmEvidence.getMedicalData();
@@ -248,5 +257,28 @@ public class PainAndDeliriumUpdater {
         .withCurrentScore(currentScore);
 
     getDelirium(harmEvidence).setRASS(rass);
+  }
+
+  /**
+   * Updates Cam.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateCam(HarmEvidence harmEvidence, Encounter encounter) {
+    String encounterId = encounter.getId().getIdPart();
+
+    String camResult = camResultImpl.getCamResult(encounterId);
+
+    String camUtaReason = camUtaReasonImpl.getCamUtaReason(encounterId);
+
+    Cam cam = new Cam()
+        .withResult(Cam.Result.fromValue(camResult))
+        .withUpdateTime(Date.from(Instant.now(clock)))
+        .withUtaReason((camUtaReason != null) ? Cam.UtaReason.fromValue(camUtaReason) : null);
+
+    getDelirium(harmEvidence).setCam(cam);
   }
 }

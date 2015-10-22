@@ -14,7 +14,7 @@ import joptsimple.internal.Strings;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Implements the Pain and Delirium Harms CAM-ICU Result
+ * Implements the pain and delirium harms CAM-ICU result
  */
 @Slf4j
 public class CamResult {
@@ -26,7 +26,19 @@ public class CamResult {
   private static Clock clock;
 
   /**
-   * Implements the Pain and Delirium Harms CAM-ICU Result
+   * Checks if observation is relevant to CAM-ICU result.
+   *
+   * @param observation
+   *     the observation to check
+   * @return true if observation is relevant to CAM level.
+   */
+  public static boolean isRelevant(Observation observation) {
+    return ObservationCodeEnum.CAM_ICU.getCode().equals(observation.getCode().getCodingFirstRep()
+        .getCode());
+  }
+
+  /**
+   * Implements the pain and delirium CAM-ICU result
    *
    * @param encounterId
    *     encounter to check.

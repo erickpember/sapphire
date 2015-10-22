@@ -2,9 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.harms.vae;
 
-import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
-import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
@@ -62,12 +60,10 @@ public class DiscreteHeadOfBedGreaterThan30Degrees {
    */
   public MaybeEnum getHeadOfBedGreaterThan30Degrees(String encounterId) {
     Instant now = Instant.now(clock);
-    Date fifteenMinutesAgo = Date.from(now.minus(15, ChronoUnit.MINUTES));
-    Date oneHourAgo = Date.from(now.minus(1, ChronoUnit.HOURS));
-    Date seventyFiveMinutesAgo = Date.from(now.minus(75, ChronoUnit.MINUTES));
+    Date thirteenHoursAgo = Date.from(now.minus(13, ChronoUnit.HOURS));
 
     Observation freshestDiscreteHOB = ObservationUtils.getFreshestByCodeAfterTime(apiClient,
-        encounterId, ObservationCodeEnum.HEAD_OF_BED.getCode(), oneHourAgo);
+        encounterId, ObservationCodeEnum.HEAD_OF_BED.getCode(), thirteenHoursAgo);
     if (freshestDiscreteHOB != null) {
       String value = freshestDiscreteHOB.getValue().toString();
       switch (value) {
@@ -75,34 +71,7 @@ public class DiscreteHeadOfBedGreaterThan30Degrees {
         case "HOB 45":
         case "HOB 60":
         case "HOB 90":
-          if (!ObservationUtils.isAfter(freshestDiscreteHOB, fifteenMinutesAgo)) {
-            return MaybeEnum.YES;
-          }
-          break;
-        case "HOB Flat":
-        case "HOB less than 20":
-          break;
-        default:
-          log.warn("Unexpected head of bed value [{}]", value);
-      }
-    }
-
-    PeriodDt betweenSeventyFiveAndFifteenMinutesAgo = new PeriodDt();
-    betweenSeventyFiveAndFifteenMinutesAgo.setStart(new DateTimeDt(seventyFiveMinutesAgo));
-    betweenSeventyFiveAndFifteenMinutesAgo.setEnd(new DateTimeDt(fifteenMinutesAgo));
-
-    Observation freshestDiscreteHOBFromPast75Minutes = ObservationUtils
-        .getFreshestByCodeInTimeFrame(apiClient, encounterId, ObservationCodeEnum.HEAD_OF_BED
-            .getCode(), betweenSeventyFiveAndFifteenMinutesAgo);
-
-    if (freshestDiscreteHOBFromPast75Minutes != null) {
-      String value = freshestDiscreteHOBFromPast75Minutes.getValue().toString();
-      switch (value) {
-        case "HOB 30":
-        case "HOB 45":
-        case "HOB 60":
-        case "HOB 90":
-          break;
+          return MaybeEnum.YES;
         case "HOB Flat":
         case "HOB less than 20":
           return MaybeEnum.NO;

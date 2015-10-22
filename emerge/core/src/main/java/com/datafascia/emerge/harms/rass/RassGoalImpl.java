@@ -10,7 +10,7 @@ import java.util.Optional;
 import javax.inject.Inject;
 
 /**
- * Pain and Delirium Harm Clinician RASS Goal Implementation
+ * Pain and delirium Clinician RASS goal implementation
  */
 public class RassGoalImpl {
 
@@ -18,7 +18,7 @@ public class RassGoalImpl {
   private static ClientBuilder apiClient;
 
   /**
-   * Pain and Delirium Harm Clinician RASS Goal Implementation
+   * Pain and delirium Clinician RASS goal implementation
    *
    * @param encounterId
    *     encounter to search

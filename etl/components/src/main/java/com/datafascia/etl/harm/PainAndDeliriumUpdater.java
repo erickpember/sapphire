@@ -10,22 +10,34 @@ import com.datafascia.emerge.harms.pain.NumericalPainLevel;
 import com.datafascia.emerge.harms.pain.NumericalPainLevel.CurrentPainLevel;
 import com.datafascia.emerge.harms.pain.NumericalPainLevel.MinimumOrMaximumPainLevel;
 import com.datafascia.emerge.harms.pain.VerbalPainLevel;
+import com.datafascia.emerge.harms.rass.RassGoalImpl;
+import com.datafascia.emerge.harms.rass.RassLevel;
+import com.datafascia.emerge.harms.rass.RassLevel.CurrentRassLevel;
+import com.datafascia.emerge.harms.rass.RassLevel.MinimumOrMaximumRassLevel;
 import com.datafascia.emerge.ucsf.Cpot;
 import com.datafascia.emerge.ucsf.CurrentScore;
 import com.datafascia.emerge.ucsf.CurrentScore_;
 import com.datafascia.emerge.ucsf.CurrentScore__;
+import com.datafascia.emerge.ucsf.CurrentScore___;
 import com.datafascia.emerge.ucsf.DailyMax;
 import com.datafascia.emerge.ucsf.DailyMax_;
 import com.datafascia.emerge.ucsf.DailyMax__;
+import com.datafascia.emerge.ucsf.DailyMax___;
 import com.datafascia.emerge.ucsf.DailyMin;
 import com.datafascia.emerge.ucsf.DailyMin_;
 import com.datafascia.emerge.ucsf.DailyMin__;
+import com.datafascia.emerge.ucsf.DailyMin___;
 import com.datafascia.emerge.ucsf.Delirium;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.MedicalData;
 import com.datafascia.emerge.ucsf.Numerical;
 import com.datafascia.emerge.ucsf.Pain;
+import com.datafascia.emerge.ucsf.RASS;
+import com.datafascia.emerge.ucsf.RassGoal;
 import com.datafascia.emerge.ucsf.Verbal;
+import java.time.Clock;
+import java.time.Instant;
+import java.util.Date;
 import javax.inject.Inject;
 
 /**
@@ -34,10 +46,19 @@ import javax.inject.Inject;
 public class PainAndDeliriumUpdater {
 
   @Inject
+  private Clock clock;
+
+  @Inject
   private NumericalPainLevel numericalPainLevelImpl;
 
   @Inject
   private VerbalPainLevel verbalPainLevelImpl;
+
+  @Inject
+  private RassLevel rassLevelImpl;
+
+  @Inject
+  private RassGoalImpl rassGoalImpl;
 
   @Inject
   private CpotImpl cpotImpl;
@@ -54,6 +75,20 @@ public class PainAndDeliriumUpdater {
       medicalData.getDelirium().setPain(pain);
     }
     return pain;
+  }
+
+  private static Delirium getDelirium(HarmEvidence harmEvidence) {
+    MedicalData medicalData = harmEvidence.getMedicalData();
+    if (medicalData.getDelirium() == null) {
+      medicalData.setDelirium(new Delirium());
+    }
+
+    Delirium delirium = medicalData.getDelirium();
+    if (delirium == null) {
+      delirium = new Delirium();
+      medicalData.setDelirium(delirium);
+    }
+    return delirium;
   }
 
   /**
@@ -171,5 +206,47 @@ public class PainAndDeliriumUpdater {
         .withCurrentScore(currentScore);
 
     getPain(harmEvidence).setCpot(cpot);
+  }
+
+  /**
+   * Updates RASS.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateRass(HarmEvidence harmEvidence, Encounter encounter) {
+    String encounterId = encounter.getId().getIdPart();
+
+    RassGoal rassGoal = new RassGoal().withDataEntryTime(Date.from(Instant.now(clock)))
+        .withGoal(rassGoalImpl.getRassGoal(encounterId));
+
+    CurrentRassLevel currentLevel = rassLevelImpl.getCurrentRassLevel(encounterId);
+    CurrentScore___ currentScore = new CurrentScore___()
+        .withRASSScore(currentLevel.getRassScore())
+        .withTimeOfDataAquisition(currentLevel.getTimeOfDataAquisition());
+
+    MinimumOrMaximumRassLevel maxLevel = rassLevelImpl.getRassMax(encounterId);
+    DailyMax___ dailyMax = new DailyMax___()
+        .withEndOfTimePeriod(maxLevel.getEndOfTimePeriod())
+        .withRASSMax(maxLevel.getRassScore())
+        .withStartOfTimePeriod(maxLevel.getStartOfTimePeriod())
+        .withTimeOfCalculation(maxLevel.getTimeOfCalculation());
+
+    MinimumOrMaximumRassLevel minLevel = rassLevelImpl.getRassMin(encounterId);
+    DailyMin___ dailyMin = new DailyMin___()
+        .withEndOfTimePeriod(minLevel.getEndOfTimePeriod())
+        .withRASSMin(minLevel.getRassScore())
+        .withStartOfTimePeriod(minLevel.getStartOfTimePeriod())
+        .withTimeOfCalculation(minLevel.getTimeOfCalculation());
+
+    RASS rass = new RASS()
+        .withRassGoal(rassGoal)
+        .withDailyMin(dailyMin)
+        .withDailyMax(dailyMax)
+        .withCurrentScore(currentScore);
+
+    getDelirium(harmEvidence).setRASS(rass);
   }
 }

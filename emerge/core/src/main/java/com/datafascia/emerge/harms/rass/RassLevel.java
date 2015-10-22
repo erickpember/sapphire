@@ -17,7 +17,7 @@ import lombok.Builder;
 import lombok.Data;
 
 /**
- * Implement the Pain and Delirium Current, Minimum and Maximum RASS Levels
+ * Implement the pain and delirium current, minimum and maximum RASS levels
  */
 public class RassLevel {
   private enum MinOrMax {
@@ -31,7 +31,7 @@ public class RassLevel {
   private static Clock clock;
 
   /**
-   * Result container for the Pain and Delirium RASS Level (Current)
+   * Result container for the pain and delirium RASS level (current)
    */
   @Data @Builder
   public static class CurrentRassLevel {
@@ -40,7 +40,7 @@ public class RassLevel {
   }
 
   /**
-   * Result container for the Pain and Delirium RASS Level (Minimum or Maximum)
+   * Result container for the pain and delirium RASS level (minimum or maximum)
    */
   @Data @Builder
   public static class MinimumOrMaximumRassLevel {
@@ -51,7 +51,19 @@ public class RassLevel {
   }
 
   /**
-   * Implements the Pain and Delirium RASS Level (Current)
+   * Checks if observation is relevant to RASS level.
+   *
+   * @param observation
+   *     the observation to check
+   * @return true if observation is relevant to RASS level.
+   */
+  public static boolean isRelevant(Observation observation) {
+    return ObservationCodeEnum.RASS.getCode().equals(observation.getCode().getCodingFirstRep()
+        .getCode());
+  }
+
+  /**
+   * Implements the pain and delirium RASS level (current)
    * Returns the RASS level and acquisition time from the newest RASS-coded observation.
    *
    * @param encounterId
@@ -89,7 +101,7 @@ public class RassLevel {
   }
 
   /**
-   * Implements the Pain and Delirium RASS Level (Low)
+   * Implements the pain and delirium RASS level (low)
    * Returns the lowest RASS level from a period of between midnight and now, along with the
    * same period and a calculation time of now.
    *
@@ -103,7 +115,7 @@ public class RassLevel {
   }
 
   /**
-   * Implements the Pain and Delirium RASS Level (High)
+   * Implements the pain and delirium RASS level (high)
    * Returns the highest RASS level from a period of between midnight and now, along with the
    * same period and a calculation time of now.
    *
@@ -117,7 +129,7 @@ public class RassLevel {
   }
 
   /**
-   * Implements the Pain and Delirium RASS Level (High/Low)
+   * Implements the pain and delirium RASS level (high/low)
    * Returns the RASS level and acquisition time from the newest observation with
    * either the highest or lowest level, depending on MinOrMax.
    *
@@ -170,5 +182,4 @@ public class RassLevel {
     }
     return result;
   }
-
 }

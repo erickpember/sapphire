@@ -7,6 +7,7 @@ import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.emerge.harms.pain.CpotImpl;
 import com.datafascia.emerge.harms.pain.NumericalPainLevel;
 import com.datafascia.emerge.harms.pain.VerbalPainLevel;
+import com.datafascia.emerge.harms.rass.RassLevel;
 import com.datafascia.etl.harm.HarmEvidenceUpdater.Event;
 import com.datafascia.etl.harm.HarmEvidenceUpdater.EventType;
 
@@ -38,4 +39,13 @@ when
   $encounter: Encounter()
 then
   painAndDeliriumUpdater.updateCpotLevel(harmEvidence, $encounter);
+end
+
+rule "Update RASS"
+when
+  Event( type == EventType.UPDATE_OBSERVATIONS )
+  $observation: Observation( RassLevel.isRelevant($observation) )
+  $encounter: Encounter()
+then
+  painAndDeliriumUpdater.updateRass(harmEvidence, $encounter);
 end

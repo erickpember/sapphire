@@ -17,7 +17,7 @@ import lombok.Builder;
 import lombok.Data;
 
 /**
- * Implement the Pain and Delirium CPOT Level
+ * Implement the pain and delirium CPOT level
  */
 public class CpotImpl {
   private enum MinOrMax {
@@ -31,7 +31,7 @@ public class CpotImpl {
   private static Clock clock;
 
   /**
-   * Result container for the Pain and Delirium CPOT Level (Current)
+   * Result container for the pain and delirium CPOT level (current)
    */
   @Data @Builder
   public static class CurrentCpotLevel {
@@ -40,7 +40,7 @@ public class CpotImpl {
   }
 
   /**
-   * Result container for the Pain and Delirium CPOT Level (Minimum or Maximum)
+   * Result container for the pain and delirium CPOT level (Minimum or Maximum)
    */
   @Data @Builder
   public static class MinimumOrMaximumCpotLevel {
@@ -51,7 +51,19 @@ public class CpotImpl {
   }
 
   /**
-   * Implements the Pain and Delirium CPOT Level (Current)
+   * Checks if observation is relevant to CPOT level.
+   *
+   * @param observation
+   *     the observation to check
+   * @return true if observation is relevant to CPOT level.
+   */
+  public static boolean isRelevant(Observation observation) {
+    return ObservationCodeEnum.CPOT.getCode().equals(observation.getCode().getCodingFirstRep()
+        .getCode());
+  }
+
+  /**
+   * Implements the pain and delirium CPOT level (current)
    * Returns the CPOT level and acquisition time from the newest observation with the highest score.
    *
    * @param encounterId
@@ -89,7 +101,7 @@ public class CpotImpl {
   }
 
   /**
-   * Implements the Pain and Delirium CPOT Level (Low)
+   * Implements the pain and delirium CPOT level (low)
    * Returns the lowest CPOT level from a period of between midnight and now, along with the
    * same period and a calculation time of now.
    *
@@ -103,7 +115,7 @@ public class CpotImpl {
   }
 
   /**
-   * Implements the Pain and Delirium CPOT Level (High)
+   * Implements the pain and delirium CPOT level (high)
    * Returns the highest CPOT level from a period of between midnight and now, along with the
    * same period and a calculation time of now.
    *
@@ -117,7 +129,7 @@ public class CpotImpl {
   }
 
   /**
-   * Implements the Pain and Delirium CPOT Level (High/Low)
+   * Implements the pain and delirium CPOT level (high/low)
    * Returns the CPOT level and acquisition time from the newest observation with
    * either the highest or lowest level, depending on MinOrMax.
    *

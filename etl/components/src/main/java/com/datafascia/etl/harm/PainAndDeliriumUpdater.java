@@ -3,16 +3,23 @@
 package com.datafascia.etl.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import com.datafascia.emerge.harms.pain.CpotImpl;
+import com.datafascia.emerge.harms.pain.CpotImpl.CurrentCpotLevel;
+import com.datafascia.emerge.harms.pain.CpotImpl.MinimumOrMaximumCpotLevel;
 import com.datafascia.emerge.harms.pain.NumericalPainLevel;
 import com.datafascia.emerge.harms.pain.NumericalPainLevel.CurrentPainLevel;
 import com.datafascia.emerge.harms.pain.NumericalPainLevel.MinimumOrMaximumPainLevel;
 import com.datafascia.emerge.harms.pain.VerbalPainLevel;
+import com.datafascia.emerge.ucsf.Cpot;
 import com.datafascia.emerge.ucsf.CurrentScore;
 import com.datafascia.emerge.ucsf.CurrentScore_;
+import com.datafascia.emerge.ucsf.CurrentScore__;
 import com.datafascia.emerge.ucsf.DailyMax;
 import com.datafascia.emerge.ucsf.DailyMax_;
+import com.datafascia.emerge.ucsf.DailyMax__;
 import com.datafascia.emerge.ucsf.DailyMin;
 import com.datafascia.emerge.ucsf.DailyMin_;
+import com.datafascia.emerge.ucsf.DailyMin__;
 import com.datafascia.emerge.ucsf.Delirium;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.MedicalData;
@@ -31,6 +38,9 @@ public class PainAndDeliriumUpdater {
 
   @Inject
   private VerbalPainLevel verbalPainLevelImpl;
+
+  @Inject
+  private CpotImpl cpotImpl;
 
   private static Pain getPain(HarmEvidence harmEvidence) {
     MedicalData medicalData = harmEvidence.getMedicalData();
@@ -125,4 +135,41 @@ public class PainAndDeliriumUpdater {
     getPain(harmEvidence).setVerbal(verbal);
   }
 
+  /**
+   * Updates CPOT level.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateCpotLevel(HarmEvidence harmEvidence, Encounter encounter) {
+    String encounterId = encounter.getId().getIdPart();
+
+    CurrentCpotLevel currentLevel = cpotImpl.getCurrentCpotLevel(encounterId);
+    CurrentScore__ currentScore = new CurrentScore__()
+        .withPainScore(currentLevel.getPainScore())
+        .withTimeOfDataAquisition(currentLevel.getTimeOfDataAquisition());
+
+    MinimumOrMaximumCpotLevel maxLevel = cpotImpl.getCpotMax(encounterId);
+    DailyMax__ dailyMax = new DailyMax__()
+        .withEndOfTimePeriod(maxLevel.getEndOfTimePeriod())
+        .withPainMax(maxLevel.getPainScore())
+        .withStartOfTimePeriod(maxLevel.getStartOfTimePeriod())
+        .withTimeOfCalculation(maxLevel.getTimeOfCalculation());
+
+    MinimumOrMaximumCpotLevel minLevel = cpotImpl.getCpotMin(encounterId);
+    DailyMin__ dailyMin = new DailyMin__()
+        .withEndOfTimePeriod(minLevel.getEndOfTimePeriod())
+        .withPainMin(minLevel.getPainScore())
+        .withStartOfTimePeriod(minLevel.getStartOfTimePeriod())
+        .withTimeOfCalculation(minLevel.getTimeOfCalculation());
+
+    Cpot cpot = new Cpot()
+        .withDailyMin(dailyMin)
+        .withDailyMax(dailyMax)
+        .withCurrentScore(currentScore);
+
+    getPain(harmEvidence).setCpot(cpot);
+  }
 }

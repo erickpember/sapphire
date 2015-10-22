@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Utilities for Sub-Glottic Suction ETT
  */
-public class SubGlotticSuctionETT {
+public class SubglotticSuctionNonSurgicalAirway {
   /**
    * Determines whether a subglottic suction ETT is active for a given encounter.
    *

@@ -7,35 +7,39 @@ import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
-import java.math.BigDecimal;
-import java.util.Calendar;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Computes VAE Harm Current Tidal Volume
+ * Computes current tidal volume
  */
 @Slf4j
 public class CurrentTidalVolume {
 
   @Inject
+  private Clock clock;
+
+  @Inject
   private ClientBuilder apiClient;
 
-  private final BigDecimal ZERO = new BigDecimal("0");
-  private final BigDecimal NEGATIVE_ONE = new BigDecimal("-1");
+  private static int getAbsValue(Observation observation) {
+    return ((QuantityDt) observation.getValue()).getValue().abs().intValue();
+  }
 
   /**
-   * Computes VAE Harm Current Tidal Volume
+   * Computes current tidal volume.
    *
    * @param encounterId
-   *     relevant encounter ID.
-   * @return tidal volume specified encounter or 0 if not found
+   *     relevant encounter ID
+   * @return current tidal volume, or 0 if not found
    */
-  public BigDecimal getTidalVolume(String encounterId) {
-    Calendar cal = Calendar.getInstance();
-    cal.add(Calendar.HOUR, -13);
-    Date thirteenHoursAgo = cal.getTime();
+  public int apply(String encounterId) {
+    Instant now = Instant.now(clock);
+    Date thirteenHoursAgo = Date.from(now.minus(13, ChronoUnit.HOURS));
 
     Observation freshestVentMode = ObservationUtils.findFreshestObservationForCode(
         apiClient, encounterId, ObservationCodeEnum.VENT_MODE.getCode());
@@ -53,23 +57,25 @@ public class CurrentTidalVolume {
         case "VolumeSupport (VS)":
         case "Pressure Regulated Volume Control (PRVC)":
           if (freshestVentSetTidalVolume == null) {
-            return NEGATIVE_ONE;
+            return -1;
           } else {
-            return ((QuantityDt) freshestVentSetTidalVolume.getValue()).getValue().abs();
+            return getAbsValue(freshestVentSetTidalVolume);
           }
         case "Synchronous Intermittent Mandatory Ventilation (SIMV)":
           if (freshestBreathType != null && freshestBreathType.getValue().toString().equals(
               "Volume Control")) {
             if (freshestVentSetTidalVolume == null) {
-              return NEGATIVE_ONE;
+              return -1;
             } else {
-              return ((QuantityDt) freshestVentSetTidalVolume.getValue()).getValue().abs();
+              return getAbsValue(freshestVentSetTidalVolume);
             }
           }
+          break;
         default:
-          log.warn("Unknown vent mode value found: " + freshestVentMode.getValue().toString());
+          log.warn("Unknown vent mode value [{}]", freshestVentMode.getValue().toString());
       }
     }
-    return ZERO;
+
+    return 0;
   }
 }

@@ -65,3 +65,11 @@ when
 then
   ventilatorAssociatedEventUpdater.updateVentilationMode(harmEvidence, $encounter);
 end
+
+rule "Update current tidal volume"
+when
+  Event( type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateCurrentTidalVolume(harmEvidence, $encounter);
+end

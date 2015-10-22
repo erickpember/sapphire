@@ -3,6 +3,7 @@
 package com.datafascia.etl.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import com.datafascia.emerge.harms.vae.CurrentTidalVolume;
 import com.datafascia.emerge.harms.vae.DiscreteHeadOfBedGreaterThan30Degrees;
 import com.datafascia.emerge.harms.vae.MechanicalVentilationGreaterThan48Hours;
 import com.datafascia.emerge.harms.vae.RecentStressUlcerProphylaxisAdministration;
@@ -12,6 +13,7 @@ import com.datafascia.emerge.harms.vae.VentilationModeImpl;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.MedicalData;
 import com.datafascia.emerge.ucsf.TimestampedBoolean;
+import com.datafascia.emerge.ucsf.TimestampedInteger;
 import com.datafascia.emerge.ucsf.TimestampedMaybe;
 import com.datafascia.emerge.ucsf.VAE;
 import com.datafascia.emerge.ucsf.VentilationMode;
@@ -45,6 +47,9 @@ public class VentilatorAssociatedEventUpdater {
 
   @Inject
   private VentilationModeImpl ventilationModeImpl;
+
+  @Inject
+  private CurrentTidalVolume currentTidalVolume;
 
   private static VAE getVAE(HarmEvidence harmEvidence) {
     MedicalData medicalData = harmEvidence.getMedicalData();
@@ -172,5 +177,23 @@ public class VentilatorAssociatedEventUpdater {
         .withUpdateTime(Date.from(Instant.now(clock)));
 
     getVAE(harmEvidence).setVentilationMode(ventilationMode);
+  }
+
+  /**
+   * Updates current tidal volume.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateCurrentTidalVolume(HarmEvidence harmEvidence, Encounter encounter) {
+    String encounterId = encounter.getId().getIdPart();
+
+    TimestampedInteger tidalVolume = new TimestampedInteger()
+        .withValue(currentTidalVolume.apply(encounterId))
+        .withUpdateTime(Date.from(Instant.now(clock)));
+
+    getVAE(harmEvidence).setCurrentTidalVolume(tidalVolume);
   }
 }

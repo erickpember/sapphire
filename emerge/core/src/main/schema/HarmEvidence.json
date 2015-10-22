@@ -38,14 +38,12 @@
         }
       }
     },
-    "TimestampedMaybe": {
+    "TimestampedInteger": {
       "type": "object",
-      "javaType": "com.datafascia.emerge.ucsf.TimestampedMaybe",
-      "description": "enum of Yes, No, Contraindicated, Not Documented",
+      "javaType": "com.datafascia.emerge.ucsf.TimestampedInteger",
       "properties": {
         "value": {
-          "type": "string",
-          "enum": [ "Yes", "No", "Contraindicated", "Not Documented" ]
+          "type": "integer"
         },
         "updateTime": {
           "type": "string",
@@ -54,12 +52,14 @@
         }
       }
     },
-    "TimestampedNumber": {
+    "TimestampedMaybe": {
       "type": "object",
-      "javaType": "com.datafascia.emerge.ucsf.TimestampedNumber",
+      "javaType": "com.datafascia.emerge.ucsf.TimestampedMaybe",
+      "description": "enum of Yes, No, Contraindicated, Not Documented",
       "properties": {
         "value": {
-          "type": "number"
+          "type": "string",
+          "enum": [ "Yes", "No", "Contraindicated", "Not Documented" ]
         },
         "updateTime": {
           "type": "string",
@@ -953,8 +953,8 @@
                 }
               }
             },
-            "current Tidal Volume ": {
-              "$ref": "#/definitions/TimestampedNumber"
+            "currentTidalVolume": {
+              "$ref": "#/definitions/TimestampedInteger"
             },
             "subglotticSuctionSurgicalAirway": {
               "$ref": "#/definitions/TimestampedMaybe"

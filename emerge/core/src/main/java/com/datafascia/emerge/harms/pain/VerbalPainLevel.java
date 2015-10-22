@@ -18,7 +18,7 @@ import lombok.Data;
 /**
  * Implements the Pain and Delirium Verbal Pain Level
  */
-public class VerbalPainLevelImpl {
+public class VerbalPainLevel {
   private enum MinOrMax {
     MIN, MAX
   }

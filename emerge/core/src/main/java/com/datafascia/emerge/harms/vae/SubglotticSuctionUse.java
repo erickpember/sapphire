@@ -7,62 +7,60 @@ import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.codes.MaybeEnum;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
-import java.util.Calendar;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * VAE Harm Subglottic Suction Use Implementation
+ * Checks for subglottic suction use
  */
 @Slf4j
 public class SubglotticSuctionUse {
-  // Private constructor disallows creating instances of this class.
-  private SubglotticSuctionUse() {
-  }
+
+  @Inject
+  private Clock clock;
 
   @Inject
   private ClientBuilder apiClient;
 
-  private static final String DEFAULT_RESULT = MaybeEnum.NOT_DOCUMENTED.getCode();
-
   /**
-   * VAE Harm Subglottic Suction Use Implementation
-   * Returns whether the encounter contains an Observation that indicates Subglottic Suction Use.
+   * Checks for subglottic suction use.
    *
    * @param encounterId
-   *    The encounter to check.
+   *     encounter to search
    * @return
-   *    "Yes", "No" or "Not Documented" depending on if conditions are met.
+   *     "Yes", "No" or "Not Documented" depending on conditions
    */
-  public String getSubGlotticSuctionUse(String encounterId) {
-    Calendar cal = Calendar.getInstance();
+  public MaybeEnum apply(String encounterId) {
+    Instant now = Instant.now(clock);
+    Date effectiveLowerBound = Date.from(now.minus(7, ChronoUnit.HOURS));
 
-    cal.add(Calendar.HOUR, -7);
-    Date sevenHoursAgo = cal.getTime();
-
-    List<Observation> observations = ObservationUtils.getObservationByCodeAfterTime(apiClient,
-        encounterId, ObservationCodeEnum.SUBGLOTTIC_SUCTION.getCode(), sevenHoursAgo);
-
-    if (observations == null || observations.isEmpty()) {
-      return MaybeEnum.NOT_DOCUMENTED.getCode();
+    List<Observation> observations = ObservationUtils.getObservationByCodeAfterTime(
+        apiClient,
+        encounterId,
+        ObservationCodeEnum.SUBGLOTTIC_SUCTION.getCode(),
+        effectiveLowerBound);
+    if (observations.isEmpty()) {
+      return MaybeEnum.NOT_DOCUMENTED;
     }
 
     Observation freshestSubglotticStatus = ObservationUtils.findFreshestObservation(observations);
-
-    switch (freshestSubglotticStatus.getValue().toString()) {
+    String value = freshestSubglotticStatus.getValue().toString();
+    switch (value) {
       case "Connected/In use":
-        return MaybeEnum.YES.getCode();
+        return MaybeEnum.YES;
       case "Capped off":
-        return MaybeEnum.NO.getCode();
+        return MaybeEnum.NO;
       case "Other (Comment)":
-        return MaybeEnum.NOT_DOCUMENTED.getCode();
+        return MaybeEnum.NOT_DOCUMENTED;
       default:
-        log.warn("Unrecognized subglottic status found: " + freshestSubglotticStatus.getValue()
-            .toString());
+        log.warn("Unrecognized subglottic status [{}]", value);
     }
 
-    return DEFAULT_RESULT;
+    return MaybeEnum.NOT_DOCUMENTED;
   }
 }

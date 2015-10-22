@@ -73,3 +73,11 @@ when
 then
   ventilatorAssociatedEventUpdater.updateCurrentTidalVolume(harmEvidence, $encounter);
 end
+
+rule "Update subglottic suction use"
+when
+  Event( type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateSubglotticSuctionUse(harmEvidence, $encounter);
+end

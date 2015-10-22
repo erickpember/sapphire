@@ -8,6 +8,7 @@ import com.datafascia.emerge.harms.vae.DiscreteHeadOfBedGreaterThan30Degrees;
 import com.datafascia.emerge.harms.vae.MechanicalVentilationGreaterThan48Hours;
 import com.datafascia.emerge.harms.vae.RecentStressUlcerProphylaxisAdministration;
 import com.datafascia.emerge.harms.vae.StressUlcerProphylacticsOrder;
+import com.datafascia.emerge.harms.vae.SubglotticSuctionUse;
 import com.datafascia.emerge.harms.vae.Ventilated;
 import com.datafascia.emerge.harms.vae.VentilationModeImpl;
 import com.datafascia.emerge.ucsf.HarmEvidence;
@@ -50,6 +51,9 @@ public class VentilatorAssociatedEventUpdater {
 
   @Inject
   private CurrentTidalVolume currentTidalVolume;
+
+  @Inject
+  private SubglotticSuctionUse subglotticSuctionUse;
 
   private static VAE getVAE(HarmEvidence harmEvidence) {
     MedicalData medicalData = harmEvidence.getMedicalData();
@@ -195,5 +199,24 @@ public class VentilatorAssociatedEventUpdater {
         .withUpdateTime(Date.from(Instant.now(clock)));
 
     getVAE(harmEvidence).setCurrentTidalVolume(tidalVolume);
+  }
+
+  /**
+   * Updates subglottic suction use.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateSubglotticSuctionUse(HarmEvidence harmEvidence, Encounter encounter) {
+    String encounterId = encounter.getId().getIdPart();
+    String value = subglotticSuctionUse.apply(encounterId).getCode();
+
+    TimestampedMaybe newSubglotticSuctionUse = new TimestampedMaybe()
+        .withValue(TimestampedMaybe.Value.fromValue(value))
+        .withUpdateTime(Date.from(Instant.now(clock)));
+
+    getVAE(harmEvidence).setSubglotticSuctionUse(newSubglotticSuctionUse);
   }
 }

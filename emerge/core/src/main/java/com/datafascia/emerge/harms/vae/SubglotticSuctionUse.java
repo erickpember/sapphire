@@ -17,9 +17,9 @@ import lombok.extern.slf4j.Slf4j;
  * VAE Harm Subglottic Suction Use Implementation
  */
 @Slf4j
-public class SubGlotticSuctionUseImpl {
+public class SubglotticSuctionUse {
   // Private constructor disallows creating instances of this class.
-  private SubGlotticSuctionUseImpl() {
+  private SubglotticSuctionUse() {
   }
 
   @Inject

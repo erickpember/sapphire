@@ -79,6 +79,9 @@ public class HarmEvidenceUpdater {
   @Inject
   private RespectDignityUpdater respectDignityUpdater;
 
+  @Inject
+  private PainAndDeliriumUpdater painAndDeliriumUpdater;
+
   private KieContainer container;
 
   /**
@@ -123,6 +126,7 @@ public class HarmEvidenceUpdater {
     session.setGlobal("ventilatorAssociatedEventUpdater", ventilatorAssociatedEventUpdater);
     session.setGlobal("respectDignityUpdater", respectDignityUpdater);
     session.setGlobal("intensiveCareUnitAcquiredWeaknessUpdater", icuAcquiredWeaknessUpdater);
+    session.setGlobal("painAndDeliriumUpdater", painAndDeliriumUpdater);
 
     String patientId = encounter.getPatient().getReference().getIdPart();
     HarmEvidence harmEvidence = getHarmEvidence(patientId);

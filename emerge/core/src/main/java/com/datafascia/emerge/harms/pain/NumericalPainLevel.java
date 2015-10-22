@@ -7,10 +7,13 @@ import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
+import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
+import com.google.common.collect.ImmutableSet;
 import java.time.Clock;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 import javax.inject.Inject;
 import lombok.Builder;
 import lombok.Data;
@@ -19,6 +22,11 @@ import lombok.Data;
  * Implements the Pain and Delirium Numerical Pain Level
  */
 public class NumericalPainLevel {
+  private static final Set<String> RELEVANT_OBSERVATION_CODES = ImmutableSet.of(
+      ObservationCodeEnum.NUMERICAL_PAIN_01.getCode(),
+      ObservationCodeEnum.NUMERICAL_PAIN_02.getCode(),
+      ObservationCodeEnum.NUMERICAL_PAIN_03.getCode(),
+      ObservationCodeEnum.NUMERICAL_PAIN_04.getCode());
 
   private enum MinOrMax {
     MIN, MAX
@@ -48,6 +56,17 @@ public class NumericalPainLevel {
     private Date timeOfCalculation;
     private Date startOfTimePeriod;
     private Date endOfTimePeriod;
+  }
+
+  /**
+   * Checks if observation is relevant to numerical pain score.
+   *
+   * @param observation
+   *     the observation to check
+   * @return true if observation is relevant to numerical pain score.
+   */
+  public static boolean isRelevant(Observation observation) {
+    return RELEVANT_OBSERVATION_CODES.contains(observation.getCode().getCodingFirstRep().getCode());
   }
 
   /**

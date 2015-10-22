@@ -41,6 +41,10 @@ public enum ObservationCodeEnum implements SystemDefinedCode<String> {
   RASS("304890022"),
   CAM_ICU("304890023"),
   NEEDS_ASSESSMENT("304890072"),
+  NUMERICAL_PAIN_01("304890008"),
+  NUMERICAL_PAIN_02("304890009"),
+  NUMERICAL_PAIN_03("304890010"),
+  NUMERICAL_PAIN_04("304890011"),
   END_OF_OBSERVATION_ENUM("99999999");
 
   private static final String SYSTEM = "http://datafascia.com/code/Observation";

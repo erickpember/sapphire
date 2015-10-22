@@ -1,0 +1,21 @@
+// Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
+// For license information, please contact http://datafascia.com/contact
+package com.datafascia.etl.harm;
+
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import ca.uhn.fhir.model.dstu2.resource.Observation;
+import com.datafascia.emerge.harms.pain.NumericalPainLevel;
+import com.datafascia.etl.harm.HarmEvidenceUpdater.Event;
+import com.datafascia.etl.harm.HarmEvidenceUpdater.EventType;
+
+global com.datafascia.emerge.ucsf.HarmEvidence harmEvidence;
+global com.datafascia.etl.harm.PainAndDeliriumUpdater painAndDeliriumUpdater;
+
+rule "Update Numerical Pain Level"
+when
+  Event( type == EventType.UPDATE_OBSERVATIONS )
+  $observation: Observation( NumericalPainLevel.isRelevant($observation) )
+  $encounter: Encounter()
+then
+  painAndDeliriumUpdater.updateNumericalPainLevel(harmEvidence, $encounter);
+end

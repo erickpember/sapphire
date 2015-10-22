@@ -43,6 +43,7 @@
     <!-- Checks that line length <= 100. -->
     <module name="LineLength">
       <property name="max" value="100"/>
+      <property name="ignorePattern" value="^package .*|^import .*|href|http://|https://|ftp://"/>
     </module>
 
     <!-- Trailing comments not allowed -->

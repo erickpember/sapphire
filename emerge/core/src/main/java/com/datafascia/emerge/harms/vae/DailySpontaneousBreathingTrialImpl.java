@@ -22,7 +22,7 @@ import javax.inject.Inject;
 /**
  * Implements Daily Spontaneous Breathing Trial
  */
-public class DailySpontaneousBreathingTrial {
+public class DailySpontaneousBreathingTrialImpl {
   @Inject
   private ClientBuilder apiClient;
 
@@ -31,7 +31,7 @@ public class DailySpontaneousBreathingTrial {
   private static final BigDecimal FIFTY = new BigDecimal("50");
 
   // Private constructor disallows creating instances of this class.
-  private DailySpontaneousBreathingTrial() {
+  private DailySpontaneousBreathingTrialImpl() {
   }
 
   /**

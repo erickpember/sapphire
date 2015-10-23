@@ -5,31 +5,68 @@ package com.datafascia.emerge.harms.iaw;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
+import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
+import javax.inject.Inject;
 
 /**
  * Utilities related to IAW mobility score.
  */
 public class MobilityScore {
+
+  @Inject
+  private ClientBuilder apiClient;
+
   /**
-   * Implements mobility score time.
+   * Checks if observation is relevant to mobility score.
    *
-   * @param client API client.
-   * @param encounterId Relevant encounter ID.
-   * @return The effect date of the last mobility event.
+   * @param observation
+   *     observation
+   * @return true if observation is relevant to mobility score
    */
-  public static Date mobilityScoreTime(ClientBuilder client, String encounterId) {
-    return ObservationUtils.getEffectiveDate(freshestObservation(client, encounterId));
+  public static boolean isRelevant(Observation observation) {
+    return ObservationCodeEnum.MOBILITY_SCORE.getCode().equals(
+        observation.getCode().getCodingFirstRep().getCode());
   }
 
   /**
-   * Implements mobility level achieved.
+   * Gets the freshest mobility observation.
    *
-   * @param observation The observation to pull from.
-   * @return The level achieved of the last mobility event.
+   * @param encounterId
+   *     encounter to search
+   * @return optional observation, empty if not found
    */
-  public static int mobilityLevelAchieved(Observation observation) {
+  public Optional<Observation> getFreshestObservation(String encounterId) {
+    List<Observation> observations = apiClient.getObservationClient().searchObservation(
+        encounterId, ObservationCodeEnum.MOBILITY_SCORE.getCode(), null);
+    if (observations.isEmpty()) {
+      return Optional.empty();
+    }
+
+    return Optional.of(ObservationUtils.findFreshestObservation(observations));
+  }
+
+  /**
+   * Gets mobility score time.
+   *
+   * @param observation
+   *     observation to pull from
+   * @return effective time of freshest mobility event
+   */
+  public static Date getMobilityScoreTime(Observation observation) {
+    return ObservationUtils.getEffectiveDate(observation);
+  }
+
+  /**
+   * Gets mobility level achieved.
+   *
+   * @param observation
+   *     observation to pull from
+   * @return level achieved of the freshest mobility event
+   */
+  public static int getMobilityLevelAchieved(Observation observation) {
     String[] typeScoreParts = getTypeScoreParts(observation);
 
     if (typeScoreParts != null) {
@@ -42,12 +79,13 @@ public class MobilityScore {
   }
 
   /**
-   * Implements mobility clinician type.
+   * Gets mobility clinician type.
    *
-   * @param observation The observation to pull from.
-   * @return The clinician type of the last mobility event.
+   * @param observation
+   *     observation to pull from
+   * @return clinician type of the freshest mobility event
    */
-  public static String clinicianType(Observation observation) {
+  public static String getClinicianType(Observation observation) {
     String[] typeScoreParts = getTypeScoreParts(observation);
 
     if (typeScoreParts != null) {
@@ -60,24 +98,11 @@ public class MobilityScore {
   }
 
   private static String[] getTypeScoreParts(Observation observation) {
-    String[] identifierParts = observation.getIdentifierFirstRep().getValue().split(":");
+    String[] identifierParts = observation.getValue().toString().split(":");
     if (identifierParts.length > 0) {
       String[] typeScoreParts = identifierParts[0].split("_");
       return typeScoreParts;
     }
     return null;
-  }
-
-  /**
-   * Returns the freshest mobility observation.
-   *
-   * @param client API client.
-   * @param encounterId Relevant encounter ID.
-   * @return The last mobility event.
-   */
-  public static Observation freshestObservation(ClientBuilder client, String encounterId) {
-    List<Observation> observations = client.getObservationClient().searchObservation(encounterId,
-        "30489003", null);
-    return ObservationUtils.findFreshestObservation(observations);
   }
 }

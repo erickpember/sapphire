@@ -684,21 +684,9 @@
                   "description": "An explanation about the purpose of this instance described by this schema."
                 },
                 "levelMobilityAchieved": {
-                  "type": "string",
-                  "enum": [
-                    "No Activity or Passive ROM Only",
-                    "Bed Exercises or Sitting edge of bed <5 minutes, cycle or Active ROM",
-                    "Tilt Table",
-                    "Sitting edge of bed with any level of assist for > 5 minutes",
-                    "Passive Transfer to Chair",
-                    "Active Transfer to Chair with any level of assist",
-                    "Stand with weight support device",
-                    "Stand >10 sec with any assistive device or level of assist",
-                    "Walking 5-200 ft with any device or any level of assistance",
-                    "Walking 201-400ft with any device or level of assist, or wheelchair mobility",
-                    "Walking >400ft with or without device, supervision level"
-                  ],
-                  "description": "An explanation about the purpose of this instance described by this schema."
+                  "type": "integer",
+                  "minimum": 0,
+                  "maximum":  10
                 },
                 "mobilityScoreTime": {
                   "type": "string",

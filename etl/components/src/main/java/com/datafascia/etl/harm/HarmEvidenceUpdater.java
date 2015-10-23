@@ -65,6 +65,9 @@ public class HarmEvidenceUpdater {
   private CentralLineAssociatedBloodStreamInfectionUpdater clabsiUpdater;
 
   @Inject
+  private IntensiveCareUnitAcquiredWeaknessUpdater icuAcquiredWeaknessUpdater;
+
+  @Inject
   private AlignmentOfGoalsUpdater alignmentOfGoalsUpdater;
 
   @Inject
@@ -119,6 +122,7 @@ public class HarmEvidenceUpdater {
     session.setGlobal("venousThromboembolismUpdater", venousThromboembolismUpdater);
     session.setGlobal("ventilatorAssociatedEventUpdater", ventilatorAssociatedEventUpdater);
     session.setGlobal("respectDignityUpdater", respectDignityUpdater);
+    session.setGlobal("intensiveCareUnitAcquiredWeaknessUpdater", icuAcquiredWeaknessUpdater);
 
     String patientId = encounter.getPatient().getReference().getIdPart();
     HarmEvidence harmEvidence = getHarmEvidence(patientId);

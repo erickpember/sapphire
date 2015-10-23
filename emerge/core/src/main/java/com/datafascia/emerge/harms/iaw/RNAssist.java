@@ -3,49 +3,47 @@
 package com.datafascia.emerge.harms.iaw;
 
 import ca.uhn.fhir.model.dstu2.resource.Observation;
-import com.datafascia.api.client.ClientBuilder;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Utilities related to IAW RN assist.
  */
 public class RNAssist {
   /**
-   * RN Assist Devices.
+   * Gets RN assist devices.
    *
-   * @param client The client to use.
-   * @param encounterId The encounter to query.
-   * @return RN assist devices.
+   * @param observation
+   *     observation to pull from
+   * @return RN assist devices
    */
-  public static String assistDevices(ClientBuilder client, String encounterId) {
-    Observation observation = MobilityScore.freshestObservation(client, encounterId);
-    String clinicianType = MobilityScore.clinicianType(observation);
-
-    if (clinicianType != null && clinicianType.equals("RN")) {
-      String[] identifierParts = observation.getIdentifierFirstRep().getValue().split(":");
+  public static String getAssistDevices(Observation observation) {
+    String clinicianType = MobilityScore.getClinicianType(observation);
+    if ("RN".equals(clinicianType)) {
+      String[] identifierParts = observation.getValue().toString().split(":");
       if (identifierParts.length > 1) {
         return getBestRnAssistDevice(identifierParts[1]);
       }
     }
+
     return "Not Documented";
   }
 
   /**
-   * RN Number of Assists.
+   * Gets RN number of assists.
    *
-   * @param client The client to use.
-   * @param encounterId The encounter to query.
-   * @return RN number of assists.
+   * @param observation
+   *     observation to pull from
+   * @return RN number of assists
    */
-  public static String numberOfAssists(ClientBuilder client, String encounterId) {
-    Observation observation = MobilityScore.freshestObservation(client, encounterId);
-    String clinicianType = MobilityScore.clinicianType(observation);
-
-    if (clinicianType != null && clinicianType.equals("RN")) {
-      String[] identifierParts = observation.getIdentifierFirstRep().getValue().split(":");
+  public static String getNumberOfAssists(Observation observation) {
+    String clinicianType = MobilityScore.getClinicianType(observation);
+    if ("RN".equals(clinicianType)) {
+      String[] identifierParts = observation.getValue().toString().split(":");
       if (identifierParts.length > 1) {
         return getBestRnNumberOfAssists(identifierParts[1]);
       }
     }
+
     return "Not Documented";
   }
 
@@ -69,43 +67,43 @@ public class RNAssist {
     if (assistDeviceString.contains("None")) {
       return "None";
     }
-    if (assistDeviceString.contains("Cane")) {
+    if (StringUtils.containsIgnoreCase(assistDeviceString, "Cane")) {
       return "Cane";
     }
-    if (assistDeviceString.contains("Crutches")) {
+    if (StringUtils.containsIgnoreCase(assistDeviceString, "Crutches")) {
       return "Crutches";
     }
-    if (assistDeviceString.contains("Walker")) {
+    if (StringUtils.containsIgnoreCase(assistDeviceString, "Walker")) {
       return "Walker";
     }
-    if (assistDeviceString.contains("Gait Belt")) {
+    if (StringUtils.containsIgnoreCase(assistDeviceString, "Gait Belt")) {
       return "Gait Belt";
     }
-    if (assistDeviceString.contains("Shower Chair")) {
+    if (StringUtils.containsIgnoreCase(assistDeviceString, "Shower Chair")) {
       return "Shower Chair";
     }
-    if (assistDeviceString.contains("Toilet Riser")) {
+    if (StringUtils.containsIgnoreCase(assistDeviceString, "Toilet Riser")) {
       return "Toilet Riser";
     }
-    if (assistDeviceString.contains("Sit-to-stand Device (Non-powered)")) {
+    if (StringUtils.containsIgnoreCase(assistDeviceString, "Sit-to-stand Device (Non-powered)")) {
       return "Sit-to-stand Device (Non-powered)";
     }
-    if (assistDeviceString.contains("Sit-to-stand Device (Powered)")) {
+    if (StringUtils.containsIgnoreCase(assistDeviceString, "Sit-to-stand Device (Powered)")) {
       return "Sit-to-stand Device (Powered)";
     }
-    if (assistDeviceString.contains("Wheechair")) {
+    if (StringUtils.containsIgnoreCase(assistDeviceString, "Wheechair")) {
       return "Wheelchair";
     }
-    if (assistDeviceString.contains("Lateral Transfer Device")) {
+    if (StringUtils.containsIgnoreCase(assistDeviceString, "Lateral Transfer Device")) {
       return "Lateral Transfer Device";
     }
-    if (assistDeviceString.contains("Neuro Chair")) {
+    if (StringUtils.containsIgnoreCase(assistDeviceString, "Neuro Chair")) {
       return "Neuro Chair";
     }
-    if (assistDeviceString.contains("Vertical dependent lift")) {
+    if (StringUtils.containsIgnoreCase(assistDeviceString, "Vertical dependent lift")) {
       return "Vertical dependent lift";
     }
-    if (assistDeviceString.contains("Ceiling Lift")) {
+    if (StringUtils.containsIgnoreCase(assistDeviceString, "Ceiling Lift")) {
       return "Ceiling Lift";
     }
     return "Other";

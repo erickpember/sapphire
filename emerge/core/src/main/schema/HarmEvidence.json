@@ -3,9 +3,9 @@
   "id": "http://datafascia.com/schema/emerge",
 
   "definitions": {
-    "Practitioner": {
+    "CareProvider": {
       "type": "object",
-      "javaType": "com.datafascia.emerge.ucsf.Practitioner",
+      "javaType": "com.datafascia.emerge.ucsf.CareProvider",
       "description": "Care team member",
       "properties": {
         "name": {
@@ -1006,13 +1006,13 @@
           "description": "An explanation about the purpose of this instance described by this schema.",
           "properties": {
             "icuAttending": {
-              "$ref": "#/definitions/Practitioner"
+              "$ref": "#/definitions/CareProvider"
             },
             "primaryServiceAttending": {
-              "$ref": "#/definitions/Practitioner"
+              "$ref": "#/definitions/CareProvider"
             },
             "RN": {
-              "$ref": "#/definitions/Practitioner"
+              "$ref": "#/definitions/CareProvider"
             }
           }
         }

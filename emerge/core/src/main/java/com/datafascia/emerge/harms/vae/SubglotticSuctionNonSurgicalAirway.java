@@ -6,27 +6,48 @@ import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import java.util.List;
+import javax.inject.Inject;
 
 /**
- * Utilities for Sub-Glottic Suction ETT
+ * Checks if subglottic suction non-surgical airway is active for an encounter.
  */
 public class SubglotticSuctionNonSurgicalAirway {
+
+  private static final String AIRWAY_DEVICE_CODE = "304894155";
+
+  @Inject
+  private ClientBuilder apiClient;
+
   /**
-   * Determines whether a subglottic suction ETT is active for a given encounter.
+   * Checks if observation is relevant to subglottic suction non-surgical airway.
    *
-   * @param client The client to use.
-   * @param encounterId The encounter to query.
-   * @return Whether a subglottic suction ETT is active for the given encounter.
+   * @param observation
+   *     observation
+   * @return true if observation is relevant to subglottic suction non-surgical airway
    */
-  public static boolean subglotticSuctionEtt(ClientBuilder client, String encounterId) {
-    List<Observation> airwayDevices = client.getObservationClient().searchObservation(encounterId,
-        "304894155", null);
+  public static boolean isRelevant(Observation observation) {
+    return AIRWAY_DEVICE_CODE.equals(observation.getCode().getCodingFirstRep().getCode());
+  }
+
+  /**
+   * Checks if subglottic suction non-surgical airway is active for the encounter.
+   *
+   * @param encounterId
+   *     encounter to search
+   * @return true if subglottic suction non-surgical airway is active the encounter
+   */
+  public boolean test(String encounterId) {
+    List<Observation> airwayDevices = apiClient.getObservationClient().searchObservation(
+        encounterId, AIRWAY_DEVICE_CODE, null);
+    if (airwayDevices.isEmpty()) {
+      return false;
+    }
 
     Observation freshestAirwayDevice = ObservationUtils.findFreshestObservation(airwayDevices);
     String airway = ObservationUtils.airwayName(freshestAirwayDevice);
 
     String airwaySubglotticSuctionCapabilityStatus = null;
-    if (airway.equals("Surgical Airway")) {
+    if ("Surgical Airway".equals(airway)) {
       airwaySubglotticSuctionCapabilityStatus = "Unknown";
     } else if (freshestAirwayDevice.getValue()
         .toString().equals("Endotracheal Tube – Subglottic")) {
@@ -36,8 +57,8 @@ public class SubglotticSuctionNonSurgicalAirway {
       airwaySubglotticSuctionCapabilityStatus = "Absent";
     }
 
-    if (airway.equals("Non-Surgical Airway")
-        && airwaySubglotticSuctionCapabilityStatus.equals("Present")) {
+    if ("Non-Surgical Airway".equals(airway)
+        && "Present".equals(airwaySubglotticSuctionCapabilityStatus)) {
       return true;
     }
 

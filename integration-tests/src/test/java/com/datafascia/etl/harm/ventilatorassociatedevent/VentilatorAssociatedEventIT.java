@@ -64,4 +64,15 @@ public class VentilatorAssociatedEventIT extends HarmEvidenceTestSupport {
     assertEquals(ventilationMode.getValue().toString(), "Volume Control (AC)");
     assertEquals(ventilationMode.getUpdateTime(), Date.from(Instant.now(clock)));
   }
+
+  @Test
+  public void should_export_subglottic_suction_non_surgical_airway() throws Exception {
+    processMessage("subglottic-suction-non-surgical-airway-true.hl7");
+
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    TimestampedBoolean subglotticSuctionNonSurgicalAirway =
+        harmEvidence.getMedicalData().getVAE().getSubglotticSuctionNonSurgicalAirway();
+    assertTrue(subglotticSuctionNonSurgicalAirway.isValue());
+    assertEquals(subglotticSuctionNonSurgicalAirway.getUpdateTime(), Date.from(Instant.now(clock)));
+  }
 }

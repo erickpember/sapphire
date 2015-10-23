@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Tools for tracheostomy.
  */
-public class Tracheostomy {
+public class SubglotticSuctionSurgicalAirway {
   /**
    * Determines whether a tracheostomy is active for a given encounter.
    *

@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Utilities related to Daily Needs
  */
-public class DailyNeeds {
+public class DailyNeedsAssessmentImpl {
   @Inject
   private static ClientBuilder client;
 

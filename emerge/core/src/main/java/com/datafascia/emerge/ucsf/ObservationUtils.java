@@ -274,20 +274,14 @@ public class ObservationUtils {
   }
 
   /**
-   * Returns the airway name for an observation.
-   * @param observation The observation to pull from.
-   * @return The airway name for an observation.
+   * Gets the airway name for an observation.
+   *
+   * @param observation
+   *     observation to pull from
+   * @return airway name, or {@code null} if not present
    */
   public static String airwayName(Observation observation) {
-    String[] identifierParts = observation.getIdentifierFirstRep().getValue().split("^");
-    if (identifierParts.length > 1) {
-      String[] propertyParts = identifierParts[2].split("-");
-
-      if (propertyParts.length > 1) {
-        return propertyParts[2];
-      }
-    }
-
-    return null;
+    String[] propertyParts = observation.getCode().getText().split("-", 2);
+    return (propertyParts.length > 1) ? propertyParts[1] : null;
   }
 }

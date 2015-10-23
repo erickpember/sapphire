@@ -6,6 +6,7 @@ import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.emerge.harms.vae.DiscreteHeadOfBedGreaterThan30Degrees;
 import com.datafascia.emerge.harms.vae.SubglotticSuctionNonSurgicalAirway;
+import com.datafascia.emerge.harms.vae.SubglotticSuctionSurgicalAirway;
 import com.datafascia.emerge.harms.vae.Ventilated;
 import com.datafascia.emerge.harms.vae.VentilationModeImpl;
 import com.datafascia.etl.harm.HarmEvidenceUpdater.Event;
@@ -73,6 +74,15 @@ when
   $encounter: Encounter()
 then
   ventilatorAssociatedEventUpdater.updateCurrentTidalVolume(harmEvidence, $encounter);
+end
+
+rule "Update subglottic suction surgical airway"
+when
+  Event( type == EventType.UPDATE_OBSERVATIONS )
+  $observation: Observation( SubglotticSuctionSurgicalAirway.isRelevant($observation) )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateSubglotticSuctionSurgicalAirway(harmEvidence, $encounter);
 end
 
 rule "Update subglottic suction non-surgical airway"

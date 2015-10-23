@@ -12,6 +12,7 @@ import com.datafascia.emerge.harms.vae.OralCare;
 import com.datafascia.emerge.harms.vae.RecentStressUlcerProphylaxisAdministration;
 import com.datafascia.emerge.harms.vae.StressUlcerProphylacticsOrder;
 import com.datafascia.emerge.harms.vae.SubglotticSuctionNonSurgicalAirway;
+import com.datafascia.emerge.harms.vae.SubglotticSuctionSurgicalAirway;
 import com.datafascia.emerge.harms.vae.SubglotticSuctionUse;
 import com.datafascia.emerge.harms.vae.Ventilated;
 import com.datafascia.emerge.harms.vae.VentilationModeImpl;
@@ -58,6 +59,9 @@ public class VentilatorAssociatedEventUpdater {
 
   @Inject
   private CurrentTidalVolume currentTidalVolume;
+
+  @Inject
+  private SubglotticSuctionSurgicalAirway subglotticSuctionSurgicalAirway;
 
   @Inject
   private SubglotticSuctionNonSurgicalAirway subglotticSuctionNonSurgicalAirway;
@@ -218,6 +222,28 @@ public class VentilatorAssociatedEventUpdater {
         .withUpdateTime(Date.from(Instant.now(clock)));
 
     getVAE(harmEvidence).setCurrentTidalVolume(tidalVolume);
+  }
+
+  /**
+   * Updates subglottic suction surgical airway.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateSubglotticSuctionSurgicalAirway(
+      HarmEvidence harmEvidence, Encounter encounter) {
+
+    String encounterId = encounter.getId().getIdPart();
+    boolean value = subglotticSuctionSurgicalAirway.test(encounterId);
+
+    TimestampedMaybe newSubglotticSuctionSurgicalAirway = new TimestampedMaybe()
+        .withValue(value ? TimestampedMaybe.Value.YES : TimestampedMaybe.Value.NO)
+        .withUpdateTime(Date.from(Instant.now(clock)));
+
+    getVAE(harmEvidence).setSubglotticSuctionSurgicalAirway(
+        newSubglotticSuctionSurgicalAirway);
   }
 
   /**

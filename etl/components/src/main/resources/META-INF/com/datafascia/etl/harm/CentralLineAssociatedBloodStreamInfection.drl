@@ -10,7 +10,16 @@ import com.datafascia.etl.harm.HarmEvidenceUpdater.EventType;
 global com.datafascia.emerge.ucsf.HarmEvidence harmEvidence;
 global com.datafascia.etl.harm.CentralLineAssociatedBloodStreamInfectionUpdater centralLineAssociatedBloodStreamInfectionUpdater;
 
-rule "Update Central Line Associated Blood Stream Infection data"
+rule "Update daily needs assessment"
+when
+  Event( type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  centralLineAssociatedBloodStreamInfectionUpdater.updateDailyNeedsAssessment(
+      harmEvidence, $encounter);
+end
+
+rule "Update central line"
 when
   Event( type == EventType.UPDATE_PROCEDURE )
   Procedure( category.codingFirstRep.code == "CENTRAL_LINE" )

@@ -69,4 +69,8 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
     String hl7 = Resources.toString(url, StandardCharsets.UTF_8).replace('\n', '\r');
     hl7MessageProcessor.accept(hl7);
   }
+
+  protected void processTimer() {
+    harmEvidenceUpdater.processTimer(getEncounter());
+  }
 }

@@ -11,11 +11,16 @@ import ca.uhn.fhir.model.primitive.InstantDt;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.ProcedureRepository;
+import com.datafascia.emerge.harms.clabsi.DailyNeedsAssessmentImpl;
 import com.datafascia.emerge.ucsf.CLABSI;
 import com.datafascia.emerge.ucsf.CentralLine;
+import com.datafascia.emerge.ucsf.DailyNeedsAssessment;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.MedicalData;
 import com.datafascia.emerge.ucsf.codes.ProcedureCategoryEnum;
+import java.time.Clock;
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
@@ -24,6 +29,12 @@ import javax.inject.Inject;
  * Updates Central Line-Associated Blood Stream Infection data for a patient
  */
 public class CentralLineAssociatedBloodStreamInfectionUpdater {
+
+  @Inject
+  private Clock clock;
+
+  @Inject
+  private DailyNeedsAssessmentImpl dailyNeedsAssessment;
 
   @Inject
   private ProcedureRepository procedureRepository;
@@ -37,6 +48,25 @@ public class CentralLineAssociatedBloodStreamInfectionUpdater {
     }
 
     return clabsi;
+  }
+
+  /**
+   * Updates daily needs assessment.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateDailyNeedsAssessment(HarmEvidence harmEvidence, Encounter encounter) {
+    String encounterId = encounter.getId().getIdPart();
+    String value = dailyNeedsAssessment.test(encounterId);
+
+    DailyNeedsAssessment newDailyNeedsAssessment = new DailyNeedsAssessment()
+        .withPerformed(DailyNeedsAssessment.Performed.fromValue(value))
+        .withUpdateTime(Date.from(Instant.now(clock)));
+
+    getCLABSI(harmEvidence).setDailyNeedsAssessment(newDailyNeedsAssessment);
   }
 
   private static boolean isActiveCentralLine(Procedure procedure) {
@@ -70,7 +100,7 @@ public class CentralLineAssociatedBloodStreamInfectionUpdater {
   }
 
   /**
-   * Updates Central Line-Associated Blood Stream Infection data.
+   * Updates central line.
    *
    * @param harmEvidence
    *     to modify
@@ -78,7 +108,6 @@ public class CentralLineAssociatedBloodStreamInfectionUpdater {
    *     encounter
    */
   public void updateCentralLine(HarmEvidence harmEvidence, Encounter encounter) {
-    CLABSI clabsi = getCLABSI(harmEvidence);
-    clabsi.setCentralLine(getActiveCentralLines(encounter));
+    getCLABSI(harmEvidence).setCentralLine(getActiveCentralLines(encounter));
   }
 }

@@ -4,70 +4,90 @@ package com.datafascia.emerge.harms.clabsi;
 
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.dstu2.resource.Procedure;
+import ca.uhn.fhir.model.dstu2.valueset.ProcedureStatusEnum;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
-import com.google.inject.Inject;
-import java.util.Calendar;
+import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
+import com.datafascia.emerge.ucsf.codes.ProcedureCategoryEnum;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
+import javax.inject.Inject;
 
 /**
- * Utilities related to Daily Needs
+ * Checks if daily needs assessment was completed.
  */
 public class DailyNeedsAssessmentImpl {
+
   @Inject
-  private static ClientBuilder client;
+  private Clock clock;
+
+  @Inject
+  private ClientBuilder apiClient;
+
+  private static boolean isCentralLine(Procedure procedure) {
+    return procedure.getCategory().getCodingFirstRep().getCode()
+        .equals(ProcedureCategoryEnum.CENTRAL_LINE.getCode());
+  }
+
+  private boolean haveActiveCentralLine(String encounterId) {
+    List<Procedure> procedures = apiClient.getProcedureClient().searchProcedure(
+        encounterId, null, ProcedureStatusEnum.IN_PROGRESS.getCode());
+    return procedures.stream()
+        .anyMatch(procedure -> isCentralLine(procedure));
+  }
 
   /**
-   * Returns whether daily needs have been completed.
+   * Checks if daily needs assessment was completed.
    *
-   * @param encounterId The encounter to check.
-   * @return Whether daily needs have been completed.
+   * @param encounterId
+   *     encounter to search
+   * @return {@code "Yes"}, {@code "No"} or {@code "N/A"}
    */
-  public static String dailyNeedsAssessment(String encounterId) {
-    boolean activeLine = checkActiveLines(encounterId);
-
-    if (!activeLine) {
+  public String test(String encounterId) {
+    if (!haveActiveCentralLine(encounterId)) {
       return "N/A";
     }
 
-    List<Observation> observations = client.getObservationClient().searchObservation(encounterId,
-        null, null);
-
+    List<Observation> observations = apiClient.getObservationClient().searchObservation(
+        encounterId, ObservationCodeEnum.NEEDS_ASSESSMENT.getCode(), null);
     Observation freshestCVCNeedAssessment = ObservationUtils.findFreshestObservation(observations);
 
-    Calendar cal = Calendar.getInstance();
-    cal.set(Calendar.HOUR_OF_DAY, 7);
-    Date sevenAmToday = cal.getTime();
+    ZonedDateTime now = ZonedDateTime.now(clock);
+    Instant sevenAmTodayInstant = ZonedDateTime.of(
+        now.getYear(),
+        now.getMonthValue(),
+        now.getDayOfMonth(),
+        7,
+        0,
+        0,
+        0,
+        now.getZone())
+        .toInstant();
+    Date sevenAmToday = Date.from(sevenAmTodayInstant);
+    Date sevenAmYesterday = Date.from(sevenAmTodayInstant.minus(24, ChronoUnit.HOURS));
 
-    cal.add(Calendar.HOUR, -24);
-    Date sevenAmYesterday = cal.getTime();
-
-    int hourOftheDay = cal.get(Calendar.HOUR_OF_DAY);
-
+    int hourOftheDay = now.getHour();
     if (hourOftheDay >= 7) {
       if (freshestCVCNeedAssessment.getValue().toString().equals("Completed")) {
-        return "Completed";
+        return "Yes";
       }
       if (ObservationUtils.getEffectiveDate(freshestCVCNeedAssessment).before(sevenAmToday)) {
-        return "Not Completed";
+        return "No";
       }
     } else {
       if (freshestCVCNeedAssessment.getValue().toString().equals("Completed")
           && ObservationUtils.getEffectiveDate(freshestCVCNeedAssessment).after(sevenAmYesterday)) {
-        return "Completed";
+        return "Yes";
       }
       if (ObservationUtils.getEffectiveDate(freshestCVCNeedAssessment).before(sevenAmYesterday)) {
-        return "Not Completed";
+        return "No";
       }
     }
 
-    return null;
-  }
-
-  private static boolean checkActiveLines(String encounterId) {
-    List<Procedure> procedures
-        = client.getProcedureClient().searchProcedure(encounterId, null, "IN_PROGRESS");
-    return !procedures.isEmpty();
+    return "N/A";
   }
 }

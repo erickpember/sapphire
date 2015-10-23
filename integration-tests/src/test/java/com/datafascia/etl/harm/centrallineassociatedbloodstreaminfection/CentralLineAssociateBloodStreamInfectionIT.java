@@ -5,6 +5,7 @@ package com.datafascia.etl.harm.centrallineassociatedbloodstreaminfection;
 import com.datafascia.common.persist.Id;
 import com.datafascia.emerge.ucsf.CLABSI;
 import com.datafascia.emerge.ucsf.CentralLine;
+import com.datafascia.emerge.ucsf.DailyNeedsAssessment;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.etl.harm.HarmEvidenceTestSupport;
 import java.time.Instant;
@@ -29,6 +30,19 @@ public class CentralLineAssociateBloodStreamInfectionIT extends HarmEvidenceTest
   @AfterMethod
   public void dischargePatient() throws Exception {
     processMessage("ADT_A03.hl7");
+  }
+
+  @Test
+  public void should_export_daily_needs_assessment_yes() throws Exception {
+    processMessage("tunneled-cvc-single-lumen-femoral-left.hl7");
+    processMessage("daily-needs-assessment-yes.hl7");
+    processTimer();
+
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    DailyNeedsAssessment dailyNeedsAssessment =
+        harmEvidence.getMedicalData().getCLABSI().getDailyNeedsAssessment();
+    assertEquals(dailyNeedsAssessment.getPerformed(), DailyNeedsAssessment.Performed.YES);
+    assertEquals(dailyNeedsAssessment.getUpdateTime(), Date.from(Instant.now(clock)));
   }
 
   @Test

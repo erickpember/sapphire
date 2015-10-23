@@ -12,6 +12,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -52,14 +53,14 @@ public class OralCare {
     Instant now = Instant.now(clock);
     Date effectiveLowerBound = Date.from(now.minus(7, ChronoUnit.HOURS));
 
-    Observation freshestOralCareAction = ObservationUtils.getFreshestByCodeAfterTime(
+    Optional<Observation> freshestOralCareAction = ObservationUtils.getFreshestByCodeAfterTime(
         apiClient,
         encounterId,
         ObservationCodeEnum.ORAL_CARE.getCode(),
         effectiveLowerBound);
 
-    if (freshestOralCareAction != null) {
-      String value = freshestOralCareAction.getValue().toString();
+    if (freshestOralCareAction.isPresent()) {
+      String value = freshestOralCareAction.get().getValue().toString();
       if (YES_VALUES.contains(value)) {
         return MaybeEnum.YES;
       } else if (NO_VALUES.contains(value)) {

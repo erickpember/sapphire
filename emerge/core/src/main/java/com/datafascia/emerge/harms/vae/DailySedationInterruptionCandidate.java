@@ -16,6 +16,7 @@ import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import lombok.Builder;
 import lombok.Data;
 
@@ -168,18 +169,22 @@ public class DailySedationInterruptionCandidate {
     }
 
     // Gather observations needed.
-    String freshestTrainOfFour = ObservationUtils.getFreshestByCodeAfterTime(client, encounterId,
-        "304500964", twoHoursAgo).getValue().toString();
+    String freshestTrainOfFour = ObservationUtils.getFreshestByCodeAfterTime(
+        client, encounterId, "304500964", twoHoursAgo)
+        .map(observation -> observation.getValue().toString())
+        .orElse("");
 
-    String freshestWakeUpAction = ObservationUtils.getFreshestByCodeAfterTime(client, encounterId,
-        "304890033", twentyFiveHoursAgo).getValue().toString();
+    String freshestWakeUpAction = ObservationUtils.getFreshestByCodeAfterTime(
+        client, encounterId, "304890033", twentyFiveHoursAgo)
+        .map(observation -> observation.getValue().toString())
+        .orElse("");
 
     List<ProcedureRequest> hypothermiaBlanketOrders = ProcedureRequestUtils
         .getByCodeAfterTime(client, encounterId, "57714", twentyFiveHoursAgo);
     hypothermiaBlanketOrders.addAll(ProcedureRequestUtils.getByCodeAfterTime(client, encounterId,
         "139056", twentyFiveHoursAgo));
 
-    Observation freshestCoolingPadStatusFromPast25Hours = ObservationUtils
+    Optional<Observation> freshestCoolingPadStatusFromPast25Hours = ObservationUtils
         .getFreshestByCodeAfterTime(client, encounterId, "3045000709", twentyFiveHoursAgo);
 
     List<Observation> temperatureFromPast48Hours = ObservationUtils.getObservationByCodeAfterTime(
@@ -191,10 +196,10 @@ public class DailySedationInterruptionCandidate {
     List<Observation> coolingPadWaterTemperatureFromPast48Hours = ObservationUtils
         .getObservationByCodeAfterTime(client, encounterId, "304894100", fourtyEightHoursAgo);
 
-    Observation freshestCoolingPadWaterTemperatureFromPast2Hours = ObservationUtils
+    Optional<Observation> freshestCoolingPadWaterTemperatureFromPast2Hours = ObservationUtils
         .getFreshestByCodeAfterTime(client, encounterId, "304894100", twoHoursAgo);
 
-    Observation freshestActualRASSFromPast7Hours = ObservationUtils
+    Optional<Observation> freshestActualRASSFromPast7Hours = ObservationUtils
         .getFreshestByCodeAfterTime(client, encounterId, "3045000021", sevenHoursAgo);
 
     /* if freshestTrainOfFour.getValue() == (“0”, “1”, “2”, “3”) then Daily Sedation Interruption
@@ -263,8 +268,9 @@ public class DailySedationInterruptionCandidate {
     /* if freshestCoolingPadStatus.getValue() == “on” within the past 2 hours then Daily Sedation
      * Interruption Candidate = “No: Theraputic Hypothermia”
      */
-    if (freshestCoolingPadStatusFromPast25Hours.getValue().toString().equals("on")
-        && ObservationUtils.getEffectiveDate(freshestCoolingPadStatusFromPast25Hours)
+    if (freshestCoolingPadStatusFromPast25Hours.isPresent()
+        && freshestCoolingPadStatusFromPast25Hours.get().getValue().toString().equals("on")
+        && ObservationUtils.getEffectiveDate(freshestCoolingPadStatusFromPast25Hours.get())
             .after(twoHoursAgo)) {
       return THERAPEUTIC_HYPOTHERMIA;
     }
@@ -282,11 +288,12 @@ public class DailySedationInterruptionCandidate {
      * coolingPadPatientTemperature.getQuantity().getValue() <= 36.5c then Daily Sedation
      * Interruption Candidate = “No: Theraputic Hypothermia”
      */
-    if (freshestCoolingPadStatusFromPast25Hours.getValue().toString().equals("off")) {
+    if (freshestCoolingPadStatusFromPast25Hours.isPresent()
+        && freshestCoolingPadStatusFromPast25Hours.get().getValue().toString().equals("off")) {
       boolean allBelow36p5 = true;
       for (Observation obv : coolingPadPatientTemperatureFromPast48Hours) {
         if (ObservationUtils.getEffectiveDate(obv).after(ObservationUtils
-            .getEffectiveDate(freshestCoolingPadStatusFromPast25Hours))
+            .getEffectiveDate(freshestCoolingPadStatusFromPast25Hours.get()))
             && obv.getValue() instanceof QuantityDt
             && ((QuantityDt) obv.getValue()).getValue().doubleValue() <= 36.5) {
           allBelow36p5 = false;
@@ -304,7 +311,7 @@ public class DailySedationInterruptionCandidate {
       allBelow36p5 = false;
       for (Observation obv : temperatureFromPast48Hours) {
         if (ObservationUtils.getEffectiveDate(obv).after(ObservationUtils
-            .getEffectiveDate(freshestCoolingPadStatusFromPast25Hours))
+            .getEffectiveDate(freshestCoolingPadStatusFromPast25Hours.get()))
             && obv.getValue() instanceof QuantityDt
             && ((QuantityDt) obv.getValue()).getValue().doubleValue() <= 36.5) {
           allBelow36p5 = false;
@@ -321,13 +328,15 @@ public class DailySedationInterruptionCandidate {
      * freshestCoolingPadWaterTemperature.getQuantity().getValue() within the past 2 hours is not
      * null then Daily Sedation Interruption Candidate = “No: Theraputic Hypothermia”
      */
-    for (Observation obv : coolingPadPatientTemperatureFromPast48Hours) {
-      if (freshestCoolingPadWaterTemperatureFromPast2Hours != null
-          && ObservationUtils.getEffectiveDate(obv).after(ObservationUtils
-              .getEffectiveDate(freshestCoolingPadWaterTemperatureFromPast2Hours))
-          && obv.getValue() instanceof QuantityDt
-          && ((QuantityDt) obv.getValue()).getValue().doubleValue() <= 36.5) {
-        return THERAPEUTIC_HYPOTHERMIA;
+    if (freshestCoolingPadWaterTemperatureFromPast2Hours.isPresent()) {
+      for (Observation obv : coolingPadPatientTemperatureFromPast48Hours) {
+        if (freshestCoolingPadWaterTemperatureFromPast2Hours != null
+            && ObservationUtils.getEffectiveDate(obv).after(ObservationUtils
+                .getEffectiveDate(freshestCoolingPadWaterTemperatureFromPast2Hours.get()))
+            && obv.getValue() instanceof QuantityDt
+            && ((QuantityDt) obv.getValue()).getValue().doubleValue() <= 36.5) {
+          return THERAPEUTIC_HYPOTHERMIA;
+        }
       }
     }
 
@@ -348,7 +357,7 @@ public class DailySedationInterruptionCandidate {
      * freshestSedationWakeUpAction.getValue() == “No - Other reason (Comment)” then Daily Sedation
      * Interruption Candidate = “No: Other”
      */
-    switch (freshestActualRASSFromPast7Hours.getValue().toString()) {
+    switch (freshestActualRASSFromPast7Hours.get().getValue().toString()) {
       case "+2":
       case "+3":
       case "+4":

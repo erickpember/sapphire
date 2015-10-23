@@ -11,6 +11,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Optional;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
@@ -45,7 +46,7 @@ public class CurrentTidalVolume {
         apiClient, encounterId, ObservationCodeEnum.VENT_MODE.getCode());
 
     if (freshestVentMode != null) {
-      Observation freshestVentSetTidalVolume = ObservationUtils
+      Optional<Observation> freshestVentSetTidalVolume = ObservationUtils
           .getFreshestByCodeAfterTime(apiClient, encounterId,
               ObservationCodeEnum.NON_INVASIVE_DEVICE_MODE.getCode(), thirteenHoursAgo);
 
@@ -56,10 +57,10 @@ public class CurrentTidalVolume {
         case "VolumeControl (AC)":
         case "VolumeSupport (VS)":
         case "Pressure Regulated Volume Control (PRVC)":
-          if (freshestVentSetTidalVolume == null) {
+          if (!freshestVentSetTidalVolume.isPresent()) {
             return -1;
           } else {
-            return getAbsValue(freshestVentSetTidalVolume);
+            return getAbsValue(freshestVentSetTidalVolume.get());
           }
         case "Synchronous Intermittent Mandatory Ventilation (SIMV)":
           if (freshestBreathType != null && freshestBreathType.getValue().toString().equals(
@@ -67,7 +68,7 @@ public class CurrentTidalVolume {
             if (freshestVentSetTidalVolume == null) {
               return -1;
             } else {
-              return getAbsValue(freshestVentSetTidalVolume);
+              return getAbsValue(freshestVentSetTidalVolume.get());
             }
           }
           break;

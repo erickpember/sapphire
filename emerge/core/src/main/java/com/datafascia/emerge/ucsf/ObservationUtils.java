@@ -11,6 +11,7 @@ import ca.uhn.fhir.model.primitive.StringDt;
 import com.datafascia.api.client.ClientBuilder;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -75,28 +76,33 @@ public class ObservationUtils {
   }
 
   /**
-   * Returns the freshest observation for an encounter with the given code and after the given time.
+   * Finds the freshest observation for an encounter with the given code and after the given time.
    *
    * @param client
-   *     The client to use.
+   *     client to use
    * @param encounterId
-   *     The encounter to search by.
+   *     encounter to search
    * @param code
-   *     The code to search by.
-   * @param date
-   *     The lower time bound.
-   * @return An observation.
+   *     observation code to match
+   * @param effectiveLowerBound
+   *     observation effective time lower bound
+   * @return optional observation, empty if not found
    */
-  public static Observation getFreshestByCodeAfterTime(ClientBuilder client,
-      String encounterId, String code, Date date) {
+  public static Optional<Observation> getFreshestByCodeAfterTime(
+      ClientBuilder client, String encounterId, String code, Date effectiveLowerBound) {
+
     List<Observation> observations = client.getObservationClient()
         .searchObservation(encounterId, code, null);
     if (observations.isEmpty()) {
-      return null;
+      return Optional.empty();
     }
 
-    Observation freshestObservation = ObservationUtils.findFreshestObservation(observations);
-    return getEffectiveDate(freshestObservation).after(date) ? freshestObservation : null;
+    Observation freshestObservation = findFreshestObservation(observations);
+    if (getEffectiveDate(freshestObservation).after(effectiveLowerBound)) {
+      return Optional.of(freshestObservation);
+    }
+
+    return Optional.empty();
   }
 
   /**

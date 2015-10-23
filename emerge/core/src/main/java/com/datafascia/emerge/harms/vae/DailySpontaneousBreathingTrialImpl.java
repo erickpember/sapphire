@@ -57,38 +57,41 @@ public class DailySpontaneousBreathingTrialImpl {
     Instant now = Instant.now(clock);
     Date effectiveLowerBound = Date.from(now.minus(25, ChronoUnit.HOURS));
 
-    Observation freshestSBTAdmin = ObservationUtils.getFreshestByCodeAfterTime(
+    Optional<Observation> freshestSBTAdmin = ObservationUtils.getFreshestByCodeAfterTime(
         apiClient,
         encounterId,
         ObservationCodeEnum.SPONTANEOUS_BREATHING_TRIAL.getCode(),
         effectiveLowerBound);
 
-    Observation freshestPressureSupport = ObservationUtils.getFreshestByCodeAfterTime(
+    Optional<Observation> freshestPressureSupport = ObservationUtils.getFreshestByCodeAfterTime(
         apiClient,
         encounterId,
         ObservationCodeEnum.PRESSURE_SUPPORT.getCode(),
         effectiveLowerBound);
 
-    Observation freshestFIO2 = ObservationUtils.getFreshestByCodeAfterTime(
+    Optional<Observation> freshestFIO2 = ObservationUtils.getFreshestByCodeAfterTime(
         apiClient,
         encounterId,
         ObservationCodeEnum.FIO2.getCode(),
         effectiveLowerBound);
 
-    Observation freshestPEEP = ObservationUtils.getFreshestByCodeAfterTime(
+    Optional<Observation> freshestPEEP = ObservationUtils.getFreshestByCodeAfterTime(
         apiClient,
         encounterId,
         ObservationCodeEnum.PEEP.getCode(),
         effectiveLowerBound);
 
-    if (freshestSBTAdmin != null && freshestSBTAdmin.getValue().toString().equals("Yes")) {
+    if (freshestSBTAdmin.isPresent()
+        && freshestSBTAdmin.get().getValue().toString().equals("Yes")) {
       return DailySpontaneousBreathingTrialValueEnum.GIVEN;
     }
 
-    if (freshestPressureSupport != null && freshestPEEP != null && freshestFIO2 != null
-        && ((QuantityDt) freshestPressureSupport.getValue()).getValue().compareTo(FIVE) < 0
-        && ((QuantityDt) freshestPEEP.getValue()).getValue().compareTo(FIVE) < 0
-        && ((QuantityDt) freshestFIO2.getValue()).getValue().compareTo(FIFTY) < 0) {
+    if (freshestPressureSupport.isPresent()
+        && freshestPEEP.isPresent()
+        && freshestFIO2.isPresent()
+        && ((QuantityDt) freshestPressureSupport.get().getValue()).getValue().compareTo(FIVE) < 0
+        && ((QuantityDt) freshestPEEP.get().getValue()).getValue().compareTo(FIVE) < 0
+        && ((QuantityDt) freshestFIO2.get().getValue()).getValue().compareTo(FIFTY) < 0) {
       return DailySpontaneousBreathingTrialValueEnum.GIVEN;
     }
 
@@ -112,11 +115,11 @@ public class DailySpontaneousBreathingTrialImpl {
         .setStart(new DateTimeDt(twoHoursAgo))
         .setEnd(new DateTimeDt(Date.from(now)));
 
-    Observation freshestTrainOfFour = ObservationUtils.getFreshestByCodeAfterTime(
+    Optional<Observation> freshestTrainOfFour = ObservationUtils.getFreshestByCodeAfterTime(
         apiClient, encounterId, ObservationCodeEnum.TRAIN_OF_FOUR.getCode(), twentyFiveHoursAgo);
 
-    if (freshestTrainOfFour != null) {
-      switch (freshestTrainOfFour.getValue().toString()) {
+    if (freshestTrainOfFour.isPresent()) {
+      switch (freshestTrainOfFour.get().getValue().toString()) {
         case "0":
         case "1":
         case "2":
@@ -125,42 +128,44 @@ public class DailySpontaneousBreathingTrialImpl {
       }
     }
 
-    Observation freshestSBTContraindication = ObservationUtils.getFreshestByCodeAfterTime(
+    Optional<Observation> freshestSBTContraindication = ObservationUtils.getFreshestByCodeAfterTime(
         apiClient,
         encounterId,
         ObservationCodeEnum.SPONTANEOUS_BREATHING_TRIAL_CONTRAINDICATED.getCode(),
         twentyFiveHoursAgo);
 
-    if (freshestSBTContraindication != null) {
-      if (freshestSBTContraindication.getValue().toString().equals("Clinically Unstable")) {
+    if (freshestSBTContraindication.isPresent()) {
+      if (freshestSBTContraindication.get().getValue().toString().equals("Clinically Unstable")) {
         return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.CLINICALLY_UNSTABLE);
       }
 
-      if (freshestSBTContraindication.getValue().toString().equals("Other (see comment)")) {
+      if (freshestSBTContraindication.get().getValue().toString().equals("Other (see comment)")) {
         return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.OTHER);
       }
     }
 
-    Observation freshestPEEP = ObservationUtils.getFreshestByCodeAfterTime(
+    Optional<Observation> freshestPEEP = ObservationUtils.getFreshestByCodeAfterTime(
         apiClient, encounterId, ObservationCodeEnum.PEEP.getCode(), twentyFiveHoursAgo);
 
-    if (freshestPEEP != null && ((QuantityDt) freshestPEEP.getValue()).getValue().compareTo(EIGHT)
-        > 0) {
+    if (freshestPEEP.isPresent()
+        && ((QuantityDt) freshestPEEP.get().getValue()).getValue().compareTo(EIGHT) > 0) {
       return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.PEEP_OVER_8);
     }
 
-    Observation freshestFIO2 = ObservationUtils.getFreshestByCodeAfterTime(
+    Optional<Observation> freshestFIO2 = ObservationUtils.getFreshestByCodeAfterTime(
         apiClient, encounterId, ObservationCodeEnum.FIO2.getCode(), twentyFiveHoursAgo);
 
-    if (freshestFIO2 != null && ((QuantityDt) freshestFIO2.getValue()).getValue().compareTo(FIFTY)
-        > 0) {
+    if (freshestFIO2.isPresent()
+        && ((QuantityDt) freshestFIO2.get().getValue()).getValue().compareTo(FIFTY) > 0) {
       return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.FIO2_OVER_50);
     }
 
-    if (freshestPEEP != null && freshestFIO2 != null && freshestSBTContraindication != null
-        && freshestSBTContraindication.getValue().toString().equals("Respiratory Status")
-        && ((QuantityDt) freshestFIO2.getValue()).getValue().compareTo(FIFTY) < 0
-        && ((QuantityDt) freshestPEEP.getValue()).getValue().compareTo(EIGHT) < 0) {
+    if (freshestPEEP.isPresent()
+        && freshestFIO2.isPresent()
+        && freshestSBTContraindication.isPresent()
+        && freshestSBTContraindication.get().getValue().toString().equals("Respiratory Status")
+        && ((QuantityDt) freshestFIO2.get().getValue()).getValue().compareTo(FIFTY) < 0
+        && ((QuantityDt) freshestPEEP.get().getValue()).getValue().compareTo(EIGHT) < 0) {
       return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.OTHER);
     }
 

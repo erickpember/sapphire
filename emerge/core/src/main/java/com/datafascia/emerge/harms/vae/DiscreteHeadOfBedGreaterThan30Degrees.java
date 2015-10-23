@@ -13,6 +13,7 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
+import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -62,10 +63,10 @@ public class DiscreteHeadOfBedGreaterThan30Degrees {
     Instant now = Instant.now(clock);
     Date thirteenHoursAgo = Date.from(now.minus(13, ChronoUnit.HOURS));
 
-    Observation freshestDiscreteHOB = ObservationUtils.getFreshestByCodeAfterTime(apiClient,
-        encounterId, ObservationCodeEnum.HEAD_OF_BED.getCode(), thirteenHoursAgo);
-    if (freshestDiscreteHOB != null) {
-      String value = freshestDiscreteHOB.getValue().toString();
+    Optional<Observation> freshestDiscreteHOB = ObservationUtils.getFreshestByCodeAfterTime(
+        apiClient, encounterId, ObservationCodeEnum.HEAD_OF_BED.getCode(), thirteenHoursAgo);
+    if (freshestDiscreteHOB.isPresent()) {
+      String value = freshestDiscreteHOB.get().getValue().toString();
       switch (value) {
         case "HOB 30":
         case "HOB 45":

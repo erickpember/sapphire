@@ -7,12 +7,11 @@ import com.datafascia.domain.fhir.SystemDefinedCode;
 import java.util.Optional;
 
 /**
- * Enumerates practitioner codes.
+ * Enumerates practitioner roles.
  */
 public enum PractitionerRoleEnum implements SystemDefinedCode<String> {
   ICU_ATTENDING("ICU Attending"),
   PRIMARY_ATTENDING("Primary Attending"),
-  ATTENDING_PROVIDER("Attending Provider"),
   CLINICAL_NURSE("Clinical Nurse");
 
   private final String code;

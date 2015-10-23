@@ -8,6 +8,7 @@ import ca.uhn.fhir.model.dstu2.resource.Practitioner;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.PractitionerRepository;
+import com.datafascia.etl.harm.HarmEvidenceUpdater;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -26,6 +27,9 @@ public class AddParticipant {
 
   @Inject
   private EncounterRepository encounterRepository;
+
+  @Inject
+  private HarmEvidenceUpdater harmEvidenceUpdater;
 
   /**
    * Adds participant.
@@ -62,5 +66,7 @@ public class AddParticipant {
     participants.add(participant);
     encounter.setParticipant(participants);
     encounterRepository.save(encounter);
+
+    harmEvidenceUpdater.updateParticipant(practitioner, encounter);
   }
 }

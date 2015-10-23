@@ -6,6 +6,7 @@ import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Flag;
 import ca.uhn.fhir.model.dstu2.resource.Location;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
+import ca.uhn.fhir.model.dstu2.resource.Practitioner;
 import ca.uhn.fhir.model.dstu2.resource.Procedure;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
@@ -41,6 +42,7 @@ public class HarmEvidenceUpdater {
     TIMER,
     UPDATE_FLAG,
     UPDATE_OBSERVATIONS,
+    UPDATE_PARTICIPANT,
     UPDATE_PROCEDURE
   }
 
@@ -70,6 +72,9 @@ public class HarmEvidenceUpdater {
 
   @Inject
   private VentilatorAssociatedEventUpdater ventilatorAssociatedEventUpdater;
+
+  @Inject
+  private RespectDignityUpdater respectDignityUpdater;
 
   private KieContainer container;
 
@@ -113,6 +118,7 @@ public class HarmEvidenceUpdater {
     session.setGlobal("alignmentOfGoalsUpdater", alignmentOfGoalsUpdater);
     session.setGlobal("venousThromboembolismUpdater", venousThromboembolismUpdater);
     session.setGlobal("ventilatorAssociatedEventUpdater", ventilatorAssociatedEventUpdater);
+    session.setGlobal("respectDignityUpdater", respectDignityUpdater);
 
     String patientId = encounter.getPatient().getReference().getIdPart();
     HarmEvidence harmEvidence = getHarmEvidence(patientId);
@@ -200,6 +206,19 @@ public class HarmEvidenceUpdater {
    */
   public void updateFlag(Flag flag, Encounter encounter) {
     HarmEvidence harmEvidence = execute(EventType.UPDATE_FLAG, encounter, flag);
+    harmEvidenceRepository.save(harmEvidence);
+  }
+
+  /**
+   * Updates participant.
+   *
+   * @param practitioner
+   *    practitioner
+   * @param encounter
+   *    encounter
+   */
+  public void updateParticipant(Practitioner practitioner, Encounter encounter) {
+    HarmEvidence harmEvidence = execute(EventType.UPDATE_PARTICIPANT, encounter, practitioner);
     harmEvidenceRepository.save(harmEvidence);
   }
 

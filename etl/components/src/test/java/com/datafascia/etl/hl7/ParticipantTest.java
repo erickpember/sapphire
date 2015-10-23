@@ -23,7 +23,7 @@ import static org.testng.Assert.assertNull;
 public class ParticipantTest extends HL7MessageProcessorTestSupport {
 
   @Test
-  public void should_extract_extract_particpant_primary_attending() throws Exception {
+  public void should_extract_participant_primary_attending() throws Exception {
     processMessage("participant-primary-attending.hl7");
     processMessage("participant-primary-attending.hl7");
 
@@ -61,7 +61,7 @@ public class ParticipantTest extends HL7MessageProcessorTestSupport {
   }
 
   @Test
-  public void should_extract_extract_particpant_multiple() throws Exception {
+  public void should_extract_participant_multiple() throws Exception {
     processMessage("participant-multiple.hl7");
     processMessage("participant-multiple.hl7");
 

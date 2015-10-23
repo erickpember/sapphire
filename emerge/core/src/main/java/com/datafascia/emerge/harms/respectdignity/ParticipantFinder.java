@@ -1,6 +1,6 @@
 // Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.emerge.ucsf;
+package com.datafascia.emerge.harms.respectdignity;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import com.datafascia.api.client.ClientBuilder;
@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * Utilities for provider resources.
  */
-public class ProviderUtils {
+public class ParticipantFinder {
   /**
    * Returns the current primary attending for a given encounter.
    *

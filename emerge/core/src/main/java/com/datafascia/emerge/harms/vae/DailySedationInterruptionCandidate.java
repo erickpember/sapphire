@@ -13,82 +13,79 @@ import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
-import java.util.Calendar;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
-import lombok.Builder;
+import javax.inject.Inject;
+import lombok.AllArgsConstructor;
 import lombok.Data;
 
 /**
  * Daily Sedation Interruption Candidate
  */
 public class DailySedationInterruptionCandidate {
-  // Potential results
-  private static final CandidateResult OFF_SEDATION
-      = CandidateResult.builder().resultValue(false).resultReason("Off Sedation").build();
-  private static final CandidateResult RECEIVING_NMBA
-      = CandidateResult.builder().resultValue(false).resultReason("Receiving NMBA").build();
-  private static final CandidateResult STATUS_EPILEPTICUS
-      = CandidateResult.builder().resultValue(false).resultReason("Status Epilepticus").build();
-  private static final CandidateResult RESPIRATORY_INSTABILITY
-      = CandidateResult.builder().resultValue(false).resultReason("No: Respiratory Instability")
-      .build();
-  private static final CandidateResult THERAPEUTIC_HYPOTHERMIA
-      = CandidateResult.builder().resultValue(false).resultReason("Theraputic Hypothermia").build();
-  private static final CandidateResult RASS_2_OR_GREATER
-      = CandidateResult.builder().resultValue(false).resultReason("RASS 2+ or Greater").build();
-  private static final CandidateResult WITHDRAWAL_SEIZURE_RISK
-      = CandidateResult.builder().resultValue(false).resultReason("Withdrawal Seizure Risk")
-      .build();
-  private static final CandidateResult HEMODYNAMIC_INSTABILITY
-      = CandidateResult.builder().resultValue(false).resultReason("Hemodynamic Instability")
-      .build();
-  private static final CandidateResult OTHER
-      = CandidateResult.builder().resultValue(false).resultReason("Other").build();
-  private static final CandidateResult YES
-      = CandidateResult.builder().resultValue(true).build();
-  private static final CandidateResult INVALID
-      = CandidateResult.builder().resultValue(false)
-      .resultReason("No specified conditions were met").build();
 
   /**
    * Result container for daily sedation interruption candidate.
    */
-  @Data @Builder
+  @AllArgsConstructor
+  @Data
   public static class CandidateResult {
-    private boolean resultValue;
-    private String resultReason;
+    private boolean candidate;
+    private String notCandidateReason;
   }
 
+  // Potential results
+  private static final CandidateResult OFF_SEDATION =
+      new CandidateResult(false, "Off Sedation");
+  private static final CandidateResult RECEIVING_NMBA =
+      new CandidateResult(false, "Receiving NMBA");
+  private static final CandidateResult STATUS_EPILEPTICUS =
+      new CandidateResult(false, "Status Epilepticus");
+  private static final CandidateResult RESPIRATORY_INSTABILITY =
+      new CandidateResult(false, "Respiratory Instability");
+  private static final CandidateResult THERAPEUTIC_HYPOTHERMIA =
+      new CandidateResult(false, "Theraputic Hypothermia");
+  private static final CandidateResult RASS_2_OR_GREATER =
+      new CandidateResult(false, "RASS 2+ or Greater");
+  private static final CandidateResult WITHDRAWAL_SEIZURE_RISK =
+      new CandidateResult(false, "Withdrawal Seizure Risk");
+  private static final CandidateResult HEMODYNAMIC_INSTABILITY =
+      new CandidateResult(false, "Hemodynamic Instability");
+  private static final CandidateResult OTHER =
+      new CandidateResult(false, "Other");
+  private static final CandidateResult YES =
+      new CandidateResult(true, null);
+  private static final CandidateResult INVALID =
+      new CandidateResult(false, "No specified conditions were met");
+
+  @Inject
+  private Clock clock;
+
+  @Inject
+  private ClientBuilder apiClient;
+
   /**
-   * Returns whether the encounter is a candidate for daily sedation interruption.
+   * Determines if the patient is a candidate for daily sedation interruption.
    *
-   * @param client The client to use.
-   * @param encounterId The encounter to check.
-   * @return An object encapsulating whether they are a candidate, and a reason for why not.
+   * @param encounterId
+   *     encounter to search
+   * @return object encapsulating whether they are a candidate, and a reason for why not.
    */
-  public CandidateResult getDailySedationInterruptionCandidate(ClientBuilder client,
-      String encounterId) {
-    // Gather times (x) number of hours ago: 0, 2, 7, 25, 48
-    Calendar cal = Calendar.getInstance();
-    Date now = cal.getTime();
-
-    cal.add(Calendar.HOUR, -2);
-    Date twoHoursAgo = cal.getTime();
-
-    cal.add(Calendar.HOUR, -5);
-    Date sevenHoursAgo = cal.getTime();
-
-    cal.add(Calendar.HOUR, -18);
-    Date twentyFiveHoursAgo = cal.getTime();
-
-    cal.add(Calendar.HOUR, -23);
-    Date fourtyEightHoursAgo = cal.getTime();
+  public CandidateResult getDailySedationInterruptionCandidate(String encounterId) {
+    Instant nowInstance = Instant.now(clock);
+    Date now = Date.from(nowInstance);
+    Date twoHoursAgo = Date.from(nowInstance.minus(2, ChronoUnit.HOURS));
+    Date sevenHoursAgo = Date.from(nowInstance.minus(7, ChronoUnit.HOURS));
+    Date twentyFiveHoursAgo = Date.from(nowInstance.minus(25, ChronoUnit.HOURS));
+    Date fourtyEightHoursAgo = Date.from(nowInstance.minus(48, ChronoUnit.HOURS));
 
     // Gather the list of medication administrations we will be using.
-    List<MedicationAdministration> medicationAdministrations
-        = client.getMedicationAdministrationClient().search(encounterId);
+    List<MedicationAdministration> medicationAdministrations =
+        apiClient.getMedicationAdministrationClient().search(encounterId);
 
     /* If there are no MedicationAdministration resources where
      * MedicationAdministration.identifier.value == (“Continuous Infusion Dexmedetomidine IV”,
@@ -115,7 +112,7 @@ public class DailySedationInterruptionCandidate {
     boolean allAdminOffSedation = true;
     for (MedicationAdministration admin : medicationAdministrations) {
       for (IdentifierDt id : admin.getIdentifier()) {
-        if (MedicationAdministrationUtils.notInfusing(client, encounterId, id.getValue())) {
+        if (MedicationAdministrationUtils.notInfusing(apiClient, encounterId, id.getValue())) {
           allAdminOffSedation = false;
         }
       }
@@ -137,7 +134,7 @@ public class DailySedationInterruptionCandidate {
     for (MedicationAdministration admin : medicationAdministrations) {
       for (IdentifierDt id : admin.getIdentifier()) {
         if (MedicationAdministrationUtils
-            .beenAdministered(client, encounterId, twoHourPeriod, id.getValue())) {
+            .beenAdministered(apiClient, encounterId, twoHourPeriod, id.getValue())) {
 
           switch (admin.getIdentifierFirstRep().getValue()) {
             case "Intermittent Cisatracurium IV":
@@ -158,7 +155,7 @@ public class DailySedationInterruptionCandidate {
     for (MedicationAdministration admin : medicationAdministrations) {
       for (IdentifierDt id : admin.getIdentifier()) {
         if (MedicationAdministrationUtils
-            .activelyInfusing(client, encounterId, id.getValue())) {
+            .activelyInfusing(apiClient, encounterId, id.getValue())) {
           switch (admin.getIdentifierFirstRep().getValue()) {
             case "Continuous Infusion Cisatracurium IV":
             case "Continuous Infusion Vecuronium IV":
@@ -170,37 +167,37 @@ public class DailySedationInterruptionCandidate {
 
     // Gather observations needed.
     String freshestTrainOfFour = ObservationUtils.getFreshestByCodeAfterTime(
-        client, encounterId, "304500964", twoHoursAgo)
+        apiClient, encounterId, "304500964", twoHoursAgo)
         .map(observation -> observation.getValue().toString())
         .orElse("");
 
     String freshestWakeUpAction = ObservationUtils.getFreshestByCodeAfterTime(
-        client, encounterId, "304890033", twentyFiveHoursAgo)
+        apiClient, encounterId, "304890033", twentyFiveHoursAgo)
         .map(observation -> observation.getValue().toString())
         .orElse("");
 
-    List<ProcedureRequest> hypothermiaBlanketOrders = ProcedureRequestUtils
-        .getByCodeAfterTime(client, encounterId, "57714", twentyFiveHoursAgo);
-    hypothermiaBlanketOrders.addAll(ProcedureRequestUtils.getByCodeAfterTime(client, encounterId,
-        "139056", twentyFiveHoursAgo));
+    List<ProcedureRequest> hypothermiaBlanketOrders = ProcedureRequestUtils.getByCodeAfterTime(
+        apiClient, encounterId, "57714", twentyFiveHoursAgo);
+    hypothermiaBlanketOrders.addAll(ProcedureRequestUtils.getByCodeAfterTime(
+        apiClient, encounterId, "139056", twentyFiveHoursAgo));
 
     Optional<Observation> freshestCoolingPadStatusFromPast25Hours = ObservationUtils
-        .getFreshestByCodeAfterTime(client, encounterId, "3045000709", twentyFiveHoursAgo);
+        .getFreshestByCodeAfterTime(apiClient, encounterId, "3045000709", twentyFiveHoursAgo);
 
     List<Observation> temperatureFromPast48Hours = ObservationUtils.getObservationByCodeAfterTime(
-        client, encounterId, "3045000001", fourtyEightHoursAgo);
+        apiClient, encounterId, "3045000001", fourtyEightHoursAgo);
 
     List<Observation> coolingPadPatientTemperatureFromPast48Hours = ObservationUtils
-        .getObservationByCodeAfterTime(client, encounterId, "3045000458", fourtyEightHoursAgo);
+        .getObservationByCodeAfterTime(apiClient, encounterId, "3045000458", fourtyEightHoursAgo);
 
     List<Observation> coolingPadWaterTemperatureFromPast48Hours = ObservationUtils
-        .getObservationByCodeAfterTime(client, encounterId, "304894100", fourtyEightHoursAgo);
+        .getObservationByCodeAfterTime(apiClient, encounterId, "304894100", fourtyEightHoursAgo);
 
     Optional<Observation> freshestCoolingPadWaterTemperatureFromPast2Hours = ObservationUtils
-        .getFreshestByCodeAfterTime(client, encounterId, "304894100", twoHoursAgo);
+        .getFreshestByCodeAfterTime(apiClient, encounterId, "304894100", twoHoursAgo);
 
     Optional<Observation> freshestActualRASSFromPast7Hours = ObservationUtils
-        .getFreshestByCodeAfterTime(client, encounterId, "3045000021", sevenHoursAgo);
+        .getFreshestByCodeAfterTime(apiClient, encounterId, "3045000021", sevenHoursAgo);
 
     /* if freshestTrainOfFour.getValue() == (“0”, “1”, “2”, “3”) then Daily Sedation Interruption
      * Candidate = “No: Receiving NMBA”
@@ -260,8 +257,8 @@ public class DailySedationInterruptionCandidate {
      * Hypothermia”
      */
     if (!hypothermiaBlanketOrders.isEmpty()
-        && (ProcedureRequestUtils.activeNonMedicationOrder(client, encounterId, "57714"))
-        || ProcedureRequestUtils.activeNonMedicationOrder(client, encounterId, "139056")) {
+        && (ProcedureRequestUtils.activeNonMedicationOrder(apiClient, encounterId, "57714"))
+        || ProcedureRequestUtils.activeNonMedicationOrder(apiClient, encounterId, "139056")) {
       return THERAPEUTIC_HYPOTHERMIA;
     }
 
@@ -388,7 +385,7 @@ public class DailySedationInterruptionCandidate {
         case "Continuous Infusion Midazolam IV":
           for (IdentifierDt id : admin.getIdentifier()) {
             if (MedicationAdministrationUtils
-                .activelyInfusing(client, encounterId, id.getValue())) {
+                .activelyInfusing(apiClient, encounterId, id.getValue())) {
               return YES;
             }
           }

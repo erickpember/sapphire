@@ -9,46 +9,52 @@ import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
 import com.datafascia.emerge.ucsf.ObservationUtils;
+import java.time.Clock;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
+import javax.inject.Inject;
 
 /**
  * Daily sedation interruption.
  */
 public class DailySedationInterruption {
 
+  @Inject
+  private Clock clock;
+
+  @Inject
+  private ClientBuilder apiClient;
+
   /**
-   * Returns whether a person's sedation was interrupted in the last 25 hours.
+   * Checks if patient's sedation was interrupted in the last 25 hours.
    *
-   * @param client The client to use.
-   * @param encounterId The encounter to check.
-   * @return Whether a person's sedation was interrupted.
+   * @param encounterId
+   *     encounter to search
+   * @return true if patient's sedation was interrupted
    */
-  public static boolean dailySedationInterrupted(ClientBuilder client, String encounterId) {
-    // We only care about the last 25 hours.
-    Calendar cal = Calendar.getInstance();
-    cal.add(Calendar.HOUR, -25);
-    Date twentyFiveHoursAgo = cal.getTime();
+  public boolean test(String encounterId) {
+    Instant now = Instant.now(clock);
+    Date effectiveLowerBound = Date.from(now.minus(25, ChronoUnit.HOURS));
 
-    // Check the latest observation if it shows a wakeup action.
-    List<Observation> sedationWakeUpActionFromPast25Hours = ObservationUtils
-        .getObservationByCodeAfterTime(client, encounterId, "304890033", twentyFiveHoursAgo);
-    Observation freshest = ObservationUtils
-        .findFreshestObservation(sedationWakeUpActionFromPast25Hours);
-
-    if (freshest.getValue().toString().equals("Yes")) {
+    // If the patient was woken up, then return true.
+    Optional<Observation> sedationWakeUpActionFromPast25Hours =
+        ObservationUtils.getFreshestByCodeAfterTime(
+            apiClient, encounterId, "304890033", effectiveLowerBound);
+    if (sedationWakeUpActionFromPast25Hours.isPresent()
+        && sedationWakeUpActionFromPast25Hours.get().getValue().toString().equals("Yes")) {
       return true;
     }
 
     // Get a list of administrations and associate them with their respective orders.
-    List<MedicationAdministration> admins = client.getMedicationAdministrationClient()
+    List<MedicationAdministration> admins = apiClient.getMedicationAdministrationClient()
         .search(encounterId);
     List<MedicationAdministration> filteredAdmins = new ArrayList<>();
     Map<String, MedicationOrder> orders = new HashMap<>();
@@ -62,11 +68,11 @@ public class DailySedationInterruption {
           || adminId.equals("Continuous Infusion Propofol IV")
           || adminId.equals("Continuous Infusion Lorazepam IV")
           || adminId.equals("Continuous Infusion Midazolam IV")) {
-        if (((DateTimeDt) admin.getEffectiveTime()).getValue().after(twentyFiveHoursAgo)) {
+        if (((DateTimeDt) admin.getEffectiveTime()).getValue().after(effectiveLowerBound)) {
           filteredAdmins.add(admin);
           MedicationOrder order;
           if (!orders.containsKey(orderId)) {
-            order = client.getMedicationOrderClient().read(orderId, encounterId);
+            order = apiClient.getMedicationOrderClient().read(orderId, encounterId);
           } else {
             order = orders.get(orderId);
           }
@@ -123,7 +129,7 @@ public class DailySedationInterruption {
     // Finally, check if anything is actively administering.
     for (MedicationAdministration admin : filteredAdmins) {
       String medset = admin.getIdentifierFirstRep().getValue();
-      if (MedicationAdministrationUtils.activelyInfusing(client, encounterId, medset)) {
+      if (MedicationAdministrationUtils.activelyInfusing(apiClient, encounterId, medset)) {
         return false;
       }
     }

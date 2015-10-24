@@ -4,6 +4,8 @@ package com.datafascia.etl.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import com.datafascia.emerge.harms.vae.CurrentTidalVolume;
+import com.datafascia.emerge.harms.vae.DailySedationInterruption;
+import com.datafascia.emerge.harms.vae.DailySedationInterruptionCandidate;
 import com.datafascia.emerge.harms.vae.DailySpontaneousBreathingTrialImpl;
 import com.datafascia.emerge.harms.vae.DiscreteHeadOfBedGreaterThan30Degrees;
 import com.datafascia.emerge.harms.vae.InlineSuction;
@@ -19,6 +21,7 @@ import com.datafascia.emerge.harms.vae.VentilationModeImpl;
 import com.datafascia.emerge.ucsf.DailySpontaneousBreathingTrial;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.MedicalData;
+import com.datafascia.emerge.ucsf.SATDSI;
 import com.datafascia.emerge.ucsf.TimestampedBoolean;
 import com.datafascia.emerge.ucsf.TimestampedInteger;
 import com.datafascia.emerge.ucsf.TimestampedMaybe;
@@ -38,6 +41,12 @@ public class VentilatorAssociatedEventUpdater {
 
   @Inject
   private Clock clock;
+
+  @Inject
+  private DailySedationInterruptionCandidate dailySedationInterruptionCandidate;
+
+  @Inject
+  private DailySedationInterruption dailySedationInterruption;
 
   @Inject
   private Ventilated ventilatedImpl;
@@ -87,6 +96,33 @@ public class VentilatorAssociatedEventUpdater {
     }
 
     return vae;
+  }
+
+  /**
+   * Updates daily sedation interruption.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateDailySedationInterruption(HarmEvidence harmEvidence, Encounter encounter) {
+    String encounterId = encounter.getId().getIdPart();
+    DailySedationInterruptionCandidate.CandidateResult candidateResult =
+        dailySedationInterruptionCandidate.getDailySedationInterruptionCandidate(encounterId);
+    boolean performed = dailySedationInterruption.test(encounterId);
+
+    SATDSI dailySedationInterruption = new SATDSI()
+        .withCandidate(
+            candidateResult.isCandidate())
+        .withNotCandidateReason(
+            SATDSI.NotCandidateReason.fromValue(candidateResult.getNotCandidateReason()))
+        .withPerformed(
+            performed)
+        .withUpdateTime(
+            Date.from(Instant.now(clock)));
+
+    harmEvidence.getMedicalData().setSATDSI(dailySedationInterruption);
   }
 
   /**

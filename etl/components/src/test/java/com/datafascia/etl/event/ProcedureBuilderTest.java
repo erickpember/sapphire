@@ -50,7 +50,7 @@ public class ProcedureBuilderTest {
     Clock clock = Clock.fixed(Instant.now(), ZoneId.of("America/Los_Angeles"));
 
     ProcedureBuilder procedureBuilder = new ProcedureBuilder(new Encounter(), clock);
-    addObservation(procedureBuilder, "304890077", "Placement Date", "20150208");
+    addObservation(procedureBuilder, "304890002", "Placement Date", "20150208");
     addObservation(procedureBuilder, "304890078", "Placement Time", "181900");
     addObservation(procedureBuilder, "304890094", "Lumens", "2");
     addObservation(procedureBuilder, "304890080", "Line Type-CVC Single Lumen", "Tunneled");

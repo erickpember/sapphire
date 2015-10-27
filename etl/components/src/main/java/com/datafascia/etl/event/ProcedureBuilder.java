@@ -51,7 +51,7 @@ public class ProcedureBuilder {
 
   private static final String LINE_TYPE0 = "304890080";
   private static final String LINE_TYPE9 = "304890099";
-  private static final String LINE_PLACEMENT_DATE = "304890077";
+  private static final String LINE_PLACEMENT_DATE = "304890002";
   private static final String LINE_PLACEMENT_TIME = "304890078";
   private static final String LINE_ORIENTATION1 = "304890081";
   private static final String LINE_ORIENTATION2 = "304890092";

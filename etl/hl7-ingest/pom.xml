@@ -14,12 +14,11 @@
   <parent>
     <groupId>com.datafascia</groupId>
     <artifactId>df-parent</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>1.5.0</version>
     <relativePath>../..</relativePath>
   </parent>
 
   <artifactId>df-etl-hl7-ingest</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
   <packaging>jar</packaging>
 
   <name>${project.artifactId}</name>

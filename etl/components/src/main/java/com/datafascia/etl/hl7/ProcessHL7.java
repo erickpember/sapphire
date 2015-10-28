@@ -80,7 +80,7 @@ public class ProcessHL7 extends DependencyInjectingProcessor {
       hl7MessageProcessor.accept(message);
 
       session.transfer(messageFlowFile, SUCCESS);
-    } catch (IllegalStateException | NullPointerException e) {
+    } catch (RuntimeException e) {
       log.error("Cannot process {}", new Object[] { messageFlowFile }, e);
       messageFlowFile = session.penalize(messageFlowFile);
       session.transfer(messageFlowFile, FAILURE);

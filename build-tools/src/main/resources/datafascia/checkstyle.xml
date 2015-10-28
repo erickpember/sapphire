@@ -71,9 +71,6 @@
       <property name="severity" value="warning"/>
     </module>
 
-    <!-- Illegal exception catching -->
-    <module name="IllegalCatch"/>
-
     <!-- No EOL should be placed before block start ('{') -->
     <module name="LeftCurly">
       <property name="option" value="eol"/>

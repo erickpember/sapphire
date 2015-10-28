@@ -71,10 +71,10 @@ public class RassLevel {
    * @return RASS level and time of acquisition, or {@code null} if not found
    */
   public CurrentRassLevel getCurrentRassLevel(String encounterId) {
-    CurrentRassLevel result = CurrentRassLevel
-        .builder()
+    CurrentRassLevel result = CurrentRassLevel.builder()
         .rassScore(11)
-        .timeOfDataAquisition(null).build();
+        .timeOfDataAquisition(null)
+        .build();
 
     ZonedDateTime now = ZonedDateTime.now(clock);
     ZonedDateTime midnight = ZonedDateTime.of(
@@ -95,7 +95,7 @@ public class RassLevel {
 
     if (freshestRassScore != null) {
       result.setRassScore(RassUtils.getRassScoreFromValue(freshestRassScore));
-      result.setTimeOfDataAquisition(freshestRassScore.getIssued());
+      result.setTimeOfDataAquisition(ObservationUtils.getEffectiveDate(freshestRassScore));
     }
     return result;
   }

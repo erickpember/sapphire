@@ -90,25 +90,8 @@ public class PainAndDeliriumUpdater {
   @Inject
   private SedativeOrder sedativeOrderImpl;
 
-  private static Pain getPain(HarmEvidence harmEvidence) {
-    MedicalData medicalData = harmEvidence.getMedicalData();
-    if (medicalData.getDelirium() == null) {
-      medicalData.setDelirium(new Delirium());
-    }
-
-    Pain pain = medicalData.getDelirium().getPain();
-    if (pain == null) {
-      pain = new Pain();
-      medicalData.getDelirium().setPain(pain);
-    }
-    return pain;
-  }
-
   private static Delirium getDelirium(HarmEvidence harmEvidence) {
     MedicalData medicalData = harmEvidence.getMedicalData();
-    if (medicalData.getDelirium() == null) {
-      medicalData.setDelirium(new Delirium());
-    }
 
     Delirium delirium = medicalData.getDelirium();
     if (delirium == null) {
@@ -116,6 +99,17 @@ public class PainAndDeliriumUpdater {
       medicalData.setDelirium(delirium);
     }
     return delirium;
+  }
+
+  private static Pain getPain(HarmEvidence harmEvidence) {
+    Delirium delirium = getDelirium(harmEvidence);
+
+    Pain pain = delirium.getPain();
+    if (pain == null) {
+      pain = new Pain();
+      delirium.setPain(pain);
+    }
+    return pain;
   }
 
   /**

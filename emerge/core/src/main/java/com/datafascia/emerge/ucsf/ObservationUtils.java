@@ -241,6 +241,10 @@ public class ObservationUtils {
    *     True if the supplied  is inside the specified time window.
    */
   public static boolean insideTimeFrame(Observation observation, PeriodDt timeFrame) {
+    if (observation == null || observation.getEffective() == null) {
+      return false;
+    }
+
     IDatatype effectiveTime = observation.getEffective();
     if (effectiveTime instanceof TimingDt) {
       return ((TimingDt) effectiveTime).getEventFirstRep().getValue().after(timeFrame.getStart())

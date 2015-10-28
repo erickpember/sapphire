@@ -210,7 +210,6 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
 
     final ProcessorLog logger = getLogger();
     final ProcessSession session = sessionFactory.createSession();
-    final StopWatch stopWatch = new StopWatch(true);
     final SSLContextService sslContextService = context.getProperty(SSL_CONTEXT_SERVICE)
         .asControllerService(SSLContextService.class);
 
@@ -276,6 +275,7 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
     final HttpClient client = clientBuilder.build();
 
     for (String url : config.urls) {
+      final StopWatch stopWatch = new StopWatch(true);
       String baseUrl = url;
       String lastTimestamp = lastTimestamps.get(url);
 

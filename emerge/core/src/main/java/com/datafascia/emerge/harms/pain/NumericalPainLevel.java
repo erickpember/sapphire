@@ -78,10 +78,10 @@ public class NumericalPainLevel {
    * @return Numeric pain level and time of acquisition, or {@code null} if not found
    */
   public CurrentPainLevel getCurrentPainLevel(String encounterId) {
-    CurrentPainLevel result = CurrentPainLevel
-        .builder()
+    CurrentPainLevel result = CurrentPainLevel.builder()
         .painScore(11)
-        .timeOfDataAquisition(null).build();
+        .timeOfDataAquisition(null)
+        .build();
 
     ZonedDateTime now = ZonedDateTime.now(clock);
     ZonedDateTime midnight = ZonedDateTime.of(
@@ -105,7 +105,7 @@ public class NumericalPainLevel {
 
     if (freshestNumericalPainScore != null) {
       result.setPainScore(PainUtils.getPainScoreFromValue(freshestNumericalPainScore));
-      result.setTimeOfDataAquisition(freshestNumericalPainScore.getIssued());
+      result.setTimeOfDataAquisition(ObservationUtils.getEffectiveDate(freshestNumericalPainScore));
     }
     return result;
   }

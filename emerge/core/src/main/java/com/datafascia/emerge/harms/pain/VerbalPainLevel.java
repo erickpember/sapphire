@@ -36,7 +36,7 @@ public class VerbalPainLevel {
   private ClientBuilder apiClient;
 
   @Inject
-  private static Clock clock;
+  private Clock clock;
 
   /**
    * Result container for the Pain and Delirium Verbal Pain Level (Current)

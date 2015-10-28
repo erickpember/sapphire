@@ -36,7 +36,7 @@ public class NumericalPainLevel {
   private ClientBuilder apiClient;
 
   @Inject
-  private static Clock clock;
+  private Clock clock;
 
   /**
    * Result container for the Pain and Delirium Numerical Pain Level (Current)

@@ -23,7 +23,7 @@ public class PainGoalImpl {
   private ClientBuilder apiClient;
 
   @Inject
-  private static Clock clock;
+  private Clock clock;
 
   /**
    * Implements the Pain and Delirium Harm Acceptable Level of Pain (aka Clinician Pain Goal)

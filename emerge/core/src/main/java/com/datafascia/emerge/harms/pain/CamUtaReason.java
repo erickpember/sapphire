@@ -23,7 +23,7 @@ public class CamUtaReason {
   private ClientBuilder apiClient;
 
   @Inject
-  private static Clock clock;
+  private Clock clock;
 
   /**
    * Implements the Pain and Delirium Harms CAM-ICU UTA Reason

@@ -28,7 +28,7 @@ public class CpotImpl {
   private ClientBuilder apiClient;
 
   @Inject
-  private static Clock clock;
+  private Clock clock;
 
   /**
    * Result container for the pain and delirium CPOT level (current)

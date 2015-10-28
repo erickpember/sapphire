@@ -23,7 +23,7 @@ public class CamResult {
   private ClientBuilder apiClient;
 
   @Inject
-  private static Clock clock;
+  private Clock clock;
 
   /**
    * Checks if observation is relevant to CAM-ICU result.

@@ -15,7 +15,7 @@ import javax.inject.Inject;
 public class RassGoalImpl {
 
   @Inject
-  private static ClientBuilder apiClient;
+  private ClientBuilder apiClient;
 
   /**
    * Pain and delirium Clinician RASS goal implementation
@@ -25,7 +25,7 @@ public class RassGoalImpl {
    * @return
    *     Most recent RASS goal, or 11 if absent.
    **/
-  public static Integer getRassGoal(String encounterId) {
+  public int getRassGoal(String encounterId) {
     ProcedureRequest targetRass = getTargetRass(encounterId);
 
     if (ProcedureRequestUtils.isCurrent(targetRass)) {
@@ -75,7 +75,7 @@ public class RassGoalImpl {
    *     relevant encounter for search
    * @return Procedure request with notes value "Target RASS" or null if not found.
    */
-  private static ProcedureRequest getTargetRass(String encounterId) {
+  private ProcedureRequest getTargetRass(String encounterId) {
     Optional<ProcedureRequest> targetRass = apiClient.getProcedureRequestClient()
         .getProcedureRequest(encounterId).stream().filter(order -> order.getCode()
             .getText().equals("Target RASS")).findAny();

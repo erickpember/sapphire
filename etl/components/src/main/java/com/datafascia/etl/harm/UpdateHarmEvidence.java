@@ -12,6 +12,7 @@ import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.collect.ImmutableSet;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -44,13 +45,21 @@ public class UpdateHarmEvidence extends DependencyInjectingProcessor {
       .description("Encounter identifier of updated harm evidence record")
       .build();
 
-  private Set<Relationship> relationships = ImmutableSet.of(SUCCESS);
+  public static final Relationship FAILURE = new Relationship.Builder()
+      .name("failure")
+      .description("Harm evidence record which failed to update")
+      .build();
+
+  private Set<Relationship> relationships = ImmutableSet.of(SUCCESS, FAILURE);
 
   @Inject
   private volatile HarmEvidenceRepository harmEvidenceRepository;
 
   @Inject
   private volatile HarmEvidenceUpdater harmEvidenceUpdater;
+
+  @Inject
+  private volatile ObjectMapper objectMapper;
 
   @Override
   public Set<Relationship> getRelationships() {
@@ -91,16 +100,39 @@ public class UpdateHarmEvidence extends DependencyInjectingProcessor {
     session.transfer(flowFile, SUCCESS);
   }
 
+  private void writeFailure(ProcessSession session, HarmEvidence record) throws ProcessException {
+    FlowFile flowFile = session.create();
+    flowFile = session.write(flowFile, output -> {
+      objectMapper.writerWithDefaultPrettyPrinter().writeValue(output, record);
+    });
+
+    session.getProvenanceReporter().create(flowFile);
+
+    session.transfer(flowFile, FAILURE);
+  }
+
+  private void update(HarmEvidence record) {
+    log.info(
+        "Updating harm evidence for encounter ID [{}], patient ID [{}]",
+        new Object[] {
+          record.getEncounterID(), record.getDemographicData().getMedicalRecordNumber() });
+
+    UnitedStatesPatient patient = getPatient(record.getDemographicData().getMedicalRecordNumber());
+    Encounter encounter = getEncounter(record.getEncounterID(), patient);
+    harmEvidenceUpdater.processTimer(encounter);
+  }
+
   @Override
   public void onTrigger(ProcessContext context, ProcessSession session) throws ProcessException {
     List<HarmEvidence> records = harmEvidenceRepository.list();
     for (HarmEvidence record : records) {
-      UnitedStatesPatient patient =
-          getPatient(record.getDemographicData().getMedicalRecordNumber());
-      Encounter encounter = getEncounter(record.getEncounterID(), patient);
-      harmEvidenceUpdater.processTimer(encounter);
-
-      writeSuccess(session, record.getEncounterID());
+      try {
+        update(record);
+        writeSuccess(session, record.getEncounterID());
+      } catch (RuntimeException e) {
+        log.error("Cannot update encounter ID [{}]", new Object[] { record.getEncounterID() }, e);
+        writeFailure(session, record);
+      }
     }
   }
 }

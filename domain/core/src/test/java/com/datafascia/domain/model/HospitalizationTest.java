@@ -10,7 +10,6 @@ import java.util.Arrays;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 
 /**
  * Test code for the Hospitalization model.
@@ -20,7 +19,6 @@ public class HospitalizationTest extends ModelTestBase {
   public <T extends Object> void testHospitalization() throws IOException, URISyntaxException {
     Hospitalization decoded = (Hospitalization) geneticEncodeDecodeTest(TestModels.hospitalization);
 
-    assertTrue(decoded.getReadmission());
     assertEquals(decoded.getAdmitSource(), TestModels.codeable);
     assertEquals(decoded.getDietPreference(), TestModels.codeable);
     assertEquals(decoded.getDischargeDisposition(), TestModels.codeable);
@@ -44,7 +42,6 @@ public class HospitalizationTest extends ModelTestBase {
     jsonProperties.add("@id");
     jsonProperties.add("originId");
     jsonProperties.add("period");
-    jsonProperties.add("readmission");
     jsonProperties.add("specialArrangements");
     jsonProperties.add("specialCourtesies");
 

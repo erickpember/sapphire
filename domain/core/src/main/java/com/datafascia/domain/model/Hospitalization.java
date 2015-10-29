@@ -71,8 +71,4 @@ public class Hospitalization {
    */
   @JsonProperty("dischargeDiagnosis")
   private Reference dischargeDiagnosis;
-
-  /** Whether this hospitalization is a readmission. */
-  @JsonProperty("readmission")
-  private Boolean readmission;
 }

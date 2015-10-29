@@ -113,10 +113,6 @@
           "format": "date-time",
           "description": "An explanation about the purpose of this instance described by this schema."
         },
-        "readmission": {
-          "type": "boolean",
-          "description": "An explanation about the purpose of this instance described by this schema."
-        },
         "dateOfBirth": {
           "type": "string",
           "format": "date",

@@ -21,14 +21,18 @@ public class RxNormLookup {
   private Statement statement = null;
   private ResultSet resultSet = null;
   private final String table;
+  private final String username;
+  private final String password;
+  private final String jdbcUrl;
 
   /**
    * Create a new RxNorm db.
+   *
    * @param jdbcUrl The JDBC URL of the db to connect.
    * @param table The table to connect to.
    * @param username The username to connect with.
    * @param password The password to use.
-   * @throws SQLException  if there is an error with SQL.
+   * @throws SQLException if there is an error with SQL.
    */
   public RxNormLookup(String jdbcUrl, String table, String username, String password) throws
       SQLException {
@@ -37,9 +41,23 @@ public class RxNormLookup {
     } catch (ClassNotFoundException e) {
       throw new IllegalStateException("JDBC driver not found", e);
     }
-    connection = DriverManager.getConnection(jdbcUrl, username, password);
-    statement = connection.createStatement();
+    this.username = username;
+    this.password = password;
+    this.jdbcUrl = jdbcUrl;
     this.table = table;
+    connect();
+  }
+
+  private void connect() throws SQLException {
+    if (connection != null && !connection.isClosed()) {
+      connection.close();
+    }
+    connection = DriverManager.getConnection(jdbcUrl, username, password);
+
+    if (statement != null && !statement.isClosed()) {
+      statement.close();
+    }
+    statement = connection.createStatement();
   }
 
   /**
@@ -50,6 +68,10 @@ public class RxNormLookup {
    * @throws SQLException if there is an error with SQL.
    */
   public String getRxString(int rxcui) throws SQLException {
+    if (connection.isClosed() || statement.isClosed()) {
+      connect();
+    }
+
     String rxStr = stringCache.get(rxcui);
     if (rxStr != null) {
       return rxStr;
@@ -69,6 +91,7 @@ public class RxNormLookup {
 
   /**
    * Close the connection to SQL.
+   *
    * @throws SQLException if there is an error with SQL.
    */
   public void shutdown() throws SQLException {

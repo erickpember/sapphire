@@ -105,7 +105,7 @@ public class VerbalPainLevel {
 
     if (freshestVerbalPainScore != null) {
       result.setPainScore(PainUtils.getPainScoreFromValue(freshestVerbalPainScore));
-      result.setTimeOfDataAquisition(freshestVerbalPainScore.getIssued());
+      result.setTimeOfDataAquisition(ObservationUtils.getEffectiveDate(freshestVerbalPainScore));
     }
     return result;
   }

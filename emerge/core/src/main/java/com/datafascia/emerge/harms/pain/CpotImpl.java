@@ -95,7 +95,7 @@ public class CpotImpl {
 
     if (freshestCpotScore != null) {
       result.setPainScore(PainUtils.getPainScoreFromValue(freshestCpotScore));
-      result.setTimeOfDataAquisition(freshestCpotScore.getIssued());
+      result.setTimeOfDataAquisition(ObservationUtils.getEffectiveDate(freshestCpotScore));
     }
     return result;
   }

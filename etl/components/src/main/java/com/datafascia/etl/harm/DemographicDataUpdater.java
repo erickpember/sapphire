@@ -43,20 +43,21 @@ public class DemographicDataUpdater {
 
   private static String formatRace(UnitedStatesPatient patient) {
     switch (getRace(patient)) {
-      case AMERICAN_INDIAN:
-        return "I";
-      case ASIAN:
-        return "N";
-      case BLACK:
-        return "B";
-      case OTHER:
-        return "O";
+      // Notice that this is defaulting to "Other" for two race codes.
       case PACIFIC_ISLANDER:
-        return "P";
+      case AMERICAN_INDIAN:
+      case OTHER:
+        return "Other";
+      case ASIAN:
+        return "Asian";
+      case BLACK:
+        return "Black";
       case WHITE:
-        return "W";
+        return "White";
+      case UNKNOWN:
+        return "Unknown";
       default:
-        return "U";
+        return "Not Documented";
     }
   }
 

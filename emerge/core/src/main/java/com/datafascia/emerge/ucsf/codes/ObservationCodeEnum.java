@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.ucsf.codes;
 
+import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import com.datafascia.common.persist.CodeToEnumMapper;
 import com.datafascia.domain.fhir.SystemDefinedCode;
 import java.util.Optional;
@@ -10,6 +11,10 @@ import java.util.Optional;
  * Enumerates types of Observation codes.
  */
 public enum ObservationCodeEnum implements SystemDefinedCode<String> {
+  ADMISSION_HEIGHT("HT"),
+  CLINICAL_HEIGHT("304894102"),
+  ADMISSION_WEIGHT("WT"),
+  CLINICAL_WEIGHT("304894103"),
   ETT_INVASIVE_VENT_STATUS("304890042"),
   TRACH_INVASIVE_VENT_STATUS("304890045"),
   BENZODIAZEPINE_AVOIDANCE("3045000404"),
@@ -70,6 +75,17 @@ public enum ObservationCodeEnum implements SystemDefinedCode<String> {
   @Override
   public String getSystem() {
     return SYSTEM;
+  }
+
+  /**
+   * Checks if this enum constant's code equals the desired code.
+   *
+   * @param desiredCode
+   *     code to match
+   * @return true if this enum constant's code equals the desired code
+   */
+  public boolean isCodeEquals(CodeableConceptDt desiredCode) {
+    return code.equals(desiredCode.getCodingFirstRep().getCode());
   }
 
   /**

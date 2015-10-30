@@ -4,7 +4,10 @@ package com.datafascia.etl.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Location;
+import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
+import com.datafascia.emerge.harms.demographic.BodyHeight;
+import com.datafascia.emerge.harms.demographic.BodyWeight;
 import com.datafascia.etl.harm.HarmEvidenceUpdater.Event;
 import com.datafascia.etl.harm.HarmEvidenceUpdater.EventType;
 
@@ -19,4 +22,22 @@ when
   $encounter: Encounter()
 then
   demographicDataUpdater.update(harmEvidence, $patient, $location, $encounter);
+end
+
+rule "Update patient height"
+when
+  Event( type == EventType.UPDATE_OBSERVATIONS )
+  $observation: Observation( BodyHeight.isRelevant($observation) )
+  $encounter: Encounter()
+then
+  demographicDataUpdater.updateHeight(harmEvidence, $encounter);
+end
+
+rule "Update patient weight"
+when
+  Event( type == EventType.UPDATE_OBSERVATIONS )
+  $observation: Observation( BodyWeight.isRelevant($observation) )
+  $encounter: Encounter()
+then
+  demographicDataUpdater.updateWeight(harmEvidence, $encounter);
 end

@@ -39,6 +39,9 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
   protected HarmEvidenceUpdater harmEvidenceUpdater;
 
   @Inject
+  protected EncounterRepository encounterRepository;
+
+  @Inject
   protected Clock clock;
 
   @BeforeClass

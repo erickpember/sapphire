@@ -5,12 +5,11 @@ package com.datafascia.etl.harm.demographic;
 import com.datafascia.common.persist.Id;
 import com.datafascia.emerge.ucsf.DemographicData;
 import com.datafascia.emerge.ucsf.HarmEvidence;
-import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
 import com.datafascia.etl.harm.HarmEvidenceTestSupport;
-import java.time.Clock;
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.Optional;
-import javax.inject.Inject;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -23,13 +22,10 @@ import static org.testng.Assert.assertTrue;
 @Test(singleThreaded = true)
 public class DemographicIT extends HarmEvidenceTestSupport {
 
-  private static final String PATIENT_IDENTIFIER = "97546762";
-
-  @Inject
-  private Clock clock;
-
-  @Inject
-  private HarmEvidenceRepository harmEvidenceRepository;
+  @AfterMethod
+  public void deleteEncounter() throws Exception {
+    encounterRepository.delete(Id.of(ENCOUNTER_IDENTIFIER));
+  }
 
   @Test
   public void should_export_demographic_data() throws Exception {
@@ -45,8 +41,12 @@ public class DemographicIT extends HarmEvidenceTestSupport {
     assertEquals(demographicData.getDateOfBirth(), "1984-10-01");
     assertEquals(demographicData.getGender(), DemographicData.Gender.FEMALE);
     assertEquals(demographicData.getRace(), "W");
+    assertEquals(demographicData.getAdmissionHeight(), new BigDecimal("183"));
+    assertEquals(demographicData.getAdmissionWeight(), new BigDecimal("100.0"));
     assertEquals(demographicData.getRoomNumber(), "0009-A");
     assertEquals(demographicData.getUpdateTime().toInstant(), Instant.now(clock));
+
+    processMessage("ADT_A03.hl7");
   }
 
   @Test
@@ -60,5 +60,20 @@ public class DemographicIT extends HarmEvidenceTestSupport {
     processMessage("ADT_A03.hl7");
     harmEvidence = harmEvidenceRepository.read(patientId);
     assertFalse(harmEvidence.isPresent());
+  }
+
+  @Test
+  public void should_export_clinical_height_weight() throws Exception {
+    processMessage("ADT_A01.hl7");
+    processMessage("height-weight.hl7");
+
+    Id<HarmEvidence> patientId = Id.of(PATIENT_IDENTIFIER);
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(patientId).get();
+    DemographicData demographicData = harmEvidence.getDemographicData();
+
+    assertEquals(demographicData.getAdmissionHeight(), new BigDecimal("185"));
+    assertEquals(demographicData.getAdmissionWeight(), new BigDecimal("101"));
+
+    processMessage("ADT_A03.hl7");
   }
 }

@@ -133,11 +133,13 @@
         },
         "admissionHeight": {
           "type": "number",
-          "description": "An explanation about the purpose of this instance described by this schema."
+          "javaType": "java.math.BigDecimal",
+          "description": "body height in cm"
         },
         "admissionWeight": {
           "type": "number",
-          "description": "An explanation about the purpose of this instance described by this schema."
+          "javaType": "java.math.BigDecimal",
+          "description": "body mass in kg"
         },
         "roomNumber": {
           "type": "string",

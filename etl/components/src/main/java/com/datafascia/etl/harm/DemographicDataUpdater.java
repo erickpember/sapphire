@@ -8,9 +8,10 @@ import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import com.datafascia.domain.fhir.HumanNames;
 import com.datafascia.domain.fhir.RaceEnum;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
+import com.datafascia.emerge.harms.demographic.BodyHeight;
+import com.datafascia.emerge.harms.demographic.BodyWeight;
 import com.datafascia.emerge.ucsf.DemographicData;
 import com.datafascia.emerge.ucsf.HarmEvidence;
-import java.lang.NumberFormatException;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -26,6 +27,12 @@ public class DemographicDataUpdater {
 
   @Inject
   private Clock clock;
+
+  @Inject
+  private BodyHeight bodyHeight;
+
+  @Inject
+  private BodyWeight bodyWeight;
 
   private static RaceEnum getRace(UnitedStatesPatient patient) {
     for (RaceEnum race : patient.getRace().getValueAsEnum()) {
@@ -123,5 +130,37 @@ public class DemographicDataUpdater {
       demographicData.setDateOfBirth(
           formatLocalDate(patient.getBirthDateElement().getValue()));
     }
+  }
+
+  /**
+   * Updates patient height.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateHeight(HarmEvidence harmEvidence, Encounter encounter) {
+    String encounterId = encounter.getIdentifierFirstRep().getValue();
+
+    harmEvidence.getDemographicData()
+        .withAdmissionHeight(
+            bodyHeight.apply(encounterId));
+  }
+
+  /**
+   * Updates patient weight.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateWeight(HarmEvidence harmEvidence, Encounter encounter) {
+    String encounterId = encounter.getIdentifierFirstRep().getValue();
+
+    harmEvidence.getDemographicData()
+        .withAdmissionWeight(
+            bodyWeight.apply(encounterId));
   }
 }

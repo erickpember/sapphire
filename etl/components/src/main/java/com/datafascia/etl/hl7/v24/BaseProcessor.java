@@ -34,6 +34,7 @@ import com.neovisionaries.i18n.LanguageCode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.StringJoiner;
 
@@ -132,11 +133,16 @@ public abstract class BaseProcessor implements MessageProcessor {
       case "NM":
         observationValue = new QuantityDt()
             .setValue(new DecimalDt(value))
-            .setUnits(obx.getUnits().encode());
+            .setUnit(obx.getUnits().encode());
         break;
       default:
         observationValue = new StringDt(value);
         break;
+    }
+
+    DateTimeDt effective = toDateTime(obx.getDateTimeOfTheObservation());
+    if (effective == null) {
+      effective = new DateTimeDt(new Date());
     }
 
     Observation observation = new Observation()
@@ -145,7 +151,7 @@ public abstract class BaseProcessor implements MessageProcessor {
         .setValue(
             observationValue)
         .setEffective(
-            toDateTime(obx.getDateTimeOfTheObservation()))
+            effective)
         .setStatus(
             toObservationStatus(obx.getObservationResultStatus().getValue()))
         .setMethod(

@@ -3,6 +3,7 @@
 package com.datafascia.common.persist.entity;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.server.exceptions.InternalErrorException;
 import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.avro.schemaregistry.AvroSchemaRegistry;
 import java.io.UnsupportedEncodingException;
@@ -55,6 +56,11 @@ public class AccumuloFhirEntityStore implements FhirEntityStore {
   }
 
   private static String toRowId(TypeAndId entityIdElement) {
+    if (entityIdElement.getType() == null || entityIdElement.getId() == null) {
+      throw new InternalErrorException("Could not generate row ID for "
+          + entityIdElement.toString());
+    }
+
     return entityIdElement.getType().getSimpleName() + COMPONENT_SEPARATOR +
         escape(entityIdElement.getId().toString()) + KEY_SEPARATOR;
   }

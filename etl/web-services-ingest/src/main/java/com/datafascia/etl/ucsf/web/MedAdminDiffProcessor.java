@@ -327,7 +327,9 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
           droolNorm.getMedsSets(),
           clientBuilder);
       newOrder = clientBuilder.getMedicationOrderClient().create(newOrder);
-      diffListener.newOrder(newOrder);
+      if (diffListener != null) {
+        diffListener.newOrder(newOrder);
+      }
     }
 
     JSONArray meds = (JSONArray) orderJson.get("MedAdmin");

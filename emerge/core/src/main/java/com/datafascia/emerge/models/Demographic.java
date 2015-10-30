@@ -14,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class Demographic {
 
   private static final String DEFAULT_JHED_ID = "Topaz";
+  private static final String DEFAULT_READMISSION = "No";
   private static final String DEFAULT_WEIGHT = "0";
   private static final String DEFAULT_HEIGHT = "0";
   private static final String DEFAULT_PRIOR_HOSPITAL_STAY = "Unknown";
@@ -51,30 +52,33 @@ public class Demographic {
   @JsonProperty(value = "SICU Admission Date", index = 9)
   private String sicuAdmissionDate;
 
-  @JsonProperty(value = "Patient Date of Birth", index = 10)
+  @JsonProperty(value = "Readmission", index = 10)
+  private String readmission = DEFAULT_READMISSION;
+
+  @JsonProperty(value = "Patient Date of Birth", index = 11)
   private String patientDateOfBirth;
 
-  @JsonProperty(value = "Gender", index = 11)
+  @JsonProperty(value = "Gender", index = 12)
   private String gender;
 
-  @JsonProperty(value = "Race", index = 12)
+  @JsonProperty(value = "Race", index = 13)
   private String race;
 
-  @JsonProperty(value = "Patient Admission Weight (kg)", index = 13)
+  @JsonProperty(value = "Patient Admission Weight (kg)", index = 14)
   private String patientAdmissionWeightKg = DEFAULT_WEIGHT;
 
-  @JsonProperty(value = "Patient Admission Height (cm)", index = 14)
+  @JsonProperty(value = "Patient Admission Height (cm)", index = 15)
   private String patientAdmissionHeightCm = DEFAULT_HEIGHT;
 
-  @JsonProperty(value = "Prior to Hospital Stay", index = 15)
+  @JsonProperty(value = "Prior to Hospital Stay", index = 16)
   private String priorToHospitalStay = DEFAULT_PRIOR_HOSPITAL_STAY;
 
-  @JsonProperty(value = "Highest-level Activity", index = 16)
+  @JsonProperty(value = "Highest-level Activity", index = 17)
   private String highestLevelActivity = DEFAULT_HIGHEST_LEVEL_ACTIVITY;
 
-  @JsonProperty(value = "Screening Tool Used", index = 17)
+  @JsonProperty(value = "Screening Tool Used", index = 18)
   private String screeningToolUsed = DEFAULT_SCREENING_TOOL_USED;
 
-  @JsonProperty(value = "IVC Filter", index = 18)
+  @JsonProperty(value = "IVC Filter", index = 19)
   private String ivcFilter = DEFAULT_IVC_FILTER;
 }

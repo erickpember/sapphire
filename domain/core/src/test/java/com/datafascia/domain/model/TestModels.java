@@ -871,6 +871,7 @@ public class TestModels {
 
   public static Hospitalization hospitalization = new Hospitalization() {
     {
+      setReadmission(true);
       setAdmitSource(codeable);
       setDietPreference(codeable);
       setDischargeDisposition(codeable);

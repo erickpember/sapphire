@@ -11,6 +11,7 @@ import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.harms.HarmsLookups;
 import java.util.List;
+import java.util.Optional;
 import javax.inject.Inject;
 
 /**
@@ -26,9 +27,9 @@ public class Anticoagulation {
    *
    * @param encounterId
    *     encounter to search
-   * @return anticoagulant type, or {@code null} if none.
+   * @return optional anticoagulant type, or empty if none.
    */
-  public AnticoagulationTypeEnum getAnticoagulationTypeForEncounter(String encounterId) {
+  public Optional<AnticoagulationTypeEnum> getAnticoagulationType(String encounterId) {
     List<MedicationOrder> medicationOrders = apiClient.getMedicationOrderClient()
         .search(encounterId);
 
@@ -43,7 +44,7 @@ public class Anticoagulation {
 
         for (AnticoagulationTypeEnum at : AnticoagulationTypeEnum.values()) {
           if (at.toString().toUpperCase().equals(medName.replace(" ", "_"))) {
-            return at;
+            return Optional.of(at);
           }
         }
       }
@@ -75,18 +76,18 @@ public class Anticoagulation {
           // If INR is greater than 1.5, then it's still active. Otherwise, return null.
           if (medName.equals("Warfarin")) {
             if (HarmsLookups.inrOver1point5(apiClient, encounterId)) {
-              return at;
+              return Optional.of(at);
             } else {
-              return null;
+              return Optional.empty();
             }
           }
 
-          return at;
+          return Optional.of(at);
         }
       }
     }
 
-    return null;
+    return Optional.empty();
   }
 
   /**
@@ -97,6 +98,6 @@ public class Anticoagulation {
    * @return true if the patient is anticoagulated.
    */
   public boolean isAnticoagulated(String encounterId) {
-    return getAnticoagulationTypeForEncounter(encounterId) != null;
+    return getAnticoagulationType(encounterId).isPresent();
   }
 }

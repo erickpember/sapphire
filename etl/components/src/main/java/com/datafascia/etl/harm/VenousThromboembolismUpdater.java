@@ -4,7 +4,6 @@ package com.datafascia.etl.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import com.datafascia.emerge.harms.vte.Anticoagulation;
-import com.datafascia.emerge.harms.vte.AnticoagulationTypeEnum;
 import com.datafascia.emerge.harms.vte.LowerExtremitySCDsContraindicatedImpl;
 import com.datafascia.emerge.harms.vte.PharmacologicVteProphylaxis;
 import com.datafascia.emerge.harms.vte.PharmacologicVteProphylaxisAdministered;
@@ -158,13 +157,14 @@ public class VenousThromboembolismUpdater {
     VTE vte = getVTE(harmEvidence);
 
     String encounterId = encounter.getId().getIdPart();
-    AnticoagulationTypeEnum value = anticoagulation.getAnticoagulationTypeForEncounter(encounterId);
+    anticoagulation.getAnticoagulationType(encounterId)
+        .ifPresent(value -> {
+          AnticoagulationType anticoagulationType = new AnticoagulationType()
+              .withValue(AnticoagulationType.Value.fromValue(value.getCode()))
+              .withUpdateTime(Date.from(Instant.now(clock)));
 
-    AnticoagulationType anticoagulationType = new AnticoagulationType()
-        .withValue(
-            (value != null) ? AnticoagulationType.Value.fromValue(value.getCode()) : null)
-        .withUpdateTime(Date.from(Instant.now(clock)));
-    vte.setAnticoagulationType(anticoagulationType);
+          vte.setAnticoagulationType(anticoagulationType);
+        });
   }
 
   /**

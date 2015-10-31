@@ -60,7 +60,10 @@
     </appender>
 
     <!-- valid logging levels: TRACE, DEBUG, INFO, WARN, ERROR -->
+    <logger name="com.datafascia.etl.hl7" level="DEBUG"/>
+    <logger name="com.datafascia.etl.ucsf" level="DEBUG"/>
 
+    <logger name="org.apache" level="ERROR"/>
     <logger name="org.apache.nifi" level="INFO"/>
 
     <!-- Logger for managing logging statements for nifi clusters. -->

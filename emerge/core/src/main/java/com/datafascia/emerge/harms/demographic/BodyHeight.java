@@ -13,6 +13,12 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
+import javax.measure.Quantity;
+import javax.measure.Unit;
+import javax.measure.quantity.Length;
+import tec.units.ri.quantity.Quantities;
+import tec.units.ri.util.SI;
+import tec.units.ri.util.SIPrefix;
 
 /**
  * Gets patient's body height and weight.
@@ -22,7 +28,9 @@ public class BodyHeight {
   private static final Set<String> RELEVANT_OBSERVATION_CODES = ImmutableSet.of(
       ObservationCodeEnum.ADMISSION_HEIGHT.getCode(),
       ObservationCodeEnum.CLINICAL_HEIGHT.getCode());
-  private static final BigDecimal CENTIMETER_PER_INCH = new BigDecimal("2.54");
+  private static final Unit<Length> CENTIMETRE = SIPrefix.CENTI(SI.METRE);
+  private static final Unit<Length> INCH = CENTIMETRE.multiply(100).divide(254);
+  private static final Unit<Length> FOOT = INCH.divide(12);
 
   @Inject
   private ClientBuilder apiClient;
@@ -45,18 +53,31 @@ public class BodyHeight {
     return observations;
   }
 
-  private static BigDecimal getValue(Observation observation) {
-    QuantityDt quantity = (QuantityDt) observation.getValue();
-    switch (quantity.getUnit()) {
+  private static Quantity<Length> getQuantityLength(Observation observation) {
+    QuantityDt fromQuantity = (QuantityDt) observation.getValue();
+
+    Unit<Length> unit;
+    switch (fromQuantity.getUnit()) {
       case "cm":
-        return quantity.getValue();
+        unit = CENTIMETRE;
+        break;
+      case "ft":
+        unit = FOOT;
+        break;
       case "in":
-        // Convert inches to centimeters.
-        return quantity.getValue().multiply(CENTIMETER_PER_INCH)
-            .setScale(0, BigDecimal.ROUND_HALF_UP);
+        unit = INCH;
+        break;
       default:
-        throw new IllegalStateException("Unknown unit of measure " + quantity.getUnit());
+        throw new IllegalStateException("Unknown unit of measure " + fromQuantity.getUnit());
     }
+
+    return Quantities.getQuantity(fromQuantity.getValue(), unit);
+  }
+
+  private static BigDecimal getValue(Observation observation) {
+    Quantity<Length> quantity = getQuantityLength(observation);
+    return BigDecimal.valueOf(quantity.to(CENTIMETRE).getValue().doubleValue())
+        .setScale(0, BigDecimal.ROUND_HALF_UP);
   }
 
   /**

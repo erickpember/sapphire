@@ -233,13 +233,15 @@ public class VentilatorAssociatedEventUpdater {
    */
   public void updateVentilationMode(HarmEvidence harmEvidence, Encounter encounter) {
     String encounterId = encounter.getId().getIdPart();
-    String value = ventilationModeImpl.getVentilationMode(encounterId);
 
-    VentilationMode ventilationMode = new VentilationMode()
-        .withValue((value == null) ? null : VentilationMode.Value.fromValue(value))
-        .withUpdateTime(Date.from(Instant.now(clock)));
+    ventilationModeImpl.getVentilationMode(encounterId)
+        .ifPresent(value -> {
+          VentilationMode ventilationMode = new VentilationMode()
+              .withValue(VentilationMode.Value.fromValue(value))
+              .withUpdateTime(Date.from(Instant.now(clock)));
 
-    getVAE(harmEvidence).setVentilationMode(ventilationMode);
+          getVAE(harmEvidence).setVentilationMode(ventilationMode);
+        });
   }
 
   /**

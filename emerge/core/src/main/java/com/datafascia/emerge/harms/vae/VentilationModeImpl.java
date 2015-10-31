@@ -40,13 +40,13 @@ public class VentilationModeImpl {
   }
 
   /**
-   * Computes VAE Ventilation Mode
+   * Computes VAE ventilation mode
    *
    * @param encounterId
-   *     relevant encounter ID.
-   * @return ventilation mode for the specified encounter, or {@code null} if not found
+   *     encounter to search
+   * @return optional ventilation mode, empty if not found
    */
-  public String getVentilationMode(String encounterId) {
+  public Optional<String> getVentilationMode(String encounterId) {
     Observation freshestVentMode = ObservationUtils.findFreshestObservationForCode(
         apiClient, encounterId, ObservationCodeEnum.VENT_MODE.getCode());
 
@@ -64,7 +64,7 @@ public class VentilationModeImpl {
             freshestBreathType, freshestNonInvasiveDeviceMode))) {
       result = eitherBreathOrVentIsFreshest(freshestBreathType, freshestVentMode);
       if (result.isPresent()) {
-        return result.get();
+        return result;
       }
     }
 
@@ -73,7 +73,7 @@ public class VentilationModeImpl {
         freshestNonInvasiveDeviceMode)) {
       result = breathIsFresherThanNonInvasive(freshestBreathType);
       if (result.isPresent()) {
-        return result.get();
+        return result;
       }
     }
 
@@ -83,11 +83,11 @@ public class VentilationModeImpl {
             freshestBreathType, freshestNonInvasiveDeviceMode))) {
       result = nonInvasiveIsFresherThanVentOrBreath(freshestNonInvasiveDeviceMode);
       if (result.isPresent()) {
-        return result.get();
+        return result;
       }
     }
 
-    return null;
+    return Optional.empty();
   }
 
   /**

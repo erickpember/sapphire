@@ -6,6 +6,7 @@ import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationOrderStatusEnum;
 import com.datafascia.api.client.ClientBuilder;
 import java.util.List;
+import java.util.Optional;
 import javax.inject.Inject;
 
 /**
@@ -17,13 +18,13 @@ public class PharmacologicVteProphylaxis {
   private ClientBuilder apiClient;
 
   /**
-   * Gets Pharmacologic VTE Prophylaxis Type
+   * Gets pharmacologic VTE prophylaxis type
    *
    * @param encounterId
    *     encounter to search
-   * @return pharmacologic VTE prophylaxis type ordered, or {@code null} if not found
+   * @return optional pharmacologic VTE prophylaxis type, empty if not found
    */
-  public String getPharmacologicVteProphylaxisType(String encounterId) {
+  public Optional<String> getPharmacologicVteProphylaxisType(String encounterId) {
     String type = null;
 
     List<MedicationOrder> medicationOrders = apiClient.getMedicationOrderClient()
@@ -37,7 +38,8 @@ public class PharmacologicVteProphylaxis {
         }
       }
     }
-    return type;
+
+    return Optional.ofNullable(type);
   }
 
   /**
@@ -48,6 +50,6 @@ public class PharmacologicVteProphylaxis {
    * @return true if pharmacologic VTE prophylaxis was ordered
    */
   public boolean isPharmacologicVteProphylaxisOrdered(String encounterId) {
-    return getPharmacologicVteProphylaxisType(encounterId) != null;
+    return getPharmacologicVteProphylaxisType(encounterId).isPresent();
   }
 }

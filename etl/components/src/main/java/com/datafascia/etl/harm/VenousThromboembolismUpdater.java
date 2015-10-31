@@ -181,10 +181,14 @@ public class VenousThromboembolismUpdater {
     VTE vte = getVTE(harmEvidence);
 
     String encounterId = encounter.getId().getIdPart();
-    TimestampedString pharmacologicVteProphylaxisType = new TimestampedString()
-        .withValue(pharmacologicVteProphylaxis.getPharmacologicVteProphylaxisType(encounterId))
-        .withUpdateTime(Date.from(Instant.now(clock)));
-    vte.setPharmacologicVTEProphylaxisType(pharmacologicVteProphylaxisType);
+    pharmacologicVteProphylaxis.getPharmacologicVteProphylaxisType(encounterId)
+        .ifPresent(value -> {
+          TimestampedString pharmacologicVteProphylaxisType = new TimestampedString()
+              .withValue(value)
+              .withUpdateTime(Date.from(Instant.now(clock)));
+
+          vte.setPharmacologicVTEProphylaxisType(pharmacologicVteProphylaxisType);
+        });
   }
 
   /**

@@ -186,12 +186,19 @@ public class ObservationUtils {
   /**
    * Returns the effective date of an observation.
    *
-   * @param ob
-   *     The observation to pull from.
-   * @return The effective date.
+   * @param observation
+   *     observation to pull from
+   * @return effective date
    */
-  public static Date getEffectiveDate(Observation ob) {
-    return ((DateTimeDt) ob.getEffective()).getValue();
+  public static Date getEffectiveDate(Observation observation) {
+    IDatatype effective = observation.getEffective();
+    if (effective instanceof DateTimeDt) {
+      return ((DateTimeDt) effective).getValue();
+    } else if (effective instanceof PeriodDt) {
+      return ((PeriodDt) effective).getStart();
+    }
+
+    return null;
   }
 
   /**

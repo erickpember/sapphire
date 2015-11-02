@@ -74,6 +74,7 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
   }
 
   Encounter transientEncounter = null;
+
   @AfterClass
   public void close() throws Exception {
     client.delete().resource(transientEncounter).execute();
@@ -108,20 +109,20 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
 
     // Positive tests of new data and diffs.
     runner.enqueue(addContent("GetMedAdminUnit{questionMark}ListID=15860.json"));
-    runner.enqueue(addContent("GetMedAdminUnit{questionMark}ListID=15860&FromDate=2015-07-14T06" +
-        "{colon}14{colon}50Z.json"));
-    runner.enqueue(addContent("GetMedAdminUnit{questionMark}ListID=15860&FromDate=2015-07-14T06" +
-        "{colon}19{colon}28Z.json"));
-    runner.enqueue(addContent("GetMedAdminUnit{questionMark}ListID=15860&FromDate=2015-07-14T06" +
-        "{colon}22{colon}27Z.json"));
-    runner.enqueue(addContent("GetMedAdminUnit{questionMark}ListID=15860&FromDate=2015-07-14T06" +
-        "{colon}27{colon}36Z.json"));
-    runner.enqueue(addContent("GetMedAdminUnit{questionMark}ListID=15860&FromDate=2015-07-14T06" +
-        "{colon}37{colon}45Z.json"));
-    runner.enqueue(addContent("GetMedAdminUnit{questionMark}ListID=15860&FromDate=2015-07-14T06" +
-        "{colon}38{colon}54Z.json"));
-    runner.enqueue(addContent("GetMedAdminUnit{questionMark}ListID=15860&FromDate=2015-07-14T06" +
-        "{colon}40{colon}30Z.json"));
+    runner.enqueue(addContent("GetMedAdminUnit{questionMark}ListID=15860&FromDate=2015-07-14T06"
+        + "{colon}14{colon}50Z.json"));
+    runner.enqueue(addContent("GetMedAdminUnit{questionMark}ListID=15860&FromDate=2015-07-14T06"
+        + "{colon}19{colon}28Z.json"));
+    runner.enqueue(addContent("GetMedAdminUnit{questionMark}ListID=15860&FromDate=2015-07-14T06"
+        + "{colon}22{colon}27Z.json"));
+    runner.enqueue(addContent("GetMedAdminUnit{questionMark}ListID=15860&FromDate=2015-07-14T06"
+        + "{colon}27{colon}36Z.json"));
+    runner.enqueue(addContent("GetMedAdminUnit{questionMark}ListID=15860&FromDate=2015-07-14T06"
+        + "{colon}37{colon}45Z.json"));
+    runner.enqueue(addContent("GetMedAdminUnit{questionMark}ListID=15860&FromDate=2015-07-14T06"
+        + "{colon}38{colon}54Z.json"));
+    runner.enqueue(addContent("GetMedAdminUnit{questionMark}ListID=15860&FromDate=2015-07-14T06"
+        + "{colon}40{colon}30Z.json"));
 
     runner.run(enqueueCount);
     runner.assertQueueEmpty();
@@ -160,34 +161,34 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
   public void diff(ElementType type, String field, String id, String oldData, String newData) {
     assertEquals(diffs[diffsIndex],
         TestDiff.builder()
-            .type(type)
-            .field(field)
-            .id(id)
-            .oldData(oldData)
-            .newData(newData).build());
+        .type(type)
+        .field(field)
+        .id(id)
+        .oldData(oldData)
+        .newData(newData).build());
     diffsIndex++;
   }
 
   int diffsIndex = 0;
   TestDiff[] diffs = new TestDiff[]{
-      TestDiff.builder()
-          .type(ElementType.ORDER)
-          .field("OrderStatus")
-          .id("159301153")
-          .oldData("2^Sent")
-          .newData("5^Completed").build(),
-      TestDiff.builder()
-          .type(ElementType.ORDER)
-          .field("OrderedDose")
-          .id("159301150")
-          .oldData("50")
-          .newData("100").build(),
-      TestDiff.builder()
-          .type(ElementType.ORDER)
-          .field("OrderStatus")
-          .id("159301152")
-          .oldData("2^Sent")
-          .newData("9^Discontinued").build()
+    TestDiff.builder()
+    .type(ElementType.ORDER)
+    .field("OrderStatus")
+    .id("159301153")
+    .oldData("2^Sent")
+    .newData("5^Completed").build(),
+    TestDiff.builder()
+    .type(ElementType.ORDER)
+    .field("OrderedDose")
+    .id("159301150")
+    .oldData("50")
+    .newData("100").build(),
+    TestDiff.builder()
+    .type(ElementType.ORDER)
+    .field("OrderStatus")
+    .id("159301152")
+    .oldData("2^Sent")
+    .newData("9^Discontinued").build()
   };
 
   @Override
@@ -208,8 +209,12 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
       if (expected.orderedDose.contains("-")) {
         String[] ratioParts = expected.orderedDose.split("-");
         RangeDt range = new RangeDt();
-        SimpleQuantityDt low = new SimpleQuantityDt(Long.parseLong(ratioParts[0]));
-        SimpleQuantityDt high = new SimpleQuantityDt(Long.parseLong(ratioParts[1]));
+        SimpleQuantityDt low = new SimpleQuantityDt();
+        low.setValue(new BigDecimal(ratioParts[0]));
+        SimpleQuantityDt high = new SimpleQuantityDt();
+        high.setValue(new BigDecimal(ratioParts[1]));
+        range.setLow(low);
+        range.setHigh(high);
         low.setUnit(expected.orderedDoseUnit);
         high.setUnit(expected.orderedDoseUnit);
         range.setLow(low);
@@ -255,8 +260,8 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
     if (expected.scd != null && !expected.scd.equals("")) {
       ResourceReferenceDt medicationReference = (ResourceReferenceDt) admin.getMedication();
       if (medicationReference == null) {
-        log.warn("No medication given for admin " + admin.getIdentifierFirstRep().getValue() +
-            ". Was expecting " + expected.scd + " aka " + expected.drugName);
+        log.warn("No medication given for admin " + admin.getIdentifierFirstRep().getValue()
+            + ". Was expecting " + expected.scd + " aka " + expected.drugName);
       } else {
         Medication medication = clientBuilder.getMedicationClient().getMedication(
             medicationReference.getReference().getIdPart());

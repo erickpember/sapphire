@@ -275,8 +275,12 @@ public class UcsfMedicationUtils {
     if (orderedDose.contains("-")) {
       String[] ratioParts = orderedDose.split("-");
       RangeDt range = new RangeDt();
-      range.setLow(new SimpleQuantityDt(Long.parseLong(ratioParts[0])));
-      range.setHigh(new SimpleQuantityDt(Long.parseLong(ratioParts[1])));
+      SimpleQuantityDt lowSQ = new SimpleQuantityDt();
+      lowSQ.setValue(new BigDecimal(ratioParts[0]));
+      SimpleQuantityDt highSQ = new SimpleQuantityDt();
+      highSQ.setValue(new BigDecimal(ratioParts[1]));
+      range.setLow(lowSQ);
+      range.setHigh(highSQ);
       dosage.setDose(range);
       if (orderedDoseUnitParts.length > 1) {
         range.getLow().setUnit(orderedDoseUnitParts[1]);

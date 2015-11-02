@@ -13,6 +13,7 @@ import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -116,6 +117,10 @@ public class UpdateHarmEvidence extends DependencyInjectingProcessor {
         "Updating harm evidence for encounter ID [{}], patient ID [{}]",
         new Object[] {
           record.getEncounterID(), record.getDemographicData().getMedicalRecordNumber() });
+    if (Strings.isNullOrEmpty(record.getEncounterID())) {
+      log.warn("Skipping harm evidence with no encounter ID");
+      return;
+    }
 
     UnitedStatesPatient patient = getPatient(record.getDemographicData().getMedicalRecordNumber());
     Encounter encounter = getEncounter(record.getEncounterID(), patient);

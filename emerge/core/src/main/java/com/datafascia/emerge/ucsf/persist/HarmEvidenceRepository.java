@@ -7,6 +7,7 @@ import com.datafascia.common.persist.entity.EntityId;
 import com.datafascia.common.persist.entity.ReflectEntityStore;
 import com.datafascia.common.persist.entity.ReflectEntityStoreRepository;
 import com.datafascia.emerge.ucsf.HarmEvidence;
+import com.google.common.base.Strings;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -45,6 +46,13 @@ public class HarmEvidenceRepository extends ReflectEntityStoreRepository {
    *     to save
    */
   public void save(HarmEvidence record) {
+    if (Strings.isNullOrEmpty(record.getEncounterID())) {
+      log.warn(
+          "Saving harm evidence with no encounter ID for patient ID [{}]",
+          record.getDemographicData().getMedicalRecordNumber(),
+          new IllegalArgumentException("No encounter ID"));
+    }
+
     Id<HarmEvidence> patientId = generateId(record);
     entityStore.save(toEntityId(patientId), record);
   }

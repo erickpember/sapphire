@@ -12,6 +12,7 @@ import com.datafascia.emerge.harms.demographic.BodyHeight;
 import com.datafascia.emerge.harms.demographic.BodyWeight;
 import com.datafascia.emerge.ucsf.DemographicData;
 import com.datafascia.emerge.ucsf.HarmEvidence;
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
@@ -25,6 +26,8 @@ import javax.inject.Inject;
  */
 public class DemographicDataUpdater {
 
+  private static final BigDecimal ABSENT_VALUE = new BigDecimal(-1);
+
   @Inject
   private Clock clock;
 
@@ -33,6 +36,23 @@ public class DemographicDataUpdater {
 
   @Inject
   private BodyWeight bodyWeight;
+
+  /**
+   * Creates demographic data with initial values.
+   *
+   * @param encounter
+   *     encounter
+   * @return demographic data
+   */
+  public static DemographicData createDemographicData(Encounter encounter) {
+    return new DemographicData()
+        .withMedicalRecordNumber(
+            encounter.getPatient().getReference().getIdPart())
+        .withAdmissionHeight(
+            ABSENT_VALUE)
+        .withAdmissionWeight(
+            ABSENT_VALUE);
+  }
 
   private static RaceEnum getRace(UnitedStatesPatient patient) {
     for (RaceEnum race : patient.getRace().getValueAsEnum()) {

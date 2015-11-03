@@ -10,7 +10,6 @@ import ca.uhn.fhir.model.dstu2.resource.Practitioner;
 import ca.uhn.fhir.model.dstu2.resource.Procedure;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
-import com.datafascia.emerge.ucsf.DemographicData;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.MedicalData;
 import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
@@ -103,8 +102,7 @@ public class HarmEvidenceUpdater {
           .withEncounterID(
               encounterIdentifier)
           .withDemographicData(
-              new DemographicData()
-                  .withMedicalRecordNumber(patientIdentifier))
+              DemographicDataUpdater.createDemographicData(encounter))
           .withMedicalData(
               new MedicalData());
     }

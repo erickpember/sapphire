@@ -76,4 +76,18 @@ public class DemographicIT extends HarmEvidenceTestSupport {
 
     processMessage("ADT_A03.hl7");
   }
+
+  @Test
+  public void should_export_height_weight_absent() throws Exception {
+    processMessage("height-weight-absent.hl7");
+
+    Id<HarmEvidence> patientId = Id.of(PATIENT_IDENTIFIER);
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(patientId).get();
+    DemographicData demographicData = harmEvidence.getDemographicData();
+
+    assertEquals(demographicData.getAdmissionHeight(), new BigDecimal(-1));
+    assertEquals(demographicData.getAdmissionWeight(), new BigDecimal(-1));
+
+    processMessage("ADT_A03.hl7");
+  }
 }

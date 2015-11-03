@@ -33,41 +33,47 @@ public class CamResult {
    * @return true if observation is relevant to CAM level.
    */
   public static boolean isRelevant(Observation observation) {
-    return ObservationCodeEnum.CAM_ICU.getCode().equals(observation.getCode().getCodingFirstRep()
-        .getCode());
+    return ObservationCodeEnum.CAM_ICU.isCodeEquals(observation.getCode());
   }
 
   /**
-   * Implements the pain and delirium CAM-ICU result
+   * Gets the pain and delirium CAM-ICU result.
    *
    * @param encounterId
-   *     encounter to check.
-   * @return Cam Result, or "Not Documented" if not found.
+   *     encounter to check
+   * @return CAM result
    */
   public String getCamResult(String encounterId) {
-    PeriodDt currentOrPriorShift = ShiftUtils.getCurrentOrPreviousShift(clock);
+    String result = "Not Completed";
 
+    PeriodDt currentOrPriorShift = ShiftUtils.getCurrentOrPreviousShift(clock);
     Observation freshestFromShift = ObservationUtils.getFreshestByCodeInTimeFrame(apiClient,
         encounterId, ObservationCodeEnum.CAM_ICU.getCode(), currentOrPriorShift);
 
-    if (freshestFromShift == null || Strings.isNullOrEmpty(ObservationUtils.getValueAsString(
-        freshestFromShift))) {
-      return "Not Documented";
+    if (freshestFromShift != null) {
+      String value = freshestFromShift.getValue().toString();
+      if (!Strings.isNullOrEmpty(value)) {
+        switch (value) {
+          case "+":
+            result = "Positive";
+            break;
+          case "-":
+            result = "Negative";
+            break;
+          case "UTA (RASS Score -4 or -5)":
+          case "UTA (Language barrier)":
+          case "UTA (Developmental delay)":
+            result = "UTA";
+            break;
+          default:
+            log.warn(
+                "Unexpected CAM result value [{}] found in observation ID {}",
+                value,
+                freshestFromShift.getId().getIdPart());
+        }
+      }
     }
 
-    switch (ObservationUtils.getValueAsString(freshestFromShift)) {
-      case "+":
-        return "Positive";
-      case "-":
-        return "Negative";
-      case "UTA (RASS Score -4 or -5)":
-      case "UTA (Language barrier)":
-      case "UTA (Developmental delay)":
-        return "UTA";
-      default:
-        log.warn("Unexpected Cam Result value:" + ObservationUtils.getValueAsString(
-            freshestFromShift) + " found in observation " + freshestFromShift.getId().getValue());
-        return "Not Documented";
-    }
+    return result;
   }
 }

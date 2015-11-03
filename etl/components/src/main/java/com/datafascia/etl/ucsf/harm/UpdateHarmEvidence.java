@@ -1,6 +1,6 @@
 // Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.etl.harm;
+package com.datafascia.etl.ucsf.harm;
 
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
@@ -12,6 +12,7 @@ import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
+import com.datafascia.etl.harm.HarmEvidenceUpdater;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableSet;

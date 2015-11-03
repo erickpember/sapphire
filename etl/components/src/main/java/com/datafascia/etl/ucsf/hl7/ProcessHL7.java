@@ -1,8 +1,9 @@
 // Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
 // For license information, please contact http://datafascia.com/contact
-package com.datafascia.etl.hl7;
+package com.datafascia.etl.ucsf.hl7;
 
 import com.datafascia.common.nifi.DependencyInjectingProcessor;
+import com.datafascia.etl.hl7.HL7MessageProcessor;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.CharStreams;
 import java.io.IOException;
@@ -34,7 +35,7 @@ import org.kohsuke.MetaInfServices;
 @EventDriven
 @MetaInfServices(Processor.class)
 @SupportsBatching
-@Tags({"HL7", "health level 7", "healthcare"})
+@Tags({"HL7", "health level 7", "healthcare", "ucsf"})
 public class ProcessHL7 extends DependencyInjectingProcessor {
 
   public static final Relationship FAILURE = new Relationship.Builder()

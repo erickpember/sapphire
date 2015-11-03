@@ -92,19 +92,27 @@ public class HarmEvidenceUpdater {
     container = services.newKieClasspathContainer();
   }
 
-  private HarmEvidence getHarmEvidence(String inputPatientId) {
-    Id<HarmEvidence> patientId = Id.of(inputPatientId);
+  private HarmEvidence getHarmEvidence(Encounter encounter) {
+    String encounterIdentifier = encounter.getIdentifierFirstRep().getValue();
+    String patientIdentifier = encounter.getPatient().getReference().getIdPart();
+
+    Id<HarmEvidence> patientId = Id.of(patientIdentifier);
     Optional<HarmEvidence> optionalHarmEvidence = harmEvidenceRepository.read(patientId);
     if (!optionalHarmEvidence.isPresent()) {
       return new HarmEvidence()
+          .withEncounterID(
+              encounterIdentifier)
           .withDemographicData(
               new DemographicData()
-                  .withMedicalRecordNumber(inputPatientId))
+                  .withMedicalRecordNumber(patientIdentifier))
           .withMedicalData(
               new MedicalData());
     }
 
     HarmEvidence harmEvidence = optionalHarmEvidence.get();
+    if (harmEvidence.getEncounterID() == null) {
+      harmEvidence.setEncounterID(encounterIdentifier);
+    }
     if (harmEvidence.getMedicalData() == null) {
       harmEvidence.setMedicalData(new MedicalData());
     }
@@ -128,8 +136,7 @@ public class HarmEvidenceUpdater {
     session.setGlobal("intensiveCareUnitAcquiredWeaknessUpdater", icuAcquiredWeaknessUpdater);
     session.setGlobal("painAndDeliriumUpdater", painAndDeliriumUpdater);
 
-    String patientId = encounter.getPatient().getReference().getIdPart();
-    HarmEvidence harmEvidence = getHarmEvidence(patientId);
+    HarmEvidence harmEvidence = getHarmEvidence(encounter);
     session.setGlobal("harmEvidence", harmEvidence);
 
     List<Object> facts = new ArrayList<>();

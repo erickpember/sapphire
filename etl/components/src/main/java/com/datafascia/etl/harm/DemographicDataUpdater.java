@@ -106,8 +106,6 @@ public class DemographicDataUpdater {
       Location location,
       Encounter encounter) {
 
-    harmEvidence.setEncounterID(encounter.getIdentifierFirstRep().getValue());
-
     DemographicData demographicData = harmEvidence.getDemographicData()
         .withPatientName(
             HumanNames.toFullName(patient.getNameFirstRep()))

@@ -311,8 +311,8 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
       } else {
         log.warn(
             "Could not find prescription [{}] for encounterId [{}]."
-                + " Older data for this exists in the accumulo table [{}] but"
-                + " is not stored in the API. Attempting to create it now.",
+            + " Older data for this exists in the accumulo table [{}] but"
+            + " is not stored in the API. Attempting to create it now.",
             prescriptionId,
             encounterId,
             tableName);
@@ -408,8 +408,8 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
       } else {
         log.warn(
             "Could not find administration [{}] for prescriptionId [{}] and encounterId [{}]."
-                + " Older data for this admin exists in the accumulo table " + tableName + " but"
-                + " is not stored in the API. Attempting to create it now.",
+            + " Older data for this admin exists in the accumulo table " + tableName + " but"
+            + " is not stored in the API. Attempting to create it now.",
             adminId,
             prescriptionId,
             encounterId);
@@ -421,7 +421,9 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
           .populateAdministration(admin, adminId, prescriptionId, encounterId,
               populateMedication(droolNorm), droolNorm.getMedsSets(), clientBuilder);
       medAdmin = clientBuilder.getMedicationAdministrationClient().save(medAdmin);
-      diffListener.newAdmin(medAdmin);
+      if (diffListener != null) {
+        diffListener.newAdmin(medAdmin);
+      }
     }
   }
 
@@ -443,7 +445,7 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
         medication = new Medication();
         medication.setCode(
             new CodeableConceptDt(CodingSystems.SEMANTIC_CLINICAL_DRUG, droolNorm.getRxcuiSCD())
-                .setText(drugName));
+            .setText(drugName));
 
         medication = clientBuilder.getMedicationClient().saveMedication(medication);
       }

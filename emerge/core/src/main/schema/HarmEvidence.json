@@ -513,7 +513,7 @@
                       "drug": {
                         "type": "string",
                         "enum": [
-                          "Lorazepam ",
+                          "Lorazepam",
                           "Midazolam",
                           "Clonazepam",
                           "Diazepam",
@@ -597,7 +597,7 @@
                 }
               }
             },
-            "centralLine ": {
+            "centralLine": {
               "type": "array",
               "description": "An explanation about the purpose of this instance described by this schema.",
               "items": {
@@ -949,7 +949,7 @@
             "subglotticSuctionSurgicalAirway": {
               "$ref": "#/definitions/TimestampedMaybe"
             },
-            "subglotticSuctionNonSurgicalAirway ": {
+            "subglotticSuctionNonSurgicalAirway": {
               "$ref": "#/definitions/TimestampedBoolean"
             },
             "subglotticSuctionUse": {

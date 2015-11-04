@@ -82,7 +82,7 @@ public enum UcsfAdminStatusEnum {
    */
   public static void populateAdminStatus(MedicationAdministration admin, String status) {
     UcsfAdminStatusEnum adminStatusEnum = UcsfAdminStatusEnum.valueOf(status.replace(" ",
-        "_").toUpperCase(Locale.ENGLISH));
+        "_").replace("/", "_").toUpperCase(Locale.ENGLISH));
 
     switch (adminStatusEnum) {
       case GIVEN:

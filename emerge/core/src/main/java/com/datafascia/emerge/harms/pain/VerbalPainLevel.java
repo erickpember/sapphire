@@ -7,13 +7,10 @@ import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
-import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
-import com.google.common.collect.ImmutableSet;
 import java.time.Clock;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import javax.inject.Inject;
 import lombok.Builder;
 import lombok.Data;
@@ -25,12 +22,6 @@ public class VerbalPainLevel {
   private enum MinOrMax {
     MIN, MAX
   }
-
-  private static final Set<String> RELEVANT_OBSERVATION_CODES = ImmutableSet.of(
-      ObservationCodeEnum.VERBAL_PAIN_01.getCode(),
-      ObservationCodeEnum.VERBAL_PAIN_02.getCode(),
-      ObservationCodeEnum.VERBAL_PAIN_03.getCode(),
-      ObservationCodeEnum.VERBAL_PAIN_04.getCode());
 
   @Inject
   private ClientBuilder apiClient;
@@ -59,17 +50,6 @@ public class VerbalPainLevel {
   }
 
   /**
-   * Checks if observation is relevant to verbal pain score.
-   *
-   * @param observation
-   *     the observation to check
-   * @return true if observation is relevant to verbal pain score.
-   */
-  public static boolean isRelevant(Observation observation) {
-    return RELEVANT_OBSERVATION_CODES.contains(observation.getCode().getCodingFirstRep().getCode());
-  }
-
-  /**
    * Implements the Pain and Delirium Verbal Pain Level (Current)
    * Returns the pain score and acquisition time from the newest observation with the highest score.
    *
@@ -78,11 +58,6 @@ public class VerbalPainLevel {
    * @return Numeric pain level and time of acquisition, or {@code null} if not found
    */
   public CurrentPainLevel getCurrentPainLevel(String encounterId) {
-    CurrentPainLevel result = CurrentPainLevel
-        .builder()
-        .painScore(11)
-        .timeOfDataAquisition(null).build();
-
     ZonedDateTime now = ZonedDateTime.now(clock);
     ZonedDateTime midnight = ZonedDateTime.of(
         now.getYear(),
@@ -96,6 +71,12 @@ public class VerbalPainLevel {
     PeriodDt sinceMidnight = new PeriodDt();
     sinceMidnight.setStart(new DateTimeDt(Date.from(midnight.toInstant())));
     sinceMidnight.setEnd(new DateTimeDt(Date.from(now.toInstant())));
+
+    CurrentPainLevel result = CurrentPainLevel
+        .builder()
+        .painScore(11)
+        .timeOfDataAquisition(sinceMidnight.getEnd())
+        .build();
 
     List<Observation> observationsSinceMidnight = ObservationUtils.searchByTimeFrame(apiClient,
         encounterId, sinceMidnight);
@@ -151,13 +132,6 @@ public class VerbalPainLevel {
    *     or {@code null} if not found
    */
   private MinimumOrMaximumPainLevel getDailyMinOrMax(String encounterId, MinOrMax minOrMax) {
-    MinimumOrMaximumPainLevel result = MinimumOrMaximumPainLevel
-        .builder()
-        .painScore(11)
-        .timeOfCalculation(null)
-        .startOfTimePeriod(null)
-        .endOfTimePeriod(null).build();
-
     ZonedDateTime now = ZonedDateTime.now(clock);
     ZonedDateTime midnight = ZonedDateTime.of(
         now.getYear(),
@@ -171,6 +145,14 @@ public class VerbalPainLevel {
     PeriodDt sinceMidnight = new PeriodDt();
     sinceMidnight.setStart(new DateTimeDt(Date.from(midnight.toInstant())));
     sinceMidnight.setEnd(new DateTimeDt(Date.from(now.toInstant())));
+
+    MinimumOrMaximumPainLevel result = MinimumOrMaximumPainLevel
+        .builder()
+        .painScore(11)
+        .timeOfCalculation(sinceMidnight.getEnd())
+        .startOfTimePeriod(sinceMidnight.getStart())
+        .endOfTimePeriod(sinceMidnight.getEnd())
+        .build();
 
     List<Observation> observationsSinceMidnight = ObservationUtils.searchByTimeFrame(apiClient,
         encounterId, sinceMidnight);
@@ -187,7 +169,7 @@ public class VerbalPainLevel {
 
     if (highestOrLowestVerbalPainScore != null) {
       result.setPainScore(PainUtils.getPainScoreFromValue(highestOrLowestVerbalPainScore));
-      result.setTimeOfCalculation(Date.from(now.toInstant()));
+      result.setTimeOfCalculation(sinceMidnight.getEnd());
       result.setStartOfTimePeriod(sinceMidnight.getStart());
       result.setEndOfTimePeriod(sinceMidnight.getEnd());
     }

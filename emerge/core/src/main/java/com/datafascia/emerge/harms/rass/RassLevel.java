@@ -51,18 +51,6 @@ public class RassLevel {
   }
 
   /**
-   * Checks if observation is relevant to RASS level.
-   *
-   * @param observation
-   *     the observation to check
-   * @return true if observation is relevant to RASS level.
-   */
-  public static boolean isRelevant(Observation observation) {
-    return ObservationCodeEnum.RASS.getCode().equals(observation.getCode().getCodingFirstRep()
-        .getCode());
-  }
-
-  /**
    * Implements the pain and delirium RASS level (current)
    * Returns the RASS level and acquisition time from the newest RASS-coded observation.
    *
@@ -71,11 +59,6 @@ public class RassLevel {
    * @return RASS level and time of acquisition, or {@code null} if not found
    */
   public CurrentRassLevel getCurrentRassLevel(String encounterId) {
-    CurrentRassLevel result = CurrentRassLevel.builder()
-        .rassScore(11)
-        .timeOfDataAquisition(null)
-        .build();
-
     ZonedDateTime now = ZonedDateTime.now(clock);
     ZonedDateTime midnight = ZonedDateTime.of(
         now.getYear(),
@@ -89,6 +72,11 @@ public class RassLevel {
     PeriodDt sinceMidnight = new PeriodDt();
     sinceMidnight.setStart(new DateTimeDt(Date.from(midnight.toInstant())));
     sinceMidnight.setEnd(new DateTimeDt(Date.from(now.toInstant())));
+
+    CurrentRassLevel result = CurrentRassLevel.builder()
+        .rassScore(11)
+        .timeOfDataAquisition(sinceMidnight.getEnd())
+        .build();
 
     Observation freshestRassScore = ObservationUtils.getFreshestByCodeInTimeFrame(apiClient,
         encounterId, ObservationCodeEnum.RASS.getCode(), sinceMidnight);
@@ -141,13 +129,6 @@ public class RassLevel {
    *     or {@code null} if not found
    */
   private MinimumOrMaximumRassLevel getDailyMinOrMax(String encounterId, MinOrMax minOrMax) {
-    MinimumOrMaximumRassLevel result = MinimumOrMaximumRassLevel
-        .builder()
-        .rassScore(11)
-        .timeOfCalculation(null)
-        .startOfTimePeriod(null)
-        .endOfTimePeriod(null).build();
-
     ZonedDateTime now = ZonedDateTime.now(clock);
     ZonedDateTime midnight = ZonedDateTime.of(
         now.getYear(),
@@ -161,6 +142,13 @@ public class RassLevel {
     PeriodDt sinceMidnight = new PeriodDt();
     sinceMidnight.setStart(new DateTimeDt(Date.from(midnight.toInstant())));
     sinceMidnight.setEnd(new DateTimeDt(Date.from(now.toInstant())));
+
+    MinimumOrMaximumRassLevel result = MinimumOrMaximumRassLevel
+        .builder()
+        .rassScore(11)
+        .timeOfCalculation(sinceMidnight.getEnd())
+        .startOfTimePeriod(sinceMidnight.getStart())
+        .endOfTimePeriod(sinceMidnight.getEnd()).build();
 
     List<Observation> observationsSinceMidnight = ObservationUtils.searchByTimeFrame(apiClient,
         encounterId, sinceMidnight);
@@ -176,7 +164,7 @@ public class RassLevel {
 
     if (highestOrLowestRassLevel != null) {
       result.setRassScore(RassUtils.getRassScoreFromValue(highestOrLowestRassLevel));
-      result.setTimeOfCalculation(Date.from(now.toInstant()));
+      result.setTimeOfCalculation(sinceMidnight.getEnd());
       result.setStartOfTimePeriod(sinceMidnight.getStart());
       result.setEndOfTimePeriod(sinceMidnight.getEnd());
     }

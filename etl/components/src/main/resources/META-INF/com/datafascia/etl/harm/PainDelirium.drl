@@ -17,8 +17,7 @@ global com.datafascia.etl.harm.PainAndDeliriumUpdater painAndDeliriumUpdater;
 
 rule "Update Numerical Pain Level"
 when
-  Event( type == EventType.UPDATE_OBSERVATIONS )
-  $observation: Observation( NumericalPainLevel.isRelevant($observation) )
+  Event( type == EventType.ADMIT_PATIENT || type == EventType.TIMER )
   $encounter: Encounter()
 then
   painAndDeliriumUpdater.updateNumericalPainLevel(harmEvidence, $encounter);
@@ -26,8 +25,7 @@ end
 
 rule "Update Verbal Pain Level"
 when
-  Event( type == EventType.UPDATE_OBSERVATIONS )
-  $observation: Observation( VerbalPainLevel.isRelevant($observation) )
+  Event( type == EventType.ADMIT_PATIENT || type == EventType.TIMER )
   $encounter: Encounter()
 then
   painAndDeliriumUpdater.updateVerbalPainLevel(harmEvidence, $encounter);
@@ -35,8 +33,7 @@ end
 
 rule "Update CPOT Level"
 when
-  Event( type == EventType.UPDATE_OBSERVATIONS )
-  $observation: Observation( CpotImpl.isRelevant($observation) )
+  Event( type == EventType.ADMIT_PATIENT || type == EventType.TIMER )
   $encounter: Encounter()
 then
   painAndDeliriumUpdater.updateCpotLevel(harmEvidence, $encounter);
@@ -44,8 +41,7 @@ end
 
 rule "Update RASS"
 when
-  Event( type == EventType.UPDATE_OBSERVATIONS )
-  $observation: Observation( RassLevel.isRelevant($observation) )
+  Event( type == EventType.ADMIT_PATIENT || type == EventType.TIMER )
   $encounter: Encounter()
 then
   painAndDeliriumUpdater.updateRass(harmEvidence, $encounter);

@@ -51,18 +51,6 @@ public class CpotImpl {
   }
 
   /**
-   * Checks if observation is relevant to CPOT level.
-   *
-   * @param observation
-   *     the observation to check
-   * @return true if observation is relevant to CPOT level.
-   */
-  public static boolean isRelevant(Observation observation) {
-    return ObservationCodeEnum.CPOT.getCode().equals(observation.getCode().getCodingFirstRep()
-        .getCode());
-  }
-
-  /**
    * Implements the pain and delirium CPOT level (current)
    * Returns the CPOT level and acquisition time from the newest observation with the highest score.
    *
@@ -71,11 +59,6 @@ public class CpotImpl {
    * @return CPOT level and time of acquisition, or {@code null} if not found
    */
   public CurrentCpotLevel getCurrentCpotLevel(String encounterId) {
-    CurrentCpotLevel result = CurrentCpotLevel
-        .builder()
-        .painScore(11)
-        .timeOfDataAquisition(null).build();
-
     ZonedDateTime now = ZonedDateTime.now(clock);
     ZonedDateTime midnight = ZonedDateTime.of(
         now.getYear(),
@@ -89,6 +72,12 @@ public class CpotImpl {
     PeriodDt sinceMidnight = new PeriodDt();
     sinceMidnight.setStart(new DateTimeDt(Date.from(midnight.toInstant())));
     sinceMidnight.setEnd(new DateTimeDt(Date.from(now.toInstant())));
+
+    CurrentCpotLevel result = CurrentCpotLevel
+        .builder()
+        .painScore(11)
+        .timeOfDataAquisition(sinceMidnight.getEnd())
+        .build();
 
     Observation freshestCpotScore = ObservationUtils.getFreshestByCodeInTimeFrame(apiClient,
         encounterId, ObservationCodeEnum.CPOT.getCode(), sinceMidnight);
@@ -141,13 +130,6 @@ public class CpotImpl {
    *     or {@code null} if not found
    */
   private MinimumOrMaximumCpotLevel getDailyMinOrMax(String encounterId, MinOrMax minOrMax) {
-    MinimumOrMaximumCpotLevel result = MinimumOrMaximumCpotLevel
-        .builder()
-        .painScore(11)
-        .timeOfCalculation(null)
-        .startOfTimePeriod(null)
-        .endOfTimePeriod(null).build();
-
     ZonedDateTime now = ZonedDateTime.now(clock);
     ZonedDateTime midnight = ZonedDateTime.of(
         now.getYear(),
@@ -161,6 +143,14 @@ public class CpotImpl {
     PeriodDt sinceMidnight = new PeriodDt();
     sinceMidnight.setStart(new DateTimeDt(Date.from(midnight.toInstant())));
     sinceMidnight.setEnd(new DateTimeDt(Date.from(now.toInstant())));
+
+    MinimumOrMaximumCpotLevel result = MinimumOrMaximumCpotLevel
+        .builder()
+        .painScore(11)
+        .timeOfCalculation(sinceMidnight.getEnd())
+        .startOfTimePeriod(sinceMidnight.getStart())
+        .endOfTimePeriod(sinceMidnight.getEnd())
+        .build();
 
     List<Observation> observationsSinceMidnight = ObservationUtils.searchByTimeFrame(apiClient,
         encounterId, sinceMidnight);
@@ -176,7 +166,7 @@ public class CpotImpl {
 
     if (highestOrLowestCpotLevel != null) {
       result.setPainScore(PainUtils.getPainScoreFromValue(highestOrLowestCpotLevel));
-      result.setTimeOfCalculation(Date.from(now.toInstant()));
+      result.setTimeOfCalculation(sinceMidnight.getEnd());
       result.setStartOfTimePeriod(sinceMidnight.getStart());
       result.setEndOfTimePeriod(sinceMidnight.getEnd());
     }

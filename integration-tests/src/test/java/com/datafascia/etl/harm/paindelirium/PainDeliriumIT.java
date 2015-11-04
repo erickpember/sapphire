@@ -34,6 +34,7 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
   @Test
   public void should_export_numerical_pain_8() throws Exception {
     processMessage("numerical-pain-8.hl7");
+    processTimer();
 
     Id<HarmEvidence> patientId = Id.of(PATIENT_IDENTIFIER);
     HarmEvidence harmEvidence = harmEvidenceRepository.read(patientId).get();
@@ -49,6 +50,7 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
   @Test
   public void should_export_rass_3() throws Exception {
     processMessage("rass-3.hl7");
+    processTimer();
 
     Id<HarmEvidence> patientId = Id.of(PATIENT_IDENTIFIER);
     HarmEvidence harmEvidence = harmEvidenceRepository.read(patientId).get();

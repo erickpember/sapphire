@@ -70,9 +70,9 @@ public class VentilatorAssociatedEventIT extends HarmEvidenceTestSupport {
     processMessage("subglottic-suction-non-surgical-airway-true.hl7");
 
     HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
-    TimestampedBoolean subglotticSuctionNonSurgicalAirway =
+    TimestampedMaybe subglotticSuctionNonSurgicalAirway =
         harmEvidence.getMedicalData().getVAE().getSubglotticSuctionNonSurgicalAirway();
-    assertTrue(subglotticSuctionNonSurgicalAirway.isValue());
+    assertEquals(subglotticSuctionNonSurgicalAirway.getValue(), TimestampedMaybe.Value.YES);
     assertEquals(subglotticSuctionNonSurgicalAirway.getUpdateTime(), Date.from(Instant.now(clock)));
   }
 }

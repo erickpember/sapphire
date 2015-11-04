@@ -296,9 +296,10 @@ public class VentilatorAssociatedEventUpdater {
       HarmEvidence harmEvidence, Encounter encounter) {
 
     String encounterId = encounter.getId().getIdPart();
+    boolean value = subglotticSuctionNonSurgicalAirway.test(encounterId);
 
-    TimestampedBoolean newSubglotticSuctionNonSurgicalAirway = new TimestampedBoolean()
-        .withValue(subglotticSuctionNonSurgicalAirway.test(encounterId))
+    TimestampedMaybe newSubglotticSuctionNonSurgicalAirway = new TimestampedMaybe()
+        .withValue(value ? TimestampedMaybe.Value.YES : TimestampedMaybe.Value.NO)
         .withUpdateTime(Date.from(Instant.now(clock)));
 
     getVAE(harmEvidence).setSubglotticSuctionNonSurgicalAirway(

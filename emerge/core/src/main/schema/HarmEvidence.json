@@ -946,7 +946,7 @@
               "$ref": "#/definitions/TimestampedMaybe"
             },
             "subglotticSuctionNonSurgicalAirway": {
-              "$ref": "#/definitions/TimestampedBoolean"
+              "$ref": "#/definitions/TimestampedMaybe"
             },
             "subglotticSuctionUse": {
               "$ref": "#/definitions/TimestampedMaybe"

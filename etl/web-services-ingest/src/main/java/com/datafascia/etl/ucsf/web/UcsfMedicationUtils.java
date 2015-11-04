@@ -251,9 +251,7 @@ public class UcsfMedicationUtils {
         log.warn("\n encounters are broken in a unit test, rip all this code out.\n");
       }
       if (!encounter.isEmpty()) {
-        ResourceReferenceDt encounterRef = new ResourceReferenceDt();
-        encounterRef.setResource(encounter);
-        medicationOrder.setEncounter(encounterRef);
+        medicationOrder.setEncounter(new ResourceReferenceDt(encounter));
       } else {
         log.warn("Could not find encounter with CSN " + encounterId + ". HAPI FHIR doesn't allow "
             + "dangling references, so the linkage between the encounter and order " + orderId

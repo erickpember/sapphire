@@ -218,10 +218,10 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
               }
             }
           }
-        } catch (ParseException e) {
-          log.error("Error reading json.", e);
-          plog.error("Failed to read json string: " + e.getMessage());
-          throw new ProcessException(e);
+        } catch (Exception e) {
+          // Log exceptions, drop flowfile on the floor.
+          log.error("Error handling flowfile.", e);
+          plog.error("Error handling flowfile: " + e.getMessage());
         }
       }
     });

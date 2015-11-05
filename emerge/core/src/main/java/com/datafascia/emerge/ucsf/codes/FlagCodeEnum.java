@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.ucsf.codes;
 
+import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import com.datafascia.common.persist.CodeToEnumMapper;
 import com.datafascia.domain.fhir.SystemDefinedCode;
 import java.util.Optional;
@@ -34,6 +35,15 @@ public enum FlagCodeEnum implements SystemDefinedCode<String> {
   @Override
   public String getSystem() {
     return SYSTEM;
+  }
+
+  /**
+   * Converts this enum constant to codeable concept.
+   *
+   * @return codeable concept
+   */
+  public CodeableConceptDt toCodeableConcept() {
+    return new CodeableConceptDt(getSystem(), getCode());
   }
 
   /**

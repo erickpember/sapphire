@@ -3,6 +3,8 @@
 package com.datafascia.etl.harm.alignmentofgoals;
 
 import com.datafascia.common.persist.Id;
+import com.datafascia.common.persist.entity.EntityId;
+import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.emerge.ucsf.ADPOLST;
 import com.datafascia.emerge.ucsf.AOG;
 import com.datafascia.emerge.ucsf.CodeStatus;
@@ -33,9 +35,10 @@ public class AlignmentOfGoalsIT extends HarmEvidenceTestSupport {
   @AfterMethod
   public void dischargePatient() throws Exception {
     processMessage("ADT_A03.hl7");
+    entityStore.delete(new EntityId(UnitedStatesPatient.class, PATIENT_ID));
   }
 
-  @Test(enabled = false)
+  @Test
   public void should_export_default_values() {
     HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
 

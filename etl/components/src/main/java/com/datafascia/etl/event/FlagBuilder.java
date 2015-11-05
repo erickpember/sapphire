@@ -2,7 +2,6 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.event;
 
-import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Flag;
@@ -43,7 +42,7 @@ public class FlagBuilder {
     Flag flag = new Flag()
         .setStatus(FlagStatusEnum.ACTIVE)
         .setPeriod(period)
-        .setCode(new CodeableConceptDt(code.getSystem(), code.getCode()))
+        .setCode(code.toCodeableConcept())
         .setSubject(new ResourceReferenceDt(patient));
 
     flags.add(flag);
@@ -84,9 +83,6 @@ public class FlagBuilder {
         break;
       case PHYSICIAN_ORDERS_FOR_LIFE_SUSTAINING_TREATMENT:
         addFlag(FlagCodeEnum.PHYSICIAN_ORDERS_FOR_LIFE_SUSTAINING_TREATMENT, observation);
-        break;
-      case PATIENT_CARE_CONFERENCE_NOTE:
-        addFlag(FlagCodeEnum.PATIENT_CARE_CONFERENCE_NOTE, observation);
         break;
     }
   }

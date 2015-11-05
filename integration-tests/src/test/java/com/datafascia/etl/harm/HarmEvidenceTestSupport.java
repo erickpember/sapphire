@@ -7,6 +7,8 @@ import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.primitive.IdDt;
 import com.datafascia.api.services.ApiTestSupport;
 import com.datafascia.common.inject.Injectors;
+import com.datafascia.common.persist.Id;
+import com.datafascia.common.persist.entity.AccumuloReflectEntityStore;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.persist.EncounterRepository;
@@ -27,7 +29,9 @@ import org.testng.annotations.BeforeClass;
 public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
 
   protected static final String PATIENT_IDENTIFIER = "97546762";
+  protected static final Id<UnitedStatesPatient> PATIENT_ID = Id.of(PATIENT_IDENTIFIER);
   protected static final String ENCOUNTER_IDENTIFIER = "5014212";
+  protected static final Id<Encounter> ENCOUNTER_ID = Id.of(ENCOUNTER_IDENTIFIER);
 
   @Inject
   private HL7MessageProcessor hl7MessageProcessor;
@@ -42,7 +46,7 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
   protected EncounterRepository encounterRepository;
 
   @Inject
-  protected PatientRepository patientRepository;
+  protected AccumuloReflectEntityStore entityStore;
 
   @Inject
   protected Clock clock;

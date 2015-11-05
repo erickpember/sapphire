@@ -3,7 +3,6 @@
 package com.datafascia.domain.persist;
 
 import ca.uhn.fhir.model.dstu2.resource.Flag;
-import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.primitive.IdDt;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.persist.entity.EntityId;
@@ -11,7 +10,6 @@ import com.datafascia.common.persist.entity.FhirEntityStore;
 import com.datafascia.domain.fhir.Ids;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -41,8 +39,7 @@ public class FlagRepository extends FhirEntityStoreRepository {
   }
 
   private static Id<Flag> generateId(Flag flag) {
-    String identifierValue = (flag.getId().isEmpty())
-        ? UUID.randomUUID().toString() : flag.getId().getIdPart();
+    String identifierValue = flag.getCode().getCodingFirstRep().getCode();
     return Id.of(identifierValue);
   }
 
@@ -54,7 +51,7 @@ public class FlagRepository extends FhirEntityStoreRepository {
    */
   public void save(Flag flag) {
     Id<Flag> flagId = generateId(flag);
-    flag.setId(new IdDt(Observation.class.getSimpleName(), flagId.toString()));
+    flag.setId(new IdDt(Flag.class.getSimpleName(), flagId.toString()));
 
     Id<UnitedStatesPatient> patientId = Ids.toPrimaryKey(flag.getSubject().getReference());
     entityStore.save(toEntityId(patientId, flagId), flag);

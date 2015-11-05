@@ -5,6 +5,7 @@ package com.datafascia.etl.harm.venousthromboembolism;
 import com.datafascia.common.persist.Id;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.TimestampedBoolean;
+import com.datafascia.emerge.ucsf.VTE;
 import com.datafascia.etl.harm.HarmEvidenceTestSupport;
 import java.time.Instant;
 import java.util.Date;
@@ -30,6 +31,17 @@ public class VenousThromboembolismIT extends HarmEvidenceTestSupport {
   @AfterMethod
   public void dischargePatient() throws Exception {
     processMessage("ADT_A03.hl7");
+  }
+
+  @Test
+  public void should_export_default_values() {
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    VTE vte = harmEvidence.getMedicalData().getVTE();
+
+    TimestampedBoolean pharmacologicVTEProphylaxisOrdered =
+        vte.getPharmacologicVTEProphylaxisOrdered();
+    assertFalse(pharmacologicVTEProphylaxisOrdered.isValue());
+    assertEquals(pharmacologicVTEProphylaxisOrdered.getUpdateTime(), Date.from(Instant.now(clock)));
   }
 
   @Test

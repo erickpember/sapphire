@@ -4,6 +4,8 @@ package com.datafascia.etl.harm.alignmentofgoals;
 
 import com.datafascia.common.persist.Id;
 import com.datafascia.emerge.ucsf.ADPOLST;
+import com.datafascia.emerge.ucsf.AOG;
+import com.datafascia.emerge.ucsf.CodeStatus;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.PatientCareConferenceNote;
 import com.datafascia.etl.harm.HarmEvidenceTestSupport;
@@ -14,6 +16,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -30,6 +33,25 @@ public class AlignmentOfGoalsIT extends HarmEvidenceTestSupport {
   @AfterMethod
   public void dischargePatient() throws Exception {
     processMessage("ADT_A03.hl7");
+  }
+
+  @Test(enabled = false)
+  public void should_export_default_values() {
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+
+    AOG aog = harmEvidence.getMedicalData().getAOG();
+
+    ADPOLST adpolst = aog.getADPOLST();
+    assertFalse(adpolst.isAdValue());
+    assertFalse(adpolst.isPolstValue());
+    assertEquals(adpolst.getUpdateTime(), Date.from(Instant.now(clock)));
+
+    PatientCareConferenceNote note = aog.getPatientCareConferenceNote();
+    assertFalse(note.isValue());
+    assertEquals(note.getUpdateTime(), Date.from(Instant.now(clock)));
+
+    CodeStatus codeStatus = aog.getCodeStatus();
+    assertEquals(codeStatus.getValue(), CodeStatus.Value.NO_CURRENT_CODE_STATUS);
   }
 
   @Test

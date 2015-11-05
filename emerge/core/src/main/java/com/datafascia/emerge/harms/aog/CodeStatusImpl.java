@@ -10,14 +10,14 @@ import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
 import com.google.common.collect.Lists;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
-
+import javax.inject.Inject;
 
 /**
  * Code Status Implementation
  */
 public class CodeStatusImpl {
-  private static final List<String> qualifyingCodes = Arrays.asList(
+
+  private static final List<String> QUALIFYING_CODES = Arrays.asList(
       ProcedureRequestCodeEnum.ATTENDING_PARTIAL.getCode(),
       ProcedureRequestCodeEnum.ATTENDING_DNR_DNI.getCode(),
       ProcedureRequestCodeEnum.RESIDENT_DNR_DNI.getCode(),
@@ -25,31 +25,30 @@ public class CodeStatusImpl {
       ProcedureRequestCodeEnum.FULL.getCode()
   );
 
+  @Inject
+  private ClientBuilder apiClient;
 
   /**
-   * Code Status Implementation
+   * Gets most recent code status.
    *
-   * @param client
-   *     API client
    * @param encounterId
    *     encounter to search
    * @return
-   *     Most recent code status, or empty if absent.
+   *     code status
    **/
-  public static Optional<CodeStatus.Value> codeStatusValue(ClientBuilder client,
-      String encounterId) {
-    List<ProcedureRequest> codeStatusRequests = client.getProcedureRequestClient()
+  public CodeStatus.Value apply(String encounterId) {
+    List<ProcedureRequest> codeStatusRequests = apiClient.getProcedureRequestClient()
         .searchProcedureRequest(encounterId, null, null);
 
     List<ProcedureRequest> sortedRequests = Lists.reverse(ProcedureRequestUtils
         .sortProcedureRequests(codeStatusRequests));
 
     for (ProcedureRequest request : sortedRequests) {
-      if (qualifyingCodes.contains(request.getIdentifierFirstRep().getValue())) {
-        return Optional.of(CodeStatus.Value.fromValue(request.getIdentifierFirstRep().getValue()));
+      if (QUALIFYING_CODES.contains(request.getIdentifierFirstRep().getValue())) {
+        return CodeStatus.Value.fromValue(request.getIdentifierFirstRep().getValue());
       }
     }
 
-    return Optional.empty();
+    return CodeStatus.Value.NO_CURRENT_CODE_STATUS;
   }
 }

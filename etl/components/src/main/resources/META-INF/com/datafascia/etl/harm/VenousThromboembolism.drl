@@ -11,7 +11,7 @@ global com.datafascia.etl.harm.VenousThromboembolismUpdater venousThromboembolis
 
 rule "Update venous thromboembolism"
 when
-  Event( type == EventType.TIMER )
+  Event( type in (EventType.ADMIT_PATIENT, EventType.TIMER) )
   $encounter: Encounter()
 then
   venousThromboembolismUpdater.updateOnSystemicAnticoagulation(harmEvidence, $encounter);

@@ -10,13 +10,24 @@ import com.datafascia.etl.harm.HarmEvidenceUpdater.EventType;
 global com.datafascia.emerge.ucsf.HarmEvidence harmEvidence;
 global com.datafascia.etl.harm.AlignmentOfGoalsUpdater alignmentOfGoalsUpdater;
 
+rule "Initialize alignment of goals data with default values"
+when
+  Event( type == EventType.ADMIT_PATIENT )
+  $encounter: Encounter()
+then
+  alignmentOfGoalsUpdater.updateAdvanceDirective(harmEvidence, $encounter);
+  alignmentOfGoalsUpdater.updatePatientCareConferenceNote(harmEvidence, $encounter);
+  alignmentOfGoalsUpdater.updatePhysicianOrdersForLifeSustainingTreatment(harmEvidence, $encounter);
+  alignmentOfGoalsUpdater.updateCodeStatus(harmEvidence, $encounter);
+end
+
 rule "Update advance directive"
 when
   Event( type == EventType.UPDATE_FLAG )
   $flag: Flag( code.codingFirstRep.code == "AD" )
   $encounter: Encounter()
 then
-  alignmentOfGoalsUpdater.update(harmEvidence, $flag, $encounter);
+  alignmentOfGoalsUpdater.updateAdvanceDirective(harmEvidence, $encounter);
 end
 
 rule "Update patient care conference note"
@@ -25,7 +36,7 @@ when
   $flag: Flag( code.codingFirstRep.code == "PATIENT_CARE_CONFERENCE_NOTE" )
   $encounter: Encounter()
 then
-  alignmentOfGoalsUpdater.update(harmEvidence, $flag, $encounter);
+  alignmentOfGoalsUpdater.updatePatientCareConferenceNote(harmEvidence, $encounter);
 end
 
 rule "Update physician orders for life sustaining treatment"
@@ -34,5 +45,13 @@ when
   $flag: Flag( code.codingFirstRep.code == "POLST" )
   $encounter: Encounter()
 then
-  alignmentOfGoalsUpdater.update(harmEvidence, $flag, $encounter);
+  alignmentOfGoalsUpdater.updatePhysicianOrdersForLifeSustainingTreatment(harmEvidence, $encounter);
+end
+
+rule "Update code status"
+when
+  Event( type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  alignmentOfGoalsUpdater.updateCodeStatus(harmEvidence, $encounter);
 end

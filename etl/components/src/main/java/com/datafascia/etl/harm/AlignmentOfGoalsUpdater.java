@@ -3,14 +3,15 @@
 package com.datafascia.etl.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
-import ca.uhn.fhir.model.dstu2.resource.Flag;
 import com.datafascia.emerge.harms.aog.ADPOLSTImpl;
+import com.datafascia.emerge.harms.aog.CodeStatusImpl;
 import com.datafascia.emerge.harms.aog.PatientCareConferenceNoteImpl;
 import com.datafascia.emerge.ucsf.ADPOLST;
 import com.datafascia.emerge.ucsf.AOG;
+import com.datafascia.emerge.ucsf.CodeStatus;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.MedicalData;
-import com.datafascia.emerge.ucsf.codes.FlagCodeEnum;
+import com.datafascia.emerge.ucsf.PatientCareConferenceNote;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Date;
@@ -29,6 +30,9 @@ public class AlignmentOfGoalsUpdater {
 
   @Inject
   private PatientCareConferenceNoteImpl patientCareConferenceNoteImpl;
+
+  @Inject
+  private CodeStatusImpl codeStatusImpl;
 
   private static AOG getAOG(HarmEvidence harmEvidence) {
     MedicalData medicalData = harmEvidence.getMedicalData();
@@ -52,22 +56,55 @@ public class AlignmentOfGoalsUpdater {
     return adpolst;
   }
 
-  private void updateAdvanceDirective(HarmEvidence harmEvidence, String patientId) {
+  /**
+   * Updates advance directive.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateAdvanceDirective(HarmEvidence harmEvidence, Encounter encounter) {
+    String patientId = encounter.getPatient().getReference().getIdPart();
+
     ADPOLST adpolst = getADPOLST(harmEvidence);
     adpolst.setAdValue(adpolstImpl.haveAdvanceDirective(patientId));
     adpolst.setUpdateTime(Date.from(Instant.now(clock)));
   }
 
-  private void updatePatientCareConferenceNote(HarmEvidence harmEvidence, String patientId) {
-    patientCareConferenceNoteImpl.findPatientCareConferenceNote(patientId)
-        .ifPresent(note -> {
-          note.setUpdateTime(Date.from(Instant.now(clock)));
-          getAOG(harmEvidence).setPatientCareConferenceNote(note);
-        });
+  /**
+   * Updates patient care conference note.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updatePatientCareConferenceNote(HarmEvidence harmEvidence, Encounter encounter) {
+    String patientId = encounter.getPatient().getReference().getIdPart();
+
+    PatientCareConferenceNote note =
+        patientCareConferenceNoteImpl.findPatientCareConferenceNote(patientId)
+        .orElse(
+            new PatientCareConferenceNote()
+                .withValue(false));
+    note.setUpdateTime(Date.from(Instant.now(clock)));
+
+    getAOG(harmEvidence).setPatientCareConferenceNote(note);
   }
 
-  private void updatePhysicianOrdersForLifeSustainingTreatment(
-      HarmEvidence harmEvidence, String patientId) {
+  /**
+   * Updates physician orders for life sustaining treatment.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updatePhysicianOrdersForLifeSustainingTreatment(
+      HarmEvidence harmEvidence, Encounter encounter) {
+
+    String patientId = encounter.getPatient().getReference().getIdPart();
 
     ADPOLST adpolst = getADPOLST(harmEvidence);
     adpolst.setPolstValue(adpolstImpl.havePhysicianOrdersForLifeSustainingTreatment(patientId));
@@ -75,31 +112,18 @@ public class AlignmentOfGoalsUpdater {
   }
 
   /**
-   * Updates alignment of goals.
+   * Updates code status.
    *
    * @param harmEvidence
    *     to modify
-   * @param flag
-   *     flag
    * @param encounter
    *     encounter
    */
-  public void update(HarmEvidence harmEvidence, Flag flag, Encounter encounter) {
-    String patientId = encounter.getPatient().getReference().getIdPart();
+  public void updateCodeStatus(HarmEvidence harmEvidence, Encounter encounter) {
+    String encounterId = encounter.getId().getIdPart();
 
-    FlagCodeEnum.of(flag.getCode().getCodingFirstRep().getCode())
-        .ifPresent(flagCode -> {
-          switch (flagCode) {
-            case ADVANCE_DIRECTIVE:
-              updateAdvanceDirective(harmEvidence, patientId);
-              break;
-            case PATIENT_CARE_CONFERENCE_NOTE:
-              updatePatientCareConferenceNote(harmEvidence, patientId);
-              break;
-            case PHYSICIAN_ORDERS_FOR_LIFE_SUSTAINING_TREATMENT:
-              updatePhysicianOrdersForLifeSustainingTreatment(harmEvidence, patientId);
-              break;
-          }
-        });
+    getAOG(harmEvidence).setCodeStatus(new CodeStatus()
+        .withValue(codeStatusImpl.apply(encounterId))
+        .withUpdateTime(Date.from(Instant.now(clock))));
   }
 }

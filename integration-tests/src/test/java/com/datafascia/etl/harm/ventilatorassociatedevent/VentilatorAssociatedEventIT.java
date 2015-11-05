@@ -34,6 +34,21 @@ public class VentilatorAssociatedEventIT extends HarmEvidenceTestSupport {
   }
 
   @Test
+  public void should_export_default_values() {
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+
+    TimestampedMaybe subglotticSuctionSurgicalAirway =
+        harmEvidence.getMedicalData().getVAE().getSubglotticSuctionSurgicalAirway();
+    assertEquals(subglotticSuctionSurgicalAirway.getValue(), TimestampedMaybe.Value.NO);
+    assertEquals(subglotticSuctionSurgicalAirway.getUpdateTime(), Date.from(Instant.now(clock)));
+
+    TimestampedMaybe subglotticSuctionNonSurgicalAirway =
+        harmEvidence.getMedicalData().getVAE().getSubglotticSuctionNonSurgicalAirway();
+    assertEquals(subglotticSuctionNonSurgicalAirway.getValue(), TimestampedMaybe.Value.NO);
+    assertEquals(subglotticSuctionNonSurgicalAirway.getUpdateTime(), Date.from(Instant.now(clock)));
+  }
+
+  @Test
   public void should_export_ventilated() throws Exception {
     processMessage("ventilated-true.hl7");
 

@@ -177,26 +177,34 @@ public class VentilationModeImpl {
    *     Vent mode string if a match is found, otherwise empty.
    */
   private Optional<String> nonInvasiveIsFresherThanVentOrBreath(Observation nonInvasive) {
-    if (nonInvasive.getValue().toString().equals(NonInvasiveDeviceModeEnum.NPPV
-        .getCode()) || nonInvasive.getValue().toString().equals(
-            NonInvasiveDeviceModeEnum.CPAP.getCode())) {
+    if (nonInvasive == null || nonInvasive.getValue() == null) {
+      return Optional.empty();
+    }
+
+    if (ObservationUtils.getValueAsString(nonInvasive)
+        .equals(NonInvasiveDeviceModeEnum.NPPV.getCode())
+        || ObservationUtils.getValueAsString(nonInvasive)
+            .equals(NonInvasiveDeviceModeEnum.CPAP.getCode())) {
       return Optional.of(VentModeEmergeEnum.PRESSURE_SUPPORT_PS.getCode());
     }
 
-    if (nonInvasive.getValue().toString().equals(NonInvasiveDeviceModeEnum.PCV
-        .getCode())) {
+    if (ObservationUtils.getValueAsString(nonInvasive)
+        .equals(NonInvasiveDeviceModeEnum.PCV.getCode())) {
       return Optional.of(VentModeEmergeEnum.PRESSURE_CONTROL_PC.getCode());
     }
 
-    if (nonInvasive.getValue().toString().equals(NonInvasiveDeviceModeEnum.AVAPS
-        .getCode())) {
-      return Optional.of(VentModeEmergeEnum.PRESSURE_REGULATED_VOLUME_CONTROL_PRVC.getCode());
+    if (ObservationUtils.getValueAsString(nonInvasive)
+        .equals(NonInvasiveDeviceModeEnum.AVAPS.getCode())) {
+      return Optional.of(
+          VentModeEmergeEnum.PRESSURE_REGULATED_VOLUME_CONTROL_PRVC.getCode());
     }
 
-    if (nonInvasive.getValue().toString().equals(NonInvasiveDeviceModeEnum.S_T
-        .getCode()) || nonInvasive.getValue().toString().equals(
-            NonInvasiveDeviceModeEnum.SISAP_BIPHASIC.getCode()) || nonInvasive
-        .getValue().toString().equals(NonInvasiveDeviceModeEnum.OTHER_SEE_COMMENT.getCode())) {
+    if (ObservationUtils.getValueAsString(nonInvasive)
+        .equals(NonInvasiveDeviceModeEnum.S_T.getCode()) ||
+        ObservationUtils.getValueAsString(nonInvasive)
+        .equals(NonInvasiveDeviceModeEnum.SISAP_BIPHASIC.getCode()) ||
+        nonInvasive.getValue().toString().equals(
+            NonInvasiveDeviceModeEnum.OTHER_SEE_COMMENT.getCode())) {
       return Optional.of(VentModeEmergeEnum.OTHER.getCode());
     }
     return Optional.empty();

@@ -6,6 +6,7 @@ import com.datafascia.common.persist.Id;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.TimestampedBoolean;
 import com.datafascia.emerge.ucsf.TimestampedMaybe;
+import com.datafascia.emerge.ucsf.VAE;
 import com.datafascia.emerge.ucsf.VentilationMode;
 import com.datafascia.etl.harm.HarmEvidenceTestSupport;
 import java.time.Instant;
@@ -36,15 +37,17 @@ public class VentilatorAssociatedEventIT extends HarmEvidenceTestSupport {
   @Test
   public void should_export_default_values() {
     HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    VAE vae = harmEvidence.getMedicalData().getVAE();
 
-    TimestampedMaybe subglotticSuctionSurgicalAirway =
-        harmEvidence.getMedicalData().getVAE().getSubglotticSuctionSurgicalAirway();
-    assertEquals(subglotticSuctionSurgicalAirway.getValue(), TimestampedMaybe.Value.NO);
+    TimestampedMaybe subglotticSuctionSurgicalAirway = vae.getSubglotticSuctionSurgicalAirway();
+    assertEquals(
+        subglotticSuctionSurgicalAirway.getValue(), TimestampedMaybe.Value.NOT_DOCUMENTED);
     assertEquals(subglotticSuctionSurgicalAirway.getUpdateTime(), Date.from(Instant.now(clock)));
 
     TimestampedMaybe subglotticSuctionNonSurgicalAirway =
-        harmEvidence.getMedicalData().getVAE().getSubglotticSuctionNonSurgicalAirway();
-    assertEquals(subglotticSuctionNonSurgicalAirway.getValue(), TimestampedMaybe.Value.NO);
+        vae.getSubglotticSuctionNonSurgicalAirway();
+    assertEquals(
+        subglotticSuctionNonSurgicalAirway.getValue(), TimestampedMaybe.Value.NOT_DOCUMENTED);
     assertEquals(subglotticSuctionNonSurgicalAirway.getUpdateTime(), Date.from(Instant.now(clock)));
   }
 

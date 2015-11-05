@@ -99,6 +99,26 @@ public class VentilatorAssociatedEventUpdater {
   }
 
   /**
+   * Initializes ventilator associated event data with default values.
+   *
+   * @param harmEvidence
+   *     to modify
+   */
+  public void admitPatient(HarmEvidence harmEvidence) {
+    VAE vae = getVAE(harmEvidence);
+
+    TimestampedMaybe newSubglotticSuctionSurgicalAirway = new TimestampedMaybe()
+        .withValue(TimestampedMaybe.Value.NOT_DOCUMENTED)
+        .withUpdateTime(Date.from(Instant.now(clock)));
+    vae.setSubglotticSuctionSurgicalAirway(newSubglotticSuctionSurgicalAirway);
+
+    TimestampedMaybe newSubglotticSuctionNonSurgicalAirway = new TimestampedMaybe()
+        .withValue(TimestampedMaybe.Value.NOT_DOCUMENTED)
+        .withUpdateTime(Date.from(Instant.now(clock)));
+    vae.setSubglotticSuctionNonSurgicalAirway(newSubglotticSuctionNonSurgicalAirway);
+  }
+
+  /**
    * Updates daily sedation interruption.
    *
    * @param harmEvidence

@@ -18,11 +18,8 @@ global com.datafascia.etl.harm.VentilatorAssociatedEventUpdater ventilatorAssoci
 rule "Initialize ventilator associated event data with default values"
 when
   Event( type == EventType.ADMIT_PATIENT )
-  $encounter: Encounter()
 then
-  ventilatorAssociatedEventUpdater.updateSubglotticSuctionSurgicalAirway(harmEvidence, $encounter);
-  ventilatorAssociatedEventUpdater.updateSubglotticSuctionNonSurgicalAirway(
-      harmEvidence, $encounter);
+  ventilatorAssociatedEventUpdater.admitPatient(harmEvidence);
 end
 
 rule "Update daily sedation interruption"

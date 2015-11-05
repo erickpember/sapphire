@@ -20,6 +20,15 @@ public class MedicationAdministrationEffectiveTimeComparator implements
 
   @Override
   public int compare(MedicationAdministration left, MedicationAdministration right) {
+    if ((left == null || left.getEffectiveTime() == null)
+        && (right == null || right.getEffectiveTime() == null)) {
+      return 0;
+    } else if ((left == null || left.getEffectiveTime() == null)) {
+      return -1;
+    } else if ((right == null || right.getEffectiveTime() == null)) {
+      return 1;
+    }
+
     return toDate(left.getEffectiveTime()).compareTo(toDate(right.getEffectiveTime()));
   }
 }

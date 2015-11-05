@@ -19,6 +19,15 @@ public class MedicationOrderDateWrittenComparator implements Comparator<Medicati
 
   @Override
   public int compare(MedicationOrder left, MedicationOrder right) {
+    if ((left == null || left.getDateWrittenElement() == null)
+        && (right == null || right.getDateWrittenElement() == null)) {
+      return 0;
+    } else if ((left == null || left.getDateWrittenElement() == null)) {
+      return -1;
+    } else if ((right == null || right.getDateWrittenElement() == null)) {
+      return 1;
+    }
+
     return toDate(left.getDateWrittenElement()).compareTo(toDate(right.getDateWrittenElement()));
   }
 }

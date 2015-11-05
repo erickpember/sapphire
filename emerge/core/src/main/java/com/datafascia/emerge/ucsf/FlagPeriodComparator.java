@@ -19,6 +19,15 @@ public class FlagPeriodComparator implements Comparator<Flag> {
 
   @Override
   public int compare(Flag left, Flag right) {
+    if ((left == null || left.getPeriod() == null)
+        && (right == null || right.getPeriod() == null)) {
+      return 0;
+    } else if ((left == null || left.getPeriod() == null)) {
+      return -1;
+    } else if ((right == null || right.getPeriod() == null)) {
+      return 1;
+    }
+
     return toDate(left.getPeriod().getStartElement()).compareTo(toDate(right.getPeriod().
         getStartElement()));
   }

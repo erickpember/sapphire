@@ -25,6 +25,14 @@ public class ObservationEffectiveDescendingComparator implements Comparator<Obse
 
   @Override
   public int compare(Observation left, Observation right) {
+    if (left == null && right == null) {
+      return 0;
+    } else if (left == null) {
+      return 1;
+    } else if (right == null) {
+      return -1;
+    }
+
     return compare(
         ObservationUtils.getEffectiveDate(left), ObservationUtils.getEffectiveDate(right));
   }

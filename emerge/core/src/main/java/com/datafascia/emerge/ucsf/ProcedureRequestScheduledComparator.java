@@ -19,6 +19,15 @@ public class ProcedureRequestScheduledComparator implements Comparator<Procedure
 
   @Override
   public int compare(ProcedureRequest left, ProcedureRequest right) {
+    if ((left == null || left.getScheduled() == null)
+        && (right == null || right.getScheduled() == null)) {
+      return 0;
+    } else if ((left == null || left.getScheduled() == null)) {
+      return -1;
+    } else if ((right == null || right.getScheduled() == null)) {
+      return 1;
+    }
+
     return toDate(left.getScheduled()).compareTo(toDate(right.getScheduled()));
   }
 }

@@ -62,6 +62,10 @@ public class AdmitPatient {
 
     encounterRepository.save(encounter);
 
-    harmEvidenceUpdater.admitPatient(patient, location, encounter);
+    if ("A01".equals(triggerEvent)) {
+      harmEvidenceUpdater.admitPatient(patient, location, encounter);
+    } else {
+      harmEvidenceUpdater.updatePatient(patient, location, encounter);
+    }
   }
 }

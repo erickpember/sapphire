@@ -42,6 +42,7 @@ public class HarmEvidenceUpdater {
     UPDATE_FLAG,
     UPDATE_OBSERVATIONS,
     UPDATE_PARTICIPANT,
+    UPDATE_PATIENT,
     UPDATE_PROCEDURE
   }
 
@@ -232,6 +233,23 @@ public class HarmEvidenceUpdater {
    */
   public void updateParticipant(Practitioner practitioner, Encounter encounter) {
     HarmEvidence harmEvidence = execute(EventType.UPDATE_PARTICIPANT, encounter, practitioner);
+    harmEvidenceRepository.save(harmEvidence);
+  }
+
+  /**
+   * Updates patient.
+   *
+   * @param patient
+   *     patient
+   * @param location
+   *     location
+   * @param encounter
+   *     encounter
+   */
+  public void updatePatient(
+      UnitedStatesPatient patient, Location location, Encounter encounter) {
+
+    HarmEvidence harmEvidence = execute(EventType.UPDATE_PATIENT, encounter, patient, location);
     harmEvidenceRepository.save(harmEvidence);
   }
 

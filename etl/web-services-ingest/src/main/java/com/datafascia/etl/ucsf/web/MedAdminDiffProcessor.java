@@ -362,13 +362,21 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
      * Only recording actual administrations, not scheduled ones or verifications. Might need to
      * invert this to a whitelist instead containing "Given" and "New Bag".
      */
+    String adminAction = admin.get("AdminAction").toString();
+    String adminId = admin.get("AdminID").toString();
 
-    String[] adminAction = admin.get("AdminAction").toString().split("\\^");
-    if (IGNORE_STATUSES.contains(adminAction[1])) {
-      return;
+    String[] adminActionParts = adminAction.split("\\^");
+
+    if (adminActionParts.length == 0) {
+      log.warn("No admin action given for admin ID " + adminId);
+    } else if (adminActionParts.length == 1) {
+      log.warn("Bad admin action \"" + adminAction + "\" given for admin ID " + adminId);
+    } else {
+      if (IGNORE_STATUSES.contains(adminActionParts[1])) {
+        return;
+      }
     }
 
-    String adminId = admin.get("AdminID").toString();
     String adminDataNew = admin.toJSONString();
 
     String adminDataOld = JsonPersistUtils.fetchJson(ElementType.ADMIN, prescriptionId + "-"

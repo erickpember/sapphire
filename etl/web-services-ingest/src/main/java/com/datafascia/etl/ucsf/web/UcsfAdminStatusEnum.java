@@ -8,10 +8,12 @@ import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
 import com.datafascia.domain.fhir.CodingSystems;
 import java.util.Arrays;
 import java.util.Locale;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Enumeration of know statuses for medication administrations.
  */
+@Slf4j
 public enum UcsfAdminStatusEnum {
   GIVEN,
   MISSED,
@@ -72,7 +74,8 @@ public enum UcsfAdminStatusEnum {
   PREVIOUSLY_GIVEN,
   INSULIN_PUMP_BOLUSl,
   INSULIN_PUMP_RATE_DOSE_VERIFY,
-  INSULIN_PUMP_0_DOSE;
+  INSULIN_PUMP_0_DOSE,
+  SINGLE_VERIFY;
 
   /**
    * Sets the admin status and the reason it was given or not given.
@@ -337,6 +340,9 @@ public enum UcsfAdminStatusEnum {
             CodingSystems.UCSF_REASON_NOT_GIVEN,
             UcsfMedicationUtils.NotGivenReason.NOT_GIVEN.toString())));
         break;
+      default:
+        log.error("Unhandled admin status " + adminStatusEnum + ". Resulting administration will"
+            + "have no \"status\" or \"reason not given\".");
     }
   }
 }

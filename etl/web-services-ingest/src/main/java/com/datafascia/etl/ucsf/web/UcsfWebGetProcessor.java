@@ -332,7 +332,8 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
           }
         });
 
-        flowFile = session.putAttribute(flowFile, CoreAttributes.FILENAME.key(), config.filename);
+        flowFile = session.putAttribute(flowFile, CoreAttributes.FILENAME.key(), config.filename
+            + System.currentTimeMillis());
         flowFile = session.putAttribute(flowFile, this.getClass().getSimpleName().toLowerCase()
             + ".remote.source", source);
         final long flowFileSize = flowFile.getSize();

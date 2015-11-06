@@ -19,10 +19,10 @@ then
   respectDignityUpdater.updateIcuAttending(harmEvidence, $encounter);
 end
 
-rule "Update primary attending"
+rule "Update primary care attending"
 when
   Event( type == EventType.UPDATE_PARTICIPANT )
-  $practitioner: Practitioner( practitionerRoleFirstRep.role.codingFirstRep.code == "Primary Attending" )
+  $practitioner: Practitioner( practitionerRoleFirstRep.role.codingFirstRep.code == "Primary Care Attending" )
   $encounter: Encounter()
 then
   respectDignityUpdater.updatePrimaryAttending(harmEvidence, $encounter);

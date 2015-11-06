@@ -11,7 +11,7 @@ import java.util.Optional;
  */
 public enum PractitionerRoleEnum implements SystemDefinedCode<String> {
   ICU_ATTENDING("ICU Attending"),
-  PRIMARY_ATTENDING("Primary Attending"),
+  PRIMARY_CARE_ATTENDING("Primary Care Attending"),
   CLINICAL_NURSE("Clinical Nurse");
 
   private final String code;

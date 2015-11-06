@@ -32,8 +32,8 @@ public class RespectDignityIT extends HarmEvidenceTestSupport {
   }
 
   @Test
-  public void should_export_primary_attending() throws Exception {
-    processMessage("primary-attending.hl7");
+  public void should_export_primary_care_attending() throws Exception {
+    processMessage("primary-care-attending.hl7");
 
     Id<HarmEvidence> patientId = Id.of(PATIENT_IDENTIFIER);
     HarmEvidence harmEvidence = harmEvidenceRepository.read(patientId).get();

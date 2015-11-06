@@ -24,8 +24,8 @@ public class ParticipantTest extends HL7MessageProcessorTestSupport {
 
   @Test
   public void should_extract_participant_primary_attending() throws Exception {
-    processMessage("participant-primary-attending.hl7");
-    processMessage("participant-primary-attending.hl7");
+    processMessage("participant-primary-care-attending.hl7");
+    processMessage("participant-primary-care-attending.hl7");
 
     Id<Encounter> encounterId = Id.of("5014212");
     Encounter encounter = encounterRepository.read(encounterId).get();
@@ -41,8 +41,8 @@ public class ParticipantTest extends HL7MessageProcessorTestSupport {
     assertEquals(HumanNames.toFullName(practitioner.getName()), "DANIEL ELI ROTH");
 
     CodingDt roleCoding = practitioner.getPractitionerRoleFirstRep().getRole().getCodingFirstRep();
-    assertEquals(roleCoding.getSystem(), PractitionerRoleEnum.PRIMARY_ATTENDING.getSystem());
-    assertEquals(roleCoding.getCode(), PractitionerRoleEnum.PRIMARY_ATTENDING.getCode());
+    assertEquals(roleCoding.getSystem(), PractitionerRoleEnum.PRIMARY_CARE_ATTENDING.getSystem());
+    assertEquals(roleCoding.getCode(), PractitionerRoleEnum.PRIMARY_CARE_ATTENDING.getCode());
 
     PeriodDt period = particpant.getPeriod();
     assertEquals(period.getStart().toInstant().toString(), "2014-10-01T07:00:00Z");
@@ -57,7 +57,6 @@ public class ParticipantTest extends HL7MessageProcessorTestSupport {
 
     CodingDt roleCoding = practitioner.getPractitionerRoleFirstRep().getRole().getCodingFirstRep();
     assertEquals(roleCoding.getCode(), expectedRole.getCode());
-
   }
 
   @Test
@@ -70,7 +69,7 @@ public class ParticipantTest extends HL7MessageProcessorTestSupport {
     assertEquals(encounter.getParticipant().size(), 3);
 
     List<Encounter.Participant> participants = encounter.getParticipant();
-    assertPractitionerRole(participants.get(0), PractitionerRoleEnum.PRIMARY_ATTENDING);
+    assertPractitionerRole(participants.get(0), PractitionerRoleEnum.PRIMARY_CARE_ATTENDING);
     assertPractitionerRole(participants.get(1), PractitionerRoleEnum.ICU_ATTENDING);
     assertPractitionerRole(participants.get(2), PractitionerRoleEnum.CLINICAL_NURSE);
   }

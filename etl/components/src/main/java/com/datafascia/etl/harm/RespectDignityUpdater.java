@@ -65,7 +65,7 @@ public class RespectDignityUpdater {
    *     encounter
    */
   public void updatePrimaryAttending(HarmEvidence harmEvidence, Encounter encounter) {
-    participantFinder.findByPractitionerRole(encounter, PractitionerRoleEnum.PRIMARY_ATTENDING)
+    participantFinder.findByPractitionerRole(encounter, PractitionerRoleEnum.PRIMARY_CARE_ATTENDING)
         .ifPresent(careProvider -> {
           CareProvider newPrimaryAttending = new CareProvider()
               .withName(careProvider.getName())

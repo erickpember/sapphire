@@ -125,7 +125,7 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
         .setValue(rolePerson.getIDNumber().getValue());
 
     practitioner.addPractitionerRole().getRole().addCoding()
-        .setSystem(PractitionerRoleEnum.PRIMARY_ATTENDING.getSystem())
+        .setSystem(PractitionerRoleEnum.PRIMARY_CARE_ATTENDING.getSystem())
         .setCode(rol.getRoleROL().getIdentifier().getValue());
 
     return practitioner;

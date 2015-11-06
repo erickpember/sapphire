@@ -140,6 +140,14 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
     return participant;
   }
 
+  private void readParticipants(List<ROL> rolList, Encounter encounter) throws HL7Exception {
+    for (ROL rol : rolList) {
+      Practitioner practitioner = toPractitioner(rol);
+      Encounter.Participant participant = toParticipant(rol);
+      addParticipant.accept(practitioner, participant, encounter);
+    }
+  }
+
   /**
    * Admits patient.
    *
@@ -151,20 +159,21 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
    *     PV1 segment
    * @param rolList
    *     ROL list
+   * @param rol2List
+   *     ROL list
    * @throws HL7Exception if HL7 message is malformed
    */
-  protected void admitPatient(MSH msh, PID pid, PV1 pv1, List<ROL> rolList) throws HL7Exception {
+  protected void admitPatient(
+      MSH msh, PID pid, PV1 pv1, List<ROL> rolList, List<ROL> rol2List) throws HL7Exception {
+
     UnitedStatesPatient patient = toPatient(pid);
     Location location = toLocation(pv1);
     Encounter encounter = toEncounter(pv1);
     admitPatient.accept(
         msh.getMessageType().getTriggerEvent().getValue(), patient, location, encounter);
 
-    for (ROL rol : rolList) {
-      Practitioner practitioner = toPractitioner(rol);
-      Encounter.Participant participant = toParticipant(rol);
-      addParticipant.accept(practitioner, participant, encounter);
-    }
+    readParticipants(rolList, encounter);
+    readParticipants(rol2List, encounter);
   }
 
   /**
@@ -174,10 +183,19 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
    *     MSH segment
    * @param pv1
    *     PV1 segment
+   * @param rolList
+   *     ROL list
+   * @param rol2List
+   *     ROL list
    * @throws HL7Exception if HL7 message is malformed
    */
-  protected void dischargePatient(MSH msh, PV1 pv1) throws HL7Exception {
+  protected void dischargePatient(
+      MSH msh, PV1 pv1, List<ROL> rolList, List<ROL> rol2List) throws HL7Exception {
+
     Encounter encounter = toEncounter(pv1);
+    readParticipants(rolList, encounter);
+    readParticipants(rol2List, encounter);
+
     dischargePatient.accept(msh.getMessageType().getTriggerEvent().getValue(), encounter);
   }
 

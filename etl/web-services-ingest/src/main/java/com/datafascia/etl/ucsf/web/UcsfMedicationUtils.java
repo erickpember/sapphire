@@ -265,7 +265,12 @@ public class UcsfMedicationUtils {
       medicationOrder.setMedication(medicationRef);
     }
     medicationOrder.setDateWritten(orderedDateDt);
-    medicationOrder.setStatus(UcsfMedicationUtils.webOrderStatusToFhir(orderStatus));
+    try {
+      medicationOrder.setStatus(UcsfMedicationUtils.webOrderStatusToFhir(orderStatus));
+    } catch (IllegalArgumentException e) {
+      log.error("Unknown order status " + orderStatus + ". Resulting order will"
+          + "have no \"status\".");
+    }
 
     MedicationOrder.DosageInstruction dosage = medicationOrder.addDosageInstruction();
 

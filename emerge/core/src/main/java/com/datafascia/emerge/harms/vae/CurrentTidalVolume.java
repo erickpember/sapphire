@@ -56,12 +56,14 @@ public class CurrentTidalVolume {
       switch (freshestVentMode.getValue().toString()) {
         case "VolumeControl (AC)":
         case "VolumeSupport (VS)":
+        case "Volume Support":
         case "Pressure Regulated Volume Control (PRVC)":
           if (!freshestVentSetTidalVolume.isPresent()) {
             return -1;
           } else {
             return getAbsValue(freshestVentSetTidalVolume.get());
           }
+        case "SIMV":
         case "Synchronous Intermittent Mandatory Ventilation (SIMV)":
           if (freshestBreathType != null && freshestBreathType.getValue().toString().equals(
               "Volume Control")) {

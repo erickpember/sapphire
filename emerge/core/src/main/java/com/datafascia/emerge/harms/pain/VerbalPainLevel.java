@@ -7,6 +7,7 @@ import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
+import com.google.common.base.Strings;
 import java.time.Clock;
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -14,10 +15,12 @@ import java.util.List;
 import javax.inject.Inject;
 import lombok.Builder;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Implements the Pain and Delirium Verbal Pain Level
  */
+@Slf4j
 public class VerbalPainLevel {
   private enum MinOrMax {
     MIN, MAX
@@ -84,9 +87,12 @@ public class VerbalPainLevel {
     Observation freshestVerbalPainScore = PainUtils.freshestHighestVerbalPainScore(
         observationsSinceMidnight);
 
-    if (freshestVerbalPainScore != null) {
+    if (freshestVerbalPainScore != null && !Strings.isNullOrEmpty(
+        ObservationUtils.getValueAsString(freshestVerbalPainScore))) {
       result.setPainScore(PainUtils.getPainScoreFromValue(freshestVerbalPainScore));
       result.setTimeOfDataAquisition(ObservationUtils.getEffectiveDate(freshestVerbalPainScore));
+    } else {
+      log.info("verbal pain score for encounter ID [{}] not found", encounterId);
     }
     return result;
   }

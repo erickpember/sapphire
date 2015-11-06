@@ -48,7 +48,7 @@ public class CurrentTidalVolume {
     if (freshestVentMode != null) {
       Optional<Observation> freshestVentSetTidalVolume = ObservationUtils
           .getFreshestByCodeAfterTime(apiClient, encounterId,
-              ObservationCodeEnum.NON_INVASIVE_DEVICE_MODE.getCode(), thirteenHoursAgo);
+              ObservationCodeEnum.TIDAL_VOLUME.getCode(), thirteenHoursAgo);
 
       Observation freshestBreathType = ObservationUtils.findFreshestObservationForCode(
           apiClient, encounterId, ObservationCodeEnum.BREATH_TYPE.getCode());

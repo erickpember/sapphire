@@ -2,7 +2,10 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.fhir;
 
+import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
+import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
+import ca.uhn.fhir.model.dstu2.composite.TimingDt;
 import ca.uhn.fhir.model.primitive.DateDt;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import ca.uhn.fhir.model.primitive.InstantDt;
@@ -34,6 +37,26 @@ public class Dates {
   public static DateDt toDate(LocalDate localDate) {
     ZonedDateTime dateTime = ZonedDateTime.of(localDate, LocalTime.MIDNIGHT, TIME_ZONE);
     return new DateDt(Date.from(dateTime.toInstant()), TemporalPrecisionEnum.DAY);
+  }
+
+  /**
+   * Given a FHIR IDatatype of either PeriodDt, DateTimeDt or TimingDt, returns {@link Date} .
+   *
+   * @param time
+   *     A FHIR Date, of one of three types.
+   * @return
+   *     A Java Date.
+   */
+  public static Date toDate(IDatatype time) {
+    if (time instanceof TimingDt) {
+      return ((TimingDt) time).getEventFirstRep().getValue();
+    } else if (time instanceof PeriodDt) {
+      return ((PeriodDt) time).getStart();
+    } else if (time instanceof DateTimeDt) {
+      return ((DateTimeDt) time).getValue();
+    } else {
+      throw new RuntimeException("Unexpected type: " + time.getClass().getCanonicalName());
+    }
   }
 
   /**

@@ -2,20 +2,14 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.ucsf;
 
-import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
-import ca.uhn.fhir.model.primitive.DateTimeDt;
+import com.datafascia.domain.fhir.Dates;
 import java.util.Comparator;
-import java.util.Date;
 
 /**
  * Compares scheduled date time property of procedure requests.
  */
 public class ProcedureRequestScheduledComparator implements Comparator<ProcedureRequest> {
-
-  private static Date toDate(IDatatype value) {
-    return ((DateTimeDt) value).getValue();
-  }
 
   @Override
   public int compare(ProcedureRequest left, ProcedureRequest right) {
@@ -28,6 +22,6 @@ public class ProcedureRequestScheduledComparator implements Comparator<Procedure
       return 1;
     }
 
-    return toDate(left.getScheduled()).compareTo(toDate(right.getScheduled()));
+    return Dates.toDate(left.getScheduled()).compareTo(Dates.toDate(right.getScheduled()));
   }
 }

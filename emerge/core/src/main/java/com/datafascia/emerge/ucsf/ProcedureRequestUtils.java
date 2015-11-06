@@ -48,7 +48,7 @@ public class ProcedureRequestUtils {
   public static List<ProcedureRequest> sortProcedureRequests(
       List<ProcedureRequest> procedureRequests) {
     return procedureRequests.stream()
-        .sorted().collect(Collectors.toList());
+        .sorted(new ProcedureRequestScheduledComparator()).collect(Collectors.toList());
   }
 
   /**

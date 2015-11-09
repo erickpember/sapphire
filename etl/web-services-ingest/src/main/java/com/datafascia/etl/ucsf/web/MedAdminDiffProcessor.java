@@ -266,7 +266,7 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
 
     // If we don't have an SCD, then we can't populate a medication.
     Medication medication = null;
-    if (Strings.isNullOrEmpty(scd)) {
+    if (!Strings.isNullOrEmpty(scd)) {
       medication = populateMedication(droolNorm);
     }
 

@@ -188,7 +188,11 @@ public class UcsfMedicationUtils {
         return entry.get("Code").toString();
       }
     }
-    return null;
+
+    // TODO: Remove default SCD before going to production.
+    // HERE BE DRAGONS.
+    // A default value is provided below PURELY for debugging purposes.
+    return "107373";
   }
 
   /**
@@ -263,6 +267,9 @@ public class UcsfMedicationUtils {
       ResourceReferenceDt medicationRef = new ResourceReferenceDt();
       medicationRef.setReference(medication.getId());
       medicationOrder.setMedication(medicationRef);
+    } else {
+      throw new IllegalArgumentException("Medication order " + orderId
+          + " lacks a reference to a medication:\n" + orderJson.toJSONString());
     }
     medicationOrder.setDateWritten(orderedDateDt);
     try {

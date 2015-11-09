@@ -31,6 +31,10 @@ public class IdentifierSystems {
   public static final String INSTITUTION_MEDICATION_ORDER =
       "http://datafascia.com/identifier/InstitutionMedicationOrder";
 
+  /** institution assigned observation sub-identifier */
+  public static final String INSTITUTION_OBSERVATION_SUB_IDENTIFIER =
+      "http://datafascia.com/identifier/InstitutionObservationSubIdentifier";
+
   /** institution assigned practitioner identifier */
   public static final String INSTITUTION_PRACTITIONER =
       "http://datafascia.com/identifier/InstitutionPractitioner";

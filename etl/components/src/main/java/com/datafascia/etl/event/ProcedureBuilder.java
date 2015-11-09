@@ -31,6 +31,8 @@ import java.util.StringJoiner;
  * <p>
  * Represents a central line insertion in these procedure properties:
  * <dl>
+ *   <dt>identifier(0).value
+ *   <dd>identifier in case multiple lines of the same type are inserted
  *   <dt>code.coding(0).code
  *   <dd>line type
  *   <dt>bodySite(0).coding(0).code
@@ -360,6 +362,8 @@ public class ProcedureBuilder {
             removed ? ProcedureStatusEnum.COMPLETED : ProcedureStatusEnum.IN_PROGRESS)
         .setCategory(
             ProcedureCategoryEnum.CENTRAL_LINE.toCodeableConcept())
+        .addIdentifier(
+            inputLineType.get().getIdentifierFirstRep())
         .setCode(
             new CodeableConceptDt(
                 CodingSystems.PROCEDURE, computeLineProcedureCode(tunneledStatus, lineType)))

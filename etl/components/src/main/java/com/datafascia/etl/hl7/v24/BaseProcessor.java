@@ -25,6 +25,7 @@ import ca.uhn.hl7v2.model.v24.segment.OBX;
 import ca.uhn.hl7v2.model.v24.segment.PID;
 import ca.uhn.hl7v2.model.v24.segment.PV1;
 import ca.uhn.hl7v2.util.Terser;
+import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.domain.fhir.RaceEnum;
 import com.datafascia.etl.hl7.MessageProcessor;
 import com.datafascia.etl.hl7.RaceMap;
@@ -156,6 +157,10 @@ public abstract class BaseProcessor implements MessageProcessor {
             toObservationStatus(obx.getObservationResultStatus().getValue()))
         .setMethod(
             toCodeableConcept(obx.getObservationMethod(0)));
+
+    observation.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_OBSERVATION_SUB_IDENTIFIER)
+        .setValue(obx.getObservationSubId().getValue());
 
     if (!obx.getReferencesRange().isEmpty()) {
       ReferenceRange referenceRange = new ReferenceRange()

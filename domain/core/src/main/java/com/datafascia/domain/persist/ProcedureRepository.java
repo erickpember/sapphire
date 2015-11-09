@@ -53,6 +53,7 @@ public class ProcedureRepository extends FhirEntityStoreRepository {
       identifierValue = procedure.getId().getIdPart();
     } else {
       StringJoiner joiner = new StringJoiner("^")
+          .add(procedure.getIdentifierFirstRep().getValue())
           .add(procedure.getCode().getCodingFirstRep().getCode());
       for (CodeableConceptDt bodySite : procedure.getBodySite()) {
         joiner.add(bodySite.getCodingFirstRep().getCode());

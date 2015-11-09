@@ -68,7 +68,7 @@ public class RxNormLookup {
    * @throws SQLException if there is an error with SQL.
    */
   public String getRxString(int rxcui) throws SQLException {
-    if (connection.isClosed() || statement.isClosed()) {
+    if (!connection.isValid(0) || connection.isClosed() || statement.isClosed()) {
       connect();
     }
 

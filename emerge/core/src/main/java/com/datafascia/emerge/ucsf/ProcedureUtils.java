@@ -39,7 +39,7 @@ public class ProcedureUtils {
   public static ProcedureRequest findFreshestHypothermiaBlanketOrder(
       List<ProcedureRequest> procedureRequests) {
 
-    procedureRequests.sort(new ProcedureRequestScheduledComparator().reversed());
+    procedureRequests.sort(ProcedureRequestUtils.getScheduledComparator().reversed());
 
     for (ProcedureRequest procedureRequest : procedureRequests) {
       String code = procedureRequest.getCode().getCodingFirstRep().getCode();
@@ -58,7 +58,7 @@ public class ProcedureUtils {
 
     return procedureRequests.stream()
         .filter(request -> request.getIdentifierFirstRep().getValue().equals(identifier))
-        .max(new ProcedureRequestScheduledComparator())
+        .max(ProcedureRequestUtils.getScheduledComparator())
         .orElse(null);
   }
 

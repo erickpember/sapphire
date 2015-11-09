@@ -14,6 +14,7 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Comparator;
 import java.util.Date;
 
 /**
@@ -55,8 +56,17 @@ public class Dates {
     } else if (time instanceof DateTimeDt) {
       return ((DateTimeDt) time).getValue();
     } else {
-      throw new RuntimeException("Unexpected type: " + time.getClass().getCanonicalName());
+      throw new IllegalArgumentException("Cannot convert from " + time);
     }
+  }
+
+  /**
+   * Null-safe date comparator
+   *
+   * @return comparator
+   */
+  public static Comparator<Date> getDateComparator() {
+    return Comparator.nullsFirst(Comparator.naturalOrder());
   }
 
   /**

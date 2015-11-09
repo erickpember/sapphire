@@ -9,7 +9,9 @@ import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.domain.fhir.Dates;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,6 +26,18 @@ public class ProcedureRequestUtils {
   }
 
   /**
+   * Compares scheduled date time property of procedure requests.
+   *
+   * @return comparator
+   */
+  public static Comparator<ProcedureRequest> getScheduledComparator() {
+    return Comparator.nullsFirst(
+        Comparator.comparing(
+            request -> Dates.toDate(request.getScheduled()),
+            Dates.getDateComparator()));
+  }
+
+  /**
    * Finds freshest ProcedureRequest.
    *
    * @param procedureRequests
@@ -33,7 +47,7 @@ public class ProcedureRequestUtils {
   public static ProcedureRequest findFreshestProcedureRequest(
       List<ProcedureRequest> procedureRequests) {
     return procedureRequests.stream()
-        .max(new ProcedureRequestScheduledComparator())
+        .max(getScheduledComparator())
         .orElse(null);
   }
 
@@ -48,7 +62,8 @@ public class ProcedureRequestUtils {
   public static List<ProcedureRequest> sortProcedureRequests(
       List<ProcedureRequest> procedureRequests) {
     return procedureRequests.stream()
-        .sorted(new ProcedureRequestScheduledComparator()).collect(Collectors.toList());
+        .sorted(getScheduledComparator())
+        .collect(Collectors.toList());
   }
 
   /**
@@ -69,7 +84,7 @@ public class ProcedureRequestUtils {
       String procedureCode) {
     return client.getProcedureRequestClient()
         .searchProcedureRequest(encounterId, procedureCode, null).stream()
-        .max(new ProcedureRequestScheduledComparator())
+        .max(getScheduledComparator())
         .filter(request -> request.getStatusElement()
             .getValueAsEnum().equals(ProcedureRequestStatusEnum.IN_PROGRESS)).isPresent();
   }
@@ -92,7 +107,7 @@ public class ProcedureRequestUtils {
       String procedureCode) {
     return client.getProcedureRequestClient()
         .searchProcedureRequest(encounterId, procedureCode, null).stream()
-        .max(new ProcedureRequestScheduledComparator())
+        .max(getScheduledComparator())
         .filter(request -> isCurrent(request))
         .isPresent();
   }
@@ -130,7 +145,7 @@ public class ProcedureRequestUtils {
     return client.getProcedureRequestClient()
         .searchProcedureRequest(encounterId, procedureCode, null).stream()
         .filter(request -> afterNow(request))
-        .max(new ProcedureRequestScheduledComparator())
+        .max(getScheduledComparator())
         .filter(request -> request.getStatusElement()
             .getValueAsEnum().equals(ProcedureRequestStatusEnum.IN_PROGRESS)).isPresent();
   }

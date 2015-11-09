@@ -22,6 +22,7 @@ import ca.uhn.fhir.model.primitive.DecimalDt;
 import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.IGenericClient;
+import ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor;
 import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.common.accumulo.ConnectorFactory;
 import com.datafascia.common.configuration.guice.ConfigureModule;
@@ -101,6 +102,7 @@ public abstract class ApiTestSupport {
     log.info("Started Dropwizard application listening on port {}", app.getLocalPort());
 
     client = fhirContext.newRestfulGenericClient(API_ENDPOINT_URL);
+    client.registerInterceptor(new BasicAuthInterceptor(FHIR_USERNAME, FHIR_PASSWORD));
 
     addStaticData();
   }

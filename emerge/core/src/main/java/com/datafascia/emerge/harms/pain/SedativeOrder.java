@@ -2,8 +2,10 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.harms.pain;
 
+import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
 import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.emerge.ucsf.MedicationOrderDateWrittenComparator;
 import com.datafascia.emerge.ucsf.MedicationOrderUtils;
 import com.datafascia.emerge.ucsf.codes.painAndDelerium.SedativeOrderDosageRouteEnum;
@@ -81,19 +83,23 @@ public class SedativeOrder {
     medOrders.sort(new MedicationOrderDateWrittenComparator().reversed());
 
     for (MedicationOrder order : medOrders) {
-      String[] identifierParts = order.getIdentifierFirstRep().getValue().split(" ");
-      if (order.getIdentifierFirstRep().getValue().contains("Continuous")) {
-        result.setDosageRoute(identifierParts[1] + " " + identifierParts[2] + " "
-            + identifierParts[4]);
-        result.setDosageRoute(identifierParts[3]);
-        result.setStatus(order.getStatus());
+      List<IdentifierDt> idents = MedicationOrderUtils.findIdentifiers(order,
+          CodingSystems.UCSF_MEDICATION_GROUP_NAME);
+      for (IdentifierDt ident : idents) {
+        String[] identifierParts = ident.getValue().split(" ");
+        if (ident.getValue().contains("Continuous")) {
+          result.setDosageRoute(identifierParts[1] + " " + identifierParts[2] + " "
+              + identifierParts[4]);
+          result.setDosageRoute(identifierParts[3]);
+          result.setStatus(order.getStatus());
 
-        return verifyResult(result);
-      } else if (order.getIdentifierFirstRep().getValue().contains("Intermittent")) {
-        result.setDosageRoute(identifierParts[1] + " " + identifierParts[3]);
-        result.setDosageRoute(identifierParts[2]);
-        result.setStatus(order.getStatus());
-        return verifyResult(result);
+          return verifyResult(result);
+        } else if (ident.getValue().contains("Intermittent")) {
+          result.setDosageRoute(identifierParts[1] + " " + identifierParts[3]);
+          result.setDosageRoute(identifierParts[2]);
+          result.setStatus(order.getStatus());
+          return verifyResult(result);
+        }
       }
     }
 

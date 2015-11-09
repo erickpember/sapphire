@@ -2,13 +2,16 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.harms.vae;
 
+import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
 import com.datafascia.emerge.ucsf.ObservationUtils;
+import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -47,7 +50,8 @@ public class DailySedationInterruption {
     // If the patient was woken up, then return true.
     Optional<Observation> sedationWakeUpActionFromPast25Hours =
         ObservationUtils.getFreshestByCodeAfterTime(
-            apiClient, encounterId, "304890033", effectiveLowerBound);
+            apiClient, encounterId, ObservationCodeEnum.SEDATION_WAKE_UP.getCode(),
+            effectiveLowerBound);
     if (sedationWakeUpActionFromPast25Hours.isPresent()
         && sedationWakeUpActionFromPast25Hours.get().getValue().toString().equals("Yes")) {
       return true;
@@ -62,23 +66,27 @@ public class DailySedationInterruption {
 
     // Filter only admins for the meds we care about from the last 25 hours.
     for (MedicationAdministration admin : admins) {
-      String adminId = admin.getIdentifierFirstRep().getValue();
-      String orderId = admin.getPrescription().getReference().getValue();
-      if (adminId.equals("Continuous Infusion Dexmedetomidine IV")
-          || adminId.equals("Continuous Infusion Propofol IV")
-          || adminId.equals("Continuous Infusion Lorazepam IV")
-          || adminId.equals("Continuous Infusion Midazolam IV")) {
-        if (((DateTimeDt) admin.getEffectiveTime()).getValue().after(effectiveLowerBound)) {
-          filteredAdmins.add(admin);
-          MedicationOrder order;
-          if (!orders.containsKey(orderId)) {
-            order = apiClient.getMedicationOrderClient().read(orderId, encounterId);
-          } else {
-            order = orders.get(orderId);
-          }
+      List<IdentifierDt> identifiers = MedicationAdministrationUtils.findIdentifiers(admin,
+          CodingSystems.UCSF_MEDICATION_GROUP_NAME);
+      for (IdentifierDt ident : identifiers) {
+        String adminId = ident.getValue();
+        String orderId = admin.getPrescription().getReference().getValue();
+        if (adminId.equals("Continuous Infusion Dexmedetomidine IV")
+            || adminId.equals("Continuous Infusion Propofol IV")
+            || adminId.equals("Continuous Infusion Lorazepam IV")
+            || adminId.equals("Continuous Infusion Midazolam IV")) {
+          if (((DateTimeDt) admin.getEffectiveTime()).getValue().after(effectiveLowerBound)) {
+            filteredAdmins.add(admin);
+            MedicationOrder order;
+            if (!orders.containsKey(orderId)) {
+              order = apiClient.getMedicationOrderClient().read(orderId, encounterId);
+            } else {
+              order = orders.get(orderId);
+            }
 
-          orders.put(orderId, order);
-          orderAdmins.put(admin, order);
+            orders.put(orderId, order);
+            orderAdmins.put(admin, order);
+          }
         }
       }
     }

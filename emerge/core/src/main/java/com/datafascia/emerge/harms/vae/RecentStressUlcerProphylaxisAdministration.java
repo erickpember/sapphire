@@ -6,7 +6,9 @@ import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
+import com.datafascia.emerge.ucsf.MedicationOrderUtils;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -56,8 +58,9 @@ public class RecentStressUlcerProphylaxisAdministration {
     for (MedicationAdministration admin : admins) {
       MedicationOrder order = apiClient.getMedicationOrderClient().read(admin.getPrescription()
           .getReference().getIdPart(), encounterId);
-      if (order != null && order.getIdentifierFirstRep().getValue().equals(
-          STRESS_ULCER_PROPHYLACTICS.getCode())) {
+      if (order != null && MedicationOrderUtils.findIdentifiers(order,
+          CodingSystems.UCSF_MEDICATION_GROUP_NAME).stream().anyMatch(id -> id.getValue().equals(
+                  STRESS_ULCER_PROPHYLACTICS.getCode()))) {
         return true;
       }
     }

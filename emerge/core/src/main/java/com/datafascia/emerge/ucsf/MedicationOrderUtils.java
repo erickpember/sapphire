@@ -3,6 +3,7 @@
 package com.datafascia.emerge.ucsf;
 
 import ca.uhn.fhir.model.api.IDatatype;
+import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
 import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationOrderStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
@@ -80,6 +81,21 @@ public class MedicationOrderUtils {
         MedicationOrderStatusEnum.DRAFT.getCode(), medication));
     return medicationOrders.stream()
         .filter(order -> isBefore(order, startTime))
+        .collect(Collectors.toList());
+  }
+
+  /**
+   * Finds an identifier for a given coding system. Given multiple matches, return all.
+   *
+   * @param order
+   *    Order to search for Identifiers.
+   * @param codingSystem
+   *    Coding system of the Identifier we want.
+   * @return
+   *    All matching identifiers.
+   */
+  public static List<IdentifierDt> findIdentifiers(MedicationOrder order, String codingSystem) {
+    return order.getIdentifier().stream().filter(ident -> ident.getSystem().equals(codingSystem))
         .collect(Collectors.toList());
   }
 

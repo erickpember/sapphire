@@ -31,9 +31,10 @@ public class PharmacologicVteProphylaxis {
         .search(encounterId);
     for (MedicationOrder medicationOrder : medicationOrders) {
       if (medicationOrder.getStatusElement().getValueAsEnum() == MedicationOrderStatusEnum.ACTIVE) {
-        String medicationOrderIdentifier = medicationOrder.getIdentifierFirstRep().getValue();
-        if (medicationOrderIdentifier.equals("Intermittent Enoxaparin SC") ||
-            medicationOrderIdentifier.equals("Intermittent Heparin SC")) {
+        if (medicationOrder.getIdentifier()
+            .stream()
+            .anyMatch(id -> id.getValue().equals("Intermittent Enoxaparin SC")
+                || id.getValue().equals("Intermittent Heparin SC"))) {
           type = medicationOrder.getIdentifierFirstRep().getValue();
         }
       }

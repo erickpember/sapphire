@@ -131,8 +131,12 @@ public class MedicationOrderClient extends BaseClient<MedicationOrder> {
     if (identifier == null) {
       return search(encounterId, status);
     } else {
-      return search(encounterId, status).stream().filter(order -> order.getIdentifierFirstRep()
-          .getValue().equals(identifier)).collect(Collectors.toList());
+      return search(encounterId, status)
+          .stream()
+          .filter(order -> order.getIdentifier()
+              .stream()
+              .anyMatch(ident -> ident.getValue().equals(identifier)))
+          .collect(Collectors.toList());
     }
   }
 }

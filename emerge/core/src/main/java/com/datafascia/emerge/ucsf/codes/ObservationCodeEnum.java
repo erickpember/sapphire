@@ -55,6 +55,7 @@ public enum ObservationCodeEnum implements SystemDefinedCode<String> {
   VERBAL_PAIN_03("304890014"),
   VERBAL_PAIN_04("304890015"),
   TIDAL_VOLUME("304890051"),
+  SEDATION_WAKE_UP("304890033"),
   END_OF_OBSERVATION_ENUM("99999999");
 
   private static final String SYSTEM = "http://datafascia.com/code/Observation";

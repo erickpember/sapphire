@@ -3,6 +3,7 @@
 package com.datafascia.emerge.ucsf;
 
 import ca.uhn.fhir.model.api.IDatatype;
+import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.composite.TimingDt;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
@@ -12,6 +13,7 @@ import com.datafascia.api.client.ClientBuilder;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * MedicationAdministration helper methods
@@ -239,5 +241,21 @@ public class MedicationAdministrationUtils {
    */
   public static Date getEffectiveDate(MedicationAdministration administration) {
     return ((DateTimeDt) administration.getEffectiveTime()).getValue();
+  }
+
+  /**
+   * Finds an identifier for a given coding system. Given multiple matches, return all.
+   *
+   * @param admin
+   *    Order to search for Identifiers.
+   * @param codingSystem
+   *    Coding system of the Identifier we want.
+   * @return
+   *    All matching identifiers.
+   */
+  public static List<IdentifierDt> findIdentifiers(MedicationAdministration admin,
+      String codingSystem) {
+    return admin.getIdentifier().stream().filter(ident -> ident.getSystem().equals(codingSystem))
+        .collect(Collectors.toList());
   }
 }

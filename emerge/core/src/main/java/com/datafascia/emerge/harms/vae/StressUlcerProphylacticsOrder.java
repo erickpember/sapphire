@@ -27,8 +27,9 @@ public class StressUlcerProphylacticsOrder {
     return apiClient.getMedicationOrderClient()
         .search(encounterId)
         .stream()
-        .filter(order -> order.getIdentifierFirstRep().getValue()
-            .equals(STRESS_ULCER_PROPHYLACTICS.getCode()))
+        .filter(order -> order.getIdentifier().stream()
+            .anyMatch(ident -> ident.getValue()
+                .equals(STRESS_ULCER_PROPHYLACTICS.getCode())))
         .anyMatch(order -> order.getStatusElement().getValueAsEnum()
             .equals(MedicationOrderStatusEnum.ACTIVE) || order.getStatusElement().getValueAsEnum()
             .equals(MedicationOrderStatusEnum.DRAFT));

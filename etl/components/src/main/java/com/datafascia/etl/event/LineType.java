@@ -3,7 +3,6 @@
 package com.datafascia.etl.event;
 
 import com.datafascia.common.persist.Code;
-import com.datafascia.common.persist.CodeToEnumMapper;
 import java.util.Optional;
 
 /**
@@ -27,9 +26,6 @@ public enum LineType implements Code<String> {
 
   private final String code;
 
-  private static final CodeToEnumMapper<String, LineType> CODE_TO_ENUM_MAPPER =
-      new CodeToEnumMapper<>(LineType.class);
-
   LineType(String code) {
     this.code = code;
   }
@@ -47,6 +43,12 @@ public enum LineType implements Code<String> {
    * @return optional enum constant, empty if code is unknown
    */
   public static Optional<LineType> of(String code) {
-    return CODE_TO_ENUM_MAPPER.of(code);
+    for (LineType lineType : values()) {
+      if (code.startsWith(lineType.getCode())) {
+        return Optional.of(lineType);
+      }
+    }
+
+    return Optional.empty();
   }
 }

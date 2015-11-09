@@ -75,6 +75,17 @@ public class CentralLineAssociatedBloodStreamInfectionUpdater {
         && procedure.getStatusElement().getValueAsEnum() == ProcedureStatusEnum.IN_PROGRESS;
   }
 
+  private static CentralLine.Site formatSite(String bodySiteCode) {
+    switch (bodySiteCode) {
+      case "Arm":
+        return CentralLine.Site.UPPER_ARM;
+      case "Internal jugular":
+        return CentralLine.Site.INTERNAL_JUGULAR;
+      default:
+        return CentralLine.Site.fromValue(bodySiteCode);
+    }
+  }
+
   private static CentralLine toCentralLine(Procedure procedure) {
     String type = procedure.getCode().getCodingFirstRep().getCode();
     String site = procedure.getBodySiteFirstRep().getCodingFirstRep().getCode();
@@ -84,7 +95,7 @@ public class CentralLineAssociatedBloodStreamInfectionUpdater {
 
     return new CentralLine()
         .withType(CentralLine.Type.fromValue(type))
-        .withSite(CentralLine.Site.fromValue(site))
+        .withSite(formatSite(site))
         .withSide(CentralLine.Side.fromValue(side))
         .withInsertionDate(insertionDate.getValue())
         .withUpdateTime(updateTime.getValue());

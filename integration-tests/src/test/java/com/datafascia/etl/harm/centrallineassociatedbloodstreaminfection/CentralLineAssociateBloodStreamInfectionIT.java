@@ -2,7 +2,10 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.harm.centrallineassociatedbloodstreaminfection;
 
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import com.datafascia.common.persist.Id;
+import com.datafascia.common.persist.entity.EntityId;
+import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.emerge.ucsf.CLABSI;
 import com.datafascia.emerge.ucsf.CentralLine;
 import com.datafascia.emerge.ucsf.DailyNeedsAssessment;
@@ -28,8 +31,9 @@ public class CentralLineAssociateBloodStreamInfectionIT extends HarmEvidenceTest
   }
 
   @AfterMethod
-  public void dischargePatient() throws Exception {
-    processMessage("ADT_A03.hl7");
+  public void deletePatient() throws Exception {
+    entityStore.delete(new EntityId(Encounter.class, ENCOUNTER_ID));
+    entityStore.delete(new EntityId(UnitedStatesPatient.class, PATIENT_ID));
   }
 
   @Test
@@ -43,6 +47,20 @@ public class CentralLineAssociateBloodStreamInfectionIT extends HarmEvidenceTest
         harmEvidence.getMedicalData().getCLABSI().getDailyNeedsAssessment();
     assertEquals(dailyNeedsAssessment.getPerformed(), DailyNeedsAssessment.Performed.YES);
     assertEquals(dailyNeedsAssessment.getUpdateTime(), Date.from(Instant.now(clock)));
+  }
+
+  @Test
+  public void should_export_picc_double_lumen_arm_right() throws Exception {
+    processMessage("picc-double-lumen-arm-right.hl7");
+
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    CLABSI clabsi = harmEvidence.getMedicalData().getCLABSI();
+    CentralLine centralLine = clabsi.getCentralLine().get(0);
+    assertEquals(centralLine.getType(), CentralLine.Type.PICC_DOUBLE_LUMEN);
+    assertEquals(centralLine.getSite(), CentralLine.Site.UPPER_ARM);
+    assertEquals(centralLine.getSide(), CentralLine.Side.RIGHT);
+    assertEquals(centralLine.getInsertionDate().toInstant().toString(), "2015-11-05T16:57:00Z");
+    assertEquals(centralLine.getUpdateTime(), Date.from(Instant.now(clock)));
   }
 
   @Test

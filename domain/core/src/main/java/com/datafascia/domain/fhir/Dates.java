@@ -50,7 +50,7 @@ public class Dates {
    */
   public static Date toDate(IDatatype time) {
     if (time instanceof TimingDt) {
-      return ((TimingDt) time).getEventFirstRep().getValue();
+      return toDate(((TimingDt) time).getRepeat().getBounds());
     } else if (time instanceof PeriodDt) {
       return ((PeriodDt) time).getStart();
     } else if (time instanceof DateTimeDt) {

@@ -4,7 +4,6 @@ package com.datafascia.etl;
 
 import ca.uhn.fhir.model.dstu2.composite.AnnotationDt;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
-import ca.uhn.fhir.model.dstu2.composite.TimingDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
@@ -100,8 +99,7 @@ public class NursingOrderProcessorIT extends ApiTestSupport {
           .getDescription());
       assertEquals(storedRequest.getIdentifierFirstRep().getValue(), expectedOrder.getOrderId());
 
-      PeriodDt period =
-          (PeriodDt) ((TimingDt) storedRequest.getScheduled()).getRepeat().getBounds();
+      PeriodDt period = (PeriodDt) storedRequest.getScheduled();
       assertEquals(period.getStart(), expectedOrder.getStartDate());
       assertEquals(period.getEnd(), expectedOrder.getDiscontinuedDate());
 

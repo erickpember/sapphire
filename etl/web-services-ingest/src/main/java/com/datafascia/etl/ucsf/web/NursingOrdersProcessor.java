@@ -6,7 +6,6 @@ import ca.uhn.fhir.model.dstu2.composite.AnnotationDt;
 import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
-import ca.uhn.fhir.model.dstu2.composite.TimingDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
@@ -168,7 +167,6 @@ public class NursingOrdersProcessor extends DependencyInjectingProcessor {
       procedureRequest.setStatus(ProcedureRequestStatusEnum.COMPLETED);
     }
 
-    TimingDt timing = new TimingDt();
     PeriodDt period = new PeriodDt();
     /* Null or otherwise 0 dates (they manifest differently from system to system) may throw
      * exceptions which can be safely ignored. We only care about real data. */
@@ -186,10 +184,8 @@ public class NursingOrdersProcessor extends DependencyInjectingProcessor {
       } catch (DateTimeException e) {
       }
     }
-    TimingDt.Repeat repeat = new TimingDt.Repeat();
-    repeat.setBounds(period);
-    timing.setRepeat(repeat);
-    procedureRequest.setScheduled(timing);
+
+    procedureRequest.setScheduled(period);
 
     procedureRequest.setCode(
         new CodeableConceptDt(CodingSystems.PROCEDURE_REQUEST, procID)

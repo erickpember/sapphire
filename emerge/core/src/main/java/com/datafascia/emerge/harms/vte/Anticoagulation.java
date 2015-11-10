@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.harms.vte;
 
+import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Medication;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
@@ -9,7 +10,9 @@ import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationOrderStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.emerge.harms.HarmsLookups;
+import com.datafascia.emerge.ucsf.MedicationOrderUtils;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -36,15 +39,12 @@ public class Anticoagulation {
     // First check active prescriptions for the anticoagulants.
     for (MedicationOrder medicationOrder : medicationOrders) {
       if (medicationOrder.getStatusElement().getValueAsEnum() == MedicationOrderStatusEnum.ACTIVE) {
-        ResourceReferenceDt medicationReference =
-            (ResourceReferenceDt) medicationOrder.getMedication();
-        Medication medication = apiClient.getMedicationClient()
-            .getMedication(medicationReference.getReference().getIdPart());
-        String medName = medication.getCode().getText();
-
-        for (AnticoagulationTypeEnum at : AnticoagulationTypeEnum.values()) {
-          if (at.toString().toUpperCase().equals(medName.replace(" ", "_"))) {
-            return Optional.of(at);
+        for (IdentifierDt ident : MedicationOrderUtils.findIdentifiers(medicationOrder,
+            CodingSystems.UCSF_MEDICATION_GROUP_NAME)) {
+          for (AnticoagulationTypeEnum atEnum : AnticoagulationTypeEnum.values()) {
+            if (atEnum.getCode().equals(ident.getValue())) {
+              return Optional.of(atEnum);
+            }
           }
         }
       }

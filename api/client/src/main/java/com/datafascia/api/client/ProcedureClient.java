@@ -75,9 +75,9 @@ public class ProcedureClient extends BaseClient<Procedure> {
 
     if (!Strings.isNullOrEmpty(status)) {
       List<Procedure> filteredResults = new ArrayList<>();
-      for (Procedure observation : procedures) {
-        if (observation.getStatus().equalsIgnoreCase(status)) {
-          filteredResults.add(observation);
+      for (Procedure procedure : procedures) {
+        if (procedure.getStatus().equalsIgnoreCase(status)) {
+          filteredResults.add(procedure);
         }
       }
       procedures = filteredResults;

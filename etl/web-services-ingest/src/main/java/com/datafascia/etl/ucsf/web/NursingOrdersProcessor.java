@@ -11,6 +11,7 @@ import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
+import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.common.nifi.DependencyInjectingProcessor;
 import com.datafascia.domain.fhir.CodingSystems;
@@ -192,15 +193,20 @@ public class NursingOrdersProcessor extends DependencyInjectingProcessor {
 
     procedureRequest.setCode(
         new CodeableConceptDt(CodingSystems.PROCEDURE_REQUEST, procID)
-            .setText(orderDesc));
+        .setText(orderDesc));
 
-    Encounter encounter = clientBuilder.getEncounterClient().getEncounter(encounterId);
+    Encounter encounter = null;
+    try {
+      encounter = clientBuilder.getEncounterClient().getEncounter(encounterId);
+    } catch (ResourceNotFoundException e) {
+    }
+
     if (encounter != null) {
       procedureRequest.setEncounter(new ResourceReferenceDt(encounter.getId()));
     } else {
       log.warn("Could not find encounter with CSN " + encounterId + ". HAPI FHIR doesn't allow "
-          + "dangling references, so the linkage between the encounter and nursing order " + orderId
-          + " is lost.");
+          + "dangling references, so the linkage between the encounter and nursing order "
+          + orderId + " is lost.");
     }
 
     List<AnnotationDt> notes = new ArrayList<>();

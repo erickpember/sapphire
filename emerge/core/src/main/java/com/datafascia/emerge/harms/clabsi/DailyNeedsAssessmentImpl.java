@@ -88,6 +88,6 @@ public class DailyNeedsAssessmentImpl {
       }
     }
 
-    return "N/A";
+    return "No";
   }
 }

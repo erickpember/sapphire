@@ -15,6 +15,7 @@ import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
 import com.datafascia.etl.hl7.HL7MessageProcessor;
+import com.datafascia.etl.ucsf.web.NursingOrdersTransformer;
 import com.google.common.io.Resources;
 import java.io.IOException;
 import java.net.URL;
@@ -35,6 +36,9 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
 
   @Inject
   private HL7MessageProcessor hl7MessageProcessor;
+
+  @Inject
+  private NursingOrdersTransformer nursingOrdersTransformer;
 
   @Inject
   protected HarmEvidenceRepository harmEvidenceRepository;
@@ -78,6 +82,12 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
     URL url = getClass().getResource(hl7File);
     String hl7 = Resources.toString(url, StandardCharsets.UTF_8).replace('\n', '\r');
     hl7MessageProcessor.accept(hl7);
+  }
+
+  protected void processNursingOrder(String jsonFile) throws IOException {
+    URL url = getClass().getResource(jsonFile);
+    String json = Resources.toString(url, StandardCharsets.UTF_8);
+    nursingOrdersTransformer.accept(json);
   }
 
   protected void processTimer() {

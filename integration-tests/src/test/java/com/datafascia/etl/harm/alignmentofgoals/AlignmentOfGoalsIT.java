@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.harm.alignmentofgoals;
 
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.persist.entity.EntityId;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
@@ -33,8 +34,8 @@ public class AlignmentOfGoalsIT extends HarmEvidenceTestSupport {
   }
 
   @AfterMethod
-  public void dischargePatient() throws Exception {
-    processMessage("ADT_A03.hl7");
+  public void deletePatient() throws Exception {
+    entityStore.delete(new EntityId(Encounter.class, ENCOUNTER_ID));
     entityStore.delete(new EntityId(UnitedStatesPatient.class, PATIENT_ID));
   }
 
@@ -88,5 +89,16 @@ public class AlignmentOfGoalsIT extends HarmEvidenceTestSupport {
     ADPOLST adpolst = harmEvidence.getMedicalData().getAOG().getADPOLST();
     assertTrue(adpolst.isPolstValue());
     assertEquals(adpolst.getUpdateTime(), Date.from(Instant.now(clock)));
+  }
+
+  @Test
+  public void should_export_code_status_attending_dnr_dni() throws Exception {
+    processNursingOrder("code-status-attending-dnr-dni.json");
+    processTimer();
+
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_ID.toString())).get();
+    CodeStatus codeStatus = harmEvidence.getMedicalData().getAOG().getCodeStatus();
+    assertEquals(codeStatus.getValue(), CodeStatus.Value.ATTENDING_DNR_DNI);
+    assertEquals(codeStatus.getUpdateTime(), Date.from(Instant.now(clock)));
   }
 }

@@ -1,0 +1,56 @@
+{
+  "Error": "",
+  "ExtractDateTime": "/Date(1447148221000-0800)/",
+  "Patient": [
+    {
+      "CSN": "5014212",
+      "Orders": [
+        {
+          "Audit": null,
+          "DiscontinuedDate": "/Date(-62135568000000-0800)/",
+          "OrderDesc": "Maintain sequential compression device",
+          "OrderID": "1733733",
+          "OrderStatus": "2^Sent",
+          "OrderedDate": "/Date(1446472916000-0800)/",
+          "ProcID": "7936",
+          "Questions": null,
+          "StartDate": "/Date(1456567900000-0800)/"
+        },
+        {
+          "Audit": [
+            {
+              "Action": "3^Signed",
+              "DateTime": "/Date(1446567927000-0800)/",
+              "ID": "1",
+              "User": "       ^"
+            }
+          ],
+          "DiscontinuedDate": "/Date(-62135568000000-0800)/",
+          "OrderDesc": "Attending DNR/DNI (Do Not Resuscitate)",
+          "OrderID": "1734252",
+          "OrderStatus": "2^Sent",
+          "OrderedDate": "/Date(1446567927000-0800)/",
+          "ProcID": "517",
+          "Questions": [
+            {
+              "Answer": "Patient",
+              "Description": "CODE DISCUSSION-1",
+              "ID": "100100"
+            },
+            {
+              "Answer": "Mr. Emerge",
+              "Description": "CODE DISCUSSION-2",
+              "ID": "100101"
+            },
+            {
+              "Answer": "Documented Code Status in the Problem List Section.  (Required by Hospital ByLaws)",
+              "Description": "CODE DISCUSSION-3",
+              "ID": "100102"
+            }
+          ],
+          "StartDate": "/Date(1446472920000-0800)/"
+        }
+      ]
+    }
+  ]
+}

@@ -64,6 +64,23 @@ public class CentralLineAssociateBloodStreamInfectionIT extends HarmEvidenceTest
   }
 
   @Test
+  public void should_export_triple_lumen_hemodialysis_pheresis_catheter_internal_jugular_left()
+      throws Exception {
+
+    processMessage("triple-lumen-hemodialysis-pheresis-catheter-internal-jugular-left.hl7");
+
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_ID.toString())).get();
+    CLABSI clabsi = harmEvidence.getMedicalData().getCLABSI();
+    CentralLine centralLine = clabsi.getCentralLine().get(0);
+    assertEquals(
+        centralLine.getType(), CentralLine.Type.TRIPLE_LUMEN_HEMODIALYSIS_PHERESIS_CATHETER);
+    assertEquals(centralLine.getSite(), CentralLine.Site.INTERNAL_JUGULAR);
+    assertEquals(centralLine.getSide(), CentralLine.Side.LEFT);
+    assertEquals(centralLine.getInsertionDate().toInstant().toString(), "2015-11-10T20:45:00Z");
+    assertEquals(centralLine.getUpdateTime(), Date.from(Instant.now(clock)));
+  }
+
+  @Test
   public void should_export_tunneled_cvc_single_lumen_femoral_left() throws Exception {
     processMessage("tunneled-cvc-single-lumen-femoral-left.hl7");
 

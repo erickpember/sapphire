@@ -135,6 +135,10 @@ public class ProcedureBuilder {
         .map(observation -> ((StringDt) observation.getValue()).getValue());
   }
 
+  private static String normalizeSpace(String input) {
+    return input.replaceAll("\\s+", " ");
+  }
+
   private String extractLineType(LineType basicLineType) {
     if (basicLineType == LineType.HEMODIALYSIS_PHERESIS_CATHETER) {
       String lumens = getValue(LINE_LUMENS).orElse("");
@@ -334,7 +338,7 @@ public class ProcedureBuilder {
       return Optional.empty();
     }
 
-    String inputText = inputLineType.get().getCode().getText();
+    String inputText = normalizeSpace(inputLineType.get().getCode().getText());
     int inputCodeStart = inputText.indexOf('-');
     if (inputCodeStart < 0) {
       throw new IllegalStateException(inputText + " does not contain -");

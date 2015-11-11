@@ -2,10 +2,11 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.harms.rass;
 
+import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
+import ca.uhn.fhir.model.primitive.StringDt;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
-import com.google.common.base.Strings;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 
@@ -75,18 +76,23 @@ public class RassUtils {
    * @return The integer RASS score from the observation or  {@code null} if not found.
    */
   public static Integer getRassScoreFromValue(Observation observation) {
-    if (observation == null || Strings.isNullOrEmpty(
-        ObservationUtils.getValueAsString(observation))) {
+    if (observation == null || observation.getValue() == null) {
       return null;
     }
 
-    Integer rassScore = 11;
-    try {
-      rassScore = Integer.parseInt(ObservationUtils.getValueAsString(observation));
-    } catch (NumberFormatException ex) {
-      log.warn("Non-numeric rass score value:" + ObservationUtils.getValueAsString(observation)
-          + " found in observation: " + observation.getId());
-      return null;
+    Integer rassScore = -6;
+
+    if (observation.getValue() instanceof QuantityDt) {
+      QuantityDt value = (QuantityDt) observation.getValue();
+      rassScore = value.getValue().intValueExact();
+    } else if (observation.getValue() instanceof StringDt) {
+      try {
+        rassScore = Integer.parseInt(ObservationUtils.getValueAsString(observation));
+      } catch (NumberFormatException ex) {
+        log.warn("Non-numeric rass score value:" + ObservationUtils.getValueAsString(observation)
+            + " found in observation: " + observation.getId());
+        return null;
+      }
     }
     if (rassScore >= -5 && rassScore <= 11) {
       return rassScore;

@@ -66,7 +66,7 @@ public class ProcedureBuilder {
   private static final String LINE_ACCESS_LOCATION = "304890093";
   private static final String LINE_LUMENS = "304890094";
 
-  private static final String REMOVED = "[REMOVED] ";
+  private static final String REMOVED = "[REMOVED]";
   private static final DateTimeFormatter LOCAL_TIME = DateTimeFormatter.ofPattern("HHmmss");
 
   private static final String LEFT = "Left";
@@ -347,7 +347,7 @@ public class ProcedureBuilder {
     String inputCode = inputText.substring(inputCodeStart + 1);
     boolean removed = inputCode.startsWith(REMOVED);
     if (removed) {
-      inputCode = inputCode.substring(REMOVED.length());
+      inputCode = inputCode.substring(REMOVED.length()).trim();
     }
 
     Optional<LineType> optionalLineType = LineType.of(inputCode);

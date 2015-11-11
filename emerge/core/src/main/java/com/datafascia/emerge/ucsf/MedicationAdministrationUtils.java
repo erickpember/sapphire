@@ -154,11 +154,14 @@ public class MedicationAdministrationUtils {
         getMedicationAdministrationClient().search(encounterId);
     medicationAdministrations.addAll(client.getMedicationAdministrationClient()
         .search(encounterId));
+
     return medicationAdministrations.stream()
-        .filter(medicationAdministration -> medicationAdministration.getStatusElement().
-            getValueAsEnum().equals(MedicationAdministrationStatusEnum.IN_PROGRESS)
+        .filter(medicationAdministration ->
+            medicationAdministration.getStatusElement().getValueAsEnum() != null
+            && (medicationAdministration.getStatusElement().getValueAsEnum()
+                .equals(MedicationAdministrationStatusEnum.IN_PROGRESS)
             || medicationAdministration.getStatusElement().getValueAsEnum()
-            .equals(MedicationAdministrationStatusEnum.COMPLETED))
+            .equals(MedicationAdministrationStatusEnum.COMPLETED)))
         .filter(admin -> admin.getIdentifierFirstRep().getValue().equals(medsSet))
         .anyMatch(medicationAdministration -> insideTimeFrame(medicationAdministration, timeFrame));
   }
@@ -188,8 +191,10 @@ public class MedicationAdministrationUtils {
     medicationAdministrations.addAll(client.getMedicationAdministrationClient()
         .search(encounterId));
     return medicationAdministrations.stream()
-        .filter(medicationAdministration -> medicationAdministration.getStatusElement().
-            getValueAsEnum().equals(MedicationAdministrationStatusEnum.IN_PROGRESS))
+        .filter(medicationAdministration ->
+            medicationAdministration.getStatusElement().getValueAsEnum() != null
+            && (medicationAdministration.getStatusElement().
+            getValueAsEnum().equals(MedicationAdministrationStatusEnum.IN_PROGRESS)))
         .filter(admin -> admin.getIdentifierFirstRep().getValue().equals(medsSet))
         .anyMatch(medicationAdministration -> insideTimeFrame(medicationAdministration, timeFrame));
   }

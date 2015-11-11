@@ -3,8 +3,6 @@
 package com.datafascia.emerge.harms.vte;
 
 import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
-import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
-import ca.uhn.fhir.model.dstu2.resource.Medication;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationOrderStatusEnum;
@@ -12,6 +10,7 @@ import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.emerge.harms.HarmsLookups;
+import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
 import com.datafascia.emerge.ucsf.MedicationOrderUtils;
 import java.util.List;
 import java.util.Optional;
@@ -55,34 +54,28 @@ public class Anticoagulation {
 
     // Check if any recent administrations have been made that are anticoagulants.
     for (MedicationAdministration administration : administrations) {
-      ResourceReferenceDt prescriptionReference = administration.getPrescription();
+      for (IdentifierDt ident : MedicationAdministrationUtils.findIdentifiers(administration,
+          CodingSystems.UCSF_MEDICATION_GROUP_NAME)) {
+        String medsSet = ident.getValue();
 
-      MedicationOrder medicationOrder = apiClient.getMedicationOrderClient()
-          .read(prescriptionReference.getReference().getIdPart(), encounterId);
-      ResourceReferenceDt medicationReference =
-          (ResourceReferenceDt) medicationOrder.getMedication();
+        for (AnticoagulationTypeEnum atEnum : AnticoagulationTypeEnum.values()) {
+          DateTimeDt timeTaken = (DateTimeDt) administration.getEffectiveTime();
+          Long period = HarmsLookups.efficacyList.get(medsSet);
 
-      Medication medication = apiClient.getMedicationClient()
-          .getMedication(medicationReference.getReference().getIdPart());
-      String medName = medication.getCode().getText();
+          if (atEnum.getCode().equals(medsSet)
+              && HarmsLookups.withinDrugPeriod(timeTaken.getValue(), period)) {
 
-      for (AnticoagulationTypeEnum at : AnticoagulationTypeEnum.values()) {
-        DateTimeDt timeTaken = (DateTimeDt) administration.getEffectiveTime();
-        Long period = HarmsLookups.efficacyList.get(medName);
-
-        if (at.toString().toUpperCase().equals(medName.replace(" ", "_"))
-            && HarmsLookups.withinDrugPeriod(timeTaken.getValue(), period)) {
-
-          // If INR is greater than 1.5, then it's still active. Otherwise, return null.
-          if (medName.equals("Warfarin")) {
-            if (HarmsLookups.inrOver1point5(apiClient, encounterId)) {
-              return Optional.of(at);
-            } else {
-              return Optional.empty();
+            // If INR is greater than 1.5, then it's still active. Otherwise, return null.
+            if (medsSet.equals("Intermittent Warfarin Enteral")) {
+              if (HarmsLookups.inrOver1point5(apiClient, encounterId)) {
+                return Optional.of(atEnum);
+              } else {
+                return Optional.empty();
+              }
             }
-          }
 
-          return Optional.of(at);
+            return Optional.of(atEnum);
+          }
         }
       }
     }

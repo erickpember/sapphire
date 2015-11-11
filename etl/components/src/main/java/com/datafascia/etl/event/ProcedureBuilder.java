@@ -55,6 +55,8 @@ public class ProcedureBuilder {
   private static final String LINE_TYPE9 = "304890099";
   private static final String LINE_PLACEMENT_DATE = "304890002";
   private static final String LINE_PLACEMENT_TIME = "304890078";
+  private static final String LINE_REMOVAL_DATE = "304890084";
+  private static final String LINE_REMOVAL_TIME = "304890085";
   private static final String LINE_ORIENTATION1 = "304890081";
   private static final String LINE_ORIENTATION2 = "304890092";
   private static final String LINE_ORIENTATION3 = "304890103";
@@ -94,6 +96,7 @@ public class ProcedureBuilder {
   private final Encounter encounter;
   private final Clock clock;
   private final Map<String, Observation> codeToObservationMap = new HashMap<>();
+  private boolean removed;
 
   /**
    * Constructor
@@ -137,6 +140,23 @@ public class ProcedureBuilder {
 
   private static String normalizeSpace(String input) {
     return input.replaceAll("\\s+", " ");
+  }
+
+  private Optional<LineType> extractBasicLineType(String inputLineType) {
+    String inputText = normalizeSpace(inputLineType);
+
+    int inputCodeStart = inputText.indexOf('-');
+    if (inputCodeStart < 0) {
+      throw new IllegalStateException(inputText + " does not contain -");
+    }
+
+    String inputCode = inputText.substring(inputCodeStart + 1);
+    removed = inputCode.startsWith(REMOVED);
+    if (removed) {
+      inputCode = inputCode.substring(REMOVED.length()).trim();
+    }
+
+    return LineType.of(inputCode);
   }
 
   private String extractLineType(LineType basicLineType) {
@@ -307,18 +327,18 @@ public class ProcedureBuilder {
     return UNKNOWN;
   }
 
-  private Optional<DateTimeDt> extractLinePlacementDateTime() {
-    Optional<LocalDate> placementDate = getValue(LINE_PLACEMENT_DATE)
+  private Optional<DateTimeDt> extractLineDateTime(String dateCode, String timeCode) {
+    Optional<LocalDate> date = getValue(dateCode)
         .map(string -> LocalDate.parse(string, DateTimeFormatter.BASIC_ISO_DATE));
-    if (!placementDate.isPresent()) {
+    if (!date.isPresent()) {
       return Optional.empty();
     }
 
-    LocalTime placementTime = getValue(LINE_PLACEMENT_TIME)
+    LocalTime time = getValue(timeCode)
         .map(string -> LocalTime.parse(string, LOCAL_TIME))
         .orElse(LocalTime.MIDNIGHT);
 
-    return Optional.of(Dates.toDateTime(placementDate.get(), placementTime));
+    return Optional.of(Dates.toDateTime(date.get(), time));
   }
 
   private static String computeLineProcedureCode(String... parts) {
@@ -332,25 +352,15 @@ public class ProcedureBuilder {
     return procedureCode.toString();
   }
 
-  private Optional<Procedure> toLineProcedure() {
+  private Optional<Procedure> insertLine() {
     Optional<Observation> inputLineType = getObservation(
         LINE_LOCATION2, LINE_LOCATION7, LINE_LOCATION0, LINE_LOCATION4, LINE_TYPE0, LINE_TYPE9);
     if (!inputLineType.isPresent()) {
       return Optional.empty();
     }
 
-    String inputText = normalizeSpace(inputLineType.get().getCode().getText());
-    int inputCodeStart = inputText.indexOf('-');
-    if (inputCodeStart < 0) {
-      throw new IllegalStateException(inputText + " does not contain -");
-    }
-    String inputCode = inputText.substring(inputCodeStart + 1);
-    boolean removed = inputCode.startsWith(REMOVED);
-    if (removed) {
-      inputCode = inputCode.substring(REMOVED.length()).trim();
-    }
-
-    Optional<LineType> optionalLineType = LineType.of(inputCode);
+    Optional<LineType> optionalLineType =
+        extractBasicLineType(inputLineType.get().getCode().getText());
     if (!optionalLineType.isPresent()) {
       return Optional.empty();
     }
@@ -360,7 +370,8 @@ public class ProcedureBuilder {
     String lineType = extractLineType(basicLineType);
     String bodySite = extractLineBodySite(basicLineType);
     String orientation = extractLineOrientation(basicLineType);
-    Optional<DateTimeDt> placementDateTime = extractLinePlacementDateTime();
+    Optional<DateTimeDt> placementDateTime =
+        extractLineDateTime(LINE_PLACEMENT_DATE, LINE_PLACEMENT_TIME);
 
     Procedure procedure = new Procedure()
         .setStatus(
@@ -388,6 +399,54 @@ public class ProcedureBuilder {
     ResourceMetadataKeyEnum.UPDATED.put(procedure, updated);
 
     return Optional.of(procedure);
+  }
+
+  private Optional<Procedure> removeLine() {
+    Optional<Observation> inputLineType = getObservation(LINE_REMOVAL_DATE);
+    if (!inputLineType.isPresent()) {
+      return Optional.empty();
+    }
+
+    Optional<LineType> optionalLineType =
+        extractBasicLineType(inputLineType.get().getCode().getText());
+    if (!optionalLineType.isPresent()) {
+      return Optional.empty();
+    }
+    LineType basicLineType = optionalLineType.get();
+
+    String tunneledStatus = extractLineTunneledStatus(basicLineType);
+    String lineType = extractLineType(basicLineType);
+    Optional<DateTimeDt> removalDateTime =
+        extractLineDateTime(LINE_REMOVAL_DATE, LINE_REMOVAL_TIME);
+
+    Procedure procedure = new Procedure()
+        .setStatus(
+            ProcedureStatusEnum.COMPLETED)
+        .setCategory(
+            ProcedureCategoryEnum.CENTRAL_LINE.toCodeableConcept())
+        .addIdentifier(
+            inputLineType.get().getIdentifierFirstRep())
+        .setCode(
+            new CodeableConceptDt(
+                CodingSystems.PROCEDURE, computeLineProcedureCode(tunneledStatus, lineType)))
+        .setEncounter(
+            new ResourceReferenceDt(encounter));
+    if (removalDateTime.isPresent()) {
+      procedure.setPerformed(removalDateTime.get());
+    }
+
+    InstantDt updated = new InstantDt(Date.from(Instant.now(clock)));
+    ResourceMetadataKeyEnum.UPDATED.put(procedure, updated);
+
+    return Optional.of(procedure);
+  }
+
+  private Optional<Procedure> toLineProcedure() {
+    if (getObservation(LINE_REMOVAL_DATE).isPresent()) {
+      return removeLine();
+    }
+
+    return insertLine();
   }
 
   /**

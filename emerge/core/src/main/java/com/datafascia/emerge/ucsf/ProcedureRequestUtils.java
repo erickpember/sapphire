@@ -2,12 +2,8 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.ucsf;
 
-import ca.uhn.fhir.model.api.IDatatype;
-import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
-import ca.uhn.fhir.model.dstu2.composite.TimingDt;
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
-import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.domain.fhir.Dates;
 import java.util.ArrayList;
@@ -90,113 +86,51 @@ public class ProcedureRequestUtils {
   }
 
   /**
-   * Given an encounter and a Procedure type code, find the freshest match that is scheduled before
-   * now. If the freshest is in progress, return true.
-   *
-   * @param encounterId
-   *    encounter to search for procedure requests
-   * @param client
-   *    API client
-   * @param procedureCode
-   *    Code field in ProcedureRequest, identifies the type of procedure for this search.
-   * @return
-   *    True if the freshest procedure request for this encounter and code and has a status of
-   *    in progress.
-   */
-  public static boolean currentNonMedicationOrder(ClientBuilder client, String encounterId,
-      String procedureCode) {
-    return client.getProcedureRequestClient()
-        .searchProcedureRequest(encounterId, procedureCode, null).stream()
-        .max(getScheduledComparator())
-        .filter(request -> isCurrent(request))
-        .isPresent();
-  }
-
-  /**
    * Given a procedure request return true if it is dated before now and is in progress.
    *
    * @param request
    *    The request in question.
+   * @param now
+   *    The current time.
    * @return
    *    True if the request is before now and in progress. Otherwise false.
    */
-  public static boolean isCurrent(ProcedureRequest request) {
-    return (request != null && beforeNow(request) && request.getStatusElement()
+  public static boolean isCurrent(ProcedureRequest request, Date now) {
+    return (request != null && isScheduledBefore(request, now) && request.getStatusElement()
         .getValueAsEnum().equals(ProcedureRequestStatusEnum.IN_PROGRESS));
   }
 
   /**
-   * Given an encounter and a Procedure type code, find the freshest match that is also
-   * scheduled after now. If the freshest is in progress, return true.
-   * and a dosage over zero.
-   *
-   * @param encounterId
-   *    encounter to search for procedure requests
-   * @param client
-   *    API client
-   * @param procedureCode
-   *    Code field in ProcedureRequest, identifies the type of procedure for this search.
-   * @return
-   *    True if the freshest procedure request scheduled in the future for this encounter and code
-   *    and has a status of in progress.
-   */
-  public static boolean futureNonMedicationOrder(ClientBuilder client, String encounterId,
-      String procedureCode) {
-    return client.getProcedureRequestClient()
-        .searchProcedureRequest(encounterId, procedureCode, null).stream()
-        .filter(request -> afterNow(request))
-        .max(getScheduledComparator())
-        .filter(request -> request.getStatusElement()
-            .getValueAsEnum().equals(ProcedureRequestStatusEnum.IN_PROGRESS)).isPresent();
-  }
-
-  /**
-   * Returns true if a specified procedure request is scheduled before now.
+   * Returns true if a specified procedure request is scheduled before a specified time.
    *
    * @param request
    *     Procedure request resource.
+   * @param date
+   *     Specified time.
    * @return
-   *     True if the supplied request is scheduled before now.
+   *     True if the supplied request is scheduled before a specified time.
    */
-  public static boolean beforeNow(ProcedureRequest request) {
-    Date now = new Date();
-    IDatatype scheduled = request.getScheduled();
-    if (scheduled instanceof TimingDt) {
-      return ((TimingDt) scheduled).getEventFirstRep().getValue().before(now);
-    } else if (scheduled instanceof PeriodDt) {
-      return ((PeriodDt) scheduled).getStart().before(now);
-    } else if (scheduled instanceof DateTimeDt) {
-      return ((DateTimeDt) scheduled).getValue().before(now);
-    } else {
-      throw new RuntimeException("Unexpected type: " + scheduled.getClass().getCanonicalName());
-    }
+  public static boolean isScheduledBefore(ProcedureRequest request, Date date) {
+    return (date != null) ? Dates.toDate(request.getScheduled()).before(date) : false;
   }
 
   /**
-   * Returns true if a specified procedure request is scheduled after now.
+   * Returns true if a specified procedure request is scheduled isAfter a specified time.
    *
    * @param request
    *     Procedure request resource.
+   * @param date
+   *     Specified time.
    * @return
-   *     True if the supplied request is scheduled after now.
+   *     True if the supplied request is scheduled isAfter a specified time.
    */
-  public static boolean afterNow(ProcedureRequest request) {
-    Date now = new Date();
-    IDatatype scheduled = request.getScheduled();
-    if (scheduled instanceof TimingDt) {
-      return ((TimingDt) scheduled).getEventFirstRep().getValue().after(now);
-    } else if (scheduled instanceof PeriodDt) {
-      return ((PeriodDt) scheduled).getStart().after(now);
-    } else if (scheduled instanceof DateTimeDt) {
-      return ((DateTimeDt) scheduled).getValue().after(now);
-    } else {
-      throw new RuntimeException("Unexpected type: " + scheduled.getClass().getCanonicalName());
-    }
+  public static boolean isScheduledAfter(ProcedureRequest request, Date date) {
+    return (date != null) ? Dates.toDate(request.getScheduled()).after(date) : false;
   }
 
   /**
-   * Returns the procedure requests for a given encounter with the given code and after the given
-   * time.
+   * Returns the procedure requests for a given encounter with the given code and isAfter the given
+ time.
    *
    * @param client
    *     The client to use.
@@ -214,7 +148,7 @@ public class ProcedureRequestUtils {
         = client.getProcedureRequestClient().searchProcedureRequest(encounterId, code, null);
     List<ProcedureRequest> returnList = new ArrayList<>();
     for (ProcedureRequest req : requests) {
-      if (req.getOrderedOn().after(date)) {
+      if (isScheduledAfter(req, date)) {
         returnList.add(req);
       }
     }

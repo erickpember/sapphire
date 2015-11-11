@@ -6,6 +6,9 @@ import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
 import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
+import java.time.Clock;
+import java.time.Instant;
+import java.util.Date;
 import java.util.Optional;
 import javax.inject.Inject;
 
@@ -16,6 +19,9 @@ public class RassGoalImpl {
 
   @Inject
   private ClientBuilder apiClient;
+
+  @Inject
+  private Clock clock;
 
   /**
    * Pain and delirium Clinician RASS goal implementation
@@ -28,7 +34,7 @@ public class RassGoalImpl {
   public int getRassGoal(String encounterId) {
     ProcedureRequest targetRass = getTargetRass(encounterId);
 
-    if (ProcedureRequestUtils.isCurrent(targetRass)) {
+    if (ProcedureRequestUtils.isCurrent(targetRass, Date.from(Instant.now(clock)))) {
       if (targetRass.getNotesFirstRep().getText().equals(
           ProcedureRequestCodeEnum.TARGET_RASS_0_ALERT_AND_CALM
           .getCode())) {

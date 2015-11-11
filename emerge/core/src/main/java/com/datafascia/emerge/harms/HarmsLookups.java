@@ -27,40 +27,36 @@ public class HarmsLookups {
   public final static Map<String, Long> efficacyList = new HashMap<String, Long>() {
     {
       // Administered within 10 hours
-      put("Heparin infusion", TimeUnit.HOURS.toMillis(10));
+      put("Continuous Infusion Heparin IV", TimeUnit.HOURS.toMillis(10));
       // Administered within 12 hours + 1h buffer = 13 hours
-      put("Heparin injection (ppx)", TimeUnit.HOURS.toMillis(12));
+      put("Intermittent Heparin SC", TimeUnit.HOURS.toMillis(12));
       /* Administered within 5 hours. Did 5x normal half-life in this scenario as the drug would not
        * be routinely used in hepatic impairment. */
-      put("Argatroban infusion", TimeUnit.HOURS.toMillis(5));
+      put("Continuous Infusion Argatroban IV", TimeUnit.HOURS.toMillis(5));
       /* Administered within 5 hours. Used 5x half-life for gfr 10-29 since would not routinely be
        * used in patients with ESRD off dialysis. */
-      put("Bivalirudin infusion", TimeUnit.HOURS.toMillis(5));
+      put("Continuous Infusion Bivalirudin IV", TimeUnit.HOURS.toMillis(5));
       /* Administered within 24 hours + 1 h buffer = 25 hours. Initial idea was to pull by
        * administration frequency + weight; administered within 12 hours (1 mg/kg doses) or 24 hours
        * (1.5 mg/kg doses + prophylactic doses) */
-      put("Enoxaparin injection (ppx) ", TimeUnit.HOURS.toMillis(25));
-      /* Administered within 24 hours + 1 h buffer = 25 hours. Initial idea was to pull by
-       * administration frequency + weight; administered within 12 hours (1 mg/kg doses) or 24 hours
-       * (1.5 mg/kg doses + prophylactic doses) */
-      put("Enoxaparin injection (therapeutic) ", TimeUnit.HOURS.toMillis(25));
+      put("Intermittent Enoxaparin", TimeUnit.HOURS.toMillis(25));
       // Administered within 24 hours + 1 h buffer = 25 hours
-      put("Dabigatran oral", TimeUnit.HOURS.toMillis(25));
+      put("Intermittent Dabigatran Enteral", TimeUnit.HOURS.toMillis(25));
       // Administered within 12 hours + 1h buffer = 13 hours
-      put("Apixaban oral", TimeUnit.HOURS.toMillis(13));
+      put("Intermittent Apixaban Enteral", TimeUnit.HOURS.toMillis(13));
       /* Administered within 24 hours + 1 h buffer = 25 hours. For drugs given therapeutically at 12
        * and 24 hour intervals, should we pull based on the 24h + buffer to be most inclusive? I'd
        * hate to prompt earlier admin in someone who is still therapeutic. */
-      put("Rivaroxaban", TimeUnit.HOURS.toMillis(25));
+      put("Intermittent Rivaroxaban Enteral", TimeUnit.HOURS.toMillis(25));
       // Administered within 24 hours + 1 h buffer = 25 hours
-      put("Edoxaban", TimeUnit.HOURS.toMillis(25));
+      put("Intermittent Edoxaban Enteral", TimeUnit.HOURS.toMillis(25));
       // Administered within 24 hours + 1 h buffer = 25 hours
-      put("Fondaparinux", TimeUnit.HOURS.toMillis(25));
+      put("Intermittent Fondaparinux SC", TimeUnit.HOURS.toMillis(25));
       /* Administered within 3 days + INR > 1.5 I would like to base on the "duration" of 2-5 days
        * given variability in ordering, potential for held doses, etc. the INR where you would give
        * ppx once warfarin was held is not well defined, but 1.5 is reasonable and also our cutoff
        * for the lab value itself. */
-      put("Warfarin", TimeUnit.HOURS.toMillis(3));
+      put("Intermittent Warfarin Enteral", TimeUnit.HOURS.toMillis(3));
     }
   };
 

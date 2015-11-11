@@ -333,7 +333,8 @@ public class ProcedureBuilder {
   }
 
   private Optional<Procedure> toLineProcedure() {
-    Optional<Observation> inputLineType = getObservation(LINE_TYPE0, LINE_TYPE9);
+    Optional<Observation> inputLineType = getObservation(
+        LINE_LOCATION2, LINE_LOCATION7, LINE_LOCATION0, LINE_LOCATION4, LINE_TYPE0, LINE_TYPE9);
     if (!inputLineType.isPresent()) {
       return Optional.empty();
     }

@@ -17,6 +17,7 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import static org.junit.Assert.assertNull;
 import static org.testng.Assert.assertEquals;
 
 /**
@@ -47,6 +48,20 @@ public class CentralLineAssociateBloodStreamInfectionIT extends HarmEvidenceTest
         harmEvidence.getMedicalData().getCLABSI().getDailyNeedsAssessment();
     assertEquals(dailyNeedsAssessment.getPerformed(), DailyNeedsAssessment.Performed.YES);
     assertEquals(dailyNeedsAssessment.getUpdateTime(), Date.from(Instant.now(clock)));
+  }
+
+  @Test
+  public void should_export_introducer_femoral_right() throws Exception {
+    processMessage("introducer-femoral-right.hl7");
+
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    CLABSI clabsi = harmEvidence.getMedicalData().getCLABSI();
+    CentralLine centralLine = clabsi.getCentralLine().get(0);
+    assertEquals(centralLine.getType(), CentralLine.Type.INTRODUCER);
+    assertEquals(centralLine.getSite(), CentralLine.Site.FEMORAL);
+    assertEquals(centralLine.getSide(), CentralLine.Side.RIGHT);
+    assertNull(centralLine.getInsertionDate());
+    assertEquals(centralLine.getUpdateTime(), Date.from(Instant.now(clock)));
   }
 
   @Test

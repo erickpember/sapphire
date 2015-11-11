@@ -58,10 +58,10 @@ public class ProcedureBuilderTest {
     addObservation(procedureBuilder, "304890081", "Orientation", "Left");
     addObservation(procedureBuilder, "304890092", "Orientation", "Left");
     addObservation(procedureBuilder, "304890103", "Orientation", "Left");
-    addObservation(procedureBuilder, "304890082", "Location", "Femoral");
-    addObservation(procedureBuilder, "304890097", "Location", "Femoral");
-    addObservation(procedureBuilder, "304890100", "Location", "Arm");
-    addObservation(procedureBuilder, "304890104", "Location", "Arm");
+    addObservation(procedureBuilder, "304890082", "Location-CVC Single Lumen", "Femoral");
+    addObservation(procedureBuilder, "304890097", "Location-CVC Single Lumen", "Femoral");
+    addObservation(procedureBuilder, "304890100", "Location-CVC Single Lumen", "Arm");
+    addObservation(procedureBuilder, "304890104", "Location-CVC Single Lumen", "Arm");
     addObservation(procedureBuilder, "304890093", "Access Location", "Arm");
     Procedure procedure = procedureBuilder.build().get();
 

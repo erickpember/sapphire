@@ -3,7 +3,9 @@
 package com.datafascia.emerge.harms.pain;
 
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
+import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
+import ca.uhn.fhir.model.primitive.StringDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationEffectiveComparator;
 import com.datafascia.emerge.ucsf.ObservationUtils;
@@ -297,24 +299,34 @@ public class PainUtils {
    * @return The integer pain score from the observation or  {@code null} if not found.
    */
   public static Integer getPainScoreFromValue(Observation observation) {
-    if (observation == null || Strings.isNullOrEmpty(
-        ObservationUtils.getValueAsString(observation))) {
+    if (observation == null || observation.getValue() == null) {
       return null;
     }
 
     int painScore = -1;
-    try {
-      painScore = Integer.parseInt(ObservationUtils.getValueAsString(observation));
-    } catch (NumberFormatException ex) {
-      log.warn("Non-numeric value:" + ObservationUtils.getValueAsString(observation)
-          + " found in observation: " + observation.getId());
+
+    if (observation.getValue() instanceof QuantityDt) {
+      QuantityDt value = (QuantityDt) observation.getValue();
+      painScore = value.getValue().intValueExact();
+    } else if (observation.getValue() instanceof StringDt) {
+      try {
+        painScore = Integer.parseInt(ObservationUtils.getValueAsString(observation));
+      } catch (NumberFormatException ex) {
+        log.warn("Non-numeric pain score value:" + ObservationUtils.getValueAsString(observation)
+            + " found in observation: " + observation.getId().getValueAsString());
+        return null;
+      }
+    } else {
+      log.warn("Unexpected type of pain score value:" + observation.getValue()
+          + " found in observation: " + observation.getId().getValueAsString());
       return null;
     }
+
     if (painScore >= 0 && painScore <= 11) {
       return painScore;
     } else {
-      log.warn("Unexpected quantiy of value:" + painScore + " found in observation: " + observation
-          .getId().getValueAsString());
+      log.warn("Unexpected quantiy of pain score value:" + painScore + " found in observation: "
+          + observation.getId().getValueAsString());
       return null;
     }
   }

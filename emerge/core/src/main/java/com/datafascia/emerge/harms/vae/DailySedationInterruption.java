@@ -64,6 +64,10 @@ public class DailySedationInterruption {
     Map<String, MedicationOrder> orders = new HashMap<>();
     Map<MedicationAdministration, MedicationOrder> orderAdmins = new HashMap<>();
 
+    if (admins.isEmpty()) {
+      return false;
+    }
+
     // Filter only admins for the meds we care about from the last 25 hours.
     for (MedicationAdministration admin : admins) {
       List<IdentifierDt> identifiers = MedicationAdministrationUtils.findIdentifiers(admin,

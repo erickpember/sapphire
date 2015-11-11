@@ -97,7 +97,7 @@ public class CentralLineAssociatedBloodStreamInfectionUpdater {
         .withType(CentralLine.Type.fromValue(type))
         .withSite(formatSite(site))
         .withSide(CentralLine.Side.fromValue(side))
-        .withInsertionDate(insertionDate.getValue())
+        .withInsertionDate((insertionDate != null) ? insertionDate.getValue() : null)
         .withUpdateTime(updateTime.getValue());
   }
 

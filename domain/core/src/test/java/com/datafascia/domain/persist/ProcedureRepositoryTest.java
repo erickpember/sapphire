@@ -77,11 +77,16 @@ public class ProcedureRepositoryTest extends RepositoryTestSupport {
     return encounter;
   }
 
-  private Procedure createProcedure(String typeCode, String bodySiteCode, Encounter encounter) {
+  private Procedure createProcedure(
+      String identifier, String typeCode, String bodySiteCode, Encounter encounter) {
+
     Procedure procedure = new Procedure()
         .setCode(new CodeableConceptDt(CodingSystems.PROCEDURE, typeCode))
         .setPerformed(new DateTimeDt(new Date(), TemporalPrecisionEnum.SECOND))
         .setEncounter(new ResourceReferenceDt(encounter.getId()));
+    procedure.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_OBSERVATION_SUB_IDENTIFIER)
+        .setValue(identifier);
     procedure.addBodySite(
         new CodeableConceptDt(CodingSystems.BODY_SITE, bodySiteCode));
     return procedure;
@@ -95,10 +100,10 @@ public class ProcedureRepositoryTest extends RepositoryTestSupport {
     Encounter encounter = createEncounter(patient);
     encounterRepository.save(encounter);
 
-    Procedure procedure1 = createProcedure(TYPE_CODE1, "1", encounter);
+    Procedure procedure1 = createProcedure("id1", TYPE_CODE1, "1", encounter);
     procedureRepository.save(procedure1);
 
-    Procedure procedure2 = createProcedure(TYPE_CODE2, "2", encounter);
+    Procedure procedure2 = createProcedure("id2", TYPE_CODE2, "2", encounter);
     procedureRepository.save(procedure2);
 
     Id<Encounter> encounterId = Ids.toPrimaryKey(encounter.getId());

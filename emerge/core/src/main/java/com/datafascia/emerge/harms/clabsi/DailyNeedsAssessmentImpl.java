@@ -71,7 +71,8 @@ public class DailyNeedsAssessmentImpl {
     Date sevenAmYesterday = Date.from(sevenAmTodayInstant.minus(24, ChronoUnit.HOURS));
 
     int hourOftheDay = now.getHour();
-    if (hourOftheDay >= 7 && freshestCVCNeedAssessment.getValue() != null) {
+    if (hourOftheDay >= 7 && freshestCVCNeedAssessment != null
+        && freshestCVCNeedAssessment.getValue() != null) {
       if (freshestCVCNeedAssessment.getValue().toString().equals("Completed")) {
         return "Yes";
       }

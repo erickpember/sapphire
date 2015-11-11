@@ -42,7 +42,7 @@ public class PharmacologicVteProphylaxisAdministered {
         for (PharmacologicVtePpxTypeEnum vtePpx : PharmacologicVtePpxTypeEnum.values()) {
           DateTimeDt timeTaken = (DateTimeDt) administration.getEffectiveTime();
           Long period = HarmsLookups.efficacyList.get(medsSet);
-          if (vtePpx.toString().equalsIgnoreCase(medsSet.replace(" ", "_"))
+          if (vtePpx.getCode().equals(medsSet)
               && HarmsLookups.withinDrugPeriod(timeTaken.getValue(), period)) {
             administered = true;
             break;

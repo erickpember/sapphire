@@ -6,9 +6,8 @@ import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.CodeStatus;
 import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
-import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
+import com.datafascia.emerge.ucsf.codes.CodeStatusCodeMap;
 import com.google.common.collect.Lists;
-import java.util.Arrays;
 import java.util.List;
 import javax.inject.Inject;
 
@@ -16,14 +15,6 @@ import javax.inject.Inject;
  * Code Status Implementation
  */
 public class CodeStatusImpl {
-
-  private static final List<String> QUALIFYING_CODES = Arrays.asList(
-      ProcedureRequestCodeEnum.ATTENDING_PARTIAL.getCode(),
-      ProcedureRequestCodeEnum.ATTENDING_DNR_DNI.getCode(),
-      ProcedureRequestCodeEnum.RESIDENT_DNR_DNI.getCode(),
-      ProcedureRequestCodeEnum.RESIDENT_PARTIAL.getCode(),
-      ProcedureRequestCodeEnum.FULL.getCode()
-  );
 
   @Inject
   private ClientBuilder apiClient;
@@ -44,8 +35,11 @@ public class CodeStatusImpl {
         .sortProcedureRequests(codeStatusRequests));
 
     for (ProcedureRequest request : sortedRequests) {
-      if (QUALIFYING_CODES.contains(request.getIdentifierFirstRep().getValue())) {
-        return CodeStatus.Value.fromValue(request.getIdentifierFirstRep().getValue());
+      String code = request.getCode().getCodingFirstRep().getCode();
+      if (code != null &&
+          (code.equals("82935") || code.equals("82934") ||
+           code.equals("521") || code.equals("519") || code.equals("517"))) {
+        return CodeStatus.Value.fromValue(CodeStatusCodeMap.getName(code));
       }
     }
 

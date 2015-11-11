@@ -252,7 +252,7 @@ public class UcsfMedicationUtils {
       try {
         encounter = clientBuilder.getEncounterClient().getEncounter(encounterId);
       } catch (ResourceNotFoundException e) {
-        log.warn("\n encounters are broken in a unit test, rip all this code out.\n");
+        // The encounter will remain empty, and the warning below will trigger.
       }
       if (!encounter.isEmpty()) {
         medicationOrder.setEncounter(new ResourceReferenceDt(encounter));

@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.harm.paindelirium;
 
-import com.datafascia.common.persist.Id;
+import com.datafascia.emerge.ucsf.Cam;
 import com.datafascia.emerge.ucsf.CurrentScore;
 import com.datafascia.emerge.ucsf.CurrentScore___;
 import com.datafascia.emerge.ucsf.HarmEvidence;
@@ -27,8 +27,8 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
   }
 
   @AfterMethod
-  public void dischargePatient() throws Exception {
-    processMessage("ADT_A03.hl7");
+  public void deletePatient() {
+    deleteIngestedData();
   }
 
   @Test
@@ -36,8 +36,7 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
     processMessage("numerical-pain-8.hl7");
     processTimer();
 
-    Id<HarmEvidence> patientId = Id.of(PATIENT_IDENTIFIER);
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(patientId).get();
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
     Numerical numerical =
         harmEvidence.getMedicalData().getDelirium().getPain().getNumerical();
 
@@ -52,13 +51,44 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
     processMessage("rass-3.hl7");
     processTimer();
 
-    Id<HarmEvidence> patientId = Id.of(PATIENT_IDENTIFIER);
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(patientId).get();
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
     RASS rass = harmEvidence.getMedicalData().getDelirium().getRASS();
 
     CurrentScore___ currentScore = rass.getCurrentScore();
     assertEquals(currentScore.getRASSScore(), 3);
     assertEquals(
         currentScore.getTimeOfDataAquisition().toInstant().toString(), "2014-09-29T21:48:59Z");
+  }
+
+  @Test
+  public void should_export_cam_all() throws Exception {
+    processMessage("cam-positive.hl7");
+    processTimer();
+
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
+    Cam cam = harmEvidence.getMedicalData().getDelirium().getCam();
+
+    Cam.Result result = cam.getResult();
+    assertEquals(result, Cam.Result.POSITIVE);
+
+    processMessage("cam-negative.hl7");
+    processTimer();
+
+    harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
+    cam = harmEvidence.getMedicalData().getDelirium().getCam();
+
+    result = cam.getResult();
+    assertEquals(result, Cam.Result.NEGATIVE);
+
+    processMessage("cam-uta.hl7");
+    processTimer();
+
+    harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
+    cam = harmEvidence.getMedicalData().getDelirium().getCam();
+
+    result = cam.getResult();
+    Cam.UtaReason utaReason = cam.getUtaReason();
+    assertEquals(result, Cam.Result.UTA);
+    assertEquals(utaReason, Cam.UtaReason.RASS_SCORE_4_OR_5);
   }
 }

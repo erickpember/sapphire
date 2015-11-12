@@ -9,10 +9,12 @@ import com.datafascia.api.services.ApiTestSupport;
 import com.datafascia.common.inject.Injectors;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.persist.entity.AccumuloReflectEntityStore;
+import com.datafascia.common.persist.entity.EntityId;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.PatientRepository;
+import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
 import com.datafascia.etl.hl7.HL7MessageProcessor;
 import com.datafascia.etl.ucsf.web.NursingOrdersTransformer;
@@ -33,6 +35,7 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
   protected static final Id<UnitedStatesPatient> PATIENT_ID = Id.of(PATIENT_IDENTIFIER);
   protected static final String ENCOUNTER_IDENTIFIER = "5014212";
   protected static final Id<Encounter> ENCOUNTER_ID = Id.of(ENCOUNTER_IDENTIFIER);
+  protected static final Id<HarmEvidence> HARM_EVIDENCE_ID = Id.of(PATIENT_IDENTIFIER);
 
   @Inject
   private HL7MessageProcessor hl7MessageProcessor;
@@ -92,5 +95,10 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
 
   protected void processTimer() {
     harmEvidenceUpdater.processTimer(getEncounter());
+  }
+
+  protected void deleteIngestedData() {
+    entityStore.delete(new EntityId(Encounter.class, ENCOUNTER_ID));
+    entityStore.delete(new EntityId(UnitedStatesPatient.class, PATIENT_ID));
   }
 }

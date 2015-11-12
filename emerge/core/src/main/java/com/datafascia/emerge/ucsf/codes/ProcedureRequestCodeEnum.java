@@ -11,6 +11,7 @@ import java.util.Optional;
  * Enumerates procedure request codes.
  */
 public enum ProcedureRequestCodeEnum implements SystemDefinedCode<String> {
+  // All these are found in code.coding.code like normal codeable concept values.
   TARGET_RASS("124838"),
   HYPOTHERMIA_BLANKET_ORDER_1("57714"),
   HYPOTHERMIA_BLANKET_ORDER_2("139056"),
@@ -34,6 +35,7 @@ public enum ProcedureRequestCodeEnum implements SystemDefinedCode<String> {
   RESIDENT_PARTIAL("82935"),
   FULL_CODE("519"),
 
+  // Unlike the normal code values above, these are actually found both in code.text and notes.text
   TARGET_RASS_0_ALERT_AND_CALM("Target RASS 0: Alert and Calm (acceptable range -1 to +1)"),
   TARGET_RASS_NEG1_DROWSY("Target RASS -1: Drowsy (acceptable range -2 to 0)"),
   TARGET_RASS_NEG2_LIGHT_SEDATION("Target RASS -2: Light Sedation (acceptable range -3 to -1)"),

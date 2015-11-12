@@ -22,9 +22,15 @@ import javax.inject.Inject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import org.kie.api.KieBase;
+import org.kie.api.KieBaseConfiguration;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.StatelessKieSession;
+import org.kie.api.runtime.rule.ConsequenceExceptionHandler;
+import org.kie.api.runtime.rule.Match;
+import org.kie.api.runtime.rule.RuleRuntime;
+import org.kie.internal.conf.ConsequenceExceptionHandlerOption;
 
 /**
  * Updates harm evidence for a patient in response to an event.
@@ -55,6 +61,16 @@ public class HarmEvidenceUpdater {
     private EventType type;
   }
 
+  /**
+   * Swallows exception throw in consequence
+   */
+  public static class MyConsequenceExceptionHandler implements ConsequenceExceptionHandler {
+    @Override
+    public void handleException(Match match, RuleRuntime workingMemory, Exception exception) {
+      log.error("Exception in consequence of rule {}", match.getRule(), exception);
+    }
+  }
+
   @Inject
   private HarmEvidenceRepository harmEvidenceRepository;
 
@@ -82,14 +98,20 @@ public class HarmEvidenceUpdater {
   @Inject
   private PainAndDeliriumUpdater painAndDeliriumUpdater;
 
-  private KieContainer container;
+  private KieBase base;
 
   /**
    * Constructor
    */
   public HarmEvidenceUpdater() {
     KieServices services = KieServices.Factory.get();
-    container = services.newKieClasspathContainer();
+    KieContainer container = services.newKieClasspathContainer();
+
+    KieBaseConfiguration baseConfiguration = services.newKieBaseConfiguration();
+    baseConfiguration.setOption(
+        ConsequenceExceptionHandlerOption.get(MyConsequenceExceptionHandler.class));
+
+    base = container.newKieBase("harmEvidenceBase", baseConfiguration);
   }
 
   private HarmEvidence getHarmEvidence(Encounter encounter) {
@@ -125,7 +147,7 @@ public class HarmEvidenceUpdater {
       List<Observation> observations,
       Object... additionalFacts) {
 
-    StatelessKieSession session = container.newStatelessKieSession("harmEvidence");
+    StatelessKieSession session = base.newStatelessKieSession();
     session.setGlobal("demographicDataUpdater", demographicDataUpdater);
     session.setGlobal("centralLineAssociatedBloodStreamInfectionUpdater", clabsiUpdater);
     session.setGlobal("alignmentOfGoalsUpdater", alignmentOfGoalsUpdater);

@@ -56,6 +56,10 @@ public class DailyNeedsAssessmentImpl {
         encounterId, ObservationCodeEnum.NEEDS_ASSESSMENT.getCode(), null);
     Observation freshestCVCNeedAssessment = ObservationUtils.findFreshestObservation(observations);
 
+    if (freshestCVCNeedAssessment == null || freshestCVCNeedAssessment.getValue() == null) {
+      return "No";
+    }
+
     ZonedDateTime now = ZonedDateTime.now(clock);
     Instant sevenAmTodayInstant = ZonedDateTime.of(
         now.getYear(),
@@ -71,8 +75,7 @@ public class DailyNeedsAssessmentImpl {
     Date sevenAmYesterday = Date.from(sevenAmTodayInstant.minus(24, ChronoUnit.HOURS));
 
     int hourOftheDay = now.getHour();
-    if (hourOftheDay >= 7 && freshestCVCNeedAssessment != null
-        && freshestCVCNeedAssessment.getValue() != null) {
+    if (hourOftheDay >= 7) {
       if (freshestCVCNeedAssessment.getValue().toString().equals("Completed")) {
         return "Yes";
       }

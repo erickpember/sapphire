@@ -107,6 +107,16 @@ public class VentilatorAssociatedEventUpdater {
   public void admitPatient(HarmEvidence harmEvidence) {
     VAE vae = getVAE(harmEvidence);
 
+    TimestampedBoolean newVentiliated = new TimestampedBoolean()
+        .withValue(false)
+        .withUpdateTime(Date.from(Instant.now(clock)));
+    vae.setVentilated(newVentiliated);
+
+    TimestampedMaybe newDiscreteHOBGreaterThan30Deg = new TimestampedMaybe()
+        .withValue(TimestampedMaybe.Value.NO)
+        .withUpdateTime(Date.from(Instant.now(clock)));
+    vae.setDiscreteHOBGreaterThan30Deg(newDiscreteHOBGreaterThan30Deg);
+
     TimestampedMaybe newSubglotticSuctionSurgicalAirway = new TimestampedMaybe()
         .withValue(TimestampedMaybe.Value.NOT_DOCUMENTED)
         .withUpdateTime(Date.from(Instant.now(clock)));
@@ -116,6 +126,11 @@ public class VentilatorAssociatedEventUpdater {
         .withValue(TimestampedMaybe.Value.NOT_DOCUMENTED)
         .withUpdateTime(Date.from(Instant.now(clock)));
     vae.setSubglotticSuctionNonSurgicalAirway(newSubglotticSuctionNonSurgicalAirway);
+
+    TimestampedMaybe newOralCare = new TimestampedMaybe()
+        .withValue(TimestampedMaybe.Value.NO)
+        .withUpdateTime(Date.from(Instant.now(clock)));
+    vae.setOralCare(newOralCare);
   }
 
   /**

@@ -11,12 +11,10 @@ import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Location;
 import ca.uhn.fhir.model.dstu2.resource.Medication;
-import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
-import ca.uhn.fhir.model.dstu2.valueset.MedicationOrderStatusEnum;
 import ca.uhn.fhir.model.primitive.DateDt;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import ca.uhn.fhir.model.primitive.DecimalDt;
@@ -128,7 +126,6 @@ public abstract class ApiTestSupport {
     Medication medication = addMedication();
 
     List<Observation> observations = addObservations(patients, encounters);
-    List<MedicationOrder> medicationOrders = addMedicationOrders(patients, encounters);
   }
 
   private List<UnitedStatesPatient> addPatients() {
@@ -439,64 +436,5 @@ public abstract class ApiTestSupport {
     log.info("medication ID: {}", id.getValue());
 
     return medication;
-  }
-
-  private MedicationOrder createPrescription(String identifier,
-      List<UnitedStatesPatient> patients, List<Encounter> encounters) {
-    MedicationOrder rx = new MedicationOrder();
-    rx.addIdentifier().setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue(identifier);
-    rx.setStatus(MedicationOrderStatusEnum.ACTIVE);
-    rx.setEncounter(new ResourceReferenceDt(encounters.get(2)));
-    rx.setPatient(new ResourceReferenceDt(patients.get(2)));
-
-    return rx;
-  }
-
-  private List<MedicationOrder> addMedicationOrders(
-      List<UnitedStatesPatient> patients,
-      List<Encounter> encounters) {
-    MedicationOrder rx1 = createPrescription("Continuous Infusion Lorazepam IV",
-        patients, encounters);
-    MethodOutcome outcome = client.create().resource(rx1).execute();
-    IIdType id = outcome.getId();
-    rx1.setId(id);
-
-    MedicationOrder rx2 = createPrescription("Continuous Infusion Midazolam IV",
-        patients, encounters);
-    outcome = client.create().resource(rx2).execute();
-    id = outcome.getId();
-    rx2.setId(id);
-
-    MedicationOrder rx3 = createPrescription("Intermittent Chlordiazepoxide Enteral",
-        patients, encounters);
-    outcome = client.create().resource(rx3).execute();
-    id = outcome.getId();
-    rx3.setId(id);
-
-    MedicationOrder rx4 = createPrescription("Intermittent Lorazepam IV",
-        patients, encounters);
-    outcome = client.create().resource(rx4).execute();
-    id = outcome.getId();
-    rx4.setId(id);
-
-    MedicationOrder rx5 = createPrescription("Intermittent Lorazepam Enteral",
-        patients, encounters);
-    outcome = client.create().resource(rx5).execute();
-    id = outcome.getId();
-    rx5.setId(id);
-
-    MedicationOrder rx6 = createPrescription("Intermittent Midazolam IV",
-        patients, encounters);
-    outcome = client.create().resource(rx6).execute();
-    id = outcome.getId();
-    rx6.setId(id);
-
-    MedicationOrder rx7 = createPrescription("Intermittent Something or Other IV",
-        patients, encounters);
-    outcome = client.create().resource(rx7).execute();
-    id = outcome.getId();
-    rx7.setId(id);
-
-    return Arrays.asList(rx1, rx2, rx3, rx4, rx5, rx6);
   }
 }

@@ -795,102 +795,110 @@
         },
         "VTE": {
           "type": "object",
-          "description": "An explanation about the purpose of this instance described by this schema.",
+          "description": "Venous thromboembolism data",
           "properties": {
-            "onSystemicAnticoagulation": {
-              "$ref": "#/definitions/TimestampedBoolean"
-            },
-            "lowerExtremitySCDsContraindicated": {
+            "anticoagulation": {
               "type": "object",
-              "description": "An explanation about the purpose of this instance described by this schema.",
               "properties": {
-                "updateTime": {
-                  "type": "string",
-                  "format": "date-time",
-                  "description": "An explanation about the purpose of this instance described by this schema."
+                "onSystemicAnticoagulation": {
+                  "$ref": "#/definitions/TimestampedBoolean"
                 },
-                "value": {
-                  "type": "boolean",
-                  "description": "An explanation about the purpose of this instance described by this schema."
-                },
-                "reason": {
-                  "type": "string",
-                  "enum": [
-                    "High risk of skin breakdown or arterial insufficiency",
-                    "Amputations"
-                  ],
-                  "description": "An explanation about the purpose of this instance described by this schema."
+                "type": {
+                  "type": "object",
+                  "properties": {
+                    "updateTime": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "When the value was updated"
+                    },
+                    "value": {
+                      "type": "string",
+                      "enum": [
+                        "Continuous Infusion Heparain IV",
+                        "Continuous Infusion Argatroban IV",
+                        "Continuous Infusion Bivalirudian IV",
+                        "Intermittent Enoxaparin SC",
+                        "Intermittent Dabigatran Enteral",
+                        "Intermittent Apixaban Enteral",
+                        "Intermittent Rivaroxaban Enteral",
+                        "Intermittent Edoxaban Enteral",
+                        "Intermittent Fondaparinux SC",
+                        "Intermittent Warfarin Enteral"
+                      ]
+                    }
+                  }
                 }
               }
             },
-            "SCDsInUse": {
-              "$ref": "#/definitions/TimestampedBoolean"
-            },
-            "SCDsOrdered": {
-              "$ref": "#/definitions/TimestampedBoolean"
-            },
-            "pharmacologicallyProphylaxedAgainstVTE": {
-              "$ref": "#/definitions/TimestampedBoolean"
-            },
-            "anticoagulationType": {
+            "SCDs": {
               "type": "object",
               "properties": {
-                "updateTime": {
-                  "type": "string",
-                  "format": "date-time",
-                  "description": "When the value was updated"
+                "lowerExtremitySCDsContraindicated": {
+                  "type": "object",
+                  "properties": {
+                    "updateTime": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "When the value was updated"
+                    },
+                    "value": {
+                      "type": "boolean"
+                    },
+                    "reason": {
+                      "type": "string",
+                      "enum": [
+                        "High risk of skin breakdown or arterial insufficiency",
+                        "Amputations",
+                        "No EHR mechanical VTE prophylaxis contraindication"
+                      ]
+                    }
+                  }
                 },
-                "value": {
-                  "type": "string",
-                  "enum": [
-                    "Continuous Infusion Heparain IV",
-                    "Continuous Infusion Argatroban IV",
-                    "Continuous Infusion Bivalirudian IV",
-                    "Intermittent Enoxaparin SC",
-                    "Intermittent Dabigatran Enteral",
-                    "Intermittent Apixaban Enteral",
-                    "Intermittent Rivaroxaban Enteral",
-                    "Intermittent Edoxaban Enteral",
-                    "Intermittent Fondaparinux SC",
-                    "Intermittent Warfarin Enteral"
-                  ]
+                "inUse": {
+                  "$ref": "#/definitions/TimestampedBoolean"
+                },
+                "ordered": {
+                  "$ref": "#/definitions/TimestampedBoolean"
                 }
               }
             },
-            "pharmacologicVTEProphylaxisType": {
-              "$ref": "#/definitions/TimestampedString"
-	        },
-            "pharmacologicVTEProphylaxisContraindicated": {
+            "pharmacologicVTEProphylaxis": {
               "type": "object",
-              "description": "An explanation about the purpose of this instance described by this schema.",
               "properties": {
-                "updateTime": {
-                  "type": "string",
-                  "format": "date-time",
-                  "description": "An explanation about the purpose of this instance described by this schema."
+                "type": {
+                  "$ref": "#/definitions/TimestampedString"
                 },
-                "value": {
-                  "type": "boolean",
-                  "description": "An explanation about the purpose of this instance described by this schema."
+                "contraindicated": {
+                  "type": "object",
+                  "properties": {
+                    "updateTime": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "When the value was updated"
+                    },
+                    "value": {
+                      "type": "boolean"
+                    },
+                    "reason": {
+                      "type": "string",
+                      "enum": [
+                        "High risk or recurrent CNS procedure/drain",
+                        "Allergy to heparin or HIT",
+                        "Platelet Count <50,000",
+                        "INR >1.5",
+                        "aPTT Ratio >1.5",
+                        "No EHR pharmacologic VTE prophylaxis contraindication"
+                      ]
+                    }
+                  }
                 },
-                "reason": {
-                  "type": "string",
-                  "enum": [
-                    "High risk or recurrent CNS procedure/drain",
-                    "Allergy to heparin or HIT",
-                    "Platelet Count <50,000",
-                    "INR >1.5",
-                    "aPTT Ratio >1.5"
-                  ],
-                  "description": "An explanation about the purpose of this instance described by this schema."
+                "ordered": {
+                  "$ref": "#/definitions/TimestampedBoolean"
+                },
+                "administered": {
+                  "$ref": "#/definitions/TimestampedBoolean"
                 }
               }
-            },
-            "pharmacologicVTEProphylaxisOrdered": {
-              "$ref": "#/definitions/TimestampedBoolean"
-            },
-            "pharmacologicVTEProphylaxisAdministered": {
-              "$ref": "#/definitions/TimestampedBoolean"
             }
           }
         },

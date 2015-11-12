@@ -2,8 +2,9 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.harm.venousthromboembolism;
 
-import com.datafascia.common.persist.Id;
 import com.datafascia.emerge.ucsf.HarmEvidence;
+import com.datafascia.emerge.ucsf.PharmacologicVTEProphylaxis;
+import com.datafascia.emerge.ucsf.SCDs;
 import com.datafascia.emerge.ucsf.TimestampedBoolean;
 import com.datafascia.emerge.ucsf.VTE;
 import com.datafascia.etl.harm.HarmEvidenceTestSupport;
@@ -29,17 +30,17 @@ public class VenousThromboembolismIT extends HarmEvidenceTestSupport {
   }
 
   @AfterMethod
-  public void dischargePatient() throws Exception {
-    processMessage("ADT_A03.hl7");
+  public void deletePatient() throws Exception {
+    deleteIngestedData();
   }
 
   @Test
   public void should_export_default_values() {
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
     VTE vte = harmEvidence.getMedicalData().getVTE();
+    PharmacologicVTEProphylaxis prophylaxis = vte.getPharmacologicVTEProphylaxis();
 
-    TimestampedBoolean pharmacologicVTEProphylaxisOrdered =
-        vte.getPharmacologicVTEProphylaxisOrdered();
+    TimestampedBoolean pharmacologicVTEProphylaxisOrdered = prophylaxis.getOrdered();
     assertFalse(pharmacologicVTEProphylaxisOrdered.isValue());
     assertEquals(pharmacologicVTEProphylaxisOrdered.getUpdateTime(), Date.from(Instant.now(clock)));
   }
@@ -48,8 +49,10 @@ public class VenousThromboembolismIT extends HarmEvidenceTestSupport {
   public void should_export_scds_in_use_false() throws Exception {
     harmEvidenceUpdater.processTimer(getEncounter());
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
-    TimestampedBoolean scdsInUse = harmEvidence.getMedicalData().getVTE().getSCDsInUse();
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
+    SCDs scds = harmEvidence.getMedicalData().getVTE().getSCDs();
+
+    TimestampedBoolean scdsInUse = scds.getInUse();
     assertFalse(scdsInUse.isValue());
     assertEquals(scdsInUse.getUpdateTime(), Date.from(Instant.now(clock)));
   }
@@ -59,8 +62,10 @@ public class VenousThromboembolismIT extends HarmEvidenceTestSupport {
     processMessage("sequential-compression-devices.hl7");
     harmEvidenceUpdater.processTimer(getEncounter());
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
-    TimestampedBoolean scdsInUse = harmEvidence.getMedicalData().getVTE().getSCDsInUse();
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
+    SCDs scds = harmEvidence.getMedicalData().getVTE().getSCDs();
+
+    TimestampedBoolean scdsInUse = scds.getInUse();
     assertTrue(scdsInUse.isValue());
     assertEquals(scdsInUse.getUpdateTime(), Date.from(Instant.now(clock)));
   }

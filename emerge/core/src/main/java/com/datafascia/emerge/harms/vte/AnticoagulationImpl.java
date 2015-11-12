@@ -19,7 +19,7 @@ import javax.inject.Inject;
 /**
  * Harms logic for VTE anticoagulation.
  */
-public class Anticoagulation {
+public class AnticoagulationImpl {
 
   @Inject
   private ClientBuilder apiClient;

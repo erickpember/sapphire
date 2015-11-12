@@ -3,20 +3,23 @@
 package com.datafascia.etl.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
-import com.datafascia.emerge.harms.vte.Anticoagulation;
+import com.datafascia.emerge.harms.vte.AnticoagulationImpl;
 import com.datafascia.emerge.harms.vte.LowerExtremitySCDsContraindicatedImpl;
 import com.datafascia.emerge.harms.vte.PharmacologicVteProphylaxis;
 import com.datafascia.emerge.harms.vte.PharmacologicVteProphylaxisAdministered;
 import com.datafascia.emerge.harms.vte.ProphylaxisContraindicated;
 import com.datafascia.emerge.harms.vte.SCDsInUse;
 import com.datafascia.emerge.harms.vte.SCDsOrdered;
-import com.datafascia.emerge.ucsf.AnticoagulationType;
+import com.datafascia.emerge.ucsf.Anticoagulation;
+import com.datafascia.emerge.ucsf.Contraindicated;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.LowerExtremitySCDsContraindicated;
 import com.datafascia.emerge.ucsf.MedicalData;
-import com.datafascia.emerge.ucsf.PharmacologicVTEProphylaxisContraindicated;
+import com.datafascia.emerge.ucsf.PharmacologicVTEProphylaxis;
+import com.datafascia.emerge.ucsf.SCDs;
 import com.datafascia.emerge.ucsf.TimestampedBoolean;
 import com.datafascia.emerge.ucsf.TimestampedString;
+import com.datafascia.emerge.ucsf.Type;
 import com.datafascia.emerge.ucsf.VTE;
 import java.time.Clock;
 import java.time.Instant;
@@ -34,7 +37,7 @@ public class VenousThromboembolismUpdater {
   private Clock clock;
 
   @Inject
-  private Anticoagulation anticoagulation;
+  private AnticoagulationImpl anticoagulationImpl;
 
   @Inject
   private PharmacologicVteProphylaxis pharmacologicVteProphylaxis;
@@ -65,6 +68,41 @@ public class VenousThromboembolismUpdater {
     return vte;
   }
 
+  private static Anticoagulation getAnticoagulation(HarmEvidence harmEvidence) {
+    VTE vte = getVTE(harmEvidence);
+    Anticoagulation anticoagulation = vte.getAnticoagulation();
+    if (anticoagulation == null) {
+      anticoagulation = new Anticoagulation();
+      vte.setAnticoagulation(anticoagulation);
+    }
+
+    return anticoagulation;
+  }
+
+  private static SCDs getSCDs(HarmEvidence harmEvidence) {
+    VTE vte = getVTE(harmEvidence);
+    SCDs scds = vte.getSCDs();
+    if (scds == null) {
+      scds = new SCDs();
+      vte.setSCDs(scds);
+    }
+
+    return scds;
+  }
+
+  private static PharmacologicVTEProphylaxis getPharmacologicVTEProphylaxis(
+      HarmEvidence harmEvidence) {
+
+    VTE vte = getVTE(harmEvidence);
+    PharmacologicVTEProphylaxis prophylaxis = vte.getPharmacologicVTEProphylaxis();
+    if (prophylaxis == null) {
+      prophylaxis = new PharmacologicVTEProphylaxis();
+      vte.setPharmacologicVTEProphylaxis(prophylaxis);
+    }
+
+    return prophylaxis;
+  }
+
   /**
    * Updates on systemic anticoagulation.
    *
@@ -74,13 +112,35 @@ public class VenousThromboembolismUpdater {
    *     encounter
    */
   public void updateOnSystemicAnticoagulation(HarmEvidence harmEvidence, Encounter encounter) {
-    VTE vte = getVTE(harmEvidence);
+    Anticoagulation anticoagulation = getAnticoagulation(harmEvidence);
 
     String encounterId = encounter.getId().getIdPart();
     TimestampedBoolean anticoagulated = new TimestampedBoolean()
-        .withValue(anticoagulation.isAnticoagulated(encounterId))
+        .withValue(anticoagulationImpl.isAnticoagulated(encounterId))
         .withUpdateTime(Date.from(Instant.now(clock)));
-    vte.setOnSystemicAnticoagulation(anticoagulated);
+    anticoagulation.setOnSystemicAnticoagulation(anticoagulated);
+  }
+
+  /**
+   * Updates anticoagulation type.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateAnticoagulationType(HarmEvidence harmEvidence, Encounter encounter) {
+    Anticoagulation anticoagulation = getAnticoagulation(harmEvidence);
+
+    String encounterId = encounter.getId().getIdPart();
+    anticoagulationImpl.getAnticoagulationType(encounterId)
+        .ifPresent(value -> {
+          Type anticoagulationType = new Type()
+              .withValue(Type.Value.fromValue(value.getCode()))
+              .withUpdateTime(Date.from(Instant.now(clock)));
+
+          anticoagulation.setType(anticoagulationType);
+        });
   }
 
   /**
@@ -94,7 +154,7 @@ public class VenousThromboembolismUpdater {
   public void updateLowerExtremitySCDsContraindicated(
       HarmEvidence harmEvidence, Encounter encounter) {
 
-    VTE vte = getVTE(harmEvidence);
+    SCDs scds = getSCDs(harmEvidence);
 
     String encounterId = encounter.getId().getIdPart();
     String reason = lowerExtremitySCDsContraindicatedImpl.getLowerExtremitySCDsContraindicated(
@@ -103,10 +163,12 @@ public class VenousThromboembolismUpdater {
     LowerExtremitySCDsContraindicated lowerExtremitySCDsContraindicated =
         new LowerExtremitySCDsContraindicated()
         .withValue(reason != null)
-        .withReason(
-            (reason != null) ? LowerExtremitySCDsContraindicated.Reason.fromValue(reason) : null)
+        .withReason((reason != null)
+            ? LowerExtremitySCDsContraindicated.Reason.fromValue(reason)
+            : LowerExtremitySCDsContraindicated.Reason
+                .NO_EHR_MECHANICAL_VTE_PROPHYLAXIS_CONTRAINDICATION)
         .withUpdateTime(Date.from(Instant.now(clock)));
-    vte.setLowerExtremitySCDsContraindicated(lowerExtremitySCDsContraindicated);
+    scds.setLowerExtremitySCDsContraindicated(lowerExtremitySCDsContraindicated);
   }
 
   /**
@@ -118,13 +180,13 @@ public class VenousThromboembolismUpdater {
    *     encounter
    */
   public void updateScdsInUse(HarmEvidence harmEvidence, Encounter encounter) {
-    VTE vte = getVTE(harmEvidence);
+    SCDs scds = getSCDs(harmEvidence);
 
     String encounterId = encounter.getId().getIdPart();
     TimestampedBoolean scdsInUse = new TimestampedBoolean()
         .withValue(scdsInUseImpl.isSCDsInUse(encounterId))
         .withUpdateTime(Date.from(Instant.now(clock)));
-    vte.setSCDsInUse(scdsInUse);
+    scds.setInUse(scdsInUse);
   }
 
   /**
@@ -136,35 +198,13 @@ public class VenousThromboembolismUpdater {
    *     encounter
    */
   public void updateScdsOrdered(HarmEvidence harmEvidence, Encounter encounter) {
-    VTE vte = getVTE(harmEvidence);
+    SCDs scds = getSCDs(harmEvidence);
 
     String encounterId = encounter.getId().getIdPart();
     TimestampedBoolean scdsOrdered = new TimestampedBoolean()
         .withValue(scdsOrderedImpl.isSCDsOrdered(encounterId))
         .withUpdateTime(Date.from(Instant.now(clock)));
-    vte.setSCDsOrdered(scdsOrdered);
-  }
-
-  /**
-   * Updates anticoagulation type.
-   *
-   * @param harmEvidence
-   *     to modify
-   * @param encounter
-   *     encounter
-   */
-  public void updateAnticoagulationType(HarmEvidence harmEvidence, Encounter encounter) {
-    VTE vte = getVTE(harmEvidence);
-
-    String encounterId = encounter.getId().getIdPart();
-    anticoagulation.getAnticoagulationType(encounterId)
-        .ifPresent(value -> {
-          AnticoagulationType anticoagulationType = new AnticoagulationType()
-              .withValue(AnticoagulationType.Value.fromValue(value.getCode()))
-              .withUpdateTime(Date.from(Instant.now(clock)));
-
-          vte.setAnticoagulationType(anticoagulationType);
-        });
+    scds.setOrdered(scdsOrdered);
   }
 
   /**
@@ -178,7 +218,7 @@ public class VenousThromboembolismUpdater {
   public void updatePharmacologicVTEProphylaxisType(
       HarmEvidence harmEvidence, Encounter encounter) {
 
-    VTE vte = getVTE(harmEvidence);
+    PharmacologicVTEProphylaxis prophylaxis = getPharmacologicVTEProphylaxis(harmEvidence);
 
     String encounterId = encounter.getId().getIdPart();
     pharmacologicVteProphylaxis.getPharmacologicVteProphylaxisType(encounterId)
@@ -187,7 +227,7 @@ public class VenousThromboembolismUpdater {
               .withValue(value)
               .withUpdateTime(Date.from(Instant.now(clock)));
 
-          vte.setPharmacologicVTEProphylaxisType(pharmacologicVteProphylaxisType);
+          prophylaxis.setType(pharmacologicVteProphylaxisType);
         });
   }
 
@@ -202,19 +242,18 @@ public class VenousThromboembolismUpdater {
   public void updatePharmacologicVTEProphylaxisContraindicated(
       HarmEvidence harmEvidence, Encounter encounter) {
 
-    VTE vte = getVTE(harmEvidence);
+    PharmacologicVTEProphylaxis prophylaxis = getPharmacologicVTEProphylaxis(harmEvidence);
 
     String encounterId = encounter.getId().getIdPart();
     String reason = prophylaxisContraindicated.getProphylaxisContraindicatedReason(encounterId);
 
-    PharmacologicVTEProphylaxisContraindicated pharmacologicVTEProphylaxisContraindicated =
-        new PharmacologicVTEProphylaxisContraindicated()
+    Contraindicated contraindicated = new Contraindicated()
         .withValue(reason != null)
         .withReason((reason != null)
-            ? PharmacologicVTEProphylaxisContraindicated.Reason.fromValue(reason)
-            : null)
+            ? Contraindicated.Reason.fromValue(reason)
+            : Contraindicated.Reason.NO_EHR_PHARMACOLOGIC_VTE_PROPHYLAXIS_CONTRAINDICATION)
         .withUpdateTime(Date.from(Instant.now(clock)));
-    vte.setPharmacologicVTEProphylaxisContraindicated(pharmacologicVTEProphylaxisContraindicated);
+    prophylaxis.setContraindicated(contraindicated);
   }
 
   /**
@@ -228,13 +267,13 @@ public class VenousThromboembolismUpdater {
   public void updatePharmacologicVTEProphylaxisOrdered(
       HarmEvidence harmEvidence, Encounter encounter) {
 
-    VTE vte = getVTE(harmEvidence);
+    PharmacologicVTEProphylaxis prophylaxis = getPharmacologicVTEProphylaxis(harmEvidence);
 
     String encounterId = encounter.getId().getIdPart();
     TimestampedBoolean pharmacologicVteProphylaxisOrdered = new TimestampedBoolean()
         .withValue(pharmacologicVteProphylaxis.isPharmacologicVteProphylaxisOrdered(encounterId))
         .withUpdateTime(Date.from(Instant.now(clock)));
-    vte.setPharmacologicVTEProphylaxisOrdered(pharmacologicVteProphylaxisOrdered);
+    prophylaxis.setOrdered(pharmacologicVteProphylaxisOrdered);
   }
 
   /**
@@ -248,7 +287,7 @@ public class VenousThromboembolismUpdater {
   public void updatePharmacologicVTEProphylaxisAdministered(
       HarmEvidence harmEvidence, Encounter encounter) {
 
-    VTE vte = getVTE(harmEvidence);
+    PharmacologicVTEProphylaxis prophylaxis = getPharmacologicVTEProphylaxis(harmEvidence);
 
     String encounterId = encounter.getId().getIdPart();
     TimestampedBoolean prophylaxisAdministered = new TimestampedBoolean()
@@ -256,6 +295,6 @@ public class VenousThromboembolismUpdater {
             pharmacologicVteProphylaxisAdministered.isPharmacologicVteProphylaxisAdministered(
                 encounterId))
         .withUpdateTime(Date.from(Instant.now(clock)));
-    vte.setPharmacologicVTEProphylaxisAdministered(prophylaxisAdministered);
+    prophylaxis.setAdministered(prophylaxisAdministered);
   }
 }

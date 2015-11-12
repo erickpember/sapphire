@@ -6,6 +6,7 @@ import ca.uhn.fhir.model.dstu2.composite.AnnotationDt;
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
 import java.util.List;
 import javax.inject.Inject;
 
@@ -29,7 +30,7 @@ public class LowerExtremitySCDsContraindicatedImpl {
         .getProcedureRequest(encounterId);
 
     for (ProcedureRequest request : requests) {
-      if (request.getCode().getText().equals("VTE Ppx Contraindications") &&
+      if (ProcedureRequestCodeEnum.VTE_PPX_CONTRAINDICATIONS.isCodeEquals(request.getCode()) &&
           request.getStatusElement().getValueAsEnum() == ProcedureRequestStatusEnum.ACCEPTED) {
         List<AnnotationDt> notes = request.getNotes();
         for (AnnotationDt note : notes) {

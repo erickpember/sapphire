@@ -10,6 +10,7 @@ import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.harms.HarmsLookups;
 import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
+import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Date;
@@ -39,9 +40,9 @@ public class ProphylaxisContraindicated {
    * @return pharmacologic VTE prophylaxis contraindicated reason, or {@code null} if not found
    */
   public String getProphylaxisContraindicatedReason(String encounterId) {
-    String type = "VTE Ppx Contraindications";
     List<ProcedureRequest> inProgressPpxRequests = apiClient.getProcedureRequestClient()
-        .searchProcedureRequest(encounterId, type,
+        .searchProcedureRequest(encounterId,
+            ProcedureRequestCodeEnum.VTE_PPX_CONTRAINDICATIONS.getCode(),
             ProcedureRequestStatusEnum.IN_PROGRESS.getCode());
     ProcedureRequest freshestInProgressPpxRequest = ProcedureRequestUtils.
         findFreshestProcedureRequest(inProgressPpxRequests);

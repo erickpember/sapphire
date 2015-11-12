@@ -5,6 +5,7 @@ package com.datafascia.emerge.ucsf;
 import ca.uhn.fhir.model.dstu2.resource.Procedure;
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import ca.uhn.fhir.model.dstu2.valueset.ProcedureStatusEnum;
+import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
 import java.util.List;
 
 /**
@@ -43,14 +44,22 @@ public class ProcedureUtils {
 
     for (ProcedureRequest procedureRequest : procedureRequests) {
       String code = procedureRequest.getCode().getCodingFirstRep().getCode();
-      switch (code) {
-        case "Hypothermia Blanket Order #1":
-        case "Hypothermia Blanket Order #2":
-          return procedureRequest;
+      if (code.equals(ProcedureRequestCodeEnum.HYPOTHERMIA_BLANKET_ORDER_1.getCode()) ||
+          code.equals(ProcedureRequestCodeEnum.HYPOTHERMIA_BLANKET_ORDER_2.getCode())) {
+        return procedureRequest;
       }
     }
 
     return null;
+  }
+
+  private static ProcedureRequest filterCodeFreshest(
+            List<ProcedureRequest> procedureRequests, String code) {
+
+    return procedureRequests.stream()
+        .filter(request -> request.getCode().getCodingFirstRep().getCode().equals(code))
+        .max(ProcedureRequestUtils.getScheduledComparator())
+        .orElse(null);
   }
 
   private static ProcedureRequest filterIdentifierFreshest(
@@ -69,8 +78,10 @@ public class ProcedureUtils {
    *     items to search
    * @return freshest place SCDs, or {@code null} if not found
    */
-  public static ProcedureRequest findFreshestPlaceSCDs(List<ProcedureRequest> procedureRequests) {
-    return filterIdentifierFreshest(procedureRequests, "Place SCDs");
+  public static ProcedureRequest findFreshestPlaceSCDs(
+      List<ProcedureRequest> procedureRequests) {
+    return filterCodeFreshest(procedureRequests,
+        ProcedureRequestCodeEnum.PLACE_SCDS.getCode());
   }
 
   /**
@@ -83,7 +94,8 @@ public class ProcedureUtils {
   public static ProcedureRequest findFreshestMaintainSCDs(
       List<ProcedureRequest> procedureRequests) {
 
-    return filterIdentifierFreshest(procedureRequests, "Maintain SCDs");
+    return filterCodeFreshest(procedureRequests,
+        ProcedureRequestCodeEnum.MAINTAIN_SCDS.getCode());
   }
 
   /**
@@ -94,6 +106,7 @@ public class ProcedureUtils {
    * @return freshest remove SCDs, or {@code null} if not found
    */
   public static ProcedureRequest findFreshestRemoveSCDs(List<ProcedureRequest> procedureRequests) {
-    return filterIdentifierFreshest(procedureRequests, "Remove SCDs");
+    return filterCodeFreshest(procedureRequests,
+        ProcedureRequestCodeEnum.REMOVE_SCDS.getCode());
   }
 }

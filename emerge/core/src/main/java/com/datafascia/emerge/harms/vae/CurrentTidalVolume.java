@@ -27,6 +27,9 @@ public class CurrentTidalVolume {
   @Inject
   private ClientBuilder apiClient;
 
+  @Inject
+  private VentilationModeImpl ventilationModeImpl;
+
   private static int getAbsValue(Observation observation) {
     return ((QuantityDt) observation.getValue()).getValue().abs().intValue();
   }
@@ -42,10 +45,9 @@ public class CurrentTidalVolume {
     Instant now = Instant.now(clock);
     Date thirteenHoursAgo = Date.from(now.minus(13, ChronoUnit.HOURS));
 
-    Observation freshestVentMode = ObservationUtils.findFreshestObservationForCode(
-        apiClient, encounterId, ObservationCodeEnum.VENT_MODE.getCode());
+    Optional<String> ventilationMode = ventilationModeImpl.getVentilationMode(encounterId);
 
-    if (freshestVentMode != null) {
+    if (ventilationMode.isPresent()) {
       Optional<Observation> freshestVentSetTidalVolume = ObservationUtils
           .getFreshestByCodeAfterTime(apiClient, encounterId,
               ObservationCodeEnum.TIDAL_VOLUME.getCode(), thirteenHoursAgo);
@@ -53,17 +55,15 @@ public class CurrentTidalVolume {
       Observation freshestBreathType = ObservationUtils.findFreshestObservationForCode(
           apiClient, encounterId, ObservationCodeEnum.BREATH_TYPE.getCode());
 
-      switch (freshestVentMode.getValue().toString()) {
+      switch (ventilationMode.get()) {
         case "VolumeControl (AC)":
         case "VolumeSupport (VS)":
-        case "Volume Support":
         case "Pressure Regulated Volume Control (PRVC)":
           if (!freshestVentSetTidalVolume.isPresent()) {
             return -1;
           } else {
             return getAbsValue(freshestVentSetTidalVolume.get());
           }
-        case "SIMV":
         case "Synchronous Intermittent Mandatory Ventilation (SIMV)":
           if (freshestBreathType != null && freshestBreathType.getValue().toString().equals(
               "Volume Control")) {
@@ -75,7 +75,7 @@ public class CurrentTidalVolume {
           }
           break;
         default:
-          log.warn("Unknown vent mode value [{}]", freshestVentMode.getValue().toString());
+          log.warn("Unknown vent mode value [{}]", ventilationMode.get());
       }
     }
 

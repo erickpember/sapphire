@@ -56,8 +56,8 @@ public class CurrentTidalVolume {
           apiClient, encounterId, ObservationCodeEnum.BREATH_TYPE.getCode());
 
       switch (ventilationMode.get()) {
-        case "VolumeControl (AC)":
-        case "VolumeSupport (VS)":
+        case "Volume Control (AC)":
+        case "Volume Support (VS)":
         case "Pressure Regulated Volume Control (PRVC)":
           if (!freshestVentSetTidalVolume.isPresent()) {
             return -1;

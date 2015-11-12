@@ -255,6 +255,8 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
         setRxcuiIn(rxNormIngredients);
       }
     };
+    kieSession.insert(droolNorm);
+    kieSession.fireAllRules();
 
     if (routeParts.length > 1) {
       droolNorm.setRoute(routeParts[1]);
@@ -444,7 +446,6 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
 
       // Fetch the normalized medication name.
       String drugName = rxNormDb.getRxString(Integer.parseInt(droolNorm.getRxcuiSCD()));
-      kieSession.insert(droolNorm);
 
       // Fetch the medication object.
       medication = clientBuilder.getMedicationClient().getMedication(droolNorm.getRxcuiSCD());

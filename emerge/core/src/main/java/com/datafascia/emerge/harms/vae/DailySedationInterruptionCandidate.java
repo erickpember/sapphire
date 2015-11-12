@@ -13,6 +13,7 @@ import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
+import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -177,9 +178,11 @@ public class DailySedationInterruptionCandidate {
         .orElse("");
 
     List<ProcedureRequest> hypothermiaBlanketOrders = ProcedureRequestUtils.getByCodeAfterTime(
-        apiClient, encounterId, "57714", twentyFiveHoursAgo);
+        apiClient, encounterId, ProcedureRequestCodeEnum.HYPOTHERMIA_BLANKET_ORDER_1.getCode(),
+        twentyFiveHoursAgo);
     hypothermiaBlanketOrders.addAll(ProcedureRequestUtils.getByCodeAfterTime(
-        apiClient, encounterId, "139056", twentyFiveHoursAgo));
+        apiClient, encounterId, ProcedureRequestCodeEnum.HYPOTHERMIA_BLANKET_ORDER_2.getCode(),
+        twentyFiveHoursAgo));
 
     Optional<Observation> freshestCoolingPadStatusFromPast25Hours = ObservationUtils
         .getFreshestByCodeAfterTime(apiClient, encounterId, "3045000709", twentyFiveHoursAgo);
@@ -257,8 +260,10 @@ public class DailySedationInterruptionCandidate {
      * Hypothermia”
      */
     if (!hypothermiaBlanketOrders.isEmpty()
-        && (ProcedureRequestUtils.activeNonMedicationOrder(apiClient, encounterId, "57714"))
-        || ProcedureRequestUtils.activeNonMedicationOrder(apiClient, encounterId, "139056")) {
+        && (ProcedureRequestUtils.activeNonMedicationOrder(apiClient, encounterId,
+            ProcedureRequestCodeEnum.HYPOTHERMIA_BLANKET_ORDER_1.getCode())
+        || ProcedureRequestUtils.activeNonMedicationOrder(apiClient, encounterId,
+            ProcedureRequestCodeEnum.HYPOTHERMIA_BLANKET_ORDER_2.getCode()))) {
       return THERAPEUTIC_HYPOTHERMIA;
     }
 

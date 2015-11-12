@@ -8,6 +8,7 @@ import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
 import com.datafascia.emerge.ucsf.codes.MaybeEnum;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
+import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
 import com.google.common.collect.ImmutableSet;
 import java.time.Clock;
 import java.time.Instant;
@@ -25,14 +26,14 @@ import lombok.extern.slf4j.Slf4j;
 public class DiscreteHeadOfBedGreaterThan30Degrees {
 
   private static final Set<String> CONTRAINDICATED_BED_ORDER_CODES = ImmutableSet.of(
-      "HOB Flat",
-      "Prone",
-      "Supine",
-      "Lie Flat",
-      "HOB <10",
-      "HOB <30",
-      "Bed Rest with HOB <=30 Degrees",
-      "Bed Rest with HOB Flat");
+      ProcedureRequestCodeEnum.HOB_FLAT.getCode(),
+      ProcedureRequestCodeEnum.PRONE.getCode(),
+      ProcedureRequestCodeEnum.SUPINE.getCode(),
+      ProcedureRequestCodeEnum.LIE_FLAT.getCode(),
+      ProcedureRequestCodeEnum.HOB_LESS_THAN_10.getCode(),
+      ProcedureRequestCodeEnum.HOB_LESS_THAN_30.getCode(),
+      ProcedureRequestCodeEnum.BED_REST_HOB_LESS_THAN_31.getCode(),
+      ProcedureRequestCodeEnum.BED_REST_HOB_FLAT.getCode());
 
   @Inject
   private Clock clock;

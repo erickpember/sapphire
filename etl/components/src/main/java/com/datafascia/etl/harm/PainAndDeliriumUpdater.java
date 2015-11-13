@@ -12,6 +12,7 @@ import com.datafascia.emerge.harms.pain.CpotImpl.MinimumOrMaximumCpotLevel;
 import com.datafascia.emerge.harms.pain.NumericalPainLevel;
 import com.datafascia.emerge.harms.pain.NumericalPainLevel.CurrentPainLevel;
 import com.datafascia.emerge.harms.pain.NumericalPainLevel.MinimumOrMaximumPainLevel;
+import com.datafascia.emerge.harms.pain.PainGoalImpl;
 import com.datafascia.emerge.harms.pain.SedativeOrder;
 import com.datafascia.emerge.harms.pain.SedativeOrder.OrderResult;
 import com.datafascia.emerge.harms.pain.VerbalPainLevel;
@@ -39,6 +40,7 @@ import com.datafascia.emerge.ucsf.MedicalData;
 import com.datafascia.emerge.ucsf.Numerical;
 import com.datafascia.emerge.ucsf.Order;
 import com.datafascia.emerge.ucsf.Pain;
+import com.datafascia.emerge.ucsf.PainGoal;
 import com.datafascia.emerge.ucsf.RASS;
 import com.datafascia.emerge.ucsf.RassGoal;
 import com.datafascia.emerge.ucsf.Sedative;
@@ -62,6 +64,9 @@ public class PainAndDeliriumUpdater {
 
   @Inject
   private Clock clock;
+
+  @Inject
+  private PainGoalImpl painGoalImpl;
 
   @Inject
   private NumericalPainLevel numericalPainLevelImpl;
@@ -119,6 +124,10 @@ public class PainAndDeliriumUpdater {
    */
   public void updateNumericalPainLevel(HarmEvidence harmEvidence, Encounter encounter) {
     String encounterId = encounter.getId().getIdPart();
+
+    PainGoal painGoal = new PainGoal().withDataEntryTime(Date.from(Instant.now(clock)))
+        .withGoal(painGoalImpl.getPainGoal(encounterId));
+    getPain(harmEvidence).setPainGoal(painGoal);
 
     CurrentPainLevel currentLevel = numericalPainLevelImpl.getCurrentPainLevel(encounterId);
     CurrentScore currentScore = new CurrentScore()

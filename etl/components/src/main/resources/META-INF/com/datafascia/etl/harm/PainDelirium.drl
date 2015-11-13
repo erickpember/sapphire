@@ -49,8 +49,7 @@ end
 
 rule "Update Cam"
 when
-  Event( type == EventType.UPDATE_OBSERVATIONS )
-  $observation: Observation( CamImpl.isRelevant($observation) )
+  Event( type == EventType.ADMIT_PATIENT || type == EventType.TIMER )
   $encounter: Encounter()
 then
   painAndDeliriumUpdater.updateCam(harmEvidence, $encounter);

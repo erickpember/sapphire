@@ -95,6 +95,10 @@ public class DailySedationInterruption {
       }
     }
 
+    if (orders.isEmpty() || orderAdmins.isEmpty()) {
+      return false;
+    }
+
     // Gather start/stop periods for medications.
     List<TimePeriod> periods = new ArrayList<>();
     for (MedicationOrder order : orders.values()) {

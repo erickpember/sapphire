@@ -9,6 +9,7 @@ import com.datafascia.common.persist.Id;
 import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.PractitionerRepository;
 import com.datafascia.etl.harm.HarmEvidenceUpdater;
+import com.google.common.base.Strings;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -50,8 +51,12 @@ public class AddParticipant {
       log.error("encounter ID [{}] not found", encounterId);
       return;
     }
-
     Encounter encounter = optionalEncounter.get();
+
+    if (Strings.isNullOrEmpty(practitioner.getIdentifierFirstRep().getValue())) {
+      log.error("Discarded practitioner with missing identifier for encounter ID {}", encounterId);
+      return;
+    }
 
     practitionerRepository.save(practitioner);
     participant.setIndividual(new ResourceReferenceDt(practitioner));

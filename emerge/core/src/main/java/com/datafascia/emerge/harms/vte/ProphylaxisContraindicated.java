@@ -67,15 +67,15 @@ public class ProphylaxisContraindicated {
     }
 
     if (HarmsLookups.plateletCountLessThan50000(apiClient, encounterId)) {
-      return "Platelet count <50,000";
+      return "Platelet Count <50,000";
     }
 
     if (HarmsLookups.inrOver1point5(apiClient, encounterId)) {
       return "INR >1.5";
     }
 
-    if (HarmsLookups.aPttRatioOver1point3(apiClient, encounterId)) {
-      return "aPTT Ratio >1.3";
+    if (HarmsLookups.aPttRatioOver1point5(apiClient, encounterId)) {
+      return "aPTT Ratio >1.5";
     }
 
     return null;

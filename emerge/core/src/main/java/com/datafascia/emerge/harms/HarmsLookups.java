@@ -19,7 +19,6 @@ import java.util.concurrent.TimeUnit;
  * A collection of simple API lookups commonly used as components in harms logic.
  */
 public class HarmsLookups {
-  private static final BigDecimal ONE_POINT_THREE = new BigDecimal("1.3");
   private static final BigDecimal ONE_POINT_FIVE = new BigDecimal("1.5");
   private static final BigDecimal FIFTY_THOUSAND = new BigDecimal("50000");
 
@@ -126,7 +125,7 @@ public class HarmsLookups {
   }
 
   /**
-   * aPTT Ratio >1.3 Implementation
+   * aPTT Ratio >1.5 Implementation
    *
    * @param client
    *     API client.
@@ -134,14 +133,14 @@ public class HarmsLookups {
    *     Relevant encounter ID.
    * @return true if conditions are met
    */
-  public static boolean aPttRatioOver1point3(ClientBuilder client, String encounterId) {
+  public static boolean aPttRatioOver1point5(ClientBuilder client, String encounterId) {
     String code = "PTT";
     List<Observation> pltObservations = client.getObservationClient().searchObservation(encounterId,
         code, null);
     Observation freshestPltObservation = ObservationUtils.findFreshestObservation(pltObservations);
     IDatatype quantity = freshestPltObservation.getValue();
     if (quantity instanceof QuantityDt) {
-      return ((QuantityDt) quantity).getValue().compareTo(ONE_POINT_THREE) > 0;
+      return ((QuantityDt) quantity).getValue().compareTo(ONE_POINT_FIVE) > 0;
     } else {
       throw new NumberFormatException("Observation value is not of type QuantityDt.");
     }

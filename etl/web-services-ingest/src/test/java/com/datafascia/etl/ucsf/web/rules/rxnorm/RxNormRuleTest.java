@@ -473,7 +473,7 @@ public class RxNormRuleTest {
     RxNorm ucsfa50 = new RxNorm() {
       {
         getRxcuiIn().add("6470");
-        setFrequency("n/a");
+        setFrequency("200553");
         setRoute("15");
       }
     };

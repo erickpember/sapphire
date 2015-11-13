@@ -37,12 +37,6 @@ dialect "mvel"
  *  Open issues:
  *  Rule A26 "Intermittent Oxycodone-acetaminophen Enteral"
  *  	We need to be provided a brand name.
- *
- *  Rule A26 "Intermittent Hydrocodone-acetaminophen Enteral" and
- *  Rule A24 "Intermittent Oxycodone (IR) Enteral" will both fire for:
- *  RxNorm (RXCUI for TTY = IN) = 7804
- *  Brand name = Anything but OxyContin 
- *  Rule A50 "Intermittent Lorazepam Enteral" needs to be provided a frequency.
  */
 
 // Rule name
@@ -630,7 +624,7 @@ end
 
 rule "Intermittent Lorazepam Enteral"
   when
-    $p:RxNorm($rxcuiIn : rxcuiIn contains "6470" && frequency == "n/a"
+    $p:RxNorm($rxcuiIn : rxcuiIn contains "6470" && FrequencyLookup.isIntermittent(frequency)
                && RouteLookup.isNonRectalEnteral(route))
   then
     MedsSet result = new MedsSet();

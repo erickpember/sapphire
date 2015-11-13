@@ -209,7 +209,7 @@ public class ObservationUtils {
    * @return observation value, or {@code null} if observation is null
    */
   public static String getValueAsString(Observation observation) {
-    if (observation == null) {
+    if (observation == null || observation.getValue() == null) {
       return null;
     }
 

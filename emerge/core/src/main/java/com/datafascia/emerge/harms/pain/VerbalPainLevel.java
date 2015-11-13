@@ -89,7 +89,8 @@ public class VerbalPainLevel {
 
     if (freshestVerbalPainScore != null && !Strings.isNullOrEmpty(
         ObservationUtils.getValueAsString(freshestVerbalPainScore))) {
-      result.setPainScore(PainUtils.getPainScoreFromValue(freshestVerbalPainScore));
+      Integer painScore = PainUtils.getVerbalPainScoreFromValue(freshestVerbalPainScore);
+      result.setPainScore((painScore != null) ? painScore : 11);
       result.setTimeOfDataAquisition(ObservationUtils.getEffectiveDate(freshestVerbalPainScore));
     } else {
       log.info("verbal pain score for encounter ID [{}] not found", encounterId);

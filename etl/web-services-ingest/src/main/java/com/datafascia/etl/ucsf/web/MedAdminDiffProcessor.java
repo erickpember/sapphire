@@ -262,9 +262,7 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
       droolNorm.setRoute(routeParts[1]);
     }
 
-    if (frequencyParts.length > 1) {
-      droolNorm.setFrequency(frequencyParts[1]);
-    }
+    droolNorm.setFrequency(frequencyParts[0]);
 
     // If we don't have an SCD, then we can't populate a medication.
     Medication medication = null;

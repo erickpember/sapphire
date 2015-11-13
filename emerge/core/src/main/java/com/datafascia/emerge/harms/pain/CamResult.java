@@ -60,7 +60,7 @@ public class CamResult {
           case "-":
             result = "Negative";
             break;
-          case "UTA (RASS Score -4 or -5)":
+          case "UTA (RASS -4 or -5)":
           case "UTA (Language barrier)":
           case "UTA (Developmental delay)":
             result = "UTA";

@@ -44,7 +44,7 @@ public class CamUtaReason {
     }
 
     switch (ObservationUtils.getValueAsString(freshestFromShift)) {
-      case "UTA (RASS Score -4 or -5)":
+      case "UTA (RASS -4 or -5)":
         return "RASS Score -4 or -5";
       case "UTA (Language barrier)":
         return "Language Barrier";

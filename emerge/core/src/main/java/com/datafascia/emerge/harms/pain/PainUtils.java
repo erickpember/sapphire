@@ -346,8 +346,9 @@ public class PainUtils {
       String encounterId, PeriodDt currentOrPriorShift) {
     List<String> codes = Arrays.asList("304894105", "304890004", "304890005", "304890006");
 
-    return ObservationUtils.searchByTimeFrame(apiClient, encounterId, currentOrPriorShift).stream()
-        .filter(observation -> codes.contains(ObservationUtils.getValueAsString(observation)))
+    return ObservationUtils.searchByTimeFrame(apiClient, encounterId, currentOrPriorShift)
+        .stream()
+        .filter(observation -> codes.contains(observation.getCode().getCodingFirstRep().getCode()))
         .collect(Collectors.toList());
   }
 

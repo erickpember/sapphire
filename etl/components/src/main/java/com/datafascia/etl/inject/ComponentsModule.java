@@ -26,6 +26,7 @@ import com.google.inject.Provides;
 import com.google.inject.name.Names;
 import java.time.Clock;
 import java.time.ZoneId;
+import java.util.TimeZone;
 import javax.inject.Singleton;
 import org.apache.accumulo.core.client.Connector;
 
@@ -34,8 +35,13 @@ import org.apache.accumulo.core.client.Connector;
  */
 public class ComponentsModule extends AbstractModule {
 
+  private static final ZoneId ZONE_ID = ZoneId.of("America/Los_Angeles");
+
   @Override
   protected void configure() {
+    // Set default time zone so HAPI will interpret times in this time zone.
+    TimeZone.setDefault(TimeZone.getTimeZone(ZONE_ID));
+
     bind(AuthorizationsSupplier.class)
         .to(FixedAuthorizationsSupplier.class)
         .in(Singleton.class);
@@ -43,7 +49,7 @@ public class ComponentsModule extends AbstractModule {
         .to(MemorySchemaRegistry.class)
         .in(Singleton.class);
     bind(Clock.class)
-        .toInstance(Clock.system(ZoneId.of("America/Los_Angeles")));
+        .toInstance(Clock.system(ZONE_ID));
     bind(ColumnVisibilityPolicy.class)
         .to(FixedColumnVisibilityPolicy.class)
         .in(Singleton.class);

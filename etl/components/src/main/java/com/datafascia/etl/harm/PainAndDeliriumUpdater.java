@@ -4,8 +4,8 @@ package com.datafascia.etl.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import com.datafascia.emerge.harms.pain.BenzodiazepineAvoidance;
-import com.datafascia.emerge.harms.pain.CamResult;
-import com.datafascia.emerge.harms.pain.CamUtaReason;
+import com.datafascia.emerge.harms.pain.CamImpl;
+import com.datafascia.emerge.harms.pain.CamImpl.CamImplResult;
 import com.datafascia.emerge.harms.pain.CpotImpl;
 import com.datafascia.emerge.harms.pain.CpotImpl.CurrentCpotLevel;
 import com.datafascia.emerge.harms.pain.CpotImpl.MinimumOrMaximumCpotLevel;
@@ -79,10 +79,7 @@ public class PainAndDeliriumUpdater {
   private CpotImpl cpotImpl;
 
   @Inject
-  private CamResult camResultImpl;
-
-  @Inject
-  private CamUtaReason camUtaReasonImpl;
+  private CamImpl camImpl;
 
   @Inject
   private BenzodiazepineAvoidance benzodiazepineAvoidanceImpl;
@@ -282,9 +279,9 @@ public class PainAndDeliriumUpdater {
   public void updateCam(HarmEvidence harmEvidence, Encounter encounter) {
     String encounterId = encounter.getId().getIdPart();
 
-    String camResult = camResultImpl.getCamResult(encounterId);
-
-    String camUtaReason = camUtaReasonImpl.getCamUtaReason(encounterId);
+    CamImplResult camImplResult = camImpl.getCam(encounterId);
+    String camResult = camImplResult.getResult();
+    String camUtaReason = camImplResult.getUtaReason();
 
     Cam cam = new Cam()
         .withResult(Cam.Result.fromValue(camResult))

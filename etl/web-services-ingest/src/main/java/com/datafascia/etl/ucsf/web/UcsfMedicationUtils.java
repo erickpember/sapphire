@@ -192,6 +192,7 @@ public class UcsfMedicationUtils {
     // TODO: Remove default SCD before going to production.
     // HERE BE DRAGONS.
     // A default value is provided below PURELY for debugging purposes.
+    log.warn("Using default 107373 for drug named: " + json.get("DrugName"));
     return "107373";
   }
 

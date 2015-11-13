@@ -3,6 +3,7 @@
 package com.datafascia.etl.ucsf.web;
 
 import com.datafascia.common.nifi.DependencyInjectingProcessor;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.CharStreams;
 import com.google.inject.Inject;
@@ -30,7 +31,7 @@ import org.kohsuke.MetaInfServices;
 /**
  * Processor for handling nursing orders at UCSF.
  */
-@CapabilityDescription("Transforms UCSF nursing order to FHIR procedure request.")
+@CapabilityDescription("Transforms UCSF nursing orders to FHIR procedure requests.")
 @EventDriven
 @MetaInfServices(Processor.class)
 @SupportsBatching
@@ -61,7 +62,7 @@ public class NursingOrdersProcessor extends DependencyInjectingProcessor {
     return Collections.emptyList();
   }
 
-  private String readString(InputStream input) throws IOException {
+  private static String readString(InputStream input) throws IOException {
     return CharStreams.toString(new InputStreamReader(input, StandardCharsets.UTF_8));
   }
 
@@ -82,6 +83,7 @@ public class NursingOrdersProcessor extends DependencyInjectingProcessor {
       session.transfer(flowFile, SUCCESS);
     } catch (RuntimeException e) {
       log.error("Cannot process {}", new Object[] { flowFile }, e);
+      flowFile = session.putAttribute(flowFile, "stackTrace", Throwables.getStackTraceAsString(e));
       flowFile = session.penalize(flowFile);
       session.transfer(flowFile, FAILURE);
     }

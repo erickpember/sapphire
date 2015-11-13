@@ -4,6 +4,7 @@ package com.datafascia.etl.ucsf.hl7;
 
 import com.datafascia.common.nifi.DependencyInjectingProcessor;
 import com.datafascia.etl.hl7.HL7MessageProcessor;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 import com.google.common.io.CharStreams;
 import java.io.IOException;
@@ -35,7 +36,7 @@ import org.kohsuke.MetaInfServices;
 @EventDriven
 @MetaInfServices(Processor.class)
 @SupportsBatching
-@Tags({"HL7", "health level 7", "healthcare", "ucsf"})
+@Tags({"datafascia", "HL7", "health level 7", "healthcare", "ucsf"})
 public class ProcessHL7 extends DependencyInjectingProcessor {
 
   public static final Relationship FAILURE = new Relationship.Builder()
@@ -62,29 +63,30 @@ public class ProcessHL7 extends DependencyInjectingProcessor {
     return Collections.emptyList();
   }
 
-  private String readString(InputStream input) throws IOException {
+  private static String readString(InputStream input) throws IOException {
     return CharStreams.toString(new InputStreamReader(input, StandardCharsets.UTF_8));
   }
 
   @Override
   public void onTrigger(ProcessContext context, ProcessSession session) throws ProcessException {
-    FlowFile messageFlowFile = session.get();
-    if (messageFlowFile == null) {
+    FlowFile flowFile = session.get();
+    if (flowFile == null) {
       return;
     }
 
     try {
       AtomicReference<String> messageReference = new AtomicReference<>();
-      session.read(messageFlowFile, input -> messageReference.set(readString(input)));
+      session.read(flowFile, input -> messageReference.set(readString(input)));
       String message = messageReference.get();
 
       hl7MessageProcessor.accept(message);
 
-      session.transfer(messageFlowFile, SUCCESS);
+      session.transfer(flowFile, SUCCESS);
     } catch (RuntimeException e) {
-      log.error("Cannot process {}", new Object[] { messageFlowFile }, e);
-      messageFlowFile = session.penalize(messageFlowFile);
-      session.transfer(messageFlowFile, FAILURE);
+      log.error("Cannot process {}", new Object[] { flowFile }, e);
+      flowFile = session.putAttribute(flowFile, "stackTrace", Throwables.getStackTraceAsString(e));
+      flowFile = session.penalize(flowFile);
+      session.transfer(flowFile, FAILURE);
     }
   }
 }

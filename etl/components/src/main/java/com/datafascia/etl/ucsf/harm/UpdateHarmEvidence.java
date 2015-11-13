@@ -15,6 +15,7 @@ import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
 import com.datafascia.etl.harm.HarmEvidenceUpdater;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Strings;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
@@ -98,18 +99,21 @@ public class UpdateHarmEvidence extends DependencyInjectingProcessor {
     });
 
     session.getProvenanceReporter().create(flowFile);
-
     session.transfer(flowFile, SUCCESS);
   }
 
-  private void writeFailure(ProcessSession session, HarmEvidence record) throws ProcessException {
+  private void writeFailure(ProcessSession session, HarmEvidence record, RuntimeException exception)
+      throws ProcessException {
+
     FlowFile flowFile = session.create();
     flowFile = session.write(flowFile, output -> {
       objectMapper.writerWithDefaultPrettyPrinter().writeValue(output, record);
     });
 
-    session.getProvenanceReporter().create(flowFile);
+    flowFile = session.putAttribute(
+        flowFile, "stackTrace", Throwables.getStackTraceAsString(exception));
 
+    session.getProvenanceReporter().create(flowFile);
     session.transfer(flowFile, FAILURE);
   }
 
@@ -137,7 +141,7 @@ public class UpdateHarmEvidence extends DependencyInjectingProcessor {
         writeSuccess(session, record.getEncounterID());
       } catch (RuntimeException e) {
         log.error("Cannot update encounter ID [{}]", new Object[] { record.getEncounterID() }, e);
-        writeFailure(session, record);
+        writeFailure(session, record, e);
       }
     }
   }

@@ -2,25 +2,29 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.ucsf.harm;
 
-import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
-import ca.uhn.fhir.model.primitive.IdDt;
+import ca.uhn.fhir.model.dstu2.resource.Location;
+import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
+import com.datafascia.common.configuration.ConfigurationNode;
+import com.datafascia.common.configuration.Configure;
 import com.datafascia.common.nifi.DependencyInjectingProcessor;
-import com.datafascia.domain.fhir.IdentifierSystems;
-import com.datafascia.domain.fhir.UnitedStatesPatient;
+import com.datafascia.common.persist.Id;
 import com.datafascia.domain.persist.EncounterRepository;
-import com.datafascia.domain.persist.PatientRepository;
+import com.datafascia.domain.persist.LocationRepository;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
 import com.datafascia.etl.harm.HarmEvidenceUpdater;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.base.Strings;
+import com.google.common.base.Splitter;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
@@ -39,6 +43,7 @@ import org.kohsuke.MetaInfServices;
  * values served to clients are not too stale.
  */
 @CapabilityDescription("Updates harm evidence values which are dependent on the current time.")
+@ConfigurationNode("UpdateHarmEvidence")
 @MetaInfServices(Processor.class)
 @Tags({"datafascia", "emerge", "ucsf"})
 public class UpdateHarmEvidence extends DependencyInjectingProcessor {
@@ -54,6 +59,20 @@ public class UpdateHarmEvidence extends DependencyInjectingProcessor {
       .build();
 
   private Set<Relationship> relationships = ImmutableSet.of(SUCCESS, FAILURE);
+
+  private static final Splitter COMMA_SPLITTER = Splitter.on(',').trimResults();
+
+  @Configure
+  @Inject
+  private volatile String pointOfCare;
+
+  private volatile Set<String> desiredPointsOfCare;
+
+  @Inject
+  private volatile EncounterRepository encounterRepository;
+
+  @Inject
+  private volatile LocationRepository locationRepository;
 
   @Inject
   private volatile HarmEvidenceRepository harmEvidenceRepository;
@@ -74,22 +93,35 @@ public class UpdateHarmEvidence extends DependencyInjectingProcessor {
     return Collections.emptyList();
   }
 
-  private static UnitedStatesPatient getPatient(String patientIdentifier) {
-    UnitedStatesPatient patient = new UnitedStatesPatient();
-    patient.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_PATIENT).setValue(patientIdentifier);
-    patient.setId(new IdDt(PatientRepository.generateId(patient).toString()));
-    return patient;
+  @Override
+  protected void onInjected(ProcessContext processContext) {
+    log.info("Include points of care [{}]", new Object[] { pointOfCare });
+    desiredPointsOfCare = new HashSet<>();
+    COMMA_SPLITTER.split(pointOfCare)
+        .forEach(p -> desiredPointsOfCare.add(p));
   }
 
-  private static Encounter getEncounter(String encounterIdentifier, UnitedStatesPatient patient) {
-    Encounter encounter = new Encounter();
-    encounter.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue(encounterIdentifier);
-    encounter.setId(new IdDt(EncounterRepository.generateId(encounter).toString()));
+  private Optional<String> getPointOfCare(Encounter encounter) {
+    Id<Location> locationId =
+        Id.of(encounter.getLocationFirstRep().getLocation().getReference().getIdPart());
+    Optional<Location> location = locationRepository.read(locationId);
+    if (!location.isPresent()) {
+      return Optional.empty();
+    }
 
-    encounter.setPatient(new ResourceReferenceDt(patient));
-    return encounter;
+    String[] locationParts = location.get().getIdentifierFirstRep().getValue().split("\\^");
+    if (locationParts.length > 0) {
+      String pointOfCare = locationParts[0];
+      return Optional.of(pointOfCare);
+    } else {
+      return Optional.empty();
+    }
+  }
+
+  private boolean isLocatedAt(Encounter encounter, Set<String> desiredPointsOfCare) {
+    return getPointOfCare(encounter)
+        .map(poc -> desiredPointsOfCare.contains(poc))
+        .orElse(false);
   }
 
   private void writeSuccess(ProcessSession session, String content) throws ProcessException {
@@ -117,32 +149,56 @@ public class UpdateHarmEvidence extends DependencyInjectingProcessor {
     session.transfer(flowFile, FAILURE);
   }
 
-  private void update(HarmEvidence record) {
+  private void update(HarmEvidence record, Encounter encounter) {
     log.info(
-        "Updating harm evidence for encounter ID [{}], patient ID [{}]",
+        "Updating harm evidence for encounter ID {}, patient ID {}",
         new Object[] {
           record.getEncounterID(), record.getDemographicData().getMedicalRecordNumber() });
-    if (Strings.isNullOrEmpty(record.getEncounterID())) {
-      log.warn("Skipping harm evidence with no encounter ID");
+
+    harmEvidenceUpdater.processTimer(encounter);
+  }
+
+  private void process(ProcessSession session, Encounter encounter) {
+    String encounterId = encounter.getId().getIdPart();
+    String patientId = encounter.getPatient().getReference().getIdPart();
+
+    Id<HarmEvidence> recordId = Id.of(patientId);
+    Optional<HarmEvidence> optionalRecord = harmEvidenceRepository.read(recordId);
+    if (!optionalRecord.isPresent()) {
+      log.warn(
+          "HarmEvidence record not found for encounter ID {}, patient ID {}",
+          new Object[] { encounterId, patientId });
       return;
     }
 
-    UnitedStatesPatient patient = getPatient(record.getDemographicData().getMedicalRecordNumber());
-    Encounter encounter = getEncounter(record.getEncounterID(), patient);
-    harmEvidenceUpdater.processTimer(encounter);
+    HarmEvidence record = optionalRecord.get();
+    try {
+      update(record, encounter);
+      writeSuccess(session, encounterId);
+    } catch (RuntimeException e) {
+      log.error(
+          "Cannot update for encounter ID {}, patient ID {}",
+          new Object[] { encounterId, patientId },
+          e);
+      writeFailure(session, record, e);
+    }
   }
 
   @Override
   public void onTrigger(ProcessContext context, ProcessSession session) throws ProcessException {
-    List<HarmEvidence> records = harmEvidenceRepository.list();
-    for (HarmEvidence record : records) {
-      try {
-        update(record);
-        writeSuccess(session, record.getEncounterID());
-      } catch (RuntimeException e) {
-        log.error("Cannot update encounter ID [{}]", new Object[] { record.getEncounterID() }, e);
-        writeFailure(session, record, e);
-      }
+    List<Encounter> encounters =
+        encounterRepository.list(Optional.of(EncounterStateEnum.IN_PROGRESS))
+        .stream()
+        .filter(encounter -> isLocatedAt(encounter, desiredPointsOfCare))
+        .collect(Collectors.toList());
+
+    log.info("Processing {} encounters", new Object[] { encounters.size() });
+    if (encounters.isEmpty()) {
+      log.warn("No encounters found for points of care [{}]", new Object[] { pointOfCare });
+    }
+
+    for (Encounter encounter : encounters) {
+      process(session, encounter);
     }
   }
 }

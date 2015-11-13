@@ -16,3 +16,6 @@ UcsfMedAdminProcessor:
   rxnormDbTable: RXNCONSO
   rxnormDbUsername: testuser
   rxnormDbPassword: testpassword
+
+UpdateHarmEvidence:
+  pointOfCare: M9I,13I

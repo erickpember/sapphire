@@ -175,7 +175,7 @@ public class VerbalPainLevel {
     }
 
     if (highestOrLowestVerbalPainScore != null) {
-      result.setPainScore(PainUtils.getPainScoreFromValue(highestOrLowestVerbalPainScore));
+      result.setPainScore(PainUtils.getVerbalPainScoreFromValue(highestOrLowestVerbalPainScore));
       result.setTimeOfCalculation(sinceMidnight.getEnd());
       result.setStartOfTimePeriod(sinceMidnight.getStart());
       result.setEndOfTimePeriod(sinceMidnight.getEnd());

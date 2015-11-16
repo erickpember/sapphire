@@ -2,7 +2,6 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.ucsf.web;
 
-import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import ca.uhn.fhir.model.dstu2.resource.Medication;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
@@ -11,7 +10,6 @@ import com.datafascia.common.configuration.ConfigurationNode;
 import com.datafascia.common.configuration.Configure;
 import com.datafascia.common.inject.Injectors;
 import com.datafascia.common.nifi.DependencyInjectingProcessor;
-import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.etl.ucsf.web.MedAdminDiffListener.ElementType;
 import com.datafascia.etl.ucsf.web.persist.JsonPersistUtils;
 import com.datafascia.etl.ucsf.web.rules.model.RxNorm;
@@ -26,7 +24,6 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -76,7 +73,6 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
   private final Authorizations authorizations = new Authorizations("System");
   @Inject
   private volatile Connector connector;
-  private final HashMap<String, Medication> orderMedicationCache = new HashMap<>();
 
   @Configure
   public String accumuloTable;
@@ -283,13 +279,15 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
     Medication medication = null;
     String customMedId = null;
     if (!Strings.isNullOrEmpty(scd)) {
-      medication = populateMedication(droolNorm, null);
+      medication = UcsfMedicationUtils.populateMedication(droolNorm, null, rxNormDb,
+          clientBuilder);
     } else {
       HashCode hc = hashFunction.newHasher()
           .putString(((JSONArray) orderJson.get("Mixture")).toJSONString(), Charsets.UTF_8)
           .hash();
       customMedId = hc.toString();
-      medication = populateMedication(droolNorm, customMedId);
+      medication = UcsfMedicationUtils.populateMedication(droolNorm, customMedId, rxNormDb,
+          clientBuilder);
     }
 
     String medDataNew = orderJson.toJSONString();
@@ -427,7 +425,8 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
 
       // Recreate the administration based on the new data.
       MedicationAdministration medAdmin = UcsfMedicationUtils.populateAdministration(admin, adminId,
-          prescriptionId, encounterId, populateMedication(droolNorm, customMedId),
+          prescriptionId, encounterId, UcsfMedicationUtils.populateMedication(droolNorm,
+              customMedId, rxNormDb, clientBuilder),
           droolNorm.getMedsSets(), clientBuilder);
       MedicationAdministration existingAdministration = clientBuilder
           .getMedicationAdministrationClient().get(adminId, encounterId,
@@ -450,42 +449,13 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
       // We have a new administration. Populate a MedicationAdministration and save it.
       MedicationAdministration medAdmin = UcsfMedicationUtils
           .populateAdministration(admin, adminId, prescriptionId, encounterId,
-              populateMedication(droolNorm, customMedId), droolNorm.getMedsSets(), clientBuilder);
+              UcsfMedicationUtils.populateMedication(droolNorm, customMedId, rxNormDb,
+                  clientBuilder),
+              droolNorm.getMedsSets(), clientBuilder);
       medAdmin = clientBuilder.getMedicationAdministrationClient().save(medAdmin);
       if (diffListener != null) {
         diffListener.newAdmin(medAdmin);
       }
     }
-  }
-
-  private Medication populateMedication(RxNorm droolNorm, String customID) throws SQLException {
-    String id = customID == null ? droolNorm.getRxcuiSCD() : customID;
-
-    Medication medication = orderMedicationCache.get(id);
-    if (medication == null) {
-      if (id == null) {
-        return null;
-      }
-
-      // Fetch the normalized medication name.
-      String drugName = rxNormDb.getRxString(Integer.parseInt(id));
-
-      // Fetch the medication object.
-      medication = clientBuilder.getMedicationClient().getMedication(id);
-
-      if (medication == null) {
-        medication = new Medication();
-        medication.setCode(
-            new CodeableConceptDt(CodingSystems.SEMANTIC_CLINICAL_DRUG, id)
-            .setText(drugName));
-
-        medication = clientBuilder.getMedicationClient().saveMedication(medication);
-      }
-
-      if (!orderMedicationCache.keySet().contains(id)) {
-        orderMedicationCache.put(id, medication);
-      }
-    }
-    return medication;
   }
 }

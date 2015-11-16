@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.ucsf.web;
 
+import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
 import ca.uhn.fhir.model.dstu2.composite.RangeDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
@@ -10,6 +11,7 @@ import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Medication;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
+import ca.uhn.fhir.model.dstu2.resource.Substance;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationOrderStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
@@ -17,12 +19,15 @@ import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.etl.ucsf.web.rules.model.MedsSet;
+import com.datafascia.etl.ucsf.web.rules.model.RxNorm;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -43,6 +48,9 @@ import org.kie.internal.io.ResourceFactory;
  */
 @Slf4j
 public class UcsfMedicationUtils {
+  @Inject
+  private static ClientBuilder clientBuilder;
+
   enum NotGivenReason {
     DUE,
     NOT_GIVEN
@@ -70,7 +78,8 @@ public class UcsfMedicationUtils {
    */
   public static MedicationAdministration populateAdministration(JSONObject adminJson,
       String adminId, String orderId, String encounterId, Medication med, List<MedsSet> medsSet,
-      ClientBuilder clientBuilder) throws SQLException {
+      ClientBuilder clientBuilder)
+      throws SQLException {
     MedicationAdministration admin = new MedicationAdministration();
 
     String[] adminAction = adminJson.get("AdminAction").toString().split("\\^");
@@ -367,5 +376,71 @@ public class UcsfMedicationUtils {
     // Configure and create the KieSession
     KieSessionConfiguration ksconf = ks.newKieSessionConfiguration();
     return kbase.newKieSession(ksconf, null);
+  }
+
+  private static final HashMap<String, Medication> orderMedicationCache = new HashMap<>();
+
+  /**
+   * Populates a Medication object.
+   *
+   * @param droolNorm The RxNorm object to pull from.
+   * @param customID An optional custom ID.
+   * @param rxNormDb The RxNorm database with which to do lookups.
+   * @param clientBuilder The client builder to use.
+   * @return A populated Medication object.
+   * @throws SQLException If there are problems connecting to MySQL.
+   */
+  public static Medication populateMedication(RxNorm droolNorm, String customID,
+      RxNormLookup rxNormDb, ClientBuilder clientBuilder)
+      throws SQLException {
+    String id = customID == null ? droolNorm.getRxcuiSCD() : customID;
+
+    Medication medication = orderMedicationCache.get(id);
+    if (medication == null) {
+      if (id == null) {
+        return null;
+      }
+
+      // Fetch the normalized medication name.
+      String drugName = rxNormDb.getRxString(Integer.parseInt(id));
+
+      // Fetch the medication object.
+      medication = clientBuilder.getMedicationClient().getMedication(id);
+
+      if (medication == null) {
+        medication = new Medication();
+        medication.setCode(
+            new CodeableConceptDt(CodingSystems.SEMANTIC_CLINICAL_DRUG, id)
+            .setText(drugName));
+        Medication.Product product = new Medication.Product();
+        for (String ingredientId : droolNorm.getRxcuiIn()) {
+          Substance substance = null;
+          try {
+            clientBuilder.getSubstanceClient().getSubstance(ingredientId);
+          } catch (ResourceNotFoundException e) {
+            substance = new Substance();
+            substance.addIdentifier().setSystem(CodingSystems.MEDICATION_INGREDIENT)
+                .setValue(ingredientId);
+            substance = clientBuilder.getSubstanceClient().saveSubstance(substance);
+          }
+
+          ResourceReferenceDt ingredientRef = new ResourceReferenceDt();
+          ingredientRef.setResource(substance);
+
+          Medication.ProductIngredient prodIngredient = new Medication.ProductIngredient();
+          prodIngredient.setItem(ingredientRef);
+
+          product.addIngredient(prodIngredient);
+        }
+        medication.setProduct(product);
+
+        medication = clientBuilder.getMedicationClient().saveMedication(medication);
+      }
+
+      if (!orderMedicationCache.keySet().contains(id)) {
+        orderMedicationCache.put(id, medication);
+      }
+    }
+    return medication;
   }
 }

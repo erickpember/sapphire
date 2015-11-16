@@ -93,6 +93,6 @@ public class DiscreteHeadOfBedGreaterThan30Degrees {
       return MaybeEnum.CONTRAINDICATED;
     }
 
-    return MaybeEnum.NOT_DOCUMENTED;
+    return MaybeEnum.NO;
   }
 }

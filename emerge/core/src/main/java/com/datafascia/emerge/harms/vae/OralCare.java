@@ -72,6 +72,6 @@ public class OralCare {
       }
     }
 
-    return MaybeEnum.NOT_DOCUMENTED;
+    return MaybeEnum.NO;
   }
 }

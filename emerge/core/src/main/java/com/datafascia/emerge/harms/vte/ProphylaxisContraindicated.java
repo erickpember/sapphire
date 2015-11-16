@@ -2,11 +2,9 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.harms.vte;
 
-import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.composite.AnnotationDt;
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
-import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.harms.HarmsLookups;
 import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
@@ -28,10 +26,6 @@ public class ProphylaxisContraindicated {
   @Inject
   private ClientBuilder apiClient;
 
-  private static Date toDate(IDatatype value) {
-    return ((DateTimeDt) value).getValue();
-  }
-
   /**
    * Gets pharmacologic VTE prophylaxis contraindicated reason
    *
@@ -52,7 +46,7 @@ public class ProphylaxisContraindicated {
 
     // if the request happens after now, throw it out
     Date now = Date.from(Instant.now(clock));
-    if (toDate(freshestInProgressPpxRequest.getScheduled()).after(now)) {
+    if (ProcedureRequestUtils.isScheduledAfter(freshestInProgressPpxRequest, now)) {
       return null;
     }
 

@@ -244,7 +244,17 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
     String prescriptionId = orderJson.get("OrderID").toString();
     String[] routeParts = orderJson.get("Route").toString().split("\\^");
     String[] frequencyParts = orderJson.get("Frequency").toString().split("\\^");
-    List<String> rxNormIngredients = UcsfMedicationUtils.extractRxNormIngredients(orderJson);
+    List<String> rxNormIngredients = new ArrayList<>();
+    if (orderJson.get("RxNorm") != null) {
+      rxNormIngredients.addAll(
+          UcsfMedicationUtils.extractRxNormIngredients((JSONArray) orderJson.get("RxNorm")));
+    } else {
+      for (Object mixobj : (JSONArray) orderJson.get("Mixture")) {
+        JSONObject mixjson = (JSONObject) mixobj;
+        rxNormIngredients.addAll(
+            UcsfMedicationUtils.extractRxNormIngredients((JSONArray) mixjson.get("rxNormMix")));
+      }
+    }
 
     RxNorm droolNorm = new RxNorm() {
       {

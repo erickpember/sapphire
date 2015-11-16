@@ -202,9 +202,8 @@ public class UcsfMedicationUtils {
    * @param json The JSONObject representing the order.
    * @return A search of ingredient codes.
    */
-  public static List<String> extractRxNormIngredients(JSONObject json) {
+  public static List<String> extractRxNormIngredients(JSONArray rxnorm) {
     ArrayList<String> ingredients = new ArrayList<>();
-    JSONArray rxnorm = (JSONArray) json.get("RxNorm");
     for (Object elem : rxnorm) {
       JSONObject entry = (JSONObject) elem;
       if (entry.get("TermType").toString().equals("1^Ingredient")) {

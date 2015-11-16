@@ -15,7 +15,11 @@ import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.etl.ucsf.web.MedAdminDiffListener.ElementType;
 import com.datafascia.etl.ucsf.web.persist.JsonPersistUtils;
 import com.datafascia.etl.ucsf.web.rules.model.RxNorm;
+import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
+import com.google.common.hash.HashCode;
+import com.google.common.hash.HashFunction;
+import com.google.common.hash.Hashing;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
@@ -66,6 +70,7 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
   private RxNormLookup rxNormDb;
   private String tableName;
   private KieSession kieSession;
+  HashFunction hashFunction = Hashing.md5();
   @Inject
   private ClientBuilder clientBuilder;
   private final Authorizations authorizations = new Authorizations("System");
@@ -276,8 +281,15 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
 
     // If we don't have an SCD, then we can't populate a medication.
     Medication medication = null;
+    String customMedId = null;
     if (!Strings.isNullOrEmpty(scd)) {
-      medication = populateMedication(droolNorm);
+      medication = populateMedication(droolNorm, null);
+    } else {
+      HashCode hc = hashFunction.newHasher()
+          .putString(((JSONArray) orderJson.get("Mixture")).toJSONString(), Charsets.UTF_8)
+          .hash();
+      customMedId = hc.toString();
+      medication = populateMedication(droolNorm, customMedId);
     }
 
     String medDataNew = orderJson.toJSONString();
@@ -347,7 +359,7 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
       for (Object obj : meds) {
         if (obj instanceof JSONObject) {
           JSONObject admin = (JSONObject) obj;
-          findAdministrationDiffs(admin, encounterId, prescriptionId, droolNorm);
+          findAdministrationDiffs(admin, encounterId, prescriptionId, droolNorm, customMedId);
         }
       }
     }
@@ -366,7 +378,7 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
    * @throws SQLException If there is a problem interacting with SQL.
    */
   private void findAdministrationDiffs(JSONObject admin, String encounterId, String prescriptionId,
-      RxNorm droolNorm) throws ParseException,
+      RxNorm droolNorm, String customMedId) throws ParseException,
       MutationsRejectedException, TableNotFoundException, SQLException {
     /*
      * Only recording actual administrations, not scheduled ones or verifications. Might need to
@@ -414,7 +426,7 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
 
       // Recreate the administration based on the new data.
       MedicationAdministration medAdmin = UcsfMedicationUtils.populateAdministration(admin, adminId,
-          prescriptionId, encounterId, populateMedication(droolNorm),
+          prescriptionId, encounterId, populateMedication(droolNorm, customMedId),
           droolNorm.getMedsSets(), clientBuilder);
       MedicationAdministration existingAdministration = clientBuilder
           .getMedicationAdministrationClient().get(adminId, encounterId,
@@ -437,7 +449,7 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
       // We have a new administration. Populate a MedicationAdministration and save it.
       MedicationAdministration medAdmin = UcsfMedicationUtils
           .populateAdministration(admin, adminId, prescriptionId, encounterId,
-              populateMedication(droolNorm), droolNorm.getMedsSets(), clientBuilder);
+              populateMedication(droolNorm, customMedId), droolNorm.getMedsSets(), clientBuilder);
       medAdmin = clientBuilder.getMedicationAdministrationClient().save(medAdmin);
       if (diffListener != null) {
         diffListener.newAdmin(medAdmin);
@@ -445,30 +457,32 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
     }
   }
 
-  private Medication populateMedication(RxNorm droolNorm) throws SQLException {
-    Medication medication = orderMedicationCache.get(droolNorm.getRxcuiSCD());
+  private Medication populateMedication(RxNorm droolNorm, String customID) throws SQLException {
+    String id = customID == null ? droolNorm.getRxcuiSCD() : customID;
+
+    Medication medication = orderMedicationCache.get(id);
     if (medication == null) {
-      if (droolNorm.getRxcuiSCD() == null) {
+      if (id == null) {
         return null;
       }
 
       // Fetch the normalized medication name.
-      String drugName = rxNormDb.getRxString(Integer.parseInt(droolNorm.getRxcuiSCD()));
+      String drugName = rxNormDb.getRxString(Integer.parseInt(id));
 
       // Fetch the medication object.
-      medication = clientBuilder.getMedicationClient().getMedication(droolNorm.getRxcuiSCD());
+      medication = clientBuilder.getMedicationClient().getMedication(id);
 
       if (medication == null) {
         medication = new Medication();
         medication.setCode(
-            new CodeableConceptDt(CodingSystems.SEMANTIC_CLINICAL_DRUG, droolNorm.getRxcuiSCD())
+            new CodeableConceptDt(CodingSystems.SEMANTIC_CLINICAL_DRUG, id)
             .setText(drugName));
 
         medication = clientBuilder.getMedicationClient().saveMedication(medication);
       }
 
-      if (!orderMedicationCache.keySet().contains(droolNorm.getRxcuiSCD())) {
-        orderMedicationCache.put(droolNorm.getRxcuiSCD(), medication);
+      if (!orderMedicationCache.keySet().contains(id)) {
+        orderMedicationCache.put(id, medication);
       }
     }
     return medication;

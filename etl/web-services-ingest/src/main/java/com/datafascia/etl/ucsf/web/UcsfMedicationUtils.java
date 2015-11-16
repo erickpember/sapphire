@@ -199,7 +199,7 @@ public class UcsfMedicationUtils {
   /**
    * Extract the ingredient codes from an order.
    *
-   * @param json The JSONObject representing the order.
+   * @param rxnorm The JSONObject representing the RxNorm object.
    * @return A search of ingredient codes.
    */
   public static List<String> extractRxNormIngredients(JSONArray rxnorm) {

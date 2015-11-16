@@ -249,7 +249,12 @@ public class UcsfMedicationUtils {
 
     // Fetch fields from the JSON.
     String dateTimeOrdered = orderJson.get("DateTimeOrdered").toString();
-    String orderStatus = orderJson.get("OrderStatus").toString().split("\\^")[0];
+    String orderStatus = orderJson.get("OrderStatus").toString();
+    if (!orderStatus.isEmpty()) {
+      orderStatus = orderStatus.split("\\^")[0];
+    } else {
+      log.warn("Order " + orderId + " does not have a status.");
+    }
     String orderedDose = orderJson.get("OrderedDose").toString();
     String[] orderedDoseUnitParts = orderJson.get("OrderedDoseUnit").toString().split("\\^");
 

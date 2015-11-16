@@ -12,6 +12,7 @@ import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Location;
 import ca.uhn.fhir.model.dstu2.resource.Medication;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
+import ca.uhn.fhir.model.dstu2.resource.Substance;
 import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
@@ -25,6 +26,7 @@ import com.datafascia.api.configurations.APIConfiguration;
 import com.datafascia.common.accumulo.ConnectorFactory;
 import com.datafascia.common.configuration.guice.ConfigureModule;
 import com.datafascia.common.inject.Injectors;
+import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.domain.fhir.Languages;
 import com.datafascia.domain.fhir.RaceEnum;
@@ -91,7 +93,7 @@ public abstract class ApiTestSupport {
 
     Injector injector = Guice.createInjector(
         Modules.override(new ConfigureModule(), new ComponentsModule())
-            .with(new TestModule()));
+        .with(new TestModule()));
     Injectors.setInjector(injector);
     injector.injectMembers(this);
 
@@ -121,11 +123,46 @@ public abstract class ApiTestSupport {
    */
   private void addStaticData() {
     List<UnitedStatesPatient> patients = addPatients();
+    List<Substance> substances = addSubstances();
     List<Location> locations = addLocations();
     List<Encounter> encounters = addEncounters(patients, locations);
     Medication medication = addMedication();
 
     List<Observation> observations = addObservations(patients, encounters);
+  }
+
+  private List<Substance> addSubstances() {
+    Substance substance1 = new Substance();
+    substance1.addIdentifier()
+        .setSystem(CodingSystems.MEDICATION_INGREDIENT)
+        .setValue("aaaaaaaaae");
+    MethodOutcome outcome = client.create().resource(substance1)
+        .encodedJson().execute();
+    IIdType id = outcome.getId();
+    substance1.setId(id);
+    log.info("substance 1 ID: {}", id.getValue());
+
+    Substance substance2 = new Substance();
+    substance2.addIdentifier()
+        .setSystem(CodingSystems.MEDICATION_INGREDIENT)
+        .setValue("aaaaaaaaaf");
+    MethodOutcome outcome2 = client.create().resource(substance2)
+        .encodedJson().execute();
+    IIdType id2 = outcome2.getId();
+    substance2.setId(id);
+    log.info("substance 2 ID: {}", id2.getValue());
+
+    Substance substance3 = new Substance();
+    substance3.addIdentifier()
+        .setSystem(CodingSystems.MEDICATION_INGREDIENT)
+        .setValue("aaaaaaaab0");
+    MethodOutcome outcome3 = client.create().resource(substance3)
+        .encodedJson().execute();
+    IIdType id3 = outcome3.getId();
+    substance3.setId(id);
+    log.info("substance 3 ID: {}", id3.getValue());
+
+    return Arrays.asList(substance1, substance2, substance3);
   }
 
   private List<UnitedStatesPatient> addPatients() {

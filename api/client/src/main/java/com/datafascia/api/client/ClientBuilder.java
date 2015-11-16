@@ -86,6 +86,10 @@ public class ClientBuilder {
     return new PractitionerClient(client);
   }
 
+  public SubstanceClient getSubstanceClient() {
+    return new SubstanceClient(client);
+  }
+
   /**
    * Configuration for API client.
    */

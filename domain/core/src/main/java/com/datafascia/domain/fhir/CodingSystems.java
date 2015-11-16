@@ -35,6 +35,10 @@ public class CodingSystems {
   public static final String SEMANTIC_CLINICAL_DRUG =
       "http://datafascia.com/coding/SemanticClinicalDrug";
 
+  /** dataFascia invented this coding system for Semantic Clinical Drug */
+  public static final String MEDICATION_INGREDIENT =
+      "http://datafascia.com/coding/MedicationIngredient";
+
   /** dataFascia invented this coding system for UCSF administration not given reasons */
   public static final String UCSF_REASON_NOT_GIVEN = "http://datafascia.com/coding/ReasonNotGiven";
 

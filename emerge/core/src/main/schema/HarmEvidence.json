@@ -650,7 +650,7 @@
                   },
                   "side": {
                     "type": "string",
-                    "enum": [ "Left", "Right" ],
+                    "enum": [ "Left", "Right", "N/A" ],
                     "description": "An explanation about the purpose of this instance described by this schema."
                   },
                   "insertionDate": {

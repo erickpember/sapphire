@@ -86,6 +86,15 @@ public class CentralLineAssociatedBloodStreamInfectionUpdater {
     }
   }
 
+  private static CentralLine.Side formatSide(String bodySiteSide) {
+    switch (bodySiteSide) {
+      case "Unknown":
+        return CentralLine.Side.N_A;
+      default:
+        return CentralLine.Side.fromValue(bodySiteSide);
+    }
+  }
+
   private static CentralLine toCentralLine(Procedure procedure) {
     String type = procedure.getCode().getCodingFirstRep().getCode();
     String site = procedure.getBodySiteFirstRep().getCodingFirstRep().getCode();
@@ -96,7 +105,7 @@ public class CentralLineAssociatedBloodStreamInfectionUpdater {
     return new CentralLine()
         .withType(CentralLine.Type.fromValue(type))
         .withSite(formatSite(site))
-        .withSide(CentralLine.Side.fromValue(side))
+        .withSide(formatSide(side))
         .withInsertionDate((insertionDate != null) ? insertionDate.getValue() : null)
         .withUpdateTime(updateTime.getValue());
   }

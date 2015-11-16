@@ -4,10 +4,10 @@ package com.datafascia.etl.harm.ventilatorassociatedevent;
 
 import com.datafascia.common.persist.Id;
 import com.datafascia.emerge.ucsf.HarmEvidence;
+import com.datafascia.emerge.ucsf.Mode;
 import com.datafascia.emerge.ucsf.TimestampedBoolean;
 import com.datafascia.emerge.ucsf.TimestampedMaybe;
 import com.datafascia.emerge.ucsf.VAE;
-import com.datafascia.emerge.ucsf.VentilationMode;
 import com.datafascia.etl.harm.HarmEvidenceTestSupport;
 import java.time.Instant;
 import java.util.Date;
@@ -56,7 +56,8 @@ public class VentilatorAssociatedEventIT extends HarmEvidenceTestSupport {
     processMessage("ventilated-true.hl7");
 
     HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
-    TimestampedBoolean ventilated = harmEvidence.getMedicalData().getVAE().getVentilated();
+    TimestampedBoolean ventilated =
+        harmEvidence.getMedicalData().getVAE().getVentilation().getVentilated();
     assertTrue(ventilated.isValue());
     assertEquals(ventilated.getUpdateTime(), Date.from(Instant.now(clock)));
   }
@@ -78,9 +79,9 @@ public class VentilatorAssociatedEventIT extends HarmEvidenceTestSupport {
     processMessage("ventilation-mode-volume-control-ac.hl7");
 
     HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
-    VentilationMode ventilationMode = harmEvidence.getMedicalData().getVAE().getVentilationMode();
-    assertEquals(ventilationMode.getValue().toString(), "Volume Control (AC)");
-    assertEquals(ventilationMode.getUpdateTime(), Date.from(Instant.now(clock)));
+    Mode mode = harmEvidence.getMedicalData().getVAE().getVentilation().getMode();
+    assertEquals(mode.getValue().toString(), "Volume Control (AC)");
+    assertEquals(mode.getUpdateTime(), Date.from(Instant.now(clock)));
   }
 
   @Test

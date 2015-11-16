@@ -906,8 +906,38 @@
           "type": "object",
           "description": "An explanation about the purpose of this instance described by this schema.",
           "properties": {
-            "ventilated": {
-              "$ref": "#/definitions/TimestampedBoolean"
+            "ventilation": {
+              "type": "object",
+              "properties": {
+                "ventilated": {
+                  "$ref": "#/definitions/TimestampedBoolean"
+                },
+                "mode": {
+                  "type": "object",
+                  "properties": {
+                    "updateTime": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "When the value was updated"
+                    },
+                    "value": {
+                      "type": "string",
+                       "enum": [
+                         "Volume Control (AC)",
+                         "Synchronous Intermittent Mandatory Ventilation (SIMV)",
+                         "Pressure Support (PS)",
+                         "Volume Support (VS)",
+                         "Pressure Control (PC)",
+                         "Pressure Regulated Volume Control (PRVC)",
+                         "Airway Pressure Release Ventilation (APRV)",
+                         "High Frequency Oscillation (HFO)",
+                         "Other"
+                       ],
+                      "description": "An explanation about the purpose of this instance described by this schema."
+                    }
+                  }
+                }
+              }
             },
             "discreteHOBGreaterThan30Deg": {
               "$ref": "#/definitions/TimestampedMaybe"
@@ -920,32 +950,6 @@
             },
             "recentStressUlcerProphylaxisAdministration": {
               "$ref": "#/definitions/TimestampedBoolean"
-            },
-            "ventilationMode": {
-              "type": "object",
-              "description": "An explanation about the purpose of this instance described by this schema.",
-              "properties": {
-                "updateTime": {
-                  "type": "string",
-                  "format": "date-time",
-                  "description": "An explanation about the purpose of this instance described by this schema."
-                },
-                "value": {
-                  "type": "string",
-                   "enum": [
-                     "Volume Control (AC)",
-                     "Synchronous Intermittent Mandatory Ventilation (SIMV)",
-                     "Pressure Support (PS)",
-                     "Volume Support (VS)",
-                     "Pressure Control (PC)",
-                     "Pressure Regulated Volume Control (PRVC)",
-                     "Airway Pressure Release Ventilation (APRV)",
-                     "High Frequency Oscillation (HFO)",
-                     "Other"
-                   ],
-                  "description": "An explanation about the purpose of this instance described by this schema."
-                }
-              }
             },
             "currentTidalVolume": {
               "$ref": "#/definitions/TimestampedInteger"

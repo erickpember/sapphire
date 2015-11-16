@@ -21,12 +21,13 @@ import com.datafascia.emerge.harms.vae.VentilationModeImpl;
 import com.datafascia.emerge.ucsf.DailySpontaneousBreathingTrial;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.MedicalData;
+import com.datafascia.emerge.ucsf.Mode;
 import com.datafascia.emerge.ucsf.SATDSI;
 import com.datafascia.emerge.ucsf.TimestampedBoolean;
 import com.datafascia.emerge.ucsf.TimestampedInteger;
 import com.datafascia.emerge.ucsf.TimestampedMaybe;
 import com.datafascia.emerge.ucsf.VAE;
-import com.datafascia.emerge.ucsf.VentilationMode;
+import com.datafascia.emerge.ucsf.Ventilation;
 import com.datafascia.emerge.ucsf.codes.ventilation.DailySpontaneousBreathingTrialContraindicatedEnum;
 import java.time.Clock;
 import java.time.Instant;
@@ -98,6 +99,17 @@ public class VentilatorAssociatedEventUpdater {
     return vae;
   }
 
+  private static Ventilation getVentilation(HarmEvidence harmEvidence) {
+    VAE vae = getVAE(harmEvidence);
+    Ventilation ventilation = vae.getVentilation();
+    if (ventilation == null) {
+      ventilation = new Ventilation();
+      vae.setVentilation(ventilation);
+    }
+
+    return ventilation;
+  }
+
   /**
    * Initializes ventilator associated event data with default values.
    *
@@ -106,11 +118,12 @@ public class VentilatorAssociatedEventUpdater {
    */
   public void admitPatient(HarmEvidence harmEvidence) {
     VAE vae = getVAE(harmEvidence);
+    Ventilation ventilation = getVentilation(harmEvidence);
 
     TimestampedBoolean newVentiliated = new TimestampedBoolean()
         .withValue(false)
         .withUpdateTime(Date.from(Instant.now(clock)));
-    vae.setVentilated(newVentiliated);
+    ventilation.setVentilated(newVentiliated);
 
     TimestampedMaybe newDiscreteHOBGreaterThan30Deg = new TimestampedMaybe()
         .withValue(TimestampedMaybe.Value.NO)
@@ -175,7 +188,28 @@ public class VentilatorAssociatedEventUpdater {
         .withValue(ventilatedImpl.isVentilated(encounterId))
         .withUpdateTime(Date.from(Instant.now(clock)));
 
-    getVAE(harmEvidence).setVentilated(ventilated);
+    getVentilation(harmEvidence).setVentilated(ventilated);
+  }
+
+  /**
+   * Updates ventilation mode.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateVentilationMode(HarmEvidence harmEvidence, Encounter encounter) {
+    String encounterId = encounter.getId().getIdPart();
+
+    ventilationModeImpl.getVentilationMode(encounterId)
+        .ifPresent(value -> {
+          Mode mode = new Mode()
+              .withValue(Mode.Value.fromValue(value))
+              .withUpdateTime(Date.from(Instant.now(clock)));
+
+          getVentilation(harmEvidence).setMode(mode);
+        });
   }
 
   /**
@@ -256,27 +290,6 @@ public class VentilatorAssociatedEventUpdater {
         .withUpdateTime(Date.from(Instant.now(clock)));
 
     getVAE(harmEvidence).setRecentStressUlcerProphylaxisAdministration(administration);
-  }
-
-  /**
-   * Updates ventilation mode.
-   *
-   * @param harmEvidence
-   *     to modify
-   * @param encounter
-   *     encounter
-   */
-  public void updateVentilationMode(HarmEvidence harmEvidence, Encounter encounter) {
-    String encounterId = encounter.getId().getIdPart();
-
-    ventilationModeImpl.getVentilationMode(encounterId)
-        .ifPresent(value -> {
-          VentilationMode ventilationMode = new VentilationMode()
-              .withValue(VentilationMode.Value.fromValue(value))
-              .withUpdateTime(Date.from(Instant.now(clock)));
-
-          getVAE(harmEvidence).setVentilationMode(ventilationMode);
-        });
   }
 
   /**

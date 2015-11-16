@@ -87,6 +87,7 @@ public class CamImpl {
         // Expected values for Cam Result, don't need to log a warning about these.
         case "+":
         case "-":
+          return null;
         default:
           log.warn("Unexpected CAM-ICU Observation value [{}] found", freshestCamValue);
       }

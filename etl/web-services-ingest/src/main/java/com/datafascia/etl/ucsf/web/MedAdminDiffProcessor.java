@@ -392,7 +392,8 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
     if (adminActionParts.length == 0) {
       log.warn("No admin action given for admin ID " + adminId);
     } else if (adminActionParts.length == 1) {
-      log.warn("Bad admin action \"" + adminAction + "\" given for admin ID " + adminId);
+      log.warn("Bad admin action \"" + adminAction + "\" given for admin ID " + adminId
+          + " and order ID " + prescriptionId);
     } else {
       if (IGNORE_STATUSES.contains(adminActionParts[1])) {
         return;

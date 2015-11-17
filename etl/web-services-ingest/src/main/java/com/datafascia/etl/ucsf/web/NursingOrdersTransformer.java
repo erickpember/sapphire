@@ -62,54 +62,7 @@ public class NursingOrdersTransformer {
     }
   }
 
-  /**
-   * Transforms UCSF nursing order to procedure request.
-   *
-   * @param jsonString nursing order in JSON format
-   */
-  public void accept(String jsonString) {
-    JSONObject jsonObject;
-    try {
-      jsonObject = (JSONObject) new JSONParser().parse(jsonString);
-    } catch (ParseException e) {
-      throw new IllegalStateException("Cannot parse JSON " + jsonString, e);
-    }
-
-    Object errorObj = jsonObject.get("Error");
-    if (errorObj != null && !errorObj.toString().equals("")) {
-      log.error("Nursing order web service error: " + errorObj.toString());
-    }
-
-    JSONArray patients = (JSONArray) jsonObject.get("Patient");
-    for (Object patient : patients) {
-      if (patient instanceof JSONObject) {
-        String encounterId = ((JSONObject) patient).get("CSN").toString();
-        JSONArray orders = (JSONArray) ((JSONObject) patient).get("Orders");
-
-        Collections.sort(orders, jsonDateTimeJsonCompare);
-
-        for (Object order : orders) {
-          if (order instanceof JSONObject) {
-            ProcedureRequest request = populateProcedureRequest((JSONObject) order, encounterId);
-
-            Optional<ProcedureRequest> existingRequest = apiClient.getProcedureRequestClient()
-                .read(
-                    request.getIdentifierFirstRep().getValue(),
-                    encounterId);
-
-            if (existingRequest.isPresent()) {
-              request.setId(existingRequest.get().getId());
-              apiClient.getProcedureRequestClient().update(request);
-            } else {
-              apiClient.getProcedureRequestClient().create(request);
-            }
-          }
-        }
-      }
-    }
-  }
-
-  private ProcedureRequest populateProcedureRequest(JSONObject order, String encounterId) {
+  private ProcedureRequest toProcedureRequest(JSONObject order, String encounterId) {
     String status = order.get("OrderStatus").toString();
     String orderId = order.get("OrderID").toString();
     String procID = order.get("ProcID").toString();
@@ -178,5 +131,56 @@ public class NursingOrdersTransformer {
     procedureRequest.setNotes(notes);
 
     return procedureRequest;
+  }
+
+  private void save(ProcedureRequest request) {
+    String requestId = request.getIdentifierFirstRep().getValue();
+    String encounterId = request.getEncounter().getReference().getIdPart();
+    Optional<ProcedureRequest> existingRequest = apiClient.getProcedureRequestClient()
+        .read(requestId, encounterId);
+
+    if (existingRequest.isPresent()) {
+      request.setId(existingRequest.get().getId());
+      apiClient.getProcedureRequestClient().update(request);
+    } else {
+      apiClient.getProcedureRequestClient().create(request);
+    }
+  }
+
+  /**
+   * Transforms UCSF nursing order to procedure request.
+   *
+   * @param jsonString
+   *     nursing order in JSON format
+   */
+  public void accept(String jsonString) {
+    JSONObject jsonObject;
+    try {
+      jsonObject = (JSONObject) new JSONParser().parse(jsonString);
+    } catch (ParseException e) {
+      throw new IllegalStateException("Cannot parse JSON " + jsonString, e);
+    }
+
+    Object errorObj = jsonObject.get("Error");
+    if (errorObj != null && !errorObj.toString().equals("")) {
+      log.error("Nursing order web service error: " + errorObj.toString());
+    }
+
+    JSONArray patients = (JSONArray) jsonObject.get("Patient");
+    for (Object patient : patients) {
+      if (patient instanceof JSONObject) {
+        String encounterId = ((JSONObject) patient).get("CSN").toString();
+        JSONArray orders = (JSONArray) ((JSONObject) patient).get("Orders");
+
+        Collections.sort(orders, jsonDateTimeJsonCompare);
+
+        for (Object order : orders) {
+          if (order instanceof JSONObject) {
+            ProcedureRequest request = toProcedureRequest((JSONObject) order, encounterId);
+            save(request);
+          }
+        }
+      }
+    }
   }
 }

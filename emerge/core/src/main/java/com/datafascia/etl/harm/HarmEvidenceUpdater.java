@@ -8,6 +8,7 @@ import ca.uhn.fhir.model.dstu2.resource.Location;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.dstu2.resource.Practitioner;
 import ca.uhn.fhir.model.dstu2.resource.Procedure;
+import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.emerge.ucsf.HarmEvidence;
@@ -49,7 +50,8 @@ public class HarmEvidenceUpdater {
     UPDATE_OBSERVATIONS,
     UPDATE_PARTICIPANT,
     UPDATE_PATIENT,
-    UPDATE_PROCEDURE
+    UPDATE_PROCEDURE,
+    UPDATE_PROCEDURE_REQUEST
   }
 
   /**
@@ -285,6 +287,20 @@ public class HarmEvidenceUpdater {
    */
   public void updateProcedure(Procedure procedure, Encounter encounter) {
     HarmEvidence harmEvidence = execute(EventType.UPDATE_PROCEDURE, encounter, procedure);
+    harmEvidenceRepository.save(harmEvidence);
+  }
+
+  /**
+   * Updates procedure request.
+   *
+   * @param procedureRequest
+   *     procedure request
+   * @param encounter
+   *     encounter
+   */
+  public void updateProcedureRequest(ProcedureRequest procedureRequest, Encounter encounter) {
+    HarmEvidence harmEvidence = execute(
+        EventType.UPDATE_PROCEDURE_REQUEST, encounter, procedureRequest);
     harmEvidenceRepository.save(harmEvidence);
   }
 }

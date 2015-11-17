@@ -83,7 +83,7 @@ public class RassGoalImpl {
    */
   private ProcedureRequest getTargetRass(String encounterId) {
     Optional<ProcedureRequest> targetRass = apiClient.getProcedureRequestClient()
-        .getProcedureRequest(encounterId)
+        .list(encounterId)
         .stream()
         .filter(request -> ProcedureRequestCodeEnum.TARGET_RASS.isCodeEquals(request.getCode()))
         .max(ProcedureRequestUtils.getScheduledComparator());

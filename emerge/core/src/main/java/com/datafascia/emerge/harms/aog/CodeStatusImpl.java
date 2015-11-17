@@ -29,7 +29,7 @@ public class CodeStatusImpl {
    **/
   public CodeStatus.Value apply(String encounterId) {
     List<ProcedureRequest> codeStatusRequests = apiClient.getProcedureRequestClient()
-        .searchProcedureRequest(encounterId, null, null);
+        .search(encounterId, null, null);
 
     List<ProcedureRequest> sortedRequests = Lists.reverse(ProcedureRequestUtils
         .sortProcedureRequests(codeStatusRequests));

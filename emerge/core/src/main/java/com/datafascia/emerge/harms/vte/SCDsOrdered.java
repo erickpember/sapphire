@@ -50,7 +50,7 @@ public class SCDsOrdered {
     boolean ordered = false;
 
     List<ProcedureRequest> requests = apiClient.getProcedureRequestClient()
-        .searchProcedureRequest(
+        .search(
             encounterId, null, ProcedureRequestStatusEnum.IN_PROGRESS.getCode());
 
     Optional<DateTimeDt> placeStart =

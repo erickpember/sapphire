@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -89,19 +90,18 @@ public class NursingOrdersTransformer {
 
         for (Object order : orders) {
           if (order instanceof JSONObject) {
-            ProcedureRequest procedure = populateProcedureRequest((JSONObject) order, encounterId);
+            ProcedureRequest request = populateProcedureRequest((JSONObject) order, encounterId);
 
-            ProcedureRequest existingRequest = apiClient.getProcedureRequestClient()
-                .getProcedureRequest(
-                    procedure.getIdentifierFirstRep().getValue(),
+            Optional<ProcedureRequest> existingRequest = apiClient.getProcedureRequestClient()
+                .read(
+                    request.getIdentifierFirstRep().getValue(),
                     encounterId);
 
-            if (existingRequest == null) {
-              apiClient.getProcedureRequestClient().saveProcedureRequest(
-                  procedure, encounterId);
+            if (existingRequest.isPresent()) {
+              request.setId(existingRequest.get().getId());
+              apiClient.getProcedureRequestClient().update(request);
             } else {
-              apiClient.getProcedureRequestClient().updateProcedureRequest(
-                  procedure, encounterId);
+              apiClient.getProcedureRequestClient().create(request);
             }
           }
         }

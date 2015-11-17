@@ -79,7 +79,7 @@ public class ProcedureRequestUtils {
   public static boolean activeNonMedicationOrder(ClientBuilder client, String encounterId,
       String procedureCode) {
     return client.getProcedureRequestClient()
-        .searchProcedureRequest(encounterId, procedureCode, null).stream()
+        .search(encounterId, procedureCode, null).stream()
         .max(getScheduledComparator())
         .filter(request -> request.getStatusElement()
             .getValueAsEnum().equals(ProcedureRequestStatusEnum.IN_PROGRESS)).isPresent();
@@ -145,7 +145,7 @@ public class ProcedureRequestUtils {
   public static List<ProcedureRequest> getByCodeAfterTime(ClientBuilder client,
       String encounterId, String code, Date date) {
     List<ProcedureRequest> requests
-        = client.getProcedureRequestClient().searchProcedureRequest(encounterId, code, null);
+        = client.getProcedureRequestClient().search(encounterId, code, null);
     List<ProcedureRequest> returnList = new ArrayList<>();
     for (ProcedureRequest req : requests) {
       if (isScheduledAfter(req, date)) {

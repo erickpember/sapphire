@@ -35,7 +35,7 @@ public class ProphylaxisContraindicated {
    */
   public String getProphylaxisContraindicatedReason(String encounterId) {
     List<ProcedureRequest> inProgressPpxRequests = apiClient.getProcedureRequestClient()
-        .searchProcedureRequest(encounterId,
+        .search(encounterId,
             ProcedureRequestCodeEnum.VTE_PPX_CONTRAINDICATIONS.getCode(),
             ProcedureRequestStatusEnum.IN_PROGRESS.getCode());
     ProcedureRequest freshestInProgressPpxRequest = ProcedureRequestUtils.

@@ -88,7 +88,7 @@ public class NursingOrderProcessorIT extends ApiTestSupport {
       ExpectedOrder expectedOrder = expectedOrders.get(key);
 
       ProcedureRequest storedRequest = clientBuilder.getProcedureRequestClient()
-          .getProcedureRequest(key, "2085202");
+          .read(key, "2085202").get();
 
       assertNotNull(storedRequest);
       assertEquals(storedRequest.getEncounter().getReference().getIdPart(), expectedOrder

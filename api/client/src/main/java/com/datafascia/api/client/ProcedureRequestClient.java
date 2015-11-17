@@ -3,7 +3,6 @@
 package com.datafascia.api.client;
 
 import ca.uhn.fhir.model.api.Bundle;
-import ca.uhn.fhir.model.api.BundleEntry;
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.IGenericClient;
@@ -11,6 +10,7 @@ import ca.uhn.fhir.rest.gclient.StringClientParam;
 import com.google.common.base.Strings;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * Client utilities for procedure requests.
@@ -28,28 +28,22 @@ public class ProcedureRequestClient extends BaseClient<ProcedureRequest> {
   /**
    * Updates a ProcedureRequest
    *
-   * @param procedure The ProcedureRequest to update.
-   * @param encounterId The Encounter the request belongs to.
+   * @param request The ProcedureRequest to update.
    */
-  public void updateProcedureRequest(ProcedureRequest procedure, String encounterId) {
-    // Make sure the order already exists.
-    ProcedureRequest existingRequest = getProcedureRequest(procedure.getIdentifierFirstRep()
-        .getValue(), encounterId);
-    procedure.setId(existingRequest.getId());
-    client.update().resource(procedure).execute();
+  public void update(ProcedureRequest request) {
+    client.update().resource(request).execute();
   }
 
   /**
-   * Saves a ProcedureRequest
+   * Creates a ProcedureRequest
    *
-   * @param procedure The ProcedureRequest to save.
-   * @param encounterId The Encounter the request belongs to.
+   * @param request The ProcedureRequest to create.
    * @return A ProcedureRequest.
    */
-  public ProcedureRequest saveProcedureRequest(ProcedureRequest procedure, String encounterId) {
-    MethodOutcome outcome = client.create().resource(procedure).execute();
-    procedure.setId(outcome.getId());
-    return procedure;
+  public ProcedureRequest create(ProcedureRequest request) {
+    MethodOutcome outcome = client.create().resource(request).execute();
+    request.setId(outcome.getId());
+    return request;
   }
 
   /**
@@ -57,9 +51,9 @@ public class ProcedureRequestClient extends BaseClient<ProcedureRequest> {
    *
    * @param requestId The ID of the request.
    * @param encounterId The ID of the encounter it belongs to.
-   * @return A ProcedureRequest.
+   * @return optional procedure request, empty if not found
    */
-  public ProcedureRequest getProcedureRequest(String requestId, String encounterId) {
+  public Optional<ProcedureRequest> read(String requestId, String encounterId) {
     Bundle results = client.search().forResource(ProcedureRequest.class)
         .where(new StringClientParam(ProcedureRequest.SP_ENCOUNTER)
             .matches()
@@ -68,32 +62,25 @@ public class ProcedureRequestClient extends BaseClient<ProcedureRequest> {
             .matches()
             .value(requestId))
         .execute();
-    List<BundleEntry> entries = results.getEntries();
-    if (!entries.isEmpty()) {
-      return (ProcedureRequest) entries.get(0).getResource();
-    } else {
-      return null;
-    }
+    return results.getEntries()
+        .stream()
+        .findFirst()
+        .map(entry -> (ProcedureRequest) entry.getResource());
   }
 
   /**
-   * Fetches a ProcedureRequest
+   * Lists all procedure requests for an encounter.
    *
    * @param encounterId The ID of the encounter they belong to.
    * @return A list ProcedureRequests.
    */
-  public List<ProcedureRequest> getProcedureRequest(String encounterId) {
+  public List<ProcedureRequest> list(String encounterId) {
     Bundle results = client.search().forResource(ProcedureRequest.class)
         .where(new StringClientParam(ProcedureRequest.SP_ENCOUNTER)
             .matches()
             .value(encounterId))
         .execute();
-    List<BundleEntry> entries = results.getEntries();
-    ArrayList<ProcedureRequest> requests = new ArrayList<>();
-    for (BundleEntry entry : entries) {
-      requests.add((ProcedureRequest) entry.getResource());
-    }
-    return requests;
+    return extractBundle(results, ProcedureRequest.class);
   }
 
   /**
@@ -104,9 +91,7 @@ public class ProcedureRequestClient extends BaseClient<ProcedureRequest> {
    * @param status Status of procedure request, optional.
    * @return A list ProcedureRequests.
    */
-  public List<ProcedureRequest> searchProcedureRequest(
-      String encounterId, String code, String status) {
-
+  public List<ProcedureRequest> search(String encounterId, String code, String status) {
     Bundle results = client.search().forResource(ProcedureRequest.class)
         .where(new StringClientParam(ProcedureRequest.SP_ENCOUNTER)
             .matches()

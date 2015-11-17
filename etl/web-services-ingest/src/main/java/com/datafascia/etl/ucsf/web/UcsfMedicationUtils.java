@@ -197,12 +197,7 @@ public class UcsfMedicationUtils {
         return entry.get("Code").toString();
       }
     }
-
-    // TODO: Remove default SCD before going to production.
-    // HERE BE DRAGONS.
-    // A default value is provided below PURELY for debugging purposes.
-    log.warn("Using default 107373 for drug named: " + json.get("DrugName"));
-    return "107373";
+    return null;
   }
 
   /**
@@ -407,16 +402,27 @@ public class UcsfMedicationUtils {
       }
 
       // Fetch the normalized medication name.
-      String drugName = rxNormDb.getRxString(Integer.parseInt(id));
+      String drugName = null;
+      try {
+        drugName = rxNormDb.getRxString(Integer.parseInt(id));
+      } catch (NumberFormatException e) {
+        // Happens when it's a hashed mixture or SCDless RxNorm, so no drugName is associated.
+      }
 
       // Fetch the medication object.
       medication = clientBuilder.getMedicationClient().getMedication(id);
 
       if (medication == null) {
         medication = new Medication();
-        medication.setCode(
-            new CodeableConceptDt(CodingSystems.SEMANTIC_CLINICAL_DRUG, id)
-            .setText(drugName));
+        if (drugName != null) {
+          medication.setCode(
+              new CodeableConceptDt(CodingSystems.SEMANTIC_CLINICAL_DRUG, id)
+              .setText(drugName));
+        } else {
+          medication.setCode(
+              new CodeableConceptDt(CodingSystems.DRUG_UNKNOWN, id)
+              .setText("Drug unknown"));
+        }
         Medication.Product product = new Medication.Product();
         for (String ingredientId : droolNorm.getRxcuiIn()) {
           Substance substance = null;

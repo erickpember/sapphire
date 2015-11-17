@@ -35,6 +35,10 @@ public class CodingSystems {
   public static final String SEMANTIC_CLINICAL_DRUG =
       "http://datafascia.com/coding/SemanticClinicalDrug";
 
+  /** dataFascia invented this coding system for drugs with SCDs */
+  public static final String DRUG_UNKNOWN =
+      "http://datafascia.com/coding/DrugUnknown";
+
   /** dataFascia invented this coding system for Semantic Clinical Drug */
   public static final String MEDICATION_INGREDIENT =
       "http://datafascia.com/coding/MedicationIngredient";

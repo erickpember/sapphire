@@ -308,9 +308,17 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
     if (!Strings.isNullOrEmpty(scd)) {
       medication = UcsfMedicationUtils.populateMedication(droolNorm, null, rxNormDb,
           clientBuilder);
-    } else {
+    } else if (orderJson.get("Mixture") != null) {
       HashCode hc = hashFunction.newHasher()
           .putString(((JSONArray) orderJson.get("Mixture")).toJSONString(), Charsets.UTF_8)
+          .hash();
+      customMedId = hc.toString();
+      medication = UcsfMedicationUtils.populateMedication(droolNorm, customMedId, rxNormDb,
+          clientBuilder);
+    } else if (orderJson.get("RxNorm") != null) {
+      // This will trigger if there is no SCD, but the RxNorm still isn't null.
+      HashCode hc = hashFunction.newHasher()
+          .putString(((JSONArray) orderJson.get("RxNorm")).toJSONString(), Charsets.UTF_8)
           .hash();
       customMedId = hc.toString();
       medication = UcsfMedicationUtils.populateMedication(droolNorm, customMedId, rxNormDb,

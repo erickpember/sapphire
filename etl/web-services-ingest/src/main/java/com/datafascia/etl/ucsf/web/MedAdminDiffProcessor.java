@@ -270,6 +270,7 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
   private void findPrescriptionDiffs(JSONObject orderJson, String encounterId, String scd)
       throws ParseException, MutationsRejectedException, TableNotFoundException, SQLException {
     String prescriptionId = orderJson.get("OrderID").toString();
+    String drugName = orderJson.get("DrugName").toString();
     String[] routeParts = orderJson.get("Route").toString().split("\\^");
     String[] frequencyParts = orderJson.get("Frequency").toString().split("\\^");
     List<String> rxNormIngredients = new ArrayList<>();
@@ -308,23 +309,23 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
     Medication medication = null;
     String customMedId = null;
     if (!Strings.isNullOrEmpty(scd)) {
-      medication = UcsfMedicationUtils.populateMedication(droolNorm, null, rxNormDb,
+      medication = UcsfMedicationUtils.populateMedication(droolNorm, null, null, rxNormDb,
           clientBuilder);
     } else if (orderJson.get("Mixture") != null) {
       HashCode hc = hashFunction.newHasher()
           .putString(((JSONArray) orderJson.get("Mixture")).toJSONString(), Charsets.UTF_8)
           .hash();
       customMedId = hc.toString();
-      medication = UcsfMedicationUtils.populateMedication(droolNorm, customMedId, rxNormDb,
-          clientBuilder);
+      medication = UcsfMedicationUtils.populateMedication(droolNorm, customMedId, drugName,
+          rxNormDb, clientBuilder);
     } else if (orderJson.get("RxNorm") != null) {
       // This will trigger if there is no SCD, but the RxNorm still isn't null.
       HashCode hc = hashFunction.newHasher()
           .putString(((JSONArray) orderJson.get("RxNorm")).toJSONString(), Charsets.UTF_8)
           .hash();
       customMedId = hc.toString();
-      medication = UcsfMedicationUtils.populateMedication(droolNorm, customMedId, rxNormDb,
-          clientBuilder);
+      medication = UcsfMedicationUtils.populateMedication(droolNorm, customMedId, drugName,
+          rxNormDb, clientBuilder);
     }
 
     String medDataNew = orderJson.toJSONString();
@@ -394,7 +395,8 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
       for (Object obj : meds) {
         if (obj instanceof JSONObject) {
           JSONObject admin = (JSONObject) obj;
-          findAdministrationDiffs(admin, encounterId, prescriptionId, droolNorm, customMedId);
+          findAdministrationDiffs(admin, encounterId, prescriptionId, droolNorm, customMedId,
+              drugName);
         }
       }
     }
@@ -413,7 +415,7 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
    * @throws SQLException If there is a problem interacting with SQL.
    */
   private void findAdministrationDiffs(JSONObject admin, String encounterId, String prescriptionId,
-      RxNorm droolNorm, String customMedId) throws ParseException,
+      RxNorm droolNorm, String customMedId, String drugName) throws ParseException,
       MutationsRejectedException, TableNotFoundException, SQLException {
     /*
      * Only recording actual administrations, not scheduled ones or verifications. Might need to
@@ -463,7 +465,7 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
       // Recreate the administration based on the new data.
       MedicationAdministration medAdmin = UcsfMedicationUtils.populateAdministration(admin, adminId,
           prescriptionId, encounterId, UcsfMedicationUtils.populateMedication(droolNorm,
-              customMedId, rxNormDb, clientBuilder),
+              customMedId, drugName, rxNormDb, clientBuilder),
           droolNorm.getMedsSets(), clientBuilder);
       MedicationAdministration existingAdministration = clientBuilder
           .getMedicationAdministrationClient().get(adminId, encounterId,
@@ -486,7 +488,7 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
       // We have a new administration. Populate a MedicationAdministration and save it.
       MedicationAdministration medAdmin = UcsfMedicationUtils
           .populateAdministration(admin, adminId, prescriptionId, encounterId,
-              UcsfMedicationUtils.populateMedication(droolNorm, customMedId, rxNormDb,
+              UcsfMedicationUtils.populateMedication(droolNorm, customMedId, drugName, rxNormDb,
                   clientBuilder),
               droolNorm.getMedsSets(), clientBuilder);
       medAdmin = clientBuilder.getMedicationAdministrationClient().save(medAdmin);

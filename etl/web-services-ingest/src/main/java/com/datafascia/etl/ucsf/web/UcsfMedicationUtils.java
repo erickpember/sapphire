@@ -385,13 +385,14 @@ public class UcsfMedicationUtils {
    *
    * @param droolNorm The RxNorm object to pull from.
    * @param customID An optional custom ID.
+   * @param customDrugName An optional custom drug name.
    * @param rxNormDb The RxNorm database with which to do lookups.
    * @param clientBuilder The client builder to use.
    * @return A populated Medication object.
    * @throws SQLException If there are problems connecting to MySQL.
    */
   public static Medication populateMedication(RxNorm droolNorm, String customID,
-      RxNormLookup rxNormDb, ClientBuilder clientBuilder)
+      String customDrugName, RxNormLookup rxNormDb, ClientBuilder clientBuilder)
       throws SQLException {
     String id = customID == null ? droolNorm.getRxcuiSCD() : customID;
 
@@ -402,7 +403,7 @@ public class UcsfMedicationUtils {
       }
 
       // Fetch the normalized medication name.
-      String drugName = null;
+      String drugName = customDrugName;
       try {
         drugName = rxNormDb.getRxString(Integer.parseInt(id));
       } catch (NumberFormatException e) {
@@ -417,11 +418,11 @@ public class UcsfMedicationUtils {
         if (customID == null) {
           medication.setCode(
               new CodeableConceptDt(CodingSystems.SEMANTIC_CLINICAL_DRUG, id)
-              .setText(drugName));
+              .setText(drugName == null ? "Drug unknown" : drugName));
         } else {
           medication.setCode(
               new CodeableConceptDt(CodingSystems.DRUG_UNKNOWN, id)
-              .setText("Drug unknown"));
+              .setText(drugName == null ? "Drug unknown" : drugName));
         }
         Medication.Product product = new Medication.Product();
         for (String ingredientId : droolNorm.getRxcuiIn()) {

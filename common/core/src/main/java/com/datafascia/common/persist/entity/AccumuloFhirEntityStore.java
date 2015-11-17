@@ -79,6 +79,7 @@ public class AccumuloFhirEntityStore implements FhirEntityStore {
     Schema schema = DUMMY_SCHEMA;
     long schemaId = schemaRegistry.putSchema(object.getClass().getSimpleName(), schema);
 
+    accumuloTemplate.deleteRange(getDataTableName(), Range.exact(toRowId(entityId)));
     accumuloTemplate.save(
         getDataTableName(),
         toRowId(entityId),

@@ -73,6 +73,7 @@ public class AccumuloReflectEntityStore implements ReflectEntityStore {
     Schema schema = ReflectData.get().getSchema(object.getClass());
     long schemaId = schemaRegistry.putSchema(object.getClass().getSimpleName(), schema);
 
+    accumuloTemplate.deleteRange(getDataTableName(), Range.exact(toRowId(entityId)));
     accumuloTemplate.save(
         getDataTableName(), toRowId(entityId), new ReflectMutationSetter(schemaId, object));
   }
@@ -122,11 +123,11 @@ public class AccumuloReflectEntityStore implements ReflectEntityStore {
 
   @Override
   public void delete(EntityId entityId) {
-    accumuloTemplate.delete(getDataTableName(), toRowId(entityId));
+    accumuloTemplate.deleteRowIdPrefix(getDataTableName(), toRowId(entityId));
   }
 
   @Override
   public <E> void delete(EntityId parentId, Class<E> entityType) {
-    accumuloTemplate.delete(getDataTableName(), toRowIdPrefix(parentId, entityType));
+    accumuloTemplate.deleteRowIdPrefix(getDataTableName(), toRowIdPrefix(parentId, entityType));
   }
 }

@@ -233,22 +233,22 @@ public class AccumuloTemplate {
   }
 
   /**
-   * Deletes all entries for an entity.
+   * Deletes all entries in a range.
    *
    * @param tableName
    *     table name
-   * @param rowIdPrefix
-   *     row ID prefix
+   * @param range
+   *     to delete
    */
-  public void delete(String tableName, String rowIdPrefix) {
+  public void deleteRange(String tableName, Range range) {
     BatchDeleter deleter = null;
     try {
       deleter = connector.createBatchDeleter(
           tableName, authorizationsSupplier.get(), 1, new BatchWriterConfig());
-      deleter.setRanges(Arrays.asList(Range.prefix(rowIdPrefix)));
+      deleter.setRanges(Arrays.asList(range));
       deleter.delete();
     } catch (MutationsRejectedException e) {
-      throw new IllegalStateException("Cannot delete row ID prefix " + rowIdPrefix, e);
+      throw new IllegalStateException("Cannot delete ranges " + range, e);
     } catch (TableNotFoundException e) {
       throw new IllegalStateException("Table " + tableName + " not found", e);
     } finally {
@@ -256,6 +256,18 @@ public class AccumuloTemplate {
         deleter.close();
       }
     }
+  }
+
+  /**
+   * Deletes all entries having a row ID matching a prefix.
+   *
+   * @param tableName
+   *     table name
+   * @param rowIdPrefix
+   *     row ID prefix
+   */
+  public void deleteRowIdPrefix(String tableName, String rowIdPrefix) {
+    deleteRange(tableName, Range.prefix(rowIdPrefix));
   }
 
   private <E> Timer.Context getTimerContext(String methodName, RowMapper<E> rowMapper) {

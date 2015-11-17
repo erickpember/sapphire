@@ -14,6 +14,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
 
 /**
  * Tests pain and delirium data is exported.
@@ -62,23 +63,8 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
 
   @Test
   public void should_export_cam_all() throws Exception {
-    processMessage("cam-positive.hl7");
-    processTimer();
-
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
-    Cam cam = harmEvidence.getMedicalData().getDelirium().getCam();
-
-    Cam.Result result = cam.getResult();
-    assertEquals(result, Cam.Result.POSITIVE);
-
-    processMessage("cam-negative.hl7");
-    processTimer();
-
-    harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
-    cam = harmEvidence.getMedicalData().getDelirium().getCam();
-
-    result = cam.getResult();
-    assertEquals(result, Cam.Result.NEGATIVE);
+    HarmEvidence harmEvidence;
+    Cam cam;
 
     processMessage("cam-uta.hl7");
     processTimer();
@@ -86,9 +72,25 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
     harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
     cam = harmEvidence.getMedicalData().getDelirium().getCam();
 
-    result = cam.getResult();
-    Cam.UtaReason utaReason = cam.getUtaReason();
-    assertEquals(result, Cam.Result.UTA);
-    assertEquals(utaReason, Cam.UtaReason.RASS_SCORE_4_OR_5);
+    assertEquals(cam.getResult(), Cam.Result.UTA);
+    assertEquals(cam.getUtaReason(), Cam.UtaReason.RASS_SCORE_4_OR_5);
+
+    processMessage("cam-positive.hl7");
+    processTimer();
+
+    harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
+    cam = harmEvidence.getMedicalData().getDelirium().getCam();
+
+    assertEquals(cam.getResult(), Cam.Result.POSITIVE);
+    assertNull(cam.getUtaReason());
+
+    processMessage("cam-negative.hl7");
+    processTimer();
+
+    harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
+    cam = harmEvidence.getMedicalData().getDelirium().getCam();
+
+    assertEquals(cam.getResult(), Cam.Result.NEGATIVE);
+    assertNull(cam.getUtaReason());
   }
 }

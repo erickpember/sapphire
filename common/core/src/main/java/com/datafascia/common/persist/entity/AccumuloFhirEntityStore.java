@@ -130,11 +130,11 @@ public class AccumuloFhirEntityStore implements FhirEntityStore {
 
   @Override
   public void delete(EntityId entityId) {
-    accumuloTemplate.delete(getDataTableName(), toRowId(entityId));
+    accumuloTemplate.deleteRowIdPrefix(getDataTableName(), toRowId(entityId));
   }
 
   @Override
   public <E extends IBaseResource> void delete(EntityId parentId, Class<E> entityType) {
-    accumuloTemplate.delete(getDataTableName(), toRowIdPrefix(parentId, entityType));
+    accumuloTemplate.deleteRowIdPrefix(getDataTableName(), toRowIdPrefix(parentId, entityType));
   }
 }

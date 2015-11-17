@@ -69,6 +69,8 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
   private RxNormLookup rxNormDb;
   private String tableName;
   private KieSession kieSession;
+  private JSONObjectDateTimeOrderedComparator jsonDateTimeJsonCompare
+      = new JSONObjectDateTimeOrderedComparator();
   HashFunction hashFunction = Hashing.md5();
   @Inject
   private ClientBuilder clientBuilder;

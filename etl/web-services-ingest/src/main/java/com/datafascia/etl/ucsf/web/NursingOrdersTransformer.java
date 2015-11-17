@@ -18,6 +18,8 @@ import com.google.inject.Inject;
 import java.time.DateTimeException;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import lombok.extern.slf4j.Slf4j;
@@ -31,15 +33,38 @@ import org.json.simple.parser.ParseException;
  */
 @Slf4j
 public class NursingOrdersTransformer {
+  public static JSONObjectOrderedDateComparator jsonDateTimeJsonCompare
+      = new JSONObjectOrderedDateComparator();
 
   @Inject
   private ClientBuilder apiClient;
 
   /**
+   * A comparator class for medication order JSON blobs.
+   */
+  public static class JSONObjectOrderedDateComparator implements Comparator<JSONObject> {
+    /**
+     * Compares two nursing order JSON blob dates.
+     *
+     * @param o1 The first blob.
+     * @param o2 The second blob.
+     * @return The comparator result.
+     */
+    @Override
+    public int compare(JSONObject o1, JSONObject o2) {
+      String ucsfTime1 = o1.get("OrderedDate").toString();
+      Instant dateTimeOrdered1 = UcsfWebGetProcessor.epicDateToInstant(ucsfTime1);
+      String ucsfTime2 = o2.get("OrderedDate").toString();
+      Instant dateTimeOrdered2 = UcsfWebGetProcessor.epicDateToInstant(ucsfTime2);
+
+      return dateTimeOrdered1.compareTo(dateTimeOrdered2);
+    }
+  }
+
+  /**
    * Transforms UCSF nursing order to procedure request.
    *
-   * @param jsonString
-   *     nursing order in JSON format
+   * @param jsonString nursing order in JSON format
    */
   public void accept(String jsonString) {
     JSONObject jsonObject;
@@ -59,6 +84,9 @@ public class NursingOrdersTransformer {
       if (patient instanceof JSONObject) {
         String encounterId = ((JSONObject) patient).get("CSN").toString();
         JSONArray orders = (JSONArray) ((JSONObject) patient).get("Orders");
+
+        Collections.sort(orders, jsonDateTimeJsonCompare);
+
         for (Object order : orders) {
           if (order instanceof JSONObject) {
             ProcedureRequest procedure = populateProcedureRequest((JSONObject) order, encounterId);
@@ -128,7 +156,7 @@ public class NursingOrdersTransformer {
 
     procedureRequest.setCode(
         new CodeableConceptDt(CodingSystems.PROCEDURE_REQUEST, procID)
-            .setText(orderDesc));
+        .setText(orderDesc));
 
     try {
       Encounter encounter = apiClient.getEncounterClient().getEncounter(encounterId);

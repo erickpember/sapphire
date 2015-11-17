@@ -45,22 +45,25 @@ public class SubglotticSuctionSurgicalAirway {
     }
 
     Observation freshestAirwayDevice = ObservationUtils.findFreshestObservation(airwayDevices);
-    String airway = ObservationUtils.airwayName(freshestAirwayDevice);
 
-    String airwaySubglotticSuctionCapabilityStatus = null;
-    if ("Surgical Airway".equals(airway)) {
-      airwaySubglotticSuctionCapabilityStatus = "Unknown";
-    } else if (freshestAirwayDevice.getValue()
-        .toString().equals("Endotracheal Tube – Subglottic")) {
-      airwaySubglotticSuctionCapabilityStatus = "Present";
-    } else if (!freshestAirwayDevice.getValue()
-        .toString().equals("Endotracheal Tube – Subglottic")) {
-      airwaySubglotticSuctionCapabilityStatus = "Absent";
-    }
+    if (freshestAirwayDevice != null && freshestAirwayDevice.getValue() != null) {
+      String airway = ObservationUtils.airwayName(freshestAirwayDevice);
 
-    if ("Surgical Airway".equals(airway)
-        && "Present".equals(airwaySubglotticSuctionCapabilityStatus)) {
-      return true;
+      String airwaySubglotticSuctionCapabilityStatus = null;
+      if ("Surgical Airway".equals(airway)) {
+        airwaySubglotticSuctionCapabilityStatus = "Unknown";
+      } else if (freshestAirwayDevice.getValue()
+          .toString().equals("Endotracheal Tube – Subglottic")) {
+        airwaySubglotticSuctionCapabilityStatus = "Present";
+      } else if (!freshestAirwayDevice.getValue()
+          .toString().equals("Endotracheal Tube – Subglottic")) {
+        airwaySubglotticSuctionCapabilityStatus = "Absent";
+      }
+
+      if ("Surgical Airway".equals(airway)
+          && "Present".equals(airwaySubglotticSuctionCapabilityStatus)) {
+        return true;
+      }
     }
 
     return false;

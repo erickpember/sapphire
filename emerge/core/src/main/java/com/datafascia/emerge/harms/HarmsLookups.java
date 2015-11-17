@@ -94,6 +94,10 @@ public class HarmsLookups {
     List<Observation> pltObservations = client.getObservationClient().searchObservation(encounterId,
         ObservationCodeEnum.PLT.getCode(), null);
     Observation freshestPltObservation = ObservationUtils.findFreshestObservation(pltObservations);
+    if (freshestPltObservation == null || freshestPltObservation.getValue() == null) {
+      return false;
+    }
+
     IDatatype quantity = freshestPltObservation.getValue();
     if (quantity instanceof QuantityDt) {
       return ((QuantityDt) quantity).getValue().compareTo(FIFTY_THOUSAND) < 0;
@@ -114,8 +118,13 @@ public class HarmsLookups {
   public static boolean inrOver1point5(ClientBuilder client, String encounterId) {
     List<Observation> pltObservations = client.getObservationClient().searchObservation(encounterId,
         ObservationCodeEnum.INR.getCode(), null);
-    Observation freshestPltObservation = ObservationUtils.findFreshestObservation(pltObservations);
-    IDatatype quantity = freshestPltObservation.getValue();
+    Observation freshestInrObservation = ObservationUtils.findFreshestObservation(pltObservations);
+
+    if (freshestInrObservation == null || freshestInrObservation.getValue() == null) {
+      return false;
+    }
+
+    IDatatype quantity = freshestInrObservation.getValue();
     if (quantity instanceof QuantityDt) {
       return ((QuantityDt) quantity).getValue().compareTo(ONE_POINT_FIVE) > 0;
     } else {
@@ -135,8 +144,13 @@ public class HarmsLookups {
   public static boolean aPttRatioOver1point5(ClientBuilder client, String encounterId) {
     List<Observation> pltObservations = client.getObservationClient().searchObservation(encounterId,
         ObservationCodeEnum.PTT.getCode(), null);
-    Observation freshestPltObservation = ObservationUtils.findFreshestObservation(pltObservations);
-    IDatatype quantity = freshestPltObservation.getValue();
+    Observation freshestPttObservation = ObservationUtils.findFreshestObservation(pltObservations);
+
+    if (freshestPttObservation == null || freshestPttObservation.getValue() == null) {
+      return false;
+    }
+
+    IDatatype quantity = freshestPttObservation.getValue();
     if (quantity instanceof QuantityDt) {
       return ((QuantityDt) quantity).getValue().compareTo(ONE_POINT_FIVE) > 0;
     } else {

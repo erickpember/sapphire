@@ -49,16 +49,19 @@ public class SubglotticSuctionUse {
     }
 
     Observation freshestSubglotticStatus = ObservationUtils.findFreshestObservation(observations);
-    String value = freshestSubglotticStatus.getValue().toString();
-    switch (value) {
-      case "Connected/In use":
-        return MaybeEnum.YES;
-      case "Capped off":
-        return MaybeEnum.NO;
-      case "Other (Comment)":
-        return MaybeEnum.NOT_DOCUMENTED;
-      default:
-        log.warn("Unrecognized subglottic status [{}]", value);
+
+    if (freshestSubglotticStatus != null && freshestSubglotticStatus.getValue() != null) {
+      String value = freshestSubglotticStatus.getValue().toString();
+      switch (value) {
+        case "Connected/In use":
+          return MaybeEnum.YES;
+        case "Capped off":
+          return MaybeEnum.NO;
+        case "Other (Comment)":
+          return MaybeEnum.NOT_DOCUMENTED;
+        default:
+          log.warn("Unrecognized subglottic status [{}]", value);
+      }
     }
 
     return MaybeEnum.NOT_DOCUMENTED;

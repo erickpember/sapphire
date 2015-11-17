@@ -19,7 +19,7 @@ import com.datafascia.common.persist.entity.AccumuloReflectEntityStore;
 import com.datafascia.common.persist.entity.FhirEntityStore;
 import com.datafascia.common.persist.entity.ReflectEntityStore;
 import com.datafascia.domain.persist.Tables;
-import com.datafascia.etl.harm.HarmEvidenceUpdater;
+import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater;
 import com.datafascia.etl.hl7.EncounterStatusTransition;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;

@@ -8,7 +8,7 @@ import ca.uhn.fhir.model.dstu2.resource.Practitioner;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.PractitionerRepository;
-import com.datafascia.etl.harm.HarmEvidenceUpdater;
+import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater;
 import com.google.common.base.Strings;
 import java.util.ArrayList;
 import java.util.List;

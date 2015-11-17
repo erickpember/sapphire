@@ -13,7 +13,7 @@ import com.datafascia.domain.persist.FlagRepository;
 import com.datafascia.domain.persist.ObservationRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.domain.persist.ProcedureRepository;
-import com.datafascia.etl.harm.HarmEvidenceUpdater;
+import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater;
 import java.time.Clock;
 import java.util.List;
 import javax.inject.Inject;

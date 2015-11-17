@@ -1,0 +1,143 @@
+// Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
+// For license information, please contact http://datafascia.com/contact
+package com.datafascia.emerge.ucsf.harm;
+
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import ca.uhn.fhir.model.dstu2.resource.Observation;
+import com.datafascia.emerge.harms.vae.DiscreteHeadOfBedGreaterThan30Degrees;
+import com.datafascia.emerge.harms.vae.SubglotticSuctionNonSurgicalAirway;
+import com.datafascia.emerge.harms.vae.SubglotticSuctionSurgicalAirway;
+import com.datafascia.emerge.harms.vae.Ventilated;
+import com.datafascia.emerge.harms.vae.VentilationModeImpl;
+import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater.Event;
+import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater.EventType;
+
+global com.datafascia.emerge.ucsf.HarmEvidence harmEvidence;
+global com.datafascia.emerge.ucsf.harm.VentilatorAssociatedEventUpdater ventilatorAssociatedEventUpdater;
+
+rule "Initialize ventilator associated event data with default values"
+when
+  Event( type == EventType.ADMIT_PATIENT )
+then
+  ventilatorAssociatedEventUpdater.admitPatient(harmEvidence);
+end
+
+rule "Update daily sedation interruption"
+when
+  Event( type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateDailySedationInterruption(harmEvidence, $encounter);
+end
+
+rule "Update ventilated"
+when
+  Event( type == EventType.UPDATE_OBSERVATIONS )
+  $observation: Observation( Ventilated.isRelevant($observation) )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateVentilated(harmEvidence, $encounter);
+end
+
+rule "Update head of bed angle greater than or equal to 30 degrees"
+when
+  Event( type == EventType.UPDATE_OBSERVATIONS )
+  $observation: Observation( DiscreteHeadOfBedGreaterThan30Degrees.isRelevant($observation) )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateDiscreteHOBGreaterThan30Deg(harmEvidence, $encounter);
+end
+
+rule "Update stress ulcer prophylaxis order"
+when
+  Event( type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateStressUlcerProphylaxisOrder(harmEvidence, $encounter);
+end
+
+rule "Update mechanical ventilation greater than 48 hours"
+when
+  Event( type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateMechanicalVentilationGreaterThan48Hours(
+      harmEvidence, $encounter);
+end
+
+rule "Update recent stress ulcer prophylaxis administration"
+when
+  Event( type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateRecentStressUlcerProphylaxisAdministration(
+      harmEvidence, $encounter);
+end
+
+rule "Update ventilation mode"
+when
+  Event( type == EventType.UPDATE_OBSERVATIONS )
+  $observation: Observation( VentilationModeImpl.isRelevant($observation) )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateVentilationMode(harmEvidence, $encounter);
+end
+
+rule "Update current tidal volume"
+when
+  Event( type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateCurrentTidalVolume(harmEvidence, $encounter);
+end
+
+rule "Update subglottic suction surgical airway"
+when
+  Event( type == EventType.UPDATE_OBSERVATIONS )
+  $observation: Observation( SubglotticSuctionSurgicalAirway.isRelevant($observation) )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateSubglotticSuctionSurgicalAirway(harmEvidence, $encounter);
+end
+
+rule "Update subglottic suction non-surgical airway"
+when
+  Event( type == EventType.UPDATE_OBSERVATIONS )
+  $observation: Observation( SubglotticSuctionNonSurgicalAirway.isRelevant($observation) )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateSubglotticSuctionNonSurgicalAirway(
+      harmEvidence, $encounter);
+end
+
+rule "Update subglottic suction use"
+when
+  Event( type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateSubglotticSuctionUse(harmEvidence, $encounter);
+end
+
+rule "Update oral care"
+when
+  Event( type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateOralCare(harmEvidence, $encounter);
+end
+
+rule "Update inline suction"
+when
+  Event( type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateInlineSuction(harmEvidence, $encounter);
+end
+
+rule "Update daily spontaneous breathing trial"
+when
+  Event( type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateDailySpontaneousBreathingTrial(harmEvidence, $encounter);
+end

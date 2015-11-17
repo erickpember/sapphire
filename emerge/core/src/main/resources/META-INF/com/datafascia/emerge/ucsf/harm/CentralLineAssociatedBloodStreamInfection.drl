@@ -1,0 +1,29 @@
+// Copyright (C) 2015-2016 dataFascia Corporation - All Rights Reserved
+// For license information, please contact http://datafascia.com/contact
+package com.datafascia.emerge.ucsf.harm;
+
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import ca.uhn.fhir.model.dstu2.resource.Procedure;
+import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater.Event;
+import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater.EventType;
+
+global com.datafascia.emerge.ucsf.HarmEvidence harmEvidence;
+global com.datafascia.emerge.ucsf.harm.CentralLineAssociatedBloodStreamInfectionUpdater centralLineAssociatedBloodStreamInfectionUpdater;
+
+rule "Update daily needs assessment"
+when
+  Event( type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  centralLineAssociatedBloodStreamInfectionUpdater.updateDailyNeedsAssessment(
+      harmEvidence, $encounter);
+end
+
+rule "Update central line"
+when
+  Event( type == EventType.UPDATE_PROCEDURE )
+  Procedure( category.codingFirstRep.code == "CENTRAL_LINE" )
+  $encounter: Encounter()
+then
+  centralLineAssociatedBloodStreamInfectionUpdater.updateCentralLine(harmEvidence, $encounter);
+end

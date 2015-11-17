@@ -5,7 +5,7 @@
     <ksession name="encounterStatus" type="stateless"/>
   </kbase>
 
-  <kbase name="harmEvidenceBase" packages="com.datafascia.etl.harm">
+  <kbase name="harmEvidenceBase" packages="com.datafascia.emerge.ucsf.harm">
     <ksession name="harmEvidence" type="stateless"/>
   </kbase>
 

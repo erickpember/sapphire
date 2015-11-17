@@ -9,7 +9,7 @@ import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.LocationRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.domain.persist.PractitionerRepository;
-import com.datafascia.etl.harm.HarmEvidenceUpdater;
+import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater;
 import com.datafascia.etl.inject.ComponentsModule;
 import com.google.common.io.Resources;
 import com.google.inject.AbstractModule;

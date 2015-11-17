@@ -11,7 +11,7 @@ import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.FlagRepository;
 import com.datafascia.domain.persist.PatientRepository;
-import com.datafascia.etl.harm.HarmEvidenceUpdater;
+import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater;
 import javax.inject.Inject;
 
 /**

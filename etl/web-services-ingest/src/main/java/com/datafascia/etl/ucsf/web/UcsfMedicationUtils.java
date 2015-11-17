@@ -414,7 +414,7 @@ public class UcsfMedicationUtils {
 
       if (medication == null) {
         medication = new Medication();
-        if (drugName != null) {
+        if (customID == null) {
           medication.setCode(
               new CodeableConceptDt(CodingSystems.SEMANTIC_CLINICAL_DRUG, id)
               .setText(drugName));

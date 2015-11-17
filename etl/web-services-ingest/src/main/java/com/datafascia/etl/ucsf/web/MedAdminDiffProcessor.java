@@ -273,14 +273,16 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
     String[] routeParts = orderJson.get("Route").toString().split("\\^");
     String[] frequencyParts = orderJson.get("Frequency").toString().split("\\^");
     List<String> rxNormIngredients = new ArrayList<>();
-    if (orderJson.get("RxNorm") != null) {
+    if (orderJson.get("RxNorm") != null && !((JSONArray) orderJson.get("RxNorm")).isEmpty()) {
       rxNormIngredients.addAll(
           UcsfMedicationUtils.extractRxNormIngredients((JSONArray) orderJson.get("RxNorm")));
     } else {
       for (Object mixobj : (JSONArray) orderJson.get("Mixture")) {
         JSONObject mixjson = (JSONObject) mixobj;
-        rxNormIngredients.addAll(
-            UcsfMedicationUtils.extractRxNormIngredients((JSONArray) mixjson.get("rxNormMix")));
+        if (mixjson.get("rxNormMix") != null) {
+          rxNormIngredients.addAll(
+              UcsfMedicationUtils.extractRxNormIngredients((JSONArray) mixjson.get("rxNormMix")));
+        }
       }
     }
 

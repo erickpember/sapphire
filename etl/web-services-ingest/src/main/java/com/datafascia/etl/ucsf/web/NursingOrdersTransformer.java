@@ -14,7 +14,7 @@ import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.domain.fhir.IdentifierSystems;
-import com.google.inject.Inject;
+import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater;
 import java.time.DateTimeException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -23,6 +23,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -39,6 +40,9 @@ public class NursingOrdersTransformer {
 
   @Inject
   private ClientBuilder apiClient;
+
+  @Inject
+  private HarmEvidenceUpdater harmEvidenceUpdater;
 
   /**
    * A comparator class for medication order JSON blobs.
@@ -62,7 +66,7 @@ public class NursingOrdersTransformer {
     }
   }
 
-  private ProcedureRequest toProcedureRequest(JSONObject order, String encounterId) {
+  private ProcedureRequest toProcedureRequest(JSONObject order, Encounter encounter) {
     String status = order.get("OrderStatus").toString();
     String orderId = order.get("OrderID").toString();
     String procID = order.get("ProcID").toString();
@@ -70,7 +74,8 @@ public class NursingOrdersTransformer {
     String startDate = order.get("StartDate").toString();
     String discontinuedDate = order.get("DiscontinuedDate").toString();
 
-    ProcedureRequest procedureRequest = new ProcedureRequest();
+    ProcedureRequest procedureRequest = new ProcedureRequest()
+        .setEncounter(new ResourceReferenceDt(encounter));
     procedureRequest.addIdentifier()
         .setSystem(IdentifierSystems.INSTITUTION_PROCEDURE_REQUEST)
         .setValue(orderId);
@@ -111,15 +116,6 @@ public class NursingOrdersTransformer {
         new CodeableConceptDt(CodingSystems.PROCEDURE_REQUEST, procID)
         .setText(orderDesc));
 
-    try {
-      Encounter encounter = apiClient.getEncounterClient().getEncounter(encounterId);
-      procedureRequest.setEncounter(new ResourceReferenceDt(encounter));
-    } catch (ResourceNotFoundException e) {
-      log.warn("Could not find encounter with CSN " + encounterId + ". HAPI FHIR doesn't allow "
-          + "dangling references, so the linkage between the encounter and nursing order " + orderId
-          + " is lost.", e);
-    }
-
     List<AnnotationDt> notes = new ArrayList<>();
     Object questions = order.get("Questions");
     if (questions != null) {
@@ -145,6 +141,24 @@ public class NursingOrdersTransformer {
     } else {
       apiClient.getProcedureRequestClient().create(request);
     }
+  }
+
+  private void process(JSONObject order, String encounterId) {
+    Encounter encounter;
+    try {
+      encounter = apiClient.getEncounterClient().getEncounter(encounterId);
+    } catch (ResourceNotFoundException e) {
+      log.warn(
+          "Encounter ID [{}] not found. Discarded nursing order ID {}",
+          encounterId,
+          order.get("OrderID"),
+          e);
+      return;
+    }
+
+    ProcedureRequest request = toProcedureRequest(order, encounter);
+    save(request);
+    harmEvidenceUpdater.updateProcedureRequest(request, encounter);
   }
 
   /**
@@ -176,8 +190,7 @@ public class NursingOrdersTransformer {
 
         for (Object order : orders) {
           if (order instanceof JSONObject) {
-            ProcedureRequest request = toProcedureRequest((JSONObject) order, encounterId);
-            save(request);
+            process((JSONObject) order, encounterId);
           }
         }
       }

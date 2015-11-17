@@ -4,15 +4,23 @@ package com.datafascia.etl;
 
 import ca.uhn.fhir.model.dstu2.composite.AnnotationDt;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
+import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
+import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
+import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
 import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
+import ca.uhn.fhir.model.primitive.DateDt;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.services.ApiTestSupport;
 import com.datafascia.domain.fhir.IdentifierSystems;
+import com.datafascia.domain.fhir.Languages;
+import com.datafascia.domain.fhir.RaceEnum;
+import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.etl.ucsf.web.NursingOrdersProcessor;
+import com.neovisionaries.i18n.LanguageCode;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -24,7 +32,6 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.nifi.util.TestRunner;
 import org.apache.nifi.util.TestRunners;
-import org.hl7.fhir.instance.model.api.IIdType;
 import org.testng.annotations.AfterClass;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
@@ -40,28 +47,55 @@ import static org.testng.Assert.assertTrue;
 public class NursingOrderProcessorIT extends ApiTestSupport {
   private NursingOrdersProcessor processor;
   private ClientBuilder clientBuilder;
-  private Encounter transientEncounter;
+  private UnitedStatesPatient testPatient;
+  private Encounter testEncounter;
 
   @BeforeClass
   public void setup() throws Exception {
-    transientEncounter = createAnEncounterWithApi();
+    testPatient = createPatient();
+    testEncounter = createEncounter(testPatient);
   }
 
   @AfterClass
   public void close() throws Exception {
-    client.delete().resource(transientEncounter).execute();
+    client.delete().resource(testEncounter).execute();
+    client.delete().resource(testPatient).execute();
   }
 
-  private Encounter createAnEncounterWithApi() {
-    Encounter encounter1 = new Encounter();
-    encounter1.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("2085202");
-    encounter1.setStatus(EncounterStateEnum.IN_PROGRESS);
-    MethodOutcome outcome = client.create().resource(encounter1)
+  private UnitedStatesPatient createPatient() {
+    UnitedStatesPatient patient = new UnitedStatesPatient();
+    patient.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_PATIENT)
+        .setValue(NursingOrderProcessorIT.class.getSimpleName() + "1");
+    patient.addName()
+        .addGiven("ECMNOTES").addFamily("TEST");
+    patient.addCommunication()
+        .setPreferred(true).setLanguage(Languages.createLanguage(LanguageCode.en));
+    patient
+        .setRace(RaceEnum.AMERICAN_INDIAN)
+        .setMaritalStatus(MaritalStatusCodesEnum.A)
+        .setGender(AdministrativeGenderEnum.FEMALE)
+        .setBirthDate(new DateDt("1977-01-01"))
+        .setActive(true);
+
+    MethodOutcome outcome = client.create().resource(patient)
         .encodedJson().execute();
-    IIdType id = outcome.getId();
-    encounter1.setId(id);
-    return encounter1;
+    patient.setId(outcome.getId());
+    return patient;
+  }
+
+  private Encounter createEncounter(UnitedStatesPatient patient) {
+    Encounter encounter = new Encounter()
+        .setPatient(new ResourceReferenceDt(patient))
+        .setStatus(EncounterStateEnum.IN_PROGRESS);
+    encounter.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER)
+        .setValue("2085202");
+
+    MethodOutcome outcome = client.create().resource(encounter)
+        .encodedJson().execute();
+    encounter.setId(outcome.getId());
+    return encounter;
   }
 
   int enqueueCount = 0;

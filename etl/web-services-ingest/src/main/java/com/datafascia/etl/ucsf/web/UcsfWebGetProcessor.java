@@ -194,11 +194,17 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
   @Override
   public void onTrigger(final ProcessContext context, final ProcessSessionFactory sessionFactory)
       throws ProcessException {
+    final ProcessorLog logger = getLogger();
 
     if (config == null) {
       String yamlFilename = context.getProperty(YAMLPATH).getValue();
       try {
         config = UcsfWebGetConfig.load(yamlFilename);
+        if (config.username != null) {
+          logger.info("UcsfWebGetProcessor using username " + config.username);
+        } else {
+          logger.info("UcsfWebGetProcessor not using a username.");
+        }
       } catch (FileNotFoundException ex) {
         throw new ProcessException("Configuration could not be loaded. File " + yamlFilename
             + " could not be found.", ex);
@@ -208,7 +214,6 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
       }
     }
 
-    final ProcessorLog logger = getLogger();
     final ProcessSession session = sessionFactory.createSession();
     final SSLContextService sslContextService = context.getProperty(SSL_CONTEXT_SERVICE)
         .asControllerService(SSLContextService.class);
@@ -216,6 +221,7 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
     // create the connection manager
     final HttpClientConnectionManager conMan;
     if (sslContextService == null) {
+      logger.info("No SSL context provided. Using basic HTTP.");
       conMan = new BasicHttpClientConnectionManager();
     } else {
       final SSLContext sslContext;

@@ -7,6 +7,7 @@ import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
+import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import java.math.BigDecimal;
 import java.util.Calendar;
 import java.util.Date;
@@ -90,9 +91,8 @@ public class HarmsLookups {
    * @return true if conditions are met
    */
   public static boolean plateletCountLessThan50000(ClientBuilder client, String encounterId) {
-    String code = "PLT";
     List<Observation> pltObservations = client.getObservationClient().searchObservation(encounterId,
-        code, null);
+        ObservationCodeEnum.PLT.getCode(), null);
     Observation freshestPltObservation = ObservationUtils.findFreshestObservation(pltObservations);
     IDatatype quantity = freshestPltObservation.getValue();
     if (quantity instanceof QuantityDt) {
@@ -112,9 +112,8 @@ public class HarmsLookups {
    * @return true if conditions are met
    */
   public static boolean inrOver1point5(ClientBuilder client, String encounterId) {
-    String code = "INR";
     List<Observation> pltObservations = client.getObservationClient().searchObservation(encounterId,
-        code, null);
+        ObservationCodeEnum.INR.getCode(), null);
     Observation freshestPltObservation = ObservationUtils.findFreshestObservation(pltObservations);
     IDatatype quantity = freshestPltObservation.getValue();
     if (quantity instanceof QuantityDt) {
@@ -134,9 +133,8 @@ public class HarmsLookups {
    * @return true if conditions are met
    */
   public static boolean aPttRatioOver1point5(ClientBuilder client, String encounterId) {
-    String code = "PTT";
     List<Observation> pltObservations = client.getObservationClient().searchObservation(encounterId,
-        code, null);
+        ObservationCodeEnum.PTT.getCode(), null);
     Observation freshestPltObservation = ObservationUtils.findFreshestObservation(pltObservations);
     IDatatype quantity = freshestPltObservation.getValue();
     if (quantity instanceof QuantityDt) {

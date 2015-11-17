@@ -21,9 +21,11 @@ import com.google.common.hash.Hashing;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -147,6 +149,28 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
     kieSession.setGlobal("log", log);
   }
 
+  /**
+   * A comparator class for medication order JSON blobs.
+   */
+  public class JSONObjectDateTimeOrderedComparator implements Comparator<JSONObject> {
+    /**
+     * Compares two medication order JSON blob dates.
+     *
+     * @param o1 The first blob.
+     * @param o2 The second blob.
+     * @return The comparator result.
+     */
+    @Override
+    public int compare(JSONObject o1, JSONObject o2) {
+      String ucsfTime1 = o1.get("DateTimeOrdered").toString();
+      Instant dateTimeOrdered1 = UcsfWebGetProcessor.epicDateToInstant(ucsfTime1);
+      String ucsfTime2 = o2.get("DateTimeOrdered").toString();
+      Instant dateTimeOrdered2 = UcsfWebGetProcessor.epicDateToInstant(ucsfTime2);
+
+      return dateTimeOrdered1.compareTo(dateTimeOrdered2);
+    }
+  }
+
   @Override
   public void onTrigger(ProcessContext context, ProcessSession session) throws ProcessException {
     if (connector == null) {
@@ -198,23 +222,24 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
             if (obj instanceof JSONObject) {
               String encounterId = ((JSONObject) obj).get("CSN").toString();
               JSONArray medications = (JSONArray) ((JSONObject) obj).get("Medications");
+
+              Collections.sort(medications, new JSONObjectDateTimeOrderedComparator());
+
               for (Object obj2 : medications) {
-                if (obj2 instanceof JSONObject) {
-                  JSONObject jsonMed = (JSONObject) obj2;
-                  String scd = UcsfMedicationUtils.extractSCD(jsonMed);
-                  try {
-                    findPrescriptionDiffs(jsonMed, encounterId, scd);
-                  } catch (SQLException ex) {
-                    log.error("Error fetching RxNorm name with SCD " + scd + ": " + ex.getMessage(),
-                        ex);
-                    plog.error("Error fetching RxNorm name with SCD " + scd + ": "
-                        + ex.getMessage());
-                    throw new ProcessException(ex);
-                  } catch (MutationsRejectedException | TableNotFoundException ex) {
-                    log.error("Error finding medication diffs: " + ex.getMessage(), ex);
-                    plog.error("Error finding medication diffs: " + ex.getMessage());
-                    throw new ProcessException(ex);
-                  }
+                JSONObject jsonMed = (JSONObject) obj2;
+                String scd = UcsfMedicationUtils.extractSCD(jsonMed);
+                try {
+                  findPrescriptionDiffs(jsonMed, encounterId, scd);
+                } catch (SQLException ex) {
+                  log.error("Error fetching RxNorm name with SCD " + scd + ": " + ex.getMessage(),
+                      ex);
+                  plog.error("Error fetching RxNorm name with SCD " + scd + ": "
+                      + ex.getMessage());
+                  throw new ProcessException(ex);
+                } catch (MutationsRejectedException | TableNotFoundException ex) {
+                  log.error("Error finding medication diffs: " + ex.getMessage(), ex);
+                  plog.error("Error finding medication diffs: " + ex.getMessage());
+                  throw new ProcessException(ex);
                 }
               }
             }

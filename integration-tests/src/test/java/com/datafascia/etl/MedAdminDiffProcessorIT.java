@@ -28,6 +28,7 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
 import lombok.AllArgsConstructor;
@@ -69,14 +70,26 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
   @BeforeClass
   public void setup() throws Exception {
     MemorySQLTestDatabase.populateDb();
-    transientEncounter = createAnEncounterWithApi();
+    transientEncounters.add(createAnEncounterWithApi("5041113"));
+    transientEncounters.add(createAnEncounterWithApi("2088409"));
+    transientEncounters.add(createAnEncounterWithApi("2088410"));
+    transientEncounters.add(createAnEncounterWithApi("2088600"));
+    transientEncounters.add(createAnEncounterWithApi("2088516"));
+    transientEncounters.add(createAnEncounterWithApi("2088578"));
+    transientEncounters.add(createAnEncounterWithApi("2088581"));
+    transientEncounters.add(createAnEncounterWithApi("2088584"));
+    transientEncounters.add(createAnEncounterWithApi("2088614"));
+    transientEncounters.add(createAnEncounterWithApi("2088613"));
+    transientEncounters.add(createAnEncounterWithApi("2088612"));
   }
 
-  Encounter transientEncounter = null;
+  List<Encounter> transientEncounters = new ArrayList<>();
 
   @AfterClass
   public void close() throws Exception {
-    client.delete().resource(transientEncounter).execute();
+    for (Encounter transientEncounter : transientEncounters) {
+      client.delete().resource(transientEncounter).execute();
+    }
   }
 
   protected void scan() {
@@ -128,15 +141,11 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
     runner.assertAllFlowFilesTransferred(MedAdminDiffProcessor.SUCCESS);
 
     // Errors from the webservices come back as HTML. Make sure we trigger a failure on those.
-    /* For the time being, we're not bubbling exceptions up through nifi.
-    enqueueCount = 0;
-    try {
-      testFailure(runner, "invalid.json");
-      fail("The expected ProcessException was not throw.");
-    } catch (Throwable ex) {
-      assertEquals(ex.getCause().getMessage(), "Unexpected character (<) at position 0.");
-    }*/
-
+    /* For the time being, we're
+     * not bubbling exceptions up through nifi. enqueueCount = 0; try { testFailure(runner,
+     * "invalid.json"); fail("The expected ProcessException was not throw."); } catch (Throwable ex)
+     * { assertEquals(ex.getCause().getMessage(), "Unexpected character (<) at position 0.");
+    } */
     // Make sure all the test cases were used.
     for (String key : expectedAdmins.keySet()) {
       if (!countedAdmins.contains(key)) {
@@ -147,6 +156,11 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
     assertEquals(expectedAdminsCount, expectedAdmins.keySet().size());
     assertEquals(expectedOrdersCount, expectedOrders.keySet().size());
     assertEquals(diffsIndex, diffs.length);
+
+    runner.enqueue(addContent("GetMedAdminUnit{questionMark}ListID=15860-november2015.json"));
+    runner.run(1);
+    runner.assertQueueEmpty();
+    runner.assertAllFlowFilesTransferred(MedAdminDiffProcessor.SUCCESS);
   }
 
   private void testFailure(TestRunner runner, String file) throws Exception {
@@ -682,10 +696,10 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
     }
   };
 
-  private Encounter createAnEncounterWithApi() {
+  private Encounter createAnEncounterWithApi(String encounterId) {
     Encounter encounter1 = new Encounter();
     encounter1.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("5041113");
+        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue(encounterId);
     encounter1.setStatus(EncounterStateEnum.IN_PROGRESS);
     MethodOutcome outcome = client.create().resource(encounter1)
         .encodedJson().execute();

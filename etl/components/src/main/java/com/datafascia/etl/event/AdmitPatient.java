@@ -11,11 +11,14 @@ import com.datafascia.domain.persist.LocationRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.etl.harm.HarmEvidenceUpdater;
 import com.datafascia.etl.hl7.EncounterStatusTransition;
+import com.google.common.base.Strings;
 import javax.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Admits patient.
  */
+@Slf4j
 public class AdmitPatient {
 
   @Inject
@@ -53,7 +56,12 @@ public class AdmitPatient {
 
     patientRepository.save(patient);
 
-    locationRepository.save(location);
+    if (Strings.isNullOrEmpty(location.getIdentifierFirstRep().getValue())) {
+      log.error("Discarded location with missing identifier for encounter ID {}, hl7:{}",
+          encounter.getIdentifierFirstRep().getValue(), triggerEvent);
+    } else {
+      locationRepository.save(location);
+    }
 
     encounter
         .setPatient(new ResourceReferenceDt(patient))

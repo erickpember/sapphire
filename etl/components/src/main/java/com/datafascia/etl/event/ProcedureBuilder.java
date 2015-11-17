@@ -15,6 +15,7 @@ import ca.uhn.fhir.model.primitive.StringDt;
 import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.domain.fhir.Dates;
 import com.datafascia.emerge.ucsf.codes.ProcedureCategoryEnum;
+import com.google.common.base.Strings;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.StringJoiner;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Creates procedure from observations.
@@ -49,6 +51,7 @@ import java.util.StringJoiner;
  *   <dd>indicates line is active
  * </dl>
  */
+@Slf4j
 public class ProcedureBuilder {
 
   private static final String LINE_TYPE0 = "304890080";
@@ -455,6 +458,14 @@ public class ProcedureBuilder {
    * @return optional procedure, empty if procedure cannot be created.
    */
   public Optional<Procedure> build() {
-    return toLineProcedure();
+    Optional<Procedure> procedure = toLineProcedure();
+    if (procedure.isPresent() &&
+        Strings.isNullOrEmpty(procedure.get().getIdentifierFirstRep().getValue())) {
+      log.error("Discarded procedure with missing identifier for encounter ID {}",
+          encounter.getIdentifierFirstRep().getValue());
+      return Optional.empty();
+    } else {
+      return procedure;
+    }
   }
 }

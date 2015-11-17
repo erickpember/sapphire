@@ -13,6 +13,7 @@ import ca.uhn.fhir.model.primitive.InstantDt;
 import ca.uhn.fhir.model.primitive.StringDt;
 import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.domain.fhir.Dates;
+import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.emerge.ucsf.codes.ProcedureCategoryEnum;
 import java.time.Clock;
 import java.time.Instant;
@@ -41,6 +42,10 @@ public class ProcedureBuilderTest {
     Observation observation = new Observation()
         .setCode(code)
         .setValue(new StringDt(observationValue));
+
+    observation.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_OBSERVATION_SUB_IDENTIFIER)
+        .setValue(observationText);
 
     procedureBuilder.add(observation);
   }

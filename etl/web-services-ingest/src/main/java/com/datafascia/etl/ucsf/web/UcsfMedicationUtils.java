@@ -27,7 +27,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -48,8 +47,6 @@ import org.kie.internal.io.ResourceFactory;
  */
 @Slf4j
 public class UcsfMedicationUtils {
-  @Inject
-  private static ClientBuilder clientBuilder;
 
   enum NotGivenReason {
     DUE,

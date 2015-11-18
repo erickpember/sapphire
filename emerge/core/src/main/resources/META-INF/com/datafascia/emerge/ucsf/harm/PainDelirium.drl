@@ -23,9 +23,27 @@ then
   painAndDeliriumUpdater.updateNumericalPainLevel(harmEvidence, $encounter);
 end
 
+rule "Update Numerical Pain Level from observation"
+when
+  Event( type == EventType.UPDATE_OBSERVATIONS )
+  $observation: Observation( NumericalPainLevel.isRelevant($observation) )
+  $encounter: Encounter()
+then
+  painAndDeliriumUpdater.updateNumericalPainLevel(harmEvidence, $encounter);
+end
+
 rule "Update Verbal Pain Level"
 when
   Event( type == EventType.ADMIT_PATIENT || type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  painAndDeliriumUpdater.updateVerbalPainLevel(harmEvidence, $encounter);
+end
+
+rule "Update Verbal Pain Level from observation"
+when
+  Event( type == EventType.UPDATE_OBSERVATIONS )
+  $observation: Observation( VerbalPainLevel.isRelevant($observation) )
   $encounter: Encounter()
 then
   painAndDeliriumUpdater.updateVerbalPainLevel(harmEvidence, $encounter);
@@ -39,6 +57,15 @@ then
   painAndDeliriumUpdater.updateCpotLevel(harmEvidence, $encounter);
 end
 
+rule "Update CPOT Level from observation"
+when
+  Event( type == EventType.UPDATE_OBSERVATIONS )
+  $observation: Observation( CpotImpl.isRelevant($observation) )
+  $encounter: Encounter()
+then
+  painAndDeliriumUpdater.updateCpotLevel(harmEvidence, $encounter);
+end
+
 rule "Update RASS"
 when
   Event( type == EventType.ADMIT_PATIENT || type == EventType.TIMER )
@@ -47,9 +74,27 @@ then
   painAndDeliriumUpdater.updateRass(harmEvidence, $encounter);
 end
 
+rule "Update RASS Score from observation"
+when
+  Event( type == EventType.UPDATE_OBSERVATIONS )
+  $observation: Observation( RassLevel.isRelevant($observation) )
+  $encounter: Encounter()
+then
+  painAndDeliriumUpdater.updateRass(harmEvidence, $encounter);
+end
+
 rule "Update Cam"
 when
   Event( type == EventType.ADMIT_PATIENT || type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  painAndDeliriumUpdater.updateCam(harmEvidence, $encounter);
+end
+
+rule "Update Cam from observation"
+when
+  Event( type == EventType.UPDATE_OBSERVATIONS )
+  $observation: Observation( CamImpl.isRelevant($observation) )
   $encounter: Encounter()
 then
   painAndDeliriumUpdater.updateCam(harmEvidence, $encounter);

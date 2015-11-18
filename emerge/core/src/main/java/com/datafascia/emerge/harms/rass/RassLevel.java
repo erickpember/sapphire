@@ -51,6 +51,17 @@ public class RassLevel {
   }
 
   /**
+   * Checks if observation is relevant to RASS.
+   *
+   * @param observation
+   *     the observation to check
+   * @return true if observation is relevant to RASS.
+   */
+  public static boolean isRelevant(Observation observation) {
+    return ObservationCodeEnum.RASS.isCodeEquals(observation.getCode());
+  }
+
+  /**
    * Implements the pain and delirium RASS level (current)
    * Returns the RASS level and acquisition time from the newest RASS-coded observation.
    *

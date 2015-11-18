@@ -51,6 +51,17 @@ public class CpotImpl {
   }
 
   /**
+   * Checks if observation is relevant to CPOT.
+   *
+   * @param observation
+   *     the observation to check
+   * @return true if observation is relevant to CPOT.
+   */
+  public static boolean isRelevant(Observation observation) {
+    return ObservationCodeEnum.CPOT.isCodeEquals(observation.getCode());
+  }
+
+  /**
    * Implements the pain and delirium CPOT level (current)
    * Returns the CPOT level and acquisition time from the newest observation with the highest score.
    *

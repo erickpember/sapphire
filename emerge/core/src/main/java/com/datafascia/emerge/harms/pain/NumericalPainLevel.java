@@ -7,6 +7,7 @@ import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
+import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import java.time.Clock;
 import java.time.ZonedDateTime;
 import java.util.Date;
@@ -36,6 +37,20 @@ public class NumericalPainLevel {
   public static class CurrentPainLevel {
     private int painScore;
     private Date timeOfDataAquisition;
+  }
+
+  /**
+   * Checks if observation is relevant to Numerical Pain.
+   *
+   * @param observation
+   *     the observation to check
+   * @return true if observation is relevant to Numerical Pain.
+   */
+  public static boolean isRelevant(Observation observation) {
+    return (ObservationCodeEnum.NUMERICAL_PAIN_01.isCodeEquals(observation.getCode()) ||
+            ObservationCodeEnum.NUMERICAL_PAIN_02.isCodeEquals(observation.getCode()) ||
+            ObservationCodeEnum.NUMERICAL_PAIN_03.isCodeEquals(observation.getCode()) ||
+            ObservationCodeEnum.NUMERICAL_PAIN_04.isCodeEquals(observation.getCode()));
   }
 
   /**

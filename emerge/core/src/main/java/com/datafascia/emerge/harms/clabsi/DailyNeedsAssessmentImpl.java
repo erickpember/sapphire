@@ -15,6 +15,7 @@ import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import javax.inject.Inject;
 
 /**
@@ -52,14 +53,6 @@ public class DailyNeedsAssessmentImpl {
       return "N/A";
     }
 
-    List<Observation> observations = apiClient.getObservationClient().searchObservation(
-        encounterId, ObservationCodeEnum.NEEDS_ASSESSMENT.getCode(), null);
-    Observation freshestCVCNeedAssessment = ObservationUtils.findFreshestObservation(observations);
-
-    if (freshestCVCNeedAssessment == null || freshestCVCNeedAssessment.getValue() == null) {
-      return "No";
-    }
-
     ZonedDateTime now = ZonedDateTime.now(clock);
     Instant sevenAmTodayInstant = ZonedDateTime.of(
         now.getYear(),
@@ -74,20 +67,33 @@ public class DailyNeedsAssessmentImpl {
     Date sevenAmToday = Date.from(sevenAmTodayInstant);
     Date sevenAmYesterday = Date.from(sevenAmTodayInstant.minus(24, ChronoUnit.HOURS));
 
+    Optional<Observation> freshestCVCNeedAssessment = ObservationUtils
+        .getFreshestByCodeAfterTime(
+            apiClient,
+            encounterId,
+            ObservationCodeEnum.NEEDS_ASSESSMENT.getCode(),
+            sevenAmYesterday);
+
+    if (!freshestCVCNeedAssessment.isPresent() ||
+        freshestCVCNeedAssessment.get().getValue() == null) {
+      return "No";
+    }
+
     int hourOftheDay = now.getHour();
     if (hourOftheDay >= 7) {
-      if (freshestCVCNeedAssessment.getValue().toString().equals("Completed")) {
-        return "Yes";
-      }
-      if (ObservationUtils.getEffectiveDate(freshestCVCNeedAssessment).before(sevenAmToday)) {
+      if (ObservationUtils.getEffectiveDate(freshestCVCNeedAssessment.get()).before(sevenAmToday)) {
         return "No";
+      } else if (freshestCVCNeedAssessment.get().getValue().toString().equals("Completed")) {
+        return "Yes";
       }
     } else {
-      if (freshestCVCNeedAssessment.getValue().toString().equals("Completed")
-          && ObservationUtils.getEffectiveDate(freshestCVCNeedAssessment).after(sevenAmYesterday)) {
+      if (freshestCVCNeedAssessment.get().getValue().toString().equals("Completed")
+          && ObservationUtils.getEffectiveDate(freshestCVCNeedAssessment.get()).after(
+              sevenAmYesterday)) {
         return "Yes";
       }
-      if (ObservationUtils.getEffectiveDate(freshestCVCNeedAssessment).before(sevenAmYesterday)) {
+      if (ObservationUtils.getEffectiveDate(freshestCVCNeedAssessment.get())
+          .before(sevenAmYesterday)) {
         return "No";
       }
     }

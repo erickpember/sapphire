@@ -428,7 +428,7 @@ public class UcsfMedicationUtils {
         for (String ingredientId : droolNorm.getRxcuiIn()) {
           Substance substance = null;
           try {
-            clientBuilder.getSubstanceClient().getSubstance(ingredientId);
+            substance = clientBuilder.getSubstanceClient().getSubstance(ingredientId);
           } catch (ResourceNotFoundException e) {
             substance = new Substance();
             substance.addIdentifier().setSystem(CodingSystems.MEDICATION_INGREDIENT)

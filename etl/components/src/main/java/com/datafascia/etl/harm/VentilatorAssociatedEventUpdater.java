@@ -125,6 +125,11 @@ public class VentilatorAssociatedEventUpdater {
         .withUpdateTime(Date.from(Instant.now(clock)));
     ventilation.setVentilated(newVentiliated);
 
+    Mode newMode = new Mode()
+        .withValue(Mode.Value.INDETERMINATE)
+        .withUpdateTime(Date.from(Instant.now(clock)));
+    ventilation.setMode(newMode);
+
     TimestampedMaybe newDiscreteHOBGreaterThan30Deg = new TimestampedMaybe()
         .withValue(TimestampedMaybe.Value.NO)
         .withUpdateTime(Date.from(Instant.now(clock)));
@@ -201,15 +206,13 @@ public class VentilatorAssociatedEventUpdater {
    */
   public void updateVentilationMode(HarmEvidence harmEvidence, Encounter encounter) {
     String encounterId = encounter.getId().getIdPart();
+    String value = ventilationModeImpl.getVentilationMode(encounterId);
 
-    ventilationModeImpl.getVentilationMode(encounterId)
-        .ifPresent(value -> {
-          Mode mode = new Mode()
-              .withValue(Mode.Value.fromValue(value))
-              .withUpdateTime(Date.from(Instant.now(clock)));
+    Mode mode = new Mode()
+        .withValue(Mode.Value.fromValue(value))
+        .withUpdateTime(Date.from(Instant.now(clock)));
 
-          getVentilation(harmEvidence).setMode(mode);
-        });
+    getVentilation(harmEvidence).setMode(mode);
   }
 
   /**

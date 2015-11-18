@@ -931,7 +931,8 @@
                          "Pressure Regulated Volume Control (PRVC)",
                          "Airway Pressure Release Ventilation (APRV)",
                          "High Frequency Oscillation (HFO)",
-                         "Other"
+                         "Other",
+                         "Indeterminate"
                        ],
                       "description": "An explanation about the purpose of this instance described by this schema."
                     }

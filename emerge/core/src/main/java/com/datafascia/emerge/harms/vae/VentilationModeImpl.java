@@ -44,9 +44,9 @@ public class VentilationModeImpl {
    *
    * @param encounterId
    *     encounter to search
-   * @return optional ventilation mode, empty if not found
+   * @return ventilation mode
    */
-  public Optional<String> getVentilationMode(String encounterId) {
+  public String getVentilationMode(String encounterId) {
     Observation freshestVentMode = ObservationUtils.findFreshestObservationForCode(
         apiClient, encounterId, ObservationCodeEnum.VENT_MODE.getCode());
 
@@ -56,24 +56,22 @@ public class VentilationModeImpl {
     Observation freshestNonInvasiveDeviceMode = ObservationUtils.findFreshestObservationForCode(
         apiClient, encounterId, ObservationCodeEnum.NON_INVASIVE_DEVICE_MODE.getCode());
 
-    Optional<String> result;
-
     // For when either breath type or vent mode are fresher than non-invasive device mode
     if (freshestBreathType != null && freshestVentMode != null && (ObservationUtils.firstIsFresher(
         freshestVentMode, freshestNonInvasiveDeviceMode) || ObservationUtils.firstIsFresher(
             freshestBreathType, freshestNonInvasiveDeviceMode))) {
-      result = eitherBreathOrVentIsFreshest(freshestBreathType, freshestVentMode);
+      Optional<String> result = eitherBreathOrVentIsFreshest(freshestBreathType, freshestVentMode);
       if (result.isPresent()) {
-        return result;
+        return result.get();
       }
     }
 
     // For when breath type is fresher than non-invasive device mode
     if (freshestBreathType != null && ObservationUtils.firstIsFresher(freshestBreathType,
         freshestNonInvasiveDeviceMode)) {
-      result = breathIsFresherThanNonInvasive(freshestBreathType);
+      Optional<String> result = breathIsFresherThanNonInvasive(freshestBreathType);
       if (result.isPresent()) {
-        return result;
+        return result.get();
       }
     }
 
@@ -81,13 +79,14 @@ public class VentilationModeImpl {
     if (freshestBreathType != null && freshestVentMode != null && (ObservationUtils.firstIsFresher(
         freshestVentMode, freshestNonInvasiveDeviceMode) && ObservationUtils.firstIsFresher(
             freshestBreathType, freshestNonInvasiveDeviceMode))) {
-      result = nonInvasiveIsFresherThanVentOrBreath(freshestNonInvasiveDeviceMode);
+      Optional<String> result = nonInvasiveIsFresherThanVentOrBreath(
+          freshestNonInvasiveDeviceMode);
       if (result.isPresent()) {
-        return result;
+        return result.get();
       }
     }
 
-    return Optional.empty();
+    return "Indeterminate";
   }
 
   /**

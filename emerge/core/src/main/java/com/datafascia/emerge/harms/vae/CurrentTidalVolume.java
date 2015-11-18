@@ -45,38 +45,36 @@ public class CurrentTidalVolume {
     Instant now = Instant.now(clock);
     Date thirteenHoursAgo = Date.from(now.minus(13, ChronoUnit.HOURS));
 
-    Optional<String> ventilationMode = ventilationModeImpl.getVentilationMode(encounterId);
+    String ventilationMode = ventilationModeImpl.getVentilationMode(encounterId);
 
-    if (ventilationMode.isPresent()) {
-      Optional<Observation> freshestVentSetTidalVolume = ObservationUtils
-          .getFreshestByCodeAfterTime(apiClient, encounterId,
-              ObservationCodeEnum.TIDAL_VOLUME.getCode(), thirteenHoursAgo);
+    Optional<Observation> freshestVentSetTidalVolume = ObservationUtils
+        .getFreshestByCodeAfterTime(apiClient, encounterId,
+            ObservationCodeEnum.TIDAL_VOLUME.getCode(), thirteenHoursAgo);
 
-      Observation freshestBreathType = ObservationUtils.findFreshestObservationForCode(
-          apiClient, encounterId, ObservationCodeEnum.BREATH_TYPE.getCode());
+    Observation freshestBreathType = ObservationUtils.findFreshestObservationForCode(
+        apiClient, encounterId, ObservationCodeEnum.BREATH_TYPE.getCode());
 
-      switch (ventilationMode.get()) {
-        case "Volume Control (AC)":
-        case "Volume Support (VS)":
-        case "Pressure Regulated Volume Control (PRVC)":
-          if (!freshestVentSetTidalVolume.isPresent()) {
+    switch (ventilationMode) {
+      case "Volume Control (AC)":
+      case "Volume Support (VS)":
+      case "Pressure Regulated Volume Control (PRVC)":
+        if (!freshestVentSetTidalVolume.isPresent()) {
+          return -1;
+        } else {
+          return getAbsValue(freshestVentSetTidalVolume.get());
+        }
+      case "Synchronous Intermittent Mandatory Ventilation (SIMV)":
+        if (freshestBreathType != null && freshestBreathType.getValue().toString().equals(
+            "Volume Control")) {
+          if (freshestVentSetTidalVolume == null) {
             return -1;
           } else {
             return getAbsValue(freshestVentSetTidalVolume.get());
           }
-        case "Synchronous Intermittent Mandatory Ventilation (SIMV)":
-          if (freshestBreathType != null && freshestBreathType.getValue().toString().equals(
-              "Volume Control")) {
-            if (freshestVentSetTidalVolume == null) {
-              return -1;
-            } else {
-              return getAbsValue(freshestVentSetTidalVolume.get());
-            }
-          }
-          break;
-        default:
-          log.warn("Unknown vent mode value [{}]", ventilationMode.get());
-      }
+        }
+        break;
+      default:
+        log.warn("Ventilation mode value [{}] does not set tidal volume", ventilationMode);
     }
 
     return 0;

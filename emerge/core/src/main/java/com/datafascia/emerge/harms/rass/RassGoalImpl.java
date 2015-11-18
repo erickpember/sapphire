@@ -24,6 +24,17 @@ public class RassGoalImpl {
   private Clock clock;
 
   /**
+   * Checks if observation is relevant to Target RASS.
+   *
+   * @param request
+   *     the procedureRequest to check
+   * @return true if procedureRequest is relevant to Target RASS.
+   */
+  public static boolean isRelevant(ProcedureRequest request) {
+    return ProcedureRequestCodeEnum.TARGET_RASS.isCodeEquals(request.getCode());
+  }
+
+  /**
    * Pain and delirium Clinician RASS goal implementation
    *
    * @param encounterId

@@ -4,10 +4,12 @@ package com.datafascia.emerge.ucsf.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
+import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import com.datafascia.emerge.harms.pain.CamImpl;
 import com.datafascia.emerge.harms.pain.CpotImpl;
 import com.datafascia.emerge.harms.pain.NumericalPainLevel;
 import com.datafascia.emerge.harms.pain.VerbalPainLevel;
+import com.datafascia.emerge.harms.rass.RassGoalImpl;
 import com.datafascia.emerge.harms.rass.RassLevel;
 import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater.Event;
 import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater.EventType;
@@ -78,6 +80,15 @@ rule "Update RASS Score from observation"
 when
   Event( type == EventType.UPDATE_OBSERVATIONS )
   $observation: Observation( RassLevel.isRelevant($observation) )
+  $encounter: Encounter()
+then
+  painAndDeliriumUpdater.updateRass(harmEvidence, $encounter);
+end
+
+rule "Update RASS Goal from procedure request"
+when
+  Event( type == EventType.UPDATE_PROCEDURE_REQUEST )
+  $request: ProcedureRequest( RassGoalImpl.isRelevant($request) )
   $encounter: Encounter()
 then
   painAndDeliriumUpdater.updateRass(harmEvidence, $encounter);

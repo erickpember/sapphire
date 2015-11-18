@@ -8,6 +8,7 @@ import com.datafascia.emerge.ucsf.CurrentScore___;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.Numerical;
 import com.datafascia.emerge.ucsf.RASS;
+import com.datafascia.emerge.ucsf.RassGoal;
 import com.datafascia.emerge.ucsf.harm.HarmEvidenceTestSupport;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -59,6 +60,18 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
     assertEquals(currentScore.getRASSScore(), 3);
     assertEquals(
         currentScore.getTimeOfDataAquisition().toInstant().toString(), "2014-09-29T21:48:59Z");
+  }
+
+  @Test
+  public void should_export_rass_goal_2() throws Exception {
+    processNursingOrder("rass-goal-2.json");
+
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
+    RASS rass = harmEvidence.getMedicalData().getDelirium().getRASS();
+
+    RassGoal rassGoal = rass.getRassGoal();
+    assertEquals(rassGoal.getGoal(), -2);
+    assertEquals(rassGoal.getDataEntryTime().toInstant().toString(), "2015-10-30T02:49:50Z");
   }
 
   @Test

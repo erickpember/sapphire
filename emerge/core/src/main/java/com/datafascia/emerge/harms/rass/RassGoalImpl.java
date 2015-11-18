@@ -11,11 +11,23 @@ import java.time.Instant;
 import java.util.Date;
 import java.util.Optional;
 import javax.inject.Inject;
+import lombok.Builder;
+import lombok.Data;
 
 /**
- * Pain and delirium Clinician RASS goal implementation
+ * Pain and delirium clinician RASS goal implementation
  */
 public class RassGoalImpl {
+
+  /**
+   * Result container for the pain and delirium RASS goal
+   */
+  @Data
+  @Builder
+  public static class RassGoalResult {
+    private int goal;
+    private Date dataEntryTime;
+  }
 
   @Inject
   private ClientBuilder apiClient;
@@ -35,54 +47,59 @@ public class RassGoalImpl {
   }
 
   /**
-   * Pain and delirium Clinician RASS goal implementation
+   * Pain and delirium clinician RASS goal implementation
    *
    * @param encounterId
    *     encounter to search
-   * @return
-   *     Most recent RASS goal, or 11 if absent.
+   * @return freshest RASS goal
    **/
-  public int getRassGoal(String encounterId) {
+  public RassGoalResult getRassGoal(String encounterId) {
+    RassGoalResult result = RassGoalResult.builder()
+        .goal(11)
+        .build();
+
     ProcedureRequest targetRass = getTargetRass(encounterId);
 
     if (ProcedureRequestUtils.isCurrent(targetRass, Date.from(Instant.now(clock)))) {
       if (targetRass.getNotesFirstRep().getText().equals(
           ProcedureRequestCodeEnum.TARGET_RASS_0_ALERT_AND_CALM
           .getCode())) {
-        return 0;
+        result.setGoal(0);
       }
       if (targetRass.getNotesFirstRep().getText().equals(
           ProcedureRequestCodeEnum.TARGET_RASS_NEG1_DROWSY.getCode())) {
-        return -1;
+        result.setGoal(-1);
       }
       if (targetRass.getNotesFirstRep().getText().equals(
           ProcedureRequestCodeEnum.TARGET_RASS_NEG2_LIGHT_SEDATION.getCode())) {
-        return -2;
+        result.setGoal(-2);
       }
       if (targetRass.getNotesFirstRep().getText().equals(
           ProcedureRequestCodeEnum.TARGET_RASS_NEG2_MODERATE_SEDATION.getCode())) {
-        return -3;
+        result.setGoal(-3);
       }
       if (targetRass.getNotesFirstRep().getText().equals(
           ProcedureRequestCodeEnum.TARGET_RASS_NEG4_DEEP_SEDATION.getCode())) {
-        return -4;
+        result.setGoal(-4);
       }
       if (targetRass.getNotesFirstRep().getText().equals(
           ProcedureRequestCodeEnum.TARGET_RASS_NEG5_UNAROUSABLE
           .getCode())) {
-        return -5;
+        result.setGoal(-5);
       }
       if (targetRass.getNotesFirstRep().getText()
           .equals(ProcedureRequestCodeEnum.TARGET_RASS_NA_NMBA.getCode())) {
-        return 12;
+        result.setGoal(12);
       }
       if (targetRass.getNotesFirstRep().getText().equals(
           ProcedureRequestCodeEnum.TARGET_RASS_NA_SEIZURES_STATUS_EPILEPTICUS.getCode())) {
-        return 13;
+        result.setGoal(13);
       }
+
+      result.setDataEntryTime(targetRass.getOrderedOn());
     }
 
-    return 11;
+    return result;
   }
 
   /**

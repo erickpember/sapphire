@@ -71,6 +71,7 @@ public class NursingOrdersTransformer {
     String orderId = order.get("OrderID").toString();
     String procID = order.get("ProcID").toString();
     String orderDesc = order.get("OrderDesc").toString();
+    String orderedDate = order.get("OrderedDate").toString();
     String startDate = order.get("StartDate").toString();
     String discontinuedDate = order.get("DiscontinuedDate").toString();
 
@@ -91,6 +92,9 @@ public class NursingOrdersTransformer {
     } else if (status.equalsIgnoreCase("5^COMPLETED")) {
       procedureRequest.setStatus(ProcedureRequestStatusEnum.COMPLETED);
     }
+
+    Instant orderedInstant = UcsfWebGetProcessor.epicDateToInstant(orderedDate);
+    procedureRequest.setOrderedOn(new DateTimeDt(Date.from(orderedInstant)));
 
     PeriodDt period = new PeriodDt();
     /* Null or otherwise 0 dates (they manifest differently from system to system) may throw

@@ -140,12 +140,10 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
   public void init(final ProcessorInitializationContext context) {
     List<PropertyDescriptor> initProperties = new ArrayList<>();
     this.properties = Collections.unmodifiableList(initProperties);
-
     Set<Relationship> initRelationships = new HashSet<>();
     initRelationships.add(SUCCESS);
     initRelationships.add(FAILURE);
     this.relationships = Collections.unmodifiableSet(initRelationships);
-
     kieSession = UcsfMedicationUtils
         .createKieSession("com/datafascia/etl/ucsf/web/rules/rxnorm.drl");
     kieSession.setGlobal("log", log);
@@ -296,14 +294,14 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
         setRxcuiIn(rxNormIngredients);
       }
     };
+
+    if (routeParts.length > 0) {
+      droolNorm.setRoute(routeParts[0]);
+    }
+    droolNorm.setFrequency(frequencyParts[0]);
+
     kieSession.insert(droolNorm);
     kieSession.fireAllRules();
-
-    if (routeParts.length > 1) {
-      droolNorm.setRoute(routeParts[1]);
-    }
-
-    droolNorm.setFrequency(frequencyParts[0]);
 
     // If we don't have an SCD, then we can't populate a medication.
     Medication medication = null;
@@ -329,7 +327,6 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
     }
 
     String medDataNew = orderJson.toJSONString();
-
     String medDataOld = JsonPersistUtils.fetchJson(ElementType.ORDER, prescriptionId, connector,
         tableName, authorizations);
     JsonPersistUtils.persistJson(ElementType.ORDER, prescriptionId, medDataNew, connector,
@@ -423,7 +420,6 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
      */
     String adminAction = admin.get("AdminAction").toString();
     String adminId = admin.get("AdminID").toString();
-
     String[] adminActionParts = adminAction.split("\\^");
 
     if (adminActionParts.length == 0) {
@@ -438,7 +434,6 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
     }
 
     String adminDataNew = admin.toJSONString();
-
     String adminDataOld = JsonPersistUtils.fetchJson(ElementType.ADMIN, prescriptionId + "-"
         + adminId, connector, tableName, authorizations);
     JsonPersistUtils.persistJson(ElementType.ADMIN, prescriptionId + "-" + adminId, adminDataNew,

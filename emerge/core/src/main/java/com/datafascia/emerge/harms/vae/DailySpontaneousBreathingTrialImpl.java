@@ -9,6 +9,7 @@ import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
 import com.datafascia.emerge.ucsf.ObservationUtils;
+import com.datafascia.emerge.ucsf.codes.MedsSetEnum;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import com.datafascia.emerge.ucsf.codes.ventilation.DailySpontaneousBreathingTrialContraindicatedEnum;
 import com.datafascia.emerge.ucsf.codes.ventilation.DailySpontaneousBreathingTrialValueEnum;
@@ -31,13 +32,13 @@ public class DailySpontaneousBreathingTrialImpl {
   private static final BigDecimal EIGHT = new BigDecimal("8");
   private static final BigDecimal FIFTY = new BigDecimal("50");
   private static final List<String> HAVE_THESE_BEEN_ADMINISTERED = Arrays.asList(
-      "Intermittent Cisatracurium IV",
-      "Intermittent Vecuronium IV",
-      "Intermittent Rocuronium IV",
-      "Intermittent Pancuronium IV");
+      MedsSetEnum.INTERMITTENT_CISATRACURIUM_IV.getCode(),
+      MedsSetEnum.INTERMITTENT_VECURONIUM_IV.getCode(),
+      MedsSetEnum.INTERMITTENT_ROCURONIUM_IV.getCode(),
+      MedsSetEnum.INTERMITTENT_PANCURONIUM_IV.getCode());
   private static final List<String> ARE_THESE_IN_PROGRESS = Arrays.asList(
-      "Continuous Infusion Lorazepam IV",
-      "Continuous Infusion Midazolam IV");
+      MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode(),
+      MedsSetEnum.CONTINUOUS_INFUSION_MIDAZOLAM_IV.getCode());
 
   @Inject
   private Clock clock;

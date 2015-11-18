@@ -10,16 +10,20 @@ import java.util.Optional;
  * Enumerates the drug names + routes, as formatted for Emerge, AKA MedsSet.
  */
 public enum MedsSetEnum implements Code<String> {
-  INTERMITTENT_LORAZEPAM_IV("Intermittent Lorazepam IV"),
-  INTERMITTENT_LORAZEPAM_ENTERAL("Intermittent Lorazepam Enteral"),
   CONTINUOUS_INFUSION_LORAZEPAM_IV("Continuous Infusion Lorazepam IV"),
-  INTERMITTENT_MIDAZOLAM_IV("Intermittent Midazolam IV"),
   CONTINUOUS_INFUSION_MIDAZOLAM_IV("Continuous Infusion Midazolam IV"),
-  INTERMITTENT_CLONAZEPAM_ENTERAL("Intermittent Clonazepam Enteral"),
-  INTERMITTENT_DIAZEPAM_IV("Intermittent Diazepam IV"),
-  INTERMITTENT_DIAZEPAM_ENTERAL("Intermittent Diazepam Enteral"),
+  INTERMITTENT_ALPRAZALOM_ENTERAL("Intermittent Alprazalom Enteral"),
   INTERMITTENT_CHLORADIAZEPOXIDE_ENTERAL("Intermittent Chloradiazepoxide Enteral"),
-  INTERMITTENT_ALPRAZALOM_ENTERAL("Intermittent Alprazalom Enteral");
+  INTERMITTENT_CISATRACURIUM_IV("Intermittent Cisatracurium IV"),
+  INTERMITTENT_CLONAZEPAM_ENTERAL("Intermittent Clonazepam Enteral"),
+  INTERMITTENT_DIAZEPAM_ENTERAL("Intermittent Diazepam Enteral"),
+  INTERMITTENT_DIAZEPAM_IV("Intermittent Diazepam IV"),
+  INTERMITTENT_LORAZEPAM_ENTERAL("Intermittent Lorazepam Enteral"),
+  INTERMITTENT_LORAZEPAM_IV("Intermittent Lorazepam IV"),
+  INTERMITTENT_MIDAZOLAM_IV("Intermittent Midazolam IV"),
+  INTERMITTENT_PANCURONIUM_IV("Intermittent Pancuronium IV"),
+  INTERMITTENT_ROCURONIUM_IV("Intermittent Rocuronium IV"),
+  INTERMITTENT_VECURONIUM_IV("Intermittent Vecuronium IV");
 
   private final String code;
 

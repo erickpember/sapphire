@@ -54,11 +54,11 @@ public class VerbalPainLevel {
   }
 
   /**
-   * Checks if observation is relevant to Numerical Pain.
+   * Checks if observation is relevant to Verbal Pain.
    *
    * @param observation
    *     the observation to check
-   * @return true if observation is relevant to Numerical Pain.
+   * @return true if observation is relevant to Verbal Pain.
    */
   public static boolean isRelevant(Observation observation) {
     return (ObservationCodeEnum.VERBAL_PAIN_01.isCodeEquals(observation.getCode()) ||

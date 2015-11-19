@@ -27,13 +27,23 @@ public class PainUtils {
   }
 
   /**
+   * Represents what type of pain-related observation is being handled.
+   */
+  public enum PainType {
+    VERBAL,
+    NUMERICAL,
+    ACCEPTABLE_LEVEL,
+    CPOT
+  }
+
+  /**
    * Finds freshest pain type.
    *
    * @param observations
    *     observations to search
    * @return freshest pain type, or {@code null} if no pain observations found
    */
-  public static String findFreshestPainType(List<Observation> observations) {
+  public static PainType findFreshestPainType(List<Observation> observations) {
     observations.sort(new ObservationEffectiveComparator().reversed());
 
     for (Observation observation : observations) {
@@ -43,22 +53,22 @@ public class PainUtils {
         case "304890009":
         case "304890010":
         case "304890011":
-          return "Numerical Level of Pain Assessments";
+          return PainType.NUMERICAL;
 
         case "304894105":
         case "304890004":
         case "304890005":
         case "304890006":
-          return "Acceptable Level of Pain Assessments";
+          return PainType.ACCEPTABLE_LEVEL;
 
         case "304890012":
         case "304890013":
         case "304890014":
         case "304890015":
-          return "Verbal Descriptor Level of Pain Assessments";
+          return PainType.VERBAL;
 
         case "304890016":
-          return "Critical-Care Pain Observation Tool (CPOT) Total";
+          return PainType.CPOT;
       }
     }
 
@@ -72,22 +82,25 @@ public class PainUtils {
    *     observations to search
    * @param code
    *     code to search for
-   * @return Freshest observation found with the code and an integer parseable value.
-   *    {@code null} if not found.
+   * @param verbalOrNumerical
+   *     what type of pain score we're parsing
+   * @return Pain score from the freshest applicable observation, 11 if not found.
    */
-  public static Observation acceptableLevelOfPainAssessment(List<Observation> observations,
-      String code) {
+  public static int acceptableLevelOfPainAssessment(List<Observation> observations,
+      String code, PainType verbalOrNumerical) {
     observations.sort(new ObservationEffectiveComparator().reversed());
 
     for (Observation observation : observations) {
       if (observation.getCode().getCodingFirstRep().getCode().equals(code)) {
-        if (!Strings.isNullOrEmpty(ObservationUtils.getValueAsString(observation))
-            || getPainScoreFromValue(observation) != null) {
-          return observation;
+
+        Integer score = (verbalOrNumerical == PainType.NUMERICAL) ? getPainScoreFromValue(
+            observation) : getVerbalPainScoreFromValue(observation);
+        if (score != null) {
+          return score;
         }
       }
     }
-    return null;
+    return 11;
   }
 
   /**
@@ -267,30 +280,6 @@ public class PainUtils {
   }
 
   /**
-   * Given a list of observations, returns the freshest of a list of observations
-   * that contains one of four codes indicating a verbal pain score.
-   *
-   * @param observations
-   *     observations to search
-   * @return Freshest observation found with the code.  {@code null} if not found.
-   */
-  public static Observation freshestVerbalPainScore(List<Observation> observations) {
-    observations.sort(new ObservationEffectiveComparator().reversed());
-
-    for (Observation observation : observations) {
-      switch (observation.getCode().getCodingFirstRep().getCode()) {
-        case "304890012":
-        case "304890013":
-        case "304890014":
-        case "304890015":
-          return observation;
-      }
-    }
-
-    return null;
-  }
-
-  /**
    * Attempts to pull the value of an Observation and parse it to a pain score integer that is
    * between 0 and 11. If no such integer can be parsed, null is returned.
    *
@@ -344,7 +333,11 @@ public class PainUtils {
    */
   public static List<Observation> getAcceptableLevelOfPainAssessments(ClientBuilder apiClient,
       String encounterId, PeriodDt currentOrPriorShift) {
-    List<String> codes = Arrays.asList("304894105", "304890004", "304890005", "304890006");
+    List<String> codes = Arrays.asList(
+        ObservationCodeEnum.PAIN_GOAL_01.getCode(),
+        ObservationCodeEnum.PAIN_GOAL_02.getCode(),
+        ObservationCodeEnum.PAIN_GOAL_03.getCode(),
+        ObservationCodeEnum.PAIN_GOAL_04.getCode());
 
     return ObservationUtils.searchByTimeFrame(apiClient, encounterId, currentOrPriorShift)
         .stream()

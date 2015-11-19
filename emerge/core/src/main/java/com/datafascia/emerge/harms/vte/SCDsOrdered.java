@@ -9,6 +9,7 @@ import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ProcedureUtils;
+import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Date;
@@ -26,6 +27,19 @@ public class SCDsOrdered {
 
   @Inject
   private ClientBuilder apiClient;
+
+  /**
+   * Checks if preocedure request is relevant to SCDs Ordered.
+   *
+   * @param request
+   *     the procedureRequest to check
+   * @return true if procedureRequest is relevant to cwSCDs Ordered.
+   */
+  public static boolean isRelevant(ProcedureRequest request) {
+    return (ProcedureRequestCodeEnum.PLACE_SCDS.isCodeEquals(request.getCode()) ||
+            ProcedureRequestCodeEnum.MAINTAIN_SCDS.isCodeEquals(request.getCode()) ||
+            ProcedureRequestCodeEnum.REMOVE_SCDS.isCodeEquals(request.getCode()));
+  }
 
   private static Optional<DateTimeDt> getStartTime(ProcedureRequest request) {
     if (request != null) {

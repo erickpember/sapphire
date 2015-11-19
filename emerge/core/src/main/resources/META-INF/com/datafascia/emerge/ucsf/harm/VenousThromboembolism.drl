@@ -3,6 +3,7 @@
 package com.datafascia.emerge.ucsf.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import com.datafascia.emerge.harms.vte.SCDsOrdered;
 import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater.Event;
 import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater.EventType;
 
@@ -26,3 +27,13 @@ then
   venousThromboembolismUpdater.updatePharmacologicVTEProphylaxisAdministered(
       harmEvidence, $encounter);
 end
+
+rule "Update venous thromboembolism by procedure request"
+when
+  Event( type == EventType.UPDATE_PROCEDURE_REQUEST )
+  $request: ProcedureRequest( SCDsOrdered.isRelevant($request) )
+  $encounter: Encounter()
+then
+  venousThromboembolismUpdater.updateScdsOrdered(harmEvidence, $encounter);
+end
+

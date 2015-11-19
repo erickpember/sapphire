@@ -7,6 +7,7 @@ import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.parser.CanonicalModelClassFactory;
 import ca.uhn.hl7v2.parser.Parser;
+import ca.uhn.hl7v2.validation.impl.NoValidation;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
 import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.ConnectorFactory;
@@ -78,7 +79,7 @@ public class ComponentsModule extends AbstractModule {
 
   @Provides @Singleton
   public HapiContext hapiContext() {
-    HapiContext context = new DefaultHapiContext();
+    HapiContext context = new DefaultHapiContext(new NoValidation());
 
     /* HL7 v2 is a backwards compatible standard for the most part. It is
      * possible to use a HAPI message structure to parse a message of the same

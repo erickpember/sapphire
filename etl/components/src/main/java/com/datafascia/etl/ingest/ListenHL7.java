@@ -10,6 +10,7 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.protocol.ReceivingApplication;
 import ca.uhn.hl7v2.protocol.ReceivingApplicationException;
 import ca.uhn.hl7v2.protocol.ReceivingApplicationExceptionHandler;
+import ca.uhn.hl7v2.validation.impl.NoValidation;
 import com.google.common.collect.ImmutableSet;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -125,7 +126,8 @@ public class ListenHL7 extends AbstractProcessor {
     boolean tls = processContext.getProperty(TLS).asBoolean();
     getLogger().info("Starting MLLP server, port {}, useTLS {}", new Object[] { port, tls });
 
-    HapiContext hapiContext = new DefaultHapiContext();
+    HapiContext hapiContext = new DefaultHapiContext(new NoValidation());
+
     server = hapiContext.newServer(port, tls);
     server.registerApplication(new MyReceivingApplication());
     server.setExceptionHandler(new MyExceptionHandler());

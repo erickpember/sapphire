@@ -102,8 +102,8 @@ public class DailySedationInterruption {
     // Gather start/stop periods for medications.
     List<TimePeriod> periods = new ArrayList<>();
     for (MedicationOrder order : orders.values()) {
-      Date start = Date.from(Instant.MAX);
-      Date end = Date.from(Instant.MIN);
+      Date start = new Date(Long.MAX_VALUE);
+      Date end = new Date(Long.MIN_VALUE);
 
       for (MedicationAdministration admin : orderAdmins.keySet()) {
         if (orderAdmins.containsValue(order)) {

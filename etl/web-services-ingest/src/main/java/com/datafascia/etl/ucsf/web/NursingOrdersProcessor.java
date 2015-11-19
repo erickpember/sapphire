@@ -5,16 +5,11 @@ package com.datafascia.etl.ucsf.web;
 import com.datafascia.common.nifi.DependencyInjectingProcessor;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.io.CharStreams;
 import com.google.inject.Inject;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 import org.apache.nifi.annotation.behavior.EventDriven;
 import org.apache.nifi.annotation.behavior.SupportsBatching;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
@@ -26,6 +21,7 @@ import org.apache.nifi.processor.ProcessSession;
 import org.apache.nifi.processor.Processor;
 import org.apache.nifi.processor.Relationship;
 import org.apache.nifi.processor.exception.ProcessException;
+import org.apache.nifi.stream.io.StreamUtils;
 import org.kohsuke.MetaInfServices;
 
 /**
@@ -62,8 +58,10 @@ public class NursingOrdersProcessor extends DependencyInjectingProcessor {
     return Collections.emptyList();
   }
 
-  private static String readString(InputStream input) throws IOException {
-    return CharStreams.toString(new InputStreamReader(input, StandardCharsets.UTF_8));
+  private static String readString(ProcessSession session, FlowFile flowFile) {
+    byte[] bytes = new byte[(int) flowFile.getSize()];
+    session.read(flowFile, input -> StreamUtils.fillBuffer(input, bytes));
+    return new String(bytes, StandardCharsets.UTF_8);
   }
 
   @Override
@@ -74,9 +72,7 @@ public class NursingOrdersProcessor extends DependencyInjectingProcessor {
     }
 
     try {
-      AtomicReference<String> orderReference = new AtomicReference<>();
-      session.read(flowFile, input -> orderReference.set(readString(input)));
-      String order = orderReference.get();
+      String order = readString(session, flowFile);
 
       nursingOrdersTransformer.accept(order);
 

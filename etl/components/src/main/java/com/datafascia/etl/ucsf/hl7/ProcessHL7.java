@@ -6,15 +6,10 @@ import com.datafascia.common.nifi.DependencyInjectingProcessor;
 import com.datafascia.etl.hl7.HL7MessageProcessor;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
-import com.google.common.io.CharStreams;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicReference;
 import javax.inject.Inject;
 import org.apache.nifi.annotation.behavior.EventDriven;
 import org.apache.nifi.annotation.behavior.SupportsBatching;
@@ -27,6 +22,7 @@ import org.apache.nifi.processor.ProcessSession;
 import org.apache.nifi.processor.Processor;
 import org.apache.nifi.processor.Relationship;
 import org.apache.nifi.processor.exception.ProcessException;
+import org.apache.nifi.stream.io.StreamUtils;
 import org.kohsuke.MetaInfServices;
 
 /**
@@ -41,21 +37,21 @@ public class ProcessHL7 extends DependencyInjectingProcessor {
 
   public static final Relationship FAILURE = new Relationship.Builder()
       .name("failure")
-      .description("Input FlowFiles that could not be processed")
+      .description("HL7 message that could not be processed")
       .build();
   public static final Relationship SUCCESS = new Relationship.Builder()
       .name("success")
-      .description("Input FlowFiles that were successfully processed")
+      .description("HL7 message that was successfully processed")
       .build();
 
-  private Set<Relationship> relationships = ImmutableSet.of(FAILURE, SUCCESS);
+  private static final Set<Relationship> RELATIONSHIPS = ImmutableSet.of(FAILURE, SUCCESS);
 
   @Inject
   private volatile HL7MessageProcessor hl7MessageProcessor;
 
   @Override
   public Set<Relationship> getRelationships() {
-    return relationships;
+    return RELATIONSHIPS;
   }
 
   @Override
@@ -63,8 +59,10 @@ public class ProcessHL7 extends DependencyInjectingProcessor {
     return Collections.emptyList();
   }
 
-  private static String readString(InputStream input) throws IOException {
-    return CharStreams.toString(new InputStreamReader(input, StandardCharsets.UTF_8));
+  private static String readString(ProcessSession session, FlowFile flowFile) {
+    byte[] bytes = new byte[(int) flowFile.getSize()];
+    session.read(flowFile, input -> StreamUtils.fillBuffer(input, bytes));
+    return new String(bytes, StandardCharsets.UTF_8);
   }
 
   @Override
@@ -75,9 +73,7 @@ public class ProcessHL7 extends DependencyInjectingProcessor {
     }
 
     try {
-      AtomicReference<String> messageReference = new AtomicReference<>();
-      session.read(flowFile, input -> messageReference.set(readString(input)));
-      String message = messageReference.get();
+      String message = readString(session, flowFile);
 
       hl7MessageProcessor.accept(message);
 

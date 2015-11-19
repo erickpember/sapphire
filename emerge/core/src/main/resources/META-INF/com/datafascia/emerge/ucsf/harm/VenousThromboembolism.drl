@@ -3,6 +3,9 @@
 package com.datafascia.emerge.ucsf.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import ca.uhn.fhir.model.dstu2.resource.Observation;
+import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
+import com.datafascia.emerge.harms.vte.SCDsInUse;
 import com.datafascia.emerge.harms.vte.SCDsOrdered;
 import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater.Event;
 import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater.EventType;
@@ -28,7 +31,7 @@ then
       harmEvidence, $encounter);
 end
 
-rule "Update venous thromboembolism by procedure request"
+rule "Update venous thromboembolism SCDs Ordered by procedure request"
 when
   Event( type == EventType.UPDATE_PROCEDURE_REQUEST )
   $request: ProcedureRequest( SCDsOrdered.isRelevant($request) )
@@ -37,3 +40,11 @@ then
   venousThromboembolismUpdater.updateScdsOrdered(harmEvidence, $encounter);
 end
 
+rule "Update venous thromboembolism SCDs In Use by observation"
+when
+  Event( type == EventType.UPDATE_OBSERVATIONS )
+  $observation: Observation( SCDsInUse.isRelevant($observation) )
+  $encounter: Encounter()
+then
+  venousThromboembolismUpdater.updateScdsInUse(harmEvidence, $encounter);
+end

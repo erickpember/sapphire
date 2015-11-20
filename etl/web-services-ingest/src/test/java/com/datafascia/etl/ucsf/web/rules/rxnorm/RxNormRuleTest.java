@@ -587,7 +587,7 @@ public class RxNormRuleTest {
     RxNorm ucsfa67 = new RxNorm() {
       {
         getRxcuiIn().add("67108");
-        setFrequency("q12h");
+        setFrequency("200523");
       }
     };
     meds.add(ucsfa67);
@@ -907,9 +907,6 @@ public class RxNormRuleTest {
         ucsfa2.getMedsSets().toString());
     assertEquals(ucsfa95.getMedsSets().get(1).getCode(), "UCSF_A95");
     assertEquals(ucsfa96.getMedsSets().get(1).getCode(), "UCSF_A96");
-
-    log.warn("RULES A26 A24 AND A50 HAVE KNOWN PROBLEMS. Duplicate firing detection has been"
-        + " DISABLED.");
 
     session.dispose();
     log.info("===> End of test <===\n");

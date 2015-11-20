@@ -803,7 +803,8 @@ end
 
 rule "Intermittent Enoxaparin"
   when
-    $p:RxNorm($rxcuiIn : rxcuiIn contains "67108" && (frequency == "q12h" || frequency =="q24h"))
+    $p:RxNorm($rxcuiIn : rxcuiIn contains "67108" && (FrequencyLookup.isDaily(frequency) ||
+              FrequencyLookup.isTwiceDaily(frequency)))
   then
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A67");

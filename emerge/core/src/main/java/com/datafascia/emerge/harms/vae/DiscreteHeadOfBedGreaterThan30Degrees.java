@@ -63,6 +63,17 @@ public class DiscreteHeadOfBedGreaterThan30Degrees {
     Instant now = Instant.now(clock);
     Date thirteenHoursAgo = Date.from(now.minus(13, ChronoUnit.HOURS));
 
+    boolean contraindicated = apiClient.getProcedureRequestClient()
+        .list(encounterId)
+        .stream()
+        .filter(request ->
+            CONTRAINDICATED_BED_ORDER_CODES.contains(
+                request.getCode().getCodingFirstRep().getCode()))
+        .anyMatch(request -> ProcedureRequestUtils.isScheduledBefore(request, Date.from(now)));
+    if (contraindicated) {
+      return MaybeEnum.CONTRAINDICATED;
+    }
+
     Optional<Observation> freshestDiscreteHOB = ObservationUtils.getFreshestByCodeAfterTime(
         apiClient, encounterId, ObservationCodeEnum.HEAD_OF_BED.getCode(), thirteenHoursAgo);
     if (freshestDiscreteHOB.isPresent()) {
@@ -79,17 +90,6 @@ public class DiscreteHeadOfBedGreaterThan30Degrees {
         default:
           log.warn("Unexpected head of bed value [{}]", value);
       }
-    }
-
-    boolean contraindicated = apiClient.getProcedureRequestClient()
-        .list(encounterId)
-        .stream()
-        .filter(request ->
-            CONTRAINDICATED_BED_ORDER_CODES.contains(
-                request.getCode().getCodingFirstRep().getCode()))
-        .anyMatch(request -> ProcedureRequestUtils.isScheduledBefore(request, Date.from(now)));
-    if (contraindicated) {
-      return MaybeEnum.CONTRAINDICATED;
     }
 
     return MaybeEnum.NO;

@@ -13,6 +13,7 @@ import com.datafascia.common.nifi.DependencyInjectingProcessor;
 import com.datafascia.etl.ucsf.web.MedAdminDiffListener.ElementType;
 import com.datafascia.etl.ucsf.web.persist.JsonPersistUtils;
 import com.datafascia.etl.ucsf.web.rules.model.RxNorm;
+import com.datafascia.etl.ucsf.web.util.JSONObjectDateTimeOrderedComparator;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.hash.HashCode;
@@ -21,11 +22,9 @@ import com.google.common.hash.Hashing;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -147,28 +146,6 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
     kieSession = UcsfMedicationUtils
         .createKieSession("com/datafascia/etl/ucsf/web/rules/rxnorm.drl");
     kieSession.setGlobal("log", log);
-  }
-
-  /**
-   * A comparator class for medication order JSON blobs.
-   */
-  public class JSONObjectDateTimeOrderedComparator implements Comparator<JSONObject> {
-    /**
-     * Compares two medication order JSON blob dates.
-     *
-     * @param o1 The first blob.
-     * @param o2 The second blob.
-     * @return The comparator result.
-     */
-    @Override
-    public int compare(JSONObject o1, JSONObject o2) {
-      String ucsfTime1 = o1.get("DateTimeOrdered").toString();
-      Instant dateTimeOrdered1 = UcsfWebGetProcessor.epicDateToInstant(ucsfTime1);
-      String ucsfTime2 = o2.get("DateTimeOrdered").toString();
-      Instant dateTimeOrdered2 = UcsfWebGetProcessor.epicDateToInstant(ucsfTime2);
-
-      return dateTimeOrdered1.compareTo(dateTimeOrdered2);
-    }
   }
 
   @Override
@@ -422,11 +399,11 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
     String adminId = admin.get("AdminID").toString();
     String[] adminActionParts = adminAction.split("\\^");
 
-    if (adminActionParts.length == 0) {
-      log.warn("No admin action given for admin ID " + adminId);
-    } else if (adminActionParts.length == 1) {
-      log.warn("Bad admin action \"" + adminAction + "\" given for admin ID " + adminId
-          + " and order ID " + prescriptionId);
+    if (adminActionParts.length <= 1) {
+      log.error("Non-parsable admin action field [{}]. Cannot create med admin status for "
+          + "admin ID [{}], encounter [{}], prescription id [{}]. Discarding this medication "
+          + "administration.", adminAction, adminId, encounterId, prescriptionId);
+      return;
     } else {
       if (IGNORE_STATUSES.contains(adminActionParts[1])) {
         return;

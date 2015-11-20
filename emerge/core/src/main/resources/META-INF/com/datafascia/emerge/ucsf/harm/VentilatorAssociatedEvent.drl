@@ -41,6 +41,14 @@ end
 
 rule "Update head of bed angle greater than or equal to 30 degrees"
 when
+  Event( type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateDiscreteHOBGreaterThan30Deg(harmEvidence, $encounter);
+end
+
+rule "Update head of bed angle greater than or equal to 30 degrees from observation"
+when
   Event( type == EventType.UPDATE_OBSERVATIONS )
   $observation: Observation( DiscreteHeadOfBedGreaterThan30Degrees.isRelevant($observation) )
   $encounter: Encounter()

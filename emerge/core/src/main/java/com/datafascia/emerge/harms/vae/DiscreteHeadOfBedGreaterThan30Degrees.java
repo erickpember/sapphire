@@ -49,8 +49,7 @@ public class DiscreteHeadOfBedGreaterThan30Degrees {
    * @return true if observation is relevant to head of bed greater than or equal to 30 degrees
    */
   public static boolean isRelevant(Observation observation) {
-    return ObservationCodeEnum.HEAD_OF_BED.getCode().equals(
-        observation.getCode().getCodingFirstRep().getCode());
+    return ObservationCodeEnum.HEAD_OF_BED.isCodeEquals(observation.getCode());
   }
 
   /**
@@ -67,7 +66,7 @@ public class DiscreteHeadOfBedGreaterThan30Degrees {
     Optional<Observation> freshestDiscreteHOB = ObservationUtils.getFreshestByCodeAfterTime(
         apiClient, encounterId, ObservationCodeEnum.HEAD_OF_BED.getCode(), thirteenHoursAgo);
     if (freshestDiscreteHOB.isPresent()) {
-      String value = freshestDiscreteHOB.get().getValue().toString();
+      String value = ObservationUtils.getValueAsString(freshestDiscreteHOB.get());
       switch (value) {
         case "HOB 30":
         case "HOB 45":

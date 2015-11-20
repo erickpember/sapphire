@@ -98,7 +98,7 @@ public class ObservationUtils {
     }
 
     Observation freshestObservation = findFreshestObservation(observations);
-    if (getEffectiveDate(freshestObservation).after(effectiveLowerBound)) {
+    if (ObservationUtils.isAfter(freshestObservation, effectiveLowerBound)) {
       return Optional.of(freshestObservation);
     }
 

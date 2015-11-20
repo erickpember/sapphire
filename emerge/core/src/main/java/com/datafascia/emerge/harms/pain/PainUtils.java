@@ -37,45 +37,6 @@ public class PainUtils {
   }
 
   /**
-   * Finds freshest pain type.
-   *
-   * @param observations
-   *     observations to search
-   * @return freshest pain type, or {@code null} if no pain observations found
-   */
-  public static PainType findFreshestPainType(List<Observation> observations) {
-    observations.sort(new ObservationEffectiveComparator().reversed());
-
-    for (Observation observation : observations) {
-      String code = observation.getCode().getCodingFirstRep().getCode();
-      switch (code) {
-        case "304890008":
-        case "304890009":
-        case "304890010":
-        case "304890011":
-          return PainType.NUMERICAL;
-
-        case "304894105":
-        case "304890004":
-        case "304890005":
-        case "304890006":
-          return PainType.ACCEPTABLE_LEVEL;
-
-        case "304890012":
-        case "304890013":
-        case "304890014":
-        case "304890015":
-          return PainType.VERBAL;
-
-        case "304890016":
-          return PainType.CPOT;
-      }
-    }
-
-    return null;
-  }
-
-  /**
    * Finds freshest observation with a given code and a value that's parseable to integer.
    *
    * @param observations

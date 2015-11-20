@@ -73,6 +73,8 @@ public class CurrentTidalVolume {
           }
         }
         break;
+      case "Indeterminate":
+        break;
       default:
         log.warn("Ventilation mode value [{}] does not set tidal volume", ventilationMode);
     }

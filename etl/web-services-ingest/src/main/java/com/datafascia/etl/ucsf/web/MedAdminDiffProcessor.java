@@ -10,9 +10,11 @@ import com.datafascia.common.configuration.ConfigurationNode;
 import com.datafascia.common.configuration.Configure;
 import com.datafascia.common.inject.Injectors;
 import com.datafascia.common.nifi.DependencyInjectingProcessor;
+import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
 import com.datafascia.etl.ucsf.web.MedAdminDiffListener.ElementType;
 import com.datafascia.etl.ucsf.web.persist.JsonPersistUtils;
 import com.datafascia.etl.ucsf.web.rules.model.RxNorm;
+import com.datafascia.etl.ucsf.web.utils.JSONObjectDateTimeOrderedComparator;
 import com.google.common.base.Charsets;
 import com.google.common.base.Strings;
 import com.google.common.hash.HashCode;
@@ -21,11 +23,9 @@ import com.google.common.hash.Hashing;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.SQLException;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -147,28 +147,6 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
     kieSession = UcsfMedicationUtils
         .createKieSession("com/datafascia/etl/ucsf/web/rules/rxnorm.drl");
     kieSession.setGlobal("log", log);
-  }
-
-  /**
-   * A comparator class for medication order JSON blobs.
-   */
-  public class JSONObjectDateTimeOrderedComparator implements Comparator<JSONObject> {
-    /**
-     * Compares two medication order JSON blob dates.
-     *
-     * @param o1 The first blob.
-     * @param o2 The second blob.
-     * @return The comparator result.
-     */
-    @Override
-    public int compare(JSONObject o1, JSONObject o2) {
-      String ucsfTime1 = o1.get("DateTimeOrdered").toString();
-      Instant dateTimeOrdered1 = UcsfWebGetProcessor.epicDateToInstant(ucsfTime1);
-      String ucsfTime2 = o2.get("DateTimeOrdered").toString();
-      Instant dateTimeOrdered2 = UcsfWebGetProcessor.epicDateToInstant(ucsfTime2);
-
-      return dateTimeOrdered1.compareTo(dateTimeOrdered2);
-    }
   }
 
   @Override
@@ -462,6 +440,14 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
           prescriptionId, encounterId, UcsfMedicationUtils.populateMedication(droolNorm,
               customMedId, drugName, rxNormDb, clientBuilder),
           droolNorm.getMedsSets(), clientBuilder);
+      if (!MedicationAdministrationUtils.isValid(medAdmin)) {
+        log.error(
+            "Discarding invalid medication administration id [{}] "
+            + "for prescriptionId [{}], encounterId [{}], admin status [{}]",
+            adminId, prescriptionId, encounterId, medAdmin.getStatus());
+        return;
+      }
+
       MedicationAdministration existingAdministration = clientBuilder
           .getMedicationAdministrationClient().get(adminId, encounterId,
               prescriptionId);

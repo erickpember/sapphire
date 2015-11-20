@@ -10,17 +10,14 @@ import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
-import com.google.common.base.Strings;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
-import lombok.extern.slf4j.Slf4j;
 
 /**
  * MedicationAdministration helper methods
  */
-@Slf4j
 public class MedicationAdministrationUtils {
   // Private constructor disallows creating instances of this class.
   private MedicationAdministrationUtils() {
@@ -47,23 +44,6 @@ public class MedicationAdministrationUtils {
     } else {
       throw new RuntimeException("Unexpected type: " + effectiveTime.getClass().getCanonicalName());
     }
-  }
-
-  /**
-   * Verifies a medication administration has mandatory fields.
-   *
-   * @param medAdmin
-   * admin to test
-   * @return
-   * whether or not this administration can be saved
-   */
-  public static boolean isValid(MedicationAdministration medAdmin) {
-    if (Strings.isNullOrEmpty(medAdmin.getStatus())) {
-      log.error("Med admin id [{}] has no status: [{}]", medAdmin.getIdentifierFirstRep()
-          .getValue(), medAdmin.getStatus());
-      return false;
-    }
-    return true;
   }
 
   /**

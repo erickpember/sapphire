@@ -34,9 +34,6 @@ dialect "mvel"
  *  FrequencyLookup.isIntermittent(frequency) - Use an external function to look up frequency,
  *  true if it is intermittent.
  *
- *  Open issues:
- *  Rule A26 "Intermittent Oxycodone-acetaminophen Enteral"
- *  	We need to be provided a brand name.
  */
 
 // Rule name
@@ -296,7 +293,8 @@ end
 
 rule "Intermittent Oxycodone (IR) Enteral"
   when
-    $p:RxNorm($rxcuiIn : rxcuiIn contains "7804" && rxcuiIn != "161" && brand != "OxyContin")
+    $p:RxNorm($rxcuiIn : rxcuiIn contains "7804" && !(rxcuiIn contains "161")
+              && brand != "OxyContin")
   then
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A24");
@@ -316,9 +314,7 @@ end
 
 rule "Intermittent Oxycodone-acetaminophen Enteral"
   when
-    // Problem! Brand name in "ID Clues sheet": "n/a"! I am guessing the brand is Percocet!
-    $p:RxNorm(($rxcuiIn : rxcuiIn contains "7804" || rxcuiIn contains "161")
-               && brand == "Percocet")
+    $p:RxNorm($rxcuiIn : rxcuiIn contains "7804" && rxcuiIn contains "161")
   then
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A26");
@@ -328,7 +324,7 @@ end
 
 rule "Intermittent Hydrocodone-acetaminophen Enteral"
   when
-    $p:RxNorm($rxcuiIn : rxcuiIn contains "5489" || rxcuiIn contains "161")
+    $p:RxNorm($rxcuiIn : rxcuiIn contains "5489" && rxcuiIn contains "161")
   then
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A27");
@@ -409,7 +405,8 @@ end
 
 rule "Intermittent Acetaminophen with Codeine Enteral"
   when
-    $p:RxNorm(rxcuiSCD == "993755" ||
+    $p:RxNorm(($rxcuiIn : rxcuiIn contains "2670" && rxcuiIn contains "161") ||
+             (rxcuiSCD == "993755" ||
               rxcuiSCD == "993763" ||
               rxcuiSCD == "993770" || 
               rxcuiSCD == "993781" || 
@@ -425,7 +422,7 @@ rule "Intermittent Acetaminophen with Codeine Enteral"
               rxcuiSCD == "996981" || 
               rxcuiSCD == "996982" || 
               rxcuiSCD == "994059" || 
-              rxcuiSCD == "996983")
+              rxcuiSCD == "996983"))
   then
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A34");
@@ -467,7 +464,8 @@ end
 
 rule "Intermittent Acetaminophen IV"
   when
-    $p:RxNorm($rxcuiIn : rxcuiIn contains "161" && RouteLookup.isIV(route))
+    $p:RxNorm(($rxcuiIn : rxcuiIn contains "161" && RouteLookup.isIV(route)) ||
+              (brand == "Ofirmev"))
   then
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A36");
@@ -477,7 +475,16 @@ end
 
 rule "Intermittent Acetaminophen PR"
   when
-    $p:RxNorm($rxcuiIn : rxcuiIn contains "161" && route == "17")
+    $p:RxNorm(($rxcuiIn : rxcuiIn contains "161" && route == "17") ||
+              (rxcuiSCD == "198434" ||
+              rxcuiSCD == "307666" ||
+              rxcuiSCD == "247650" ||
+              rxcuiSCD == "249875" ||
+              rxcuiSCD == "251698" ||
+              rxcuiSCD == "198437" ||
+              rxcuiSCD == "250651" ||
+              rxcuiSCD == "198443" ||
+              rxcuiSCD == "98445"))
   then
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A37");
@@ -539,7 +546,7 @@ end
 
 rule "Lidocaine 5% Transdermal"
   when
-    $p:RxNorm(rxcuiSCD == "1009464")
+    $p:RxNorm(rxcuiSCD == "1009464" || brand == "Lidoderm")
   then
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A43");
@@ -803,8 +810,7 @@ end
 
 rule "Intermittent Enoxaparin"
   when
-    $p:RxNorm($rxcuiIn : rxcuiIn contains "67108" && (FrequencyLookup.isDaily(frequency) ||
-              FrequencyLookup.isTwiceDaily(frequency)))
+    $p:RxNorm($rxcuiIn : rxcuiIn contains "67108")
   then
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A67");
@@ -972,7 +978,7 @@ end
 
 rule "Intermittent Non-Enteric Coated Pancrelipase Enteral"
   when
-    $p:RxNorm(RouteLookup.isNonJejunalEnteral(route) &&
+    $p:RxNorm((RouteLookup.isNonJejunalEnteral(route) || brand == "Viokace") &&
                (rxcuiSCD == "1247386" || rxcuiSCD == "1247379"))
   then
     MedsSet result = new MedsSet();

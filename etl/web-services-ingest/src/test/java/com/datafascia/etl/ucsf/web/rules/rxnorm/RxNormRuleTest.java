@@ -70,6 +70,7 @@ public class RxNormRuleTest {
     RxNorm oxycontin = new RxNorm() {
       {
         getRxcuiIn().add("161");
+        getRxcuiIn().add("5489");
         setBrand("Oxycontin");
       }
     };
@@ -309,14 +310,14 @@ public class RxNormRuleTest {
     RxNorm ucsfa26 = new RxNorm() {
       {
         getRxcuiIn().add("7804");
-        // We need to be provided a brand here! Guessing Percocet!
-        setBrand("Percocet");
+        getRxcuiIn().add("161");
       }
     };
     meds.add(ucsfa26);
     RxNorm ucsfa27 = new RxNorm() {
       {
         getRxcuiIn().add("5489");
+        getRxcuiIn().add("161");
       }
     };
     meds.add(ucsfa27);
@@ -829,8 +830,7 @@ public class RxNormRuleTest {
     assertEquals(ucsfa23.getMedsSets().get(0).getCode(), "UCSF_A23");
     assertEquals(ucsfa24.getMedsSets().get(0).getCode(), "UCSF_A24");
     assertEquals(ucsfa25.getMedsSets().get(0).getCode(), "UCSF_A25");
-    // This should be get(0) but the rule is broken pending fixed requirements.
-    assertEquals(ucsfa26.getMedsSets().get(1).getCode(), "UCSF_A26");
+    assertEquals(ucsfa26.getMedsSets().get(0).getCode(), "UCSF_A26");
     assertEquals(ucsfa27.getMedsSets().get(0).getCode(), "UCSF_A27");
     assertEquals(ucsfa28.getMedsSets().get(0).getCode(), "UCSF_A28");
     assertEquals(ucsfa29.getMedsSets().get(0).getCode(), "UCSF_A29");
@@ -840,10 +840,8 @@ public class RxNormRuleTest {
     assertEquals(ucsfa33.getMedsSets().get(0).getCode(), "UCSF_A33");
     assertEquals(ucsfa34.getMedsSets().get(0).getCode(), "UCSF_A34");
     assertEquals(ucsfa35.getMedsSets().get(0).getCode(), "UCSF_A35");
-    // This should be get(0) but the rule is broken pending fixed requirements.
-    assertEquals(ucsfa36.getMedsSets().get(1).getCode(), "UCSF_A36");
-    // This should be get(0) but the rule is broken pending fixed requirements.
-    assertEquals(ucsfa37.getMedsSets().get(1).getCode(), "UCSF_A37");
+    assertEquals(ucsfa36.getMedsSets().get(0).getCode(), "UCSF_A36");
+    assertEquals(ucsfa37.getMedsSets().get(0).getCode(), "UCSF_A37");
     assertEquals(ucsfa38.getMedsSets().get(0).getCode(), "UCSF_A38");
     assertEquals(ucsfa39.getMedsSets().get(0).getCode(), "UCSF_A39");
     assertEquals(ucsfa40.getMedsSets().get(0).getCode(), "UCSF_A40");

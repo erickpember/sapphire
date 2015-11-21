@@ -600,7 +600,7 @@ public class RxNormRuleTest {
     RxNorm ucsfa69 = new RxNorm() {
       {
         getRxcuiIn().add("235473");
-        setRoute("subcutaneous");
+        setRoute("18");
       }
     };
     meds.add(ucsfa69);

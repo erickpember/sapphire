@@ -825,7 +825,7 @@ end
 
 rule "Intermittent Heparin SC"
   when
-    $p:RxNorm($rxcuiIn : rxcuiIn contains "235473" && route == "subcutaneous")
+    $p:RxNorm($rxcuiIn : rxcuiIn contains "235473" && route == "18")
   then
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A69");

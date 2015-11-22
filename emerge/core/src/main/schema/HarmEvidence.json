@@ -531,6 +531,17 @@
                         "type": "string",
                         "format": "date-time",
                         "description": "An explanation about the purpose of this instance described by this schema."
+                      },
+                      "status": {
+                        "type": "string",
+                        "enum": [
+                          "active",
+                          "on-hold",
+                          "completed",
+                          "entered-in-error",
+                          "stopped",
+                          "draft"
+                        ]
                       }
                     }
                   }

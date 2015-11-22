@@ -141,6 +141,7 @@ public class VentilationModeImpl {
         .getValue().toString().equals(VentModeObservationEnum.OTHER_SEE_COMMENT.getCode())) {
       return Optional.of(VentModeEmergeEnum.OTHER.getCode());
     }
+
     return Optional.empty();
   }
 
@@ -155,7 +156,8 @@ public class VentilationModeImpl {
    *     Vent mode string if a match is found, otherwise empty.
    */
   private Optional<String> breathIsFresherThanNonInvasive(Observation breath) {
-    if (breath.getValue().toString().equals(BreathTypeEnum.APRV_BILEVEL.getCode())) {
+    if (breath.getValue().toString()
+        .replaceAll("\\s","").equals(BreathTypeEnum.APRV_BILEVEL.getCode())) {
       return Optional.of(VentModeEmergeEnum.AIRWAY_PRESSURE_RELEASE_VENTILATION_APRV.getCode());
     }
 

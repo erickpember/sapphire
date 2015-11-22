@@ -82,6 +82,20 @@ public class VentilatorAssociatedEventIT extends HarmEvidenceTestSupport {
     Mode mode = harmEvidence.getMedicalData().getVAE().getVentilation().getMode();
     assertEquals(mode.getValue().toString(), "Volume Control (AC)");
     assertEquals(mode.getUpdateTime(), Date.from(Instant.now(clock)));
+
+    processMessage("ventilation-mode-aprv1.hl7");
+
+    harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    mode = harmEvidence.getMedicalData().getVAE().getVentilation().getMode();
+    assertEquals(mode.getValue().toString(), "Airway Pressure Release Ventilation (APRV)");
+    assertEquals(mode.getUpdateTime(), Date.from(Instant.now(clock)));
+
+    processMessage("ventilation-mode-aprv2.hl7");
+
+    harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    mode = harmEvidence.getMedicalData().getVAE().getVentilation().getMode();
+    assertEquals(mode.getValue().toString(), "Airway Pressure Release Ventilation (APRV)");
+    assertEquals(mode.getUpdateTime(), Date.from(Instant.now(clock)));
   }
 
   @Test

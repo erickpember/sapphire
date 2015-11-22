@@ -14,7 +14,6 @@ import com.datafascia.emerge.harms.pain.NumericalPainLevel.CurrentPainLevel;
 import com.datafascia.emerge.harms.pain.NumericalPainLevel.MinimumOrMaximumPainLevel;
 import com.datafascia.emerge.harms.pain.PainGoalImpl;
 import com.datafascia.emerge.harms.pain.SedativeOrder;
-import com.datafascia.emerge.harms.pain.SedativeOrder.OrderResult;
 import com.datafascia.emerge.harms.pain.VerbalPainLevel;
 import com.datafascia.emerge.harms.rass.RassGoalImpl;
 import com.datafascia.emerge.harms.rass.RassGoalImpl.RassGoalResult;
@@ -54,7 +53,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
 
@@ -62,6 +60,18 @@ import javax.inject.Inject;
  * Updates pain and delirium associated data for a patient.
  */
 public class PainAndDeliriumUpdater {
+
+  private static final Set<String> BENZODIAZEPINE_NAMES = ImmutableSet.of(
+      MedsSetEnum.INTERMITTENT_LORAZEPAM_IV.getCode(),
+      MedsSetEnum.INTERMITTENT_LORAZEPAM_ENTERAL.getCode(),
+      MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode(),
+      MedsSetEnum.INTERMITTENT_MIDAZOLAM_IV.getCode(),
+      MedsSetEnum.CONTINUOUS_INFUSION_MIDAZOLAM_IV.getCode(),
+      MedsSetEnum.INTERMITTENT_CLONAZEPAM_ENTERAL.getCode(),
+      MedsSetEnum.INTERMITTENT_DIAZEPAM_IV.getCode(),
+      MedsSetEnum.INTERMITTENT_DIAZEPAM_ENTERAL.getCode(),
+      MedsSetEnum.INTERMITTENT_CHLORADIAZEPOXIDE_ENTERAL.getCode(),
+      MedsSetEnum.INTERMITTENT_ALPRAZALOM_ENTERAL.getCode());
 
   @Inject
   private Clock clock;
@@ -314,38 +324,33 @@ public class PainAndDeliriumUpdater {
   public void updateSedative(HarmEvidence harmEvidence, Encounter encounter) {
     String encounterId = encounter.getId().getIdPart();
 
-    List<Order> orders = new ArrayList<>();
-    Set<String> BENZODIAZEPINE_NAMES = ImmutableSet.of(
-        MedsSetEnum.INTERMITTENT_LORAZEPAM_IV.getCode(),
-        MedsSetEnum.INTERMITTENT_LORAZEPAM_ENTERAL.getCode(),
-        MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode(),
-        MedsSetEnum.INTERMITTENT_MIDAZOLAM_IV.getCode(),
-        MedsSetEnum.CONTINUOUS_INFUSION_MIDAZOLAM_IV.getCode(),
-        MedsSetEnum.INTERMITTENT_CLONAZEPAM_ENTERAL.getCode(),
-        MedsSetEnum.INTERMITTENT_DIAZEPAM_IV.getCode(),
-        MedsSetEnum.INTERMITTENT_DIAZEPAM_ENTERAL.getCode(),
-        MedsSetEnum.INTERMITTENT_CHLORADIAZEPOXIDE_ENTERAL.getCode(),
-        MedsSetEnum.INTERMITTENT_ALPRAZALOM_ENTERAL.getCode());
-
-    for (String medsSet : BENZODIAZEPINE_NAMES) {
-      Optional<OrderResult> result = sedativeOrderImpl.getValue(encounterId, medsSet);
-      if (result.isPresent()) {
-        Order order = new Order()
-            .withDosageRoute((result.get().getDosageRoute() != null) ? Order.DosageRoute.fromValue(
-                        result.get().getDosageRoute()) : null)
-            .withDrug((result.get().getDrug() != null) ? Order.Drug
-                    .fromValue(result.get().getDrug()) : null)
-            .withUpdateTime(Date.from(Instant.now(clock)));
-        orders.add(order);
-      }
-    }
-
     TimestampedBoolean benzodiazepineContraindicated = new TimestampedBoolean()
         .withValue(benzodiazepineAvoidanceImpl
             .isBenzodiazepineAvoidanceContraindicated(encounterId))
         .withUpdateTime(Date.from(Instant.now(clock)));
 
-    Sedative sedative = new Sedative().withContraindicated(benzodiazepineContraindicated)
+    List<Order> orders = new ArrayList<>();
+    for (String medsSet : BENZODIAZEPINE_NAMES) {
+      sedativeOrderImpl.getValue(encounterId, medsSet)
+          .ifPresent(result -> {
+            Order order = new Order()
+                .withDosageRoute(
+                    (result.getDosageRoute() != null)
+                        ? Order.DosageRoute.fromValue(result.getDosageRoute()) : null)
+                .withDrug(
+                    (result.getDrug() != null)
+                        ? Order.Drug.fromValue(result.getDrug()) : null)
+                .withStatus(
+                    (result.getStatus() != null)
+                        ? Order.Status.fromValue(result.getStatus()) : null)
+                .withUpdateTime(
+                    Date.from(Instant.now(clock)));
+            orders.add(order);
+          });
+    }
+
+    Sedative sedative = new Sedative()
+        .withContraindicated(benzodiazepineContraindicated)
         .withOrders(orders);
 
     getDelirium(harmEvidence).setSedative(sedative);

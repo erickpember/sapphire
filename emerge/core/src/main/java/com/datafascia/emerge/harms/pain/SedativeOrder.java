@@ -117,7 +117,7 @@ public class SedativeOrder {
           for (String sedativeName : SEDATIVE_NAMES) {
             if (medsSet.contains(sedativeName)) {
               result.setDrug(sedativeName);
-
+              result.setStatus(order.getStatus());
               if (medsSet.contains("Continuous")) {
                 if (medsSet.contains(" IV")) {
                   result.setDosageRoute(SedativeOrderDosageRouteEnum.CONTINUOUS_INFUSION_IV

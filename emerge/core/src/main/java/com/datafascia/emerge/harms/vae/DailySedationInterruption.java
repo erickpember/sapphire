@@ -144,9 +144,12 @@ public class DailySedationInterruption {
 
     // Finally, check if anything is actively administering.
     for (MedicationAdministration admin : filteredAdmins) {
-      String medset = admin.getIdentifierFirstRep().getValue();
-      if (MedicationAdministrationUtils.activelyInfusing(apiClient, encounterId, medset)) {
-        return false;
+      for (IdentifierDt ident : MedicationAdministrationUtils.findIdentifiers(admin,
+          CodingSystems.UCSF_MEDICATION_GROUP_NAME)) {
+        String medsSet = ident.getValue();
+        if (MedicationAdministrationUtils.activelyInfusing(apiClient, encounterId, medsSet)) {
+          return false;
+        }
       }
     }
 

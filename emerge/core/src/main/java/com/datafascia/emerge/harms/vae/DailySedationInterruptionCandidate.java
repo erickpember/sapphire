@@ -10,13 +10,16 @@ import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
+import com.datafascia.emerge.ucsf.codes.MedsSetEnum;
 import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -95,11 +98,14 @@ public class DailySedationInterruptionCandidate {
      */
     boolean sedativeInUse = false;
     for (MedicationAdministration admin : medicationAdministrations) {
-      String id = admin.getIdentifierFirstRep().getValue();
-      if (id.equals("Continuous Infusion Dexmedetomidine IV")
-          || id.equals("Continuous Infusion Propofol IV")
-          || id.equals("Continuous Infusion Lorazepam IV")
-          || id.equals("Continuous Infusion Midazolam IV")) {
+      if (MedicationAdministrationUtils.hasMedsSet(admin,
+          MedsSetEnum.CONTINUOUS_INFUSION_DEXMEDETOMIDINE_IV.getCode())
+          || MedicationAdministrationUtils.hasMedsSet(admin,
+              MedsSetEnum.CONTINUOUS_INFUSION_PROPOFOL_IV.getCode())
+          || MedicationAdministrationUtils.hasMedsSet(admin,
+              MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode())
+          || MedicationAdministrationUtils.hasMedsSet(admin,
+              MedsSetEnum.CONTINUOUS_INFUSION_MIDAZOLAM_IV.getCode())) {
         sedativeInUse = true;
       }
     }
@@ -136,13 +142,15 @@ public class DailySedationInterruptionCandidate {
       for (IdentifierDt id : admin.getIdentifier()) {
         if (MedicationAdministrationUtils
             .beenAdministered(apiClient, encounterId, twoHourPeriod, id.getValue())) {
-
-          switch (admin.getIdentifierFirstRep().getValue()) {
-            case "Intermittent Cisatracurium IV":
-            case "Intermittent Vecuronium IV":
-            case "Intermittent Rocuronium IV":
-            case "Intermittent Pancuronium IV":
-              return RECEIVING_NMBA;
+          if (MedicationAdministrationUtils.hasMedsSet(admin,
+              MedsSetEnum.INTERMITTENT_CISATRACURIUM_IV.getCode())
+              || MedicationAdministrationUtils.hasMedsSet(admin,
+                  MedsSetEnum.INTERMITTENT_VECURONIUM_IV.getCode())
+              || MedicationAdministrationUtils.hasMedsSet(admin,
+                  MedsSetEnum.INTERMITTENT_ROCURONIUM_IV.getCode())
+              || MedicationAdministrationUtils.hasMedsSet(admin,
+                  MedsSetEnum.INTERMITTENT_PANCURONIUM_IV.getCode())) {
+            return RECEIVING_NMBA;
           }
         }
       }
@@ -382,18 +390,24 @@ public class DailySedationInterruptionCandidate {
      * “Continuous Infusion Midazolam IV”) and activelyInfusing(MedicationAdministrations) then
      * Daily Sedation Interruption Candidate = “Yes”
      */
+    List<String> activelyInfusingDrugNames = Arrays.asList(
+        MedsSetEnum.CONTINUOUS_INFUSION_DEXMEDETOMIDINE_IV.getCode(),
+        MedsSetEnum.CONTINUOUS_INFUSION_PROPOFOL_IV.getCode(),
+        MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode(),
+        MedsSetEnum.CONTINUOUS_INFUSION_MIDAZOLAM_IV.getCode());
     for (MedicationAdministration admin : medicationAdministrations) {
-      switch (admin.getIdentifierFirstRep().getValue()) {
-        case "Continuous Infusion Dexmedetomidine IV":
-        case "Continuous Infusion Propofol IV":
-        case "Continuous Infusion Lorazepam IV":
-        case "Continuous Infusion Midazolam IV":
+      for (IdentifierDt ident : MedicationAdministrationUtils.findIdentifiers(admin,
+          CodingSystems.UCSF_MEDICATION_GROUP_NAME)) {
+        String medsSet = ident.getValue();
+
+        if (activelyInfusingDrugNames.contains(medsSet)) {
           for (IdentifierDt id : admin.getIdentifier()) {
             if (MedicationAdministrationUtils
                 .activelyInfusing(apiClient, encounterId, id.getValue())) {
               return YES;
             }
           }
+        }
       }
     }
 

@@ -23,7 +23,9 @@ public enum MedsSetEnum implements Code<String> {
   INTERMITTENT_MIDAZOLAM_IV("Intermittent Midazolam IV"),
   INTERMITTENT_PANCURONIUM_IV("Intermittent Pancuronium IV"),
   INTERMITTENT_ROCURONIUM_IV("Intermittent Rocuronium IV"),
-  INTERMITTENT_VECURONIUM_IV("Intermittent Vecuronium IV");
+  INTERMITTENT_VECURONIUM_IV("Intermittent Vecuronium IV"),
+  CONTINUOUS_INFUSION_DEXMEDETOMIDINE_IV("Continuous Infusion Dexmedetomidine IV"),
+  CONTINUOUS_INFUSION_PROPOFOL_IV("Continuous Infusion Propofol IV");
 
   private final String code;
 

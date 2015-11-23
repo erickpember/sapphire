@@ -10,6 +10,7 @@ import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.domain.fhir.CodingSystems;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -86,7 +87,7 @@ public class MedicationAdministrationUtils {
   public static boolean activelyInfusing(ClientBuilder client, String encounterId, String medsSet) {
     return client.getMedicationAdministrationClient()
         .search(encounterId).stream()
-        .filter(admin -> admin.getIdentifierFirstRep().getValue().equals(medsSet))
+        .filter(admin -> hasMedsSet(admin, medsSet))
         .max(new MedicationAdministrationEffectiveTimeComparator())
         .filter(medicationAdministration -> medicationAdministration.getStatusElement().
             getValueAsEnum().equals(MedicationAdministrationStatusEnum.IN_PROGRESS))
@@ -124,7 +125,7 @@ public class MedicationAdministrationUtils {
             getValueAsEnum().equals(MedicationAdministrationStatusEnum.IN_PROGRESS)
             || medicationAdministration.getStatusElement().getValueAsEnum()
             .equals(MedicationAdministrationStatusEnum.COMPLETED))
-        .filter(admin -> admin.getIdentifierFirstRep().getValue().equals(medsSet))
+        .filter(admin -> hasMedsSet(admin, medsSet))
         .filter(medicationAdministration -> dosageOverZero(medicationAdministration))
         .filter(medicationAdministration -> insideTimeFrame(medicationAdministration, timeFrame))
         .anyMatch(medicationAdministration -> dosageOverZero(medicationAdministration));
@@ -162,7 +163,7 @@ public class MedicationAdministrationUtils {
                 .equals(MedicationAdministrationStatusEnum.IN_PROGRESS)
             || medicationAdministration.getStatusElement().getValueAsEnum()
             .equals(MedicationAdministrationStatusEnum.COMPLETED)))
-        .filter(admin -> admin.getIdentifierFirstRep().getValue().equals(medsSet))
+        .filter(admin -> hasMedsSet(admin, medsSet))
         .anyMatch(medicationAdministration -> insideTimeFrame(medicationAdministration, timeFrame));
   }
 
@@ -195,7 +196,7 @@ public class MedicationAdministrationUtils {
             medicationAdministration.getStatusElement().getValueAsEnum() != null
             && (medicationAdministration.getStatusElement().
             getValueAsEnum().equals(MedicationAdministrationStatusEnum.IN_PROGRESS)))
-        .filter(admin -> admin.getIdentifierFirstRep().getValue().equals(medsSet))
+        .filter(admin -> hasMedsSet(admin, medsSet))
         .anyMatch(medicationAdministration -> insideTimeFrame(medicationAdministration, timeFrame));
   }
 
@@ -246,6 +247,25 @@ public class MedicationAdministrationUtils {
    */
   public static Date getEffectiveDate(MedicationAdministration administration) {
     return ((DateTimeDt) administration.getEffectiveTime()).getValue();
+  }
+
+  /**
+   * Return true if any identifier in a given admin matches the given meds set id.
+   *
+   * @param admin
+   *    Order to search for a meds set id.
+   * @param medsSet
+   *    The meds set ID we are looking for.
+   * @return
+   *    All matching identifiers.
+   */
+  public static boolean hasMedsSet(MedicationAdministration admin, String medsSet) {
+    if (MedicationAdministrationUtils.findIdentifiers(admin,
+        CodingSystems.UCSF_MEDICATION_GROUP_NAME).stream()
+        .anyMatch((ident) -> (medsSet.equals(ident.getValue())))) {
+      return true;
+    }
+    return false;
   }
 
   /**

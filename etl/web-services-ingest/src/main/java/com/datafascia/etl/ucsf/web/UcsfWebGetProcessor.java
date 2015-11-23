@@ -183,7 +183,7 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
     if (milliseconds.equals("")) {
       throw new RuntimeException("Epic date: " + trimmed);
     }
-    long utc = Long.parseLong(milliseconds) - offset;
+    long utc = Long.parseLong(milliseconds) + offset;
     return Instant.ofEpochMilli(utc);
   }
 

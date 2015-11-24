@@ -18,10 +18,12 @@ import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Harms logic for VTE anticoagulation.
  */
+@Slf4j
 public class AnticoagulationImpl {
   private static final BigDecimal NEGATIVE_ONE = new BigDecimal("-1");
   private static final BigDecimal ZERO_POINT_EIGHT_SIX = new BigDecimal("0.86");
@@ -56,6 +58,10 @@ public class AnticoagulationImpl {
                   QuantityDt quantity = (QuantityDt) dosage.getDose();
                   BigDecimal weight = HarmsLookups.getPatientWeight(apiClient, encounterId);
                   if (weight.compareTo(NEGATIVE_ONE) == 0) {
+                    log.error(
+                        "Failed to retrieve patient weight for enoxaparin dosage for medOrder [{}] "
+                            + "encounter [{}]",
+                        medicationOrder.getIdentifierFirstRep().getValue(), encounterId);
                     return Optional.empty();
                   } else {
                     return quantity.getValue().divide(weight)
@@ -63,6 +69,8 @@ public class AnticoagulationImpl {
                         ? Optional.of(atEnum) : Optional.empty();
                   }
                 } else {
+                  log.error("Dose is not of QuantityDt for medOrder [{}] encounter [{}]",
+                      medicationOrder.getIdentifierFirstRep().getValue(), encounterId);
                   return Optional.empty();
                 }
               } else {
@@ -119,9 +127,12 @@ public class AnticoagulationImpl {
               BigDecimal dose = administration.getDosage().getQuantity().getValue();
               BigDecimal weight = HarmsLookups.getPatientWeight(apiClient, encounterId);
               if (weight.compareTo(NEGATIVE_ONE) == 0) {
+                log.error(
+                    "Failed to retrieve patient weight for enoxaparin dosage for encounter [{}]",
+                    encounterId);
                 return false;
               } else {
-                return dose.divide(weight).compareTo(ZERO_POINT_EIGHT_SIX) > -1 ? true : false;
+                return dose.divide(weight).compareTo(ZERO_POINT_EIGHT_SIX) >= 0;
               }
             } else {
               return true;

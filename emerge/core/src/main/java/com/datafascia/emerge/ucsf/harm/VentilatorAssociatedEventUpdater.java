@@ -169,7 +169,8 @@ public class VentilatorAssociatedEventUpdater {
         .withCandidate(
             candidateResult.isCandidate())
         .withNotCandidateReason(
-            SATDSI.NotCandidateReason.fromValue(candidateResult.getNotCandidateReason()))
+            (candidateResult.getNotCandidateReason() != null) ?
+            SATDSI.NotCandidateReason.fromValue(candidateResult.getNotCandidateReason()) : null)
         .withPerformed(
             performed)
         .withUpdateTime(

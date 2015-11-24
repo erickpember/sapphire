@@ -237,8 +237,9 @@ public class MedicationAdministrationUtils {
    *     True if the supplied administration has a nonzero dosage.
    */
   public static boolean dosageOverZero(MedicationAdministration administration) {
-    if (administration.getDosage() == null || administration.getDosage()
-        .getQuantity() == null) {
+    if (administration.getDosage() == null ||
+        administration.getDosage().getQuantity() == null ||
+        administration.getDosage().getQuantity().getValue() == null) {
       log.error("Medication administration id [{}] has a null dosage,"
           + " failing to process if the dosage is over zero.",
           administration.getIdentifierFirstRep().getValue());

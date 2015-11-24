@@ -6,7 +6,6 @@ import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
 import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
-import ca.uhn.fhir.model.dstu2.valueset.MedicationOrderStatusEnum;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.emerge.harms.HarmsLookups;
@@ -39,8 +38,7 @@ public class PharmacologicVteProphylaxis {
     List<MedicationOrder> medicationOrders = apiClient.getMedicationOrderClient()
         .search(encounterId);
     for (MedicationOrder medicationOrder : medicationOrders) {
-      if (medicationOrder.getStatusElement().getValueAsEnum() == MedicationOrderStatusEnum.ACTIVE ||
-          medicationOrder.getStatusElement().getValueAsEnum() == MedicationOrderStatusEnum.DRAFT) {
+      if (MedicationOrderUtils.isActiveOrDraft(medicationOrder)) {
 
         for (IdentifierDt ident : MedicationOrderUtils.findIdentifiers(medicationOrder,
             CodingSystems.UCSF_MEDICATION_GROUP_NAME)) {

@@ -8,7 +8,6 @@ import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
-import ca.uhn.fhir.model.dstu2.valueset.MedicationOrderStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.domain.fhir.CodingSystems;
@@ -42,10 +41,7 @@ public class AnticoagulationImpl {
         .search(encounterId);
 
     for (MedicationOrder medicationOrder : medicationOrders) {
-      if (medicationOrder.getStatusElement().getValueAsEnum() ==
-              MedicationOrderStatusEnum.ACTIVE ||
-          medicationOrder.getStatusElement().getValueAsEnum() ==
-              MedicationOrderStatusEnum.DRAFT) {
+      if (MedicationOrderUtils.isActiveOrDraft(medicationOrder)) {
         for (IdentifierDt ident : MedicationOrderUtils.findIdentifiers(medicationOrder,
             CodingSystems.UCSF_MEDICATION_GROUP_NAME)) {
           for (AnticoagulationTypeEnum atEnum : AnticoagulationTypeEnum.values()) {

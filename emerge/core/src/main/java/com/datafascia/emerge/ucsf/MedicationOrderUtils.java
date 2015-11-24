@@ -113,4 +113,20 @@ public class MedicationOrderUtils {
     IDatatype effectiveTime = medicationOrder.getDateWrittenElement();
     return ((DateTimeDt) effectiveTime).getValue().before(startTime);
   }
+
+  /**
+   * Returns true if a specified medication order has a status of active or draft.
+   *
+   * @param order
+   *     medication order
+   * @return true if the medication order has a status of active or draft
+   */
+  public static boolean isActiveOrDraft(MedicationOrder order) {
+    if (order == null) {
+      return false;
+    }
+
+    MedicationOrderStatusEnum status = order.getStatusElement().getValueAsEnum();
+    return status == MedicationOrderStatusEnum.ACTIVE || status == MedicationOrderStatusEnum.DRAFT;
+  }
 }

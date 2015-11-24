@@ -2,8 +2,8 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.harms.vae;
 
-import ca.uhn.fhir.model.dstu2.valueset.MedicationOrderStatusEnum;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.emerge.ucsf.MedicationOrderUtils;
 import javax.inject.Inject;
 
 import static com.datafascia.emerge.ucsf.codes.MedicationOrderEnum.STRESS_ULCER_PROPHYLACTICS;
@@ -30,8 +30,6 @@ public class StressUlcerProphylacticsOrder {
         .filter(order -> order.getIdentifier().stream()
             .anyMatch(ident -> ident.getValue()
                 .equals(STRESS_ULCER_PROPHYLACTICS.getCode())))
-        .anyMatch(order -> order.getStatusElement().getValueAsEnum()
-            .equals(MedicationOrderStatusEnum.ACTIVE) || order.getStatusElement().getValueAsEnum()
-            .equals(MedicationOrderStatusEnum.DRAFT));
+        .anyMatch(order -> MedicationOrderUtils.isActiveOrDraft(order));
   }
 }

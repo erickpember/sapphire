@@ -15,10 +15,12 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * MedicationAdministration helper methods
  */
+@Slf4j
 public class MedicationAdministrationUtils {
   // Private constructor disallows creating instances of this class.
   private MedicationAdministrationUtils() {
@@ -235,6 +237,13 @@ public class MedicationAdministrationUtils {
    *     True if the supplied administration has a nonzero dosage.
    */
   public static boolean dosageOverZero(MedicationAdministration administration) {
+    if (administration.getDosage() == null || administration.getDosage()
+        .getQuantity() == null) {
+      log.error("Medication administration id [{}] has a null dosage,"
+          + " failing to process if the dosage is over zero.",
+          administration.getIdentifierFirstRep().getValue());
+      return false;
+    }
     return administration.getDosage().getQuantity().getValue().compareTo(BigDecimal.ZERO) > 0;
   }
 

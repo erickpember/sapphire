@@ -22,6 +22,7 @@ import java.util.concurrent.TimeUnit;
 public class HarmsLookups {
   private static final BigDecimal ONE_POINT_FIVE = new BigDecimal("1.5");
   private static final BigDecimal FIFTY_THOUSAND = new BigDecimal("50000");
+  private static final BigDecimal OUNCES_PER_KILOGRAM = new BigDecimal("35.274");
 
   // Drug efficacy durations.
   public final static Map<String, Long> efficacyList = new HashMap<String, Long>() {
@@ -142,9 +143,9 @@ public class HarmsLookups {
    * @return true if conditions are met
    */
   public static boolean aPttRatioOver1point5(ClientBuilder client, String encounterId) {
-    List<Observation> pltObservations = client.getObservationClient().searchObservation(encounterId,
+    List<Observation> pttObservations = client.getObservationClient().searchObservation(encounterId,
         ObservationCodeEnum.PTT.getCode(), null);
-    Observation freshestPttObservation = ObservationUtils.findFreshestObservation(pltObservations);
+    Observation freshestPttObservation = ObservationUtils.findFreshestObservation(pttObservations);
 
     if (freshestPttObservation == null || freshestPttObservation.getValue() == null) {
       return false;
@@ -156,5 +157,53 @@ public class HarmsLookups {
     } else {
       throw new NumberFormatException("Observation value is not of type QuantityDt.");
     }
+  }
+
+  /**
+   * Patient Weight Implementation
+   *
+   * @param client
+   *     API client.
+   * @param encounterId
+   *     Relevant encounter ID.
+   * @return the patients weight
+   */
+  public static BigDecimal getPatientWeight(ClientBuilder client, String encounterId) {
+    List<Observation> dosingWeight = client.getObservationClient().searchObservation(encounterId,
+        ObservationCodeEnum.DOSING_WEIGHT.getCode(), null);
+    Observation freshestDosingWeight = ObservationUtils.findFreshestObservation(dosingWeight);
+
+    List<Observation> clinicalWeight = client.getObservationClient().searchObservation(encounterId,
+        ObservationCodeEnum.CLINICAL_WEIGHT.getCode(), null);
+    Observation freshestClinicalWeight = ObservationUtils.findFreshestObservation(clinicalWeight);
+
+    List<Observation> admissionWeight = client.getObservationClient().searchObservation(encounterId,
+        ObservationCodeEnum.ADMISSION_WEIGHT.getCode(), null);
+    Observation freshestAdmissionWeight = ObservationUtils.findFreshestObservation(admissionWeight);
+
+    if (ObservationUtils.firstIsFresher(freshestDosingWeight, freshestClinicalWeight)) {
+      IDatatype quantity = freshestDosingWeight.getValue();
+      if (quantity instanceof QuantityDt) {
+        return ((QuantityDt) quantity).getValue().multiply(OUNCES_PER_KILOGRAM);
+      } else {
+        throw new NumberFormatException("Observation value is not of type QuantityDt.");
+      }
+    } else if (ObservationUtils.firstIsFresher(freshestClinicalWeight, freshestAdmissionWeight)) {
+      IDatatype quantity = freshestClinicalWeight.getValue();
+      if (quantity instanceof QuantityDt) {
+        return ((QuantityDt) quantity).getValue();
+      } else {
+        throw new NumberFormatException("Observation value is not of type QuantityDt.");
+      }
+    } else if (freshestAdmissionWeight != null) {
+      IDatatype quantity = freshestAdmissionWeight.getValue();
+      if (quantity instanceof QuantityDt) {
+        return ((QuantityDt) quantity).getValue();
+      } else {
+        throw new NumberFormatException("Observation value is not of type QuantityDt.");
+      }
+    }
+
+    return new BigDecimal("-1");
   }
 }

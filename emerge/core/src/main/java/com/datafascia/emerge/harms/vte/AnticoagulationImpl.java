@@ -2,9 +2,12 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.harms.vte;
 
+import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
+import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
+import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationOrderStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
@@ -12,6 +15,7 @@ import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.emerge.harms.HarmsLookups;
 import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
 import com.datafascia.emerge.ucsf.MedicationOrderUtils;
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -20,6 +24,8 @@ import javax.inject.Inject;
  * Harms logic for VTE anticoagulation.
  */
 public class AnticoagulationImpl {
+  private static final BigDecimal NEGATIVE_ONE = new BigDecimal("-1");
+  private static final BigDecimal ZERO_POINT_EIGHT_SIX = new BigDecimal("0.86");
 
   @Inject
   private ClientBuilder apiClient;
@@ -35,46 +41,38 @@ public class AnticoagulationImpl {
     List<MedicationOrder> medicationOrders = apiClient.getMedicationOrderClient()
         .search(encounterId);
 
-    // First check active prescriptions for the anticoagulants.
     for (MedicationOrder medicationOrder : medicationOrders) {
-      if (medicationOrder.getStatusElement().getValueAsEnum() == MedicationOrderStatusEnum.ACTIVE) {
+      if (medicationOrder.getStatusElement().getValueAsEnum() ==
+              MedicationOrderStatusEnum.ACTIVE ||
+          medicationOrder.getStatusElement().getValueAsEnum() ==
+              MedicationOrderStatusEnum.DRAFT) {
         for (IdentifierDt ident : MedicationOrderUtils.findIdentifiers(medicationOrder,
             CodingSystems.UCSF_MEDICATION_GROUP_NAME)) {
           for (AnticoagulationTypeEnum atEnum : AnticoagulationTypeEnum.values()) {
             if (atEnum.getCode().equals(ident.getValue())) {
-              return Optional.of(atEnum);
-            }
-          }
-        }
-      }
-    }
 
-    List<MedicationAdministration> administrations = apiClient.getMedicationAdministrationClient()
-        .search(encounterId);
-
-    // Check if any recent administrations have been made that are anticoagulants.
-    for (MedicationAdministration administration : administrations) {
-      for (IdentifierDt ident : MedicationAdministrationUtils.findIdentifiers(administration,
-          CodingSystems.UCSF_MEDICATION_GROUP_NAME)) {
-        String medsSet = ident.getValue();
-
-        for (AnticoagulationTypeEnum atEnum : AnticoagulationTypeEnum.values()) {
-          DateTimeDt timeTaken = (DateTimeDt) administration.getEffectiveTime();
-          Long period = HarmsLookups.efficacyList.get(medsSet);
-
-          if (atEnum.getCode().equals(medsSet)
-              && HarmsLookups.withinDrugPeriod(timeTaken.getValue(), period)) {
-
-            // If INR is greater than 1.5, then it's still active. Otherwise, return null.
-            if (medsSet.equals("Intermittent Warfarin Enteral")) {
-              if (HarmsLookups.inrOver1point5(apiClient, encounterId)) {
-                return Optional.of(atEnum);
+              // Check dose ratio for Intermittent Enoxaparin SC
+              if (ident.equals(AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN_SC.getCode())) {
+                MedicationOrder.DosageInstruction dosage =
+                    medicationOrder.getDosageInstructionFirstRep();
+                IDatatype dose = dosage.getDose();
+                if (dose instanceof QuantityDt) {
+                  QuantityDt quantity = (QuantityDt) dosage.getDose();
+                  BigDecimal weight = HarmsLookups.getPatientWeight(apiClient, encounterId);
+                  if (weight.compareTo(NEGATIVE_ONE) == 0) {
+                    return Optional.empty();
+                  } else {
+                    return quantity.getValue().divide(weight)
+                        .compareTo(ZERO_POINT_EIGHT_SIX) > -1
+                        ? Optional.of(atEnum) : Optional.empty();
+                  }
+                } else {
+                  return Optional.empty();
+                }
               } else {
-                return Optional.empty();
+                return Optional.of(atEnum);
               }
             }
-
-            return Optional.of(atEnum);
           }
         }
       }
@@ -91,6 +89,52 @@ public class AnticoagulationImpl {
    * @return true if the patient is anticoagulated.
    */
   public boolean isAnticoagulated(String encounterId) {
-    return getAnticoagulationType(encounterId).isPresent();
+    List<MedicationAdministration> administrations = apiClient.getMedicationAdministrationClient()
+        .search(encounterId);
+
+    // Check if any recent administrations have been made that are anticoagulants.
+    for (MedicationAdministration administration : administrations) {
+      for (IdentifierDt ident : MedicationAdministrationUtils.findIdentifiers(administration,
+          CodingSystems.UCSF_MEDICATION_GROUP_NAME)) {
+        String medsSet = ident.getValue();
+
+        for (AnticoagulationTypeEnum atEnum : AnticoagulationTypeEnum.values()) {
+          DateTimeDt timeTaken = (DateTimeDt) administration.getEffectiveTime();
+          Long period = HarmsLookups.efficacyList.get(medsSet);
+
+          if (atEnum.getCode().equals(medsSet) &&
+              HarmsLookups.withinDrugPeriod(timeTaken.getValue(), period) &&
+              (MedicationAdministrationStatusEnum.COMPLETED
+                   .equals(administration.getStatusElement().getValueAsEnum()) ||
+               MedicationAdministrationStatusEnum.IN_PROGRESS
+                   .equals(administration.getStatusElement().getValueAsEnum()))) {
+
+            // If INR is greater than 1.5, then it's still active. Otherwise, return null.
+            if (medsSet.equals(AnticoagulationTypeEnum.INTERMITTENT_WARFARIN_ENTERAL.getCode())) {
+              if (HarmsLookups.inrOver1point5(apiClient, encounterId)) {
+                return true;
+              } else {
+                return false;
+              }
+
+            // Check dose ratio for Enoxaparin SC
+            } else if (medsSet.equals(AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN_SC
+                .getCode())) {
+              BigDecimal dose = administration.getDosage().getQuantity().getValue();
+              BigDecimal weight = HarmsLookups.getPatientWeight(apiClient, encounterId);
+              if (weight.compareTo(NEGATIVE_ONE) == 0) {
+                return false;
+              } else {
+                return dose.divide(weight).compareTo(ZERO_POINT_EIGHT_SIX) > -1 ? true : false;
+              }
+            } else {
+              return true;
+            }
+          }
+        }
+      }
+    }
+
+    return false;
   }
 }

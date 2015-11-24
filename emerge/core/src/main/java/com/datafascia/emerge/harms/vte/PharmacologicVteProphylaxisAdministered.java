@@ -9,6 +9,7 @@ import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.emerge.harms.HarmsLookups;
 import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
+import java.math.BigDecimal;
 import java.util.List;
 import javax.inject.Inject;
 
@@ -16,6 +17,7 @@ import javax.inject.Inject;
  * Pharmacologic VTE Prophylaxis Administered implementation
  */
 public class PharmacologicVteProphylaxisAdministered {
+  private static final BigDecimal ZERO_POINT_EIGHT_SIX = new BigDecimal("0.86");
 
   @Inject
   private ClientBuilder apiClient;
@@ -44,8 +46,19 @@ public class PharmacologicVteProphylaxisAdministered {
           Long period = HarmsLookups.efficacyList.get(medsSet);
           if (vtePpx.getCode().equals(medsSet)
               && HarmsLookups.withinDrugPeriod(timeTaken.getValue(), period)) {
-            administered = true;
-            break;
+
+            // Check dose ratio for Enoxaparin SC
+            if (vtePpx.getCode().equals(
+                PharmacologicVtePpxTypeEnum.INTERMITTENT_ENOXAPARIN.getCode())) {
+              BigDecimal dose = administration.getDosage().getQuantity().getValue();
+              BigDecimal weight = HarmsLookups.getPatientWeight(apiClient, encounterId);
+              administered =
+                  dose.divide(weight).compareTo(ZERO_POINT_EIGHT_SIX) < 0 ? true : false;
+              break;
+            } else {
+              administered = true;
+              break;
+            }
           }
         }
       }

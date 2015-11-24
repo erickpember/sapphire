@@ -20,6 +20,24 @@ public class CodeStatusImpl {
   private ClientBuilder apiClient;
 
   /**
+  * Returns true if a procedure request has a code that indicates code status.
+  *
+  * @param request
+  *     Resource to check.
+  * @return
+  *     True if this request is relevant to code status. Otherwise false.
+  */
+  public static boolean isRelevant(ProcedureRequest request) {
+    String code = request.getCode().getCodingFirstRep().getCode();
+    if (code != null && (code.equals("82935") || code.equals("82934") || code.equals("521") || code
+        .equals("519") || code.equals("517"))) {
+      return true;
+    } else {
+      return false;
+    }
+  }
+
+  /**
    * Gets most recent code status.
    *
    * @param encounterId
@@ -35,11 +53,9 @@ public class CodeStatusImpl {
         .sortProcedureRequests(codeStatusRequests));
 
     for (ProcedureRequest request : sortedRequests) {
-      String code = request.getCode().getCodingFirstRep().getCode();
-      if (code != null &&
-          (code.equals("82935") || code.equals("82934") ||
-           code.equals("521") || code.equals("519") || code.equals("517"))) {
-        return CodeStatus.Value.fromValue(CodeStatusCodeMap.getName(code));
+      if (isRelevant(request)) {
+        return CodeStatus.Value.fromValue(CodeStatusCodeMap.getName(request.getCode()
+            .getCodingFirstRep().getCode()));
       }
     }
 

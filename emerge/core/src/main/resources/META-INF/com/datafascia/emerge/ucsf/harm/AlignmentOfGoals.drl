@@ -4,6 +4,7 @@ package com.datafascia.emerge.ucsf.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Flag;
+import com.datafascia.emerge.harms.aog.CodeStatusImpl;
 import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater.Event;
 import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater.EventType;
 
@@ -50,7 +51,8 @@ end
 
 rule "Update code status"
 when
-  Event( type == EventType.TIMER )
+  Event( type == EventType.UPDATE_PROCEDURE_REQUEST )
+  $request: ProcedureRequest( CodeStatusImpl.isRelevant($request) )
   $encounter: Encounter()
 then
   alignmentOfGoalsUpdater.updateCodeStatus(harmEvidence, $encounter);

@@ -320,8 +320,9 @@ public class DailySedationInterruptionCandidate {
        */
       allBelow36p5 = false;
       for (Observation obv : temperatureFromPast48Hours) {
-        if (ObservationUtils.getEffectiveDate(obv).after(ObservationUtils
-            .getEffectiveDate(freshestCoolingPadStatusFromPast25Hours.get()))
+        if (freshestCoolingPadStatusFromPast25Hours.isPresent()
+            && ObservationUtils.getEffectiveDate(obv).after(ObservationUtils
+                .getEffectiveDate(freshestCoolingPadStatusFromPast25Hours.get()))
             && obv.getValue() instanceof QuantityDt
             && ((QuantityDt) obv.getValue()).getValue().doubleValue() <= 36.5) {
           allBelow36p5 = false;
@@ -367,11 +368,13 @@ public class DailySedationInterruptionCandidate {
      * freshestSedationWakeUpAction.getValue() == “No - Other reason (Comment)” then Daily Sedation
      * Interruption Candidate = “No: Other”
      */
-    switch (freshestActualRASSFromPast7Hours.get().getValue().toString()) {
-      case "+2":
-      case "+3":
-      case "+4":
-        return RASS_2_OR_GREATER;
+    if (freshestActualRASSFromPast7Hours.isPresent()) {
+      switch (freshestActualRASSFromPast7Hours.get().getValue().toString()) {
+        case "+2":
+        case "+3":
+        case "+4":
+          return RASS_2_OR_GREATER;
+      }
     }
 
     switch (freshestWakeUpAction) {

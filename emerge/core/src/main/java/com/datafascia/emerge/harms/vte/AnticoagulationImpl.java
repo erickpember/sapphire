@@ -69,7 +69,7 @@ public class AnticoagulationImpl {
                         medicationOrder.getIdentifierFirstRep().getValue(), encounterId);
                     return Optional.empty();
                   } else {
-                    return quantity.getValue().divide(weight)
+                    return quantity.getValue().divide(weight, 10, BigDecimal.ROUND_HALF_UP)
                         .compareTo(ZERO_POINT_EIGHT_SIX) > -1
                         ? Optional.of(atEnum) : Optional.empty();
                   }
@@ -137,7 +137,8 @@ public class AnticoagulationImpl {
                     encounterId);
                 return false;
               } else {
-                return dose.divide(weight).compareTo(ZERO_POINT_EIGHT_SIX) >= 0;
+                return dose.divide(weight, 10, BigDecimal.ROUND_HALF_UP)
+                    .compareTo(ZERO_POINT_EIGHT_SIX) >= 0;
               }
             } else {
               return true;

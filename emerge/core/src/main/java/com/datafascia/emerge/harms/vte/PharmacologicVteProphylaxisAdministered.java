@@ -56,8 +56,8 @@ public class PharmacologicVteProphylaxisAdministered {
                 PharmacologicVtePpxTypeEnum.INTERMITTENT_ENOXAPARIN.getCode())) {
               BigDecimal dose = administration.getDosage().getQuantity().getValue();
               BigDecimal weight = HarmsLookups.getPatientWeight(apiClient, encounterId);
-              administered =
-                  dose.divide(weight).compareTo(ZERO_POINT_EIGHT_SIX) < 0 ? true : false;
+              administered = dose.divide(weight, 10, BigDecimal.ROUND_HALF_UP)
+                      .compareTo(ZERO_POINT_EIGHT_SIX) < 0;
               break;
             } else {
               administered = true;

@@ -9,7 +9,8 @@ import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import java.math.BigDecimal;
-import java.util.Calendar;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -64,15 +65,19 @@ public class HarmsLookups {
   /**
    * Determines if the drug has been taken within its effectiveness period.
    *
-   * @param timeTaken The time the drug was administered.
-   * @param period The period, in seconds, that the drug is active.
+   * @param timeTaken
+   *    The time the drug was administered.
+   * @param period
+   *    The period, in seconds, that the drug is active.
+   * @param clock
+   *    Shared configurable timekeeping instance.
    * @return Whether the time taken is within the period of efficacy for the drug to now.
    */
-  public static boolean withinDrugPeriod(Date timeTaken, long period) {
+  public static boolean withinDrugPeriod(Date timeTaken, long period, Clock clock) {
     long timeTakenLong = timeTaken.getTime();
     Date lastEffectiveTime = new Date(timeTakenLong + (1000l * period));
 
-    Date now = Calendar.getInstance().getTime();
+    Date now = Date.from(Instant.now(clock));
 
     // Right now is after the last effective time.
     if (now.after(lastEffectiveTime)) {

@@ -15,6 +15,7 @@ import com.datafascia.emerge.harms.HarmsLookups;
 import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
 import com.datafascia.emerge.ucsf.MedicationOrderUtils;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -30,6 +31,9 @@ public class AnticoagulationImpl {
 
   @Inject
   private ClientBuilder apiClient;
+
+  @Inject
+  private Clock clock;
 
   /**
    * Gets type of anticoagulant in use for an encounter.
@@ -50,7 +54,8 @@ public class AnticoagulationImpl {
             if (atEnum.getCode().equals(ident.getValue())) {
 
               // Check dose ratio for Intermittent Enoxaparin SC
-              if (ident.equals(AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN_SC.getCode())) {
+              if (ident.getValue().equals(AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN_SC
+                  .getCode())) {
                 MedicationOrder.DosageInstruction dosage =
                     medicationOrder.getDosageInstructionFirstRep();
                 IDatatype dose = dosage.getDose();
@@ -107,7 +112,7 @@ public class AnticoagulationImpl {
           Long period = HarmsLookups.efficacyList.get(medsSet);
 
           if (atEnum.getCode().equals(medsSet) &&
-              HarmsLookups.withinDrugPeriod(timeTaken.getValue(), period) &&
+              HarmsLookups.withinDrugPeriod(timeTaken.getValue(), period, clock) &&
               (MedicationAdministrationStatusEnum.COMPLETED
                    .equals(administration.getStatusElement().getValueAsEnum()) ||
                MedicationAdministrationStatusEnum.IN_PROGRESS

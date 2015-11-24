@@ -10,6 +10,7 @@ import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.emerge.harms.HarmsLookups;
 import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.util.List;
 import javax.inject.Inject;
 
@@ -21,6 +22,9 @@ public class PharmacologicVteProphylaxisAdministered {
 
   @Inject
   private ClientBuilder apiClient;
+
+  @Inject
+  private Clock clock;
 
   /**
    * Checks if pharmacologic VTE prophylaxis was administered
@@ -45,7 +49,7 @@ public class PharmacologicVteProphylaxisAdministered {
           DateTimeDt timeTaken = (DateTimeDt) administration.getEffectiveTime();
           Long period = HarmsLookups.efficacyList.get(medsSet);
           if (vtePpx.getCode().equals(medsSet)
-              && HarmsLookups.withinDrugPeriod(timeTaken.getValue(), period)) {
+              && HarmsLookups.withinDrugPeriod(timeTaken.getValue(), period, clock)) {
 
             // Check dose ratio for Enoxaparin SC
             if (vtePpx.getCode().equals(

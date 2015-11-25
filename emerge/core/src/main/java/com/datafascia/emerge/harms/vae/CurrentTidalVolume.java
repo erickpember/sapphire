@@ -73,6 +73,8 @@ public class CurrentTidalVolume {
           }
         }
         break;
+      case "Pressure Support (PS)":
+      case "Airway Pressure Release Ventilation (APRV)":
       case "Indeterminate":
         break;
       default:

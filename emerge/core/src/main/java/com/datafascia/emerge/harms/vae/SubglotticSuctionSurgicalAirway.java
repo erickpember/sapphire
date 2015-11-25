@@ -53,10 +53,10 @@ public class SubglotticSuctionSurgicalAirway {
       if ("Surgical Airway".equals(airway)) {
         airwaySubglotticSuctionCapabilityStatus = "Unknown";
       } else if (freshestAirwayDevice.getValue()
-          .toString().equals("Endotracheal Tube – Subglottic")) {
+          .toString().equals("Endotracheal Tube - Subglottic")) {
         airwaySubglotticSuctionCapabilityStatus = "Present";
       } else if (!freshestAirwayDevice.getValue()
-          .toString().equals("Endotracheal Tube – Subglottic")) {
+          .toString().equals("Endotracheal Tube - Subglottic")) {
         airwaySubglotticSuctionCapabilityStatus = "Absent";
       }
 

@@ -21,6 +21,7 @@ import java.security.NoSuchAlgorithmException;
 import java.security.UnrecoverableKeyException;
 import java.security.cert.CertificateException;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -142,9 +143,10 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
       keystore.load(in, service.getKeyStorePassword().toCharArray());
     }
 
-    final SSLContext sslContext = SSLContexts.custom().loadTrustMaterial(truststore,
-        new TrustSelfSignedStrategy()).loadKeyMaterial(keystore,
-        service.getKeyStorePassword().toCharArray()).build();
+    final SSLContext sslContext = SSLContexts.custom()
+        .loadTrustMaterial(truststore, new TrustSelfSignedStrategy())
+        .loadKeyMaterial(keystore, service.getKeyStorePassword().toCharArray())
+        .build();
 
     return sslContext;
   }
@@ -170,21 +172,31 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
     String trimmed = epicDate.replace("/Date(", "").replace(")/", "");
     String[] parts = trimmed.split("-");
     String milliseconds;
-    char offsetChar;
     // Offsets follow a dash, but we need to handle negatives, so the time and offset to shift.
     if (trimmed.startsWith("-")) {
       milliseconds = parts[1];
-      offsetChar = parts[2].toCharArray()[1];
     } else {
       milliseconds = parts[0];
-      offsetChar = parts[1].toCharArray()[1];
     }
-    int offset = Integer.parseInt(new String(new char[]{offsetChar})) * 60 * 60 * 1000;
+    int offset = getOffset(epicDate);
     if (milliseconds.equals("")) {
       throw new RuntimeException("Epic date: " + trimmed);
     }
     long utc = Long.parseLong(milliseconds) + offset;
     return Instant.ofEpochMilli(utc);
+  }
+
+  private static int getOffset(String epicDate) {
+    String trimmed = epicDate.replace("/Date(", "").replace(")/", "");
+    String[] parts = trimmed.split("-");
+    char offsetChar;
+    // Offsets follow a dash, but we need to handle negatives, so the time and offset to shift.
+    if (trimmed.startsWith("-")) {
+      offsetChar = parts[2].toCharArray()[1];
+    } else {
+      offsetChar = parts[1].toCharArray()[1];
+    }
+    return Integer.parseInt(new String(new char[]{offsetChar})) * 60 * 60 * 1000;
   }
 
   public void setConfig(UcsfWebGetConfig config) {
@@ -325,7 +337,11 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
         try {
           JSONObject jsonObject = (JSONObject) new JSONParser().parse(jsonString);
           String extractDateTime = jsonObject.get("ExtractDateTime").toString();
-          lastTimestamps.put(baseUrl, epicDateToISO8601(extractDateTime));
+          Instant correctTime = epicDateToInstant(extractDateTime);
+          // The webservice is off by (UTC offset * 2), we need to account for that.
+          Instant incorrectTime
+              = correctTime.minus(getOffset(extractDateTime) * 2, ChronoUnit.MILLIS);
+          lastTimestamps.put(baseUrl, incorrectTime.toString());
         } catch (ParseException e) {
           throw new ProcessException(e);
         }

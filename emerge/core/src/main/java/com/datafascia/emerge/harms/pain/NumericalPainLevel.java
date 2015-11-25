@@ -181,8 +181,11 @@ public class NumericalPainLevel {
           observationsSinceMidnight);
     }
 
-    if (highestOrLowestNumericalPainScore != null) {
-      result.setPainScore(PainUtils.getPainScoreFromValue(highestOrLowestNumericalPainScore));
+    Integer highestOrLowestScoreValue = PainUtils.getPainScoreFromValue(
+        highestOrLowestNumericalPainScore);
+
+    if (highestOrLowestScoreValue != null) {
+      result.setPainScore(highestOrLowestScoreValue);
       result.setTimeOfCalculation(sinceMidnight.getEnd());
       result.setStartOfTimePeriod(sinceMidnight.getStart());
       result.setEndOfTimePeriod(sinceMidnight.getEnd());

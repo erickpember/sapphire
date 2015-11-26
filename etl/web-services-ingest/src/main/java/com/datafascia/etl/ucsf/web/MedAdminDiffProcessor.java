@@ -275,7 +275,11 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
     if (routeParts.length > 0) {
       droolNorm.setRoute(routeParts[0]);
     }
-    droolNorm.setFrequency(frequencyParts[0]);
+    if (frequencyParts.length > 0) {
+      droolNorm.setFrequency(frequencyParts[0]);
+    } else {
+      log.warn("No frequency given for medication order " + prescriptionId);
+    }
 
     kieSession.insert(droolNorm);
     kieSession.fireAllRules();

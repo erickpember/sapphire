@@ -113,8 +113,10 @@ public class ProcedureRequestClient extends BaseClient<ProcedureRequest> {
     if (!Strings.isNullOrEmpty(status)) {
       List<ProcedureRequest> filteredResults = new ArrayList<>();
       for (ProcedureRequest procedureRequest : procedureRequests) {
-        if (procedureRequest.getStatus().equalsIgnoreCase(status)) {
-          filteredResults.add(procedureRequest);
+        if (procedureRequest.getStatus() != null) {
+          if (procedureRequest.getStatus().equalsIgnoreCase(status)) {
+            filteredResults.add(procedureRequest);
+          }
         }
       }
       procedureRequests = filteredResults;

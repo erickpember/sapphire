@@ -30,6 +30,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLContext;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.auth.AuthScope;
@@ -82,6 +83,7 @@ import org.kohsuke.MetaInfServices;
     "json"})
 @WritesAttribute(attribute = "filename",
     description = "the filename is set to the name of the file on the remote server")
+@Slf4j
 public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
   public static final String HEADER_ACCEPT = "Accept";
 
@@ -90,12 +92,6 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
       .description("The file path to the YAML config")
       .addValidator(StandardValidators.NON_EMPTY_VALIDATOR)
       .required(true)
-      .build();
-  public static final PropertyDescriptor SSL_CONTEXT_SERVICE = new PropertyDescriptor.Builder()
-      .name("SSL Context Service")
-      .description("The Controller Service to use in order to obtain an SSL Context")
-      .required(false)
-      .identifiesControllerService(SSLContextService.class)
       .build();
 
   public static final Relationship SUCCESS = new Relationship.Builder()
@@ -116,7 +112,6 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
 
     final List<PropertyDescriptor> properties = new ArrayList<>();
     properties.add(YAMLPATH);
-    properties.add(SSL_CONTEXT_SERVICE);
     this.properties = Collections.unmodifiableList(properties);
   }
 
@@ -213,9 +208,16 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
       try {
         config = UcsfWebGetConfig.load(yamlFilename);
         if (config.username != null) {
-          logger.info("UcsfWebGetProcessor using username " + config.username);
+          logger.info("Using username " + config.username);
         } else {
-          logger.info("UcsfWebGetProcessor not using a username.");
+          logger.info("Not using a username.");
+        }
+        if (config.trustStore != null && !config.trustStore.isEmpty()) {
+          log.info("Using truststore: " + config.trustStore);
+          System.setProperty("javax.net.ssl.trustStore", config.trustStore);
+          System.setProperty("javax.net.ssl.trustStorePassword", config.trustStorePassword);
+        } else {
+          log.info("Not using a truststore.");
         }
       } catch (FileNotFoundException ex) {
         throw new ProcessException("Configuration could not be loaded. File " + yamlFilename
@@ -227,19 +229,17 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
     }
 
     final ProcessSession session = sessionFactory.createSession();
-    final SSLContextService sslContextService = context.getProperty(SSL_CONTEXT_SERVICE)
-        .asControllerService(SSLContextService.class);
+    SSLContext sslContext = null;
 
     // create the connection manager
     final HttpClientConnectionManager conMan;
-    if (sslContextService == null) {
+    if (config.trustStore == null || config.trustStore.isEmpty()) {
       logger.info("No SSL context provided. Using basic HTTP.");
       conMan = new BasicHttpClientConnectionManager();
     } else {
-      final SSLContext sslContext;
       try {
-        sslContext = createSSLContext(sslContextService);
-      } catch (final GeneralSecurityException | IOException e) {
+        sslContext = SSLContext.getInstance("TLS");
+      } catch (final GeneralSecurityException e) {
         throw new ProcessException(e);
       }
 
@@ -271,9 +271,8 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
     }
 
     // set the ssl context if necessary
-    if (sslContextService != null) {
-      clientBuilder.setSslcontext(sslContextService
-          .createSSLContext(SSLContextService.ClientAuth.REQUIRED));
+    if (sslContext != null) {
+      clientBuilder.setSslcontext(sslContext);
     }
 
     // set the credentials if appropriate

@@ -22,6 +22,8 @@ public class UcsfWebGetConfig {
   public String username;
   public String password;
   public String userAgent;
+  public String trustStore;
+  public String trustStorePassword;
 
   /**
    * Loads a given YAML file config.

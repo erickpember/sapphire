@@ -30,12 +30,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLContext;
-import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
-import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.AuthenticationException;
 import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpGet;
@@ -45,7 +43,7 @@ import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
 import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
-import org.apache.http.impl.client.BasicCredentialsProvider;
+import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
 import org.apache.http.ssl.SSLContexts;
@@ -83,7 +81,6 @@ import org.kohsuke.MetaInfServices;
     "json"})
 @WritesAttribute(attribute = "filename",
     description = "the filename is set to the name of the file on the remote server")
-@Slf4j
 public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
   public static final String HEADER_ACCEPT = "Accept";
 
@@ -99,6 +96,8 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
       .description("All files are transferred to the success relationship")
       .build();
 
+  private boolean initialized = false;
+  private UsernamePasswordCredentials credentials;
   private Set<Relationship> relationships;
   private List<PropertyDescriptor> properties;
   private UcsfWebGetConfig config;
@@ -203,21 +202,26 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
       throws ProcessException {
     final ProcessorLog logger = getLogger();
 
-    if (config == null) {
+    if (!initialized) {
       String yamlFilename = context.getProperty(YAMLPATH).getValue();
       try {
-        config = UcsfWebGetConfig.load(yamlFilename);
-        if (config.username != null) {
-          logger.info("Using username " + config.username);
-        } else {
-          logger.info("Not using a username.");
+        if (config == null) {
+          config = UcsfWebGetConfig.load(yamlFilename);
         }
+
+        if (config.username != null) {
+          logger.info("Adding basic authentication with username " + config.username);
+          credentials = new UsernamePasswordCredentials(config.username, config.password);
+        } else {
+          logger.info("No username provided. No authentication being sent.");
+        }
+
         if (config.trustStore != null && !config.trustStore.isEmpty()) {
-          log.info("Using truststore: " + config.trustStore);
+          logger.info("Using truststore: " + config.trustStore);
           System.setProperty("javax.net.ssl.trustStore", config.trustStore);
           System.setProperty("javax.net.ssl.trustStorePassword", config.trustStorePassword);
         } else {
-          log.info("Not using a truststore.");
+          logger.info("Not using a truststore.");
         }
       } catch (FileNotFoundException ex) {
         throw new ProcessException("Configuration could not be loaded. File " + yamlFilename
@@ -226,6 +230,7 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
         throw new ProcessException("Configuration could not be loaded. This system does not"
             + " support UTF-8", ex);
       }
+      initialized = true;
     }
 
     final ProcessSession session = sessionFactory.createSession();
@@ -275,19 +280,6 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
       clientBuilder.setSslcontext(sslContext);
     }
 
-    // set the credentials if appropriate
-    if (config.username != null) {
-      final CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-      if (config.password == null) {
-        credentialsProvider.setCredentials(AuthScope.ANY,
-            new UsernamePasswordCredentials(config.username));
-      } else {
-        credentialsProvider.setCredentials(AuthScope.ANY,
-            new UsernamePasswordCredentials(config.username, config.password));
-      }
-      clientBuilder.setDefaultCredentialsProvider(credentialsProvider);
-    }
-
     // create the http client
     final HttpClient client = clientBuilder.build();
 
@@ -313,6 +305,14 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
       // create request
       final HttpGet get = new HttpGet(url);
       get.setConfig(requestConfigBuilder.build());
+      // Manually add basic authentication.
+      if (credentials != null) {
+        try {
+          get.addHeader(new BasicScheme().authenticate(credentials, get, null));
+        } catch (AuthenticationException e) {
+          throw new AssertionError("BasicScheme.authenticate should never fail, but it did", e);
+        }
+      }
 
       if (config.acceptContentType != null) {
         get.addHeader(HEADER_ACCEPT, config.acceptContentType);

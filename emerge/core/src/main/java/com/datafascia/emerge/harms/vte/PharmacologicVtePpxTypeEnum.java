@@ -4,14 +4,15 @@ package com.datafascia.emerge.harms.vte;
 
 import com.datafascia.common.persist.Code;
 import com.datafascia.common.persist.CodeToEnumMapper;
+import com.datafascia.emerge.ucsf.codes.MedsSetEnum;
 import java.util.Optional;
 
 /**
  * Enumeration of pharmacologic VTE prophylaxis types.
  */
 public enum PharmacologicVtePpxTypeEnum implements Code<String> {
-  INTERMITTENT_ENOXAPARIN("Intermittent Enoxaparin"),
-  INTERMITTENT_HEPARIN_SC("Intermittent Heparin SC");
+  INTERMITTENT_ENOXAPARIN(MedsSetEnum.INTERMITTENT_ENOXAPARIN.getCode()),
+  INTERMITTENT_HEPARIN_SC(MedsSetEnum.INTERMITTENT_HEPARIN_SC.getCode());
 
   private final String code;
 

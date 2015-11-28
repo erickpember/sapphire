@@ -4,22 +4,23 @@ package com.datafascia.emerge.harms.vte;
 
 import com.datafascia.common.persist.Code;
 import com.datafascia.common.persist.CodeToEnumMapper;
+import com.datafascia.emerge.ucsf.codes.MedsSetEnum;
 import java.util.Optional;
 
 /**
  * Enumeration of anticoagulation types.
  */
 public enum AnticoagulationTypeEnum implements Code<String> {
-  CONTINUOUS_INFUSION_HEPARIN_IV("Continuous Infusion Heparain IV"),
-  CONTINUOUS_INFUSION_ARGATROBAN_IV("Continuous Infusion Argatroban IV"),
-  CONTINUOUS_INFUSION_BIVALIRUDIAN_IV("Continuous Infusion Bivalirudian IV"),
-  INTERMITTENT_ENOXAPARIN_SC("Intermittent Enoxaparin SC"),
-  INTERMITTENT_DABIGATRAN_ENTERAL("Intermittent Dabigatran Enteral"),
-  INTERMITTENT_APIXABAN_ENTERAL("Intermittent Apixaban Enteral"),
-  INTERMITTENT_RIVAROXABAN_ENTERAL("Intermittent Rivaroxaban Enteral"),
-  INTERMITTENT_EDOXABAN_ENTERAL("Intermittent Edoxaban Enteral"),
-  INTERMITTENT_FONDAPARINUX_SC("Intermittent Fondaparinux SC"),
-  INTERMITTENT_WARFARIN_ENTERAL("Intermittent Warfarin Enteral");
+  CONTINUOUS_INFUSION_HEPARIN_IV(MedsSetEnum.CONTINUOUS_INFUSION_HEPARIN_IV.getCode()),
+  CONTINUOUS_INFUSION_ARGATROBAN_IV(MedsSetEnum.CONTINUOUS_INFUSION_ARGATROBAN_IV.getCode()),
+  CONTINUOUS_INFUSION_BIVALIRUDIAN_IV(MedsSetEnum.CONTINUOUS_INFUSION_BIVALIRUDIAN_IV.getCode()),
+  INTERMITTENT_ENOXAPARIN(MedsSetEnum.INTERMITTENT_ENOXAPARIN.getCode()),
+  INTERMITTENT_DABIGATRAN_ENTERAL(MedsSetEnum.INTERMITTENT_DABIGATRAN_ENTERAL.getCode()),
+  INTERMITTENT_APIXABAN_ENTERAL(MedsSetEnum.INTERMITTENT_APIXABAN_ENTERAL.getCode()),
+  INTERMITTENT_RIVAROXABAN_ENTERAL(MedsSetEnum.INTERMITTENT_RIVAROXABAN_ENTERAL.getCode()),
+  INTERMITTENT_EDOXABAN_ENTERAL(MedsSetEnum.INTERMITTENT_EDOXABAN_ENTERAL.getCode()),
+  INTERMITTENT_FONDAPARINUX_SC(MedsSetEnum.INTERMITTENT_FONDAPARINUX_SC.getCode()),
+  INTERMITTENT_WARFARIN_ENTERAL(MedsSetEnum.INTERMITTENT_WARFARIN_ENTERAL.getCode());
 
   private final String code;
 

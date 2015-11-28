@@ -54,7 +54,7 @@ public class AnticoagulationImpl {
             if (atEnum.getCode().equals(ident.getValue())) {
 
               // Check dose ratio for Intermittent Enoxaparin SC
-              if (ident.getValue().equals(AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN_SC
+              if (ident.getValue().equals(AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN
                   .getCode())) {
                 MedicationOrder.DosageInstruction dosage =
                     medicationOrder.getDosageInstructionFirstRep();
@@ -127,7 +127,7 @@ public class AnticoagulationImpl {
               }
 
             // Check dose ratio for Enoxaparin SC
-            } else if (medsSet.equals(AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN_SC
+            } else if (medsSet.equals(AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN
                 .getCode())) {
               BigDecimal dose = administration.getDosage().getQuantity().getValue();
               BigDecimal weight = HarmsLookups.getPatientWeight(apiClient, encounterId);

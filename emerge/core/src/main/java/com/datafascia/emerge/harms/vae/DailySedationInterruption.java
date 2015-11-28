@@ -11,6 +11,7 @@ import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
 import com.datafascia.emerge.ucsf.ObservationUtils;
+import com.datafascia.emerge.ucsf.codes.MedsSetEnum;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import java.time.Clock;
 import java.time.Instant;
@@ -75,10 +76,10 @@ public class DailySedationInterruption {
       for (IdentifierDt ident : identifiers) {
         String adminId = ident.getValue();
         String orderId = admin.getPrescription().getReference().getValue();
-        if (adminId.equals("Continuous Infusion Dexmedetomidine IV")
-            || adminId.equals("Continuous Infusion Propofol IV")
-            || adminId.equals("Continuous Infusion Lorazepam IV")
-            || adminId.equals("Continuous Infusion Midazolam IV")) {
+        if (adminId.equals(MedsSetEnum.CONTINUOUS_INFUSION_DEXMEDETOMIDINE_IV.getCode()) ||
+            adminId.equals(MedsSetEnum.CONTINUOUS_INFUSION_PROPOFOL_IV.getCode()) ||
+            adminId.equals(MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode()) ||
+            adminId.equals(MedsSetEnum.CONTINUOUS_INFUSION_MIDAZOLAM_IV.getCode())) {
           if (((DateTimeDt) admin.getEffectiveTime()).getValue().after(effectiveLowerBound)) {
             filteredAdmins.add(admin);
             MedicationOrder order;

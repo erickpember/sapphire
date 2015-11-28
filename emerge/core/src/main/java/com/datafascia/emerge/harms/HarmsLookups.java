@@ -7,6 +7,7 @@ import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
+import com.datafascia.emerge.ucsf.codes.MedsSetEnum;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -25,40 +26,23 @@ public class HarmsLookups {
   private static final BigDecimal FIFTY_THOUSAND = new BigDecimal("50000");
   private static final BigDecimal OUNCES_PER_KILOGRAM = new BigDecimal("35.274");
 
-  // Drug efficacy durations.
+  /*
+   * Drug efficacy durations.  See the current UCSF Emerge Medication Info Master spreadsheet,
+   * VTE Duration of Anitcoagulation sheet, for details.
+   */
   public final static Map<String, Long> efficacyList = new HashMap<String, Long>() {
     {
-      // Administered within 10 hours
-      put("Continuous Infusion Heparin IV", TimeUnit.HOURS.toMillis(10));
-      // Administered within 12 hours + 1h buffer = 13 hours
-      put("Intermittent Heparin SC", TimeUnit.HOURS.toMillis(12));
-      /* Administered within 5 hours. Did 5x normal half-life in this scenario as the drug would not
-       * be routinely used in hepatic impairment. */
-      put("Continuous Infusion Argatroban IV", TimeUnit.HOURS.toMillis(5));
-      /* Administered within 5 hours. Used 5x half-life for gfr 10-29 since would not routinely be
-       * used in patients with ESRD off dialysis. */
-      put("Continuous Infusion Bivalirudin IV", TimeUnit.HOURS.toMillis(5));
-      /* Administered within 24 hours + 1 h buffer = 25 hours. Initial idea was to pull by
-       * administration frequency + weight; administered within 12 hours (1 mg/kg doses) or 24 hours
-       * (1.5 mg/kg doses + prophylactic doses) */
-      put("Intermittent Enoxaparin", TimeUnit.HOURS.toMillis(25));
-      // Administered within 24 hours + 1 h buffer = 25 hours
-      put("Intermittent Dabigatran Enteral", TimeUnit.HOURS.toMillis(25));
-      // Administered within 12 hours + 1h buffer = 13 hours
-      put("Intermittent Apixaban Enteral", TimeUnit.HOURS.toMillis(13));
-      /* Administered within 24 hours + 1 h buffer = 25 hours. For drugs given therapeutically at 12
-       * and 24 hour intervals, should we pull based on the 24h + buffer to be most inclusive? I'd
-       * hate to prompt earlier admin in someone who is still therapeutic. */
-      put("Intermittent Rivaroxaban Enteral", TimeUnit.HOURS.toMillis(25));
-      // Administered within 24 hours + 1 h buffer = 25 hours
-      put("Intermittent Edoxaban Enteral", TimeUnit.HOURS.toMillis(25));
-      // Administered within 24 hours + 1 h buffer = 25 hours
-      put("Intermittent Fondaparinux SC", TimeUnit.HOURS.toMillis(25));
-      /* Administered within 3 days + INR > 1.5 I would like to base on the "duration" of 2-5 days
-       * given variability in ordering, potential for held doses, etc. the INR where you would give
-       * ppx once warfarin was held is not well defined, but 1.5 is reasonable and also our cutoff
-       * for the lab value itself. */
-      put("Intermittent Warfarin Enteral", TimeUnit.HOURS.toMillis(3));
+      put(MedsSetEnum.CONTINUOUS_INFUSION_HEPARIN_IV.getCode(), TimeUnit.HOURS.toMillis(10));
+      put(MedsSetEnum.INTERMITTENT_HEPARIN_SC.getCode(), TimeUnit.HOURS.toMillis(12));
+      put(MedsSetEnum.CONTINUOUS_INFUSION_ARGATROBAN_IV.getCode(), TimeUnit.HOURS.toMillis(5));
+      put(MedsSetEnum.CONTINUOUS_INFUSION_BIVALIRUDIAN_IV.getCode(), TimeUnit.HOURS.toMillis(5));
+      put(MedsSetEnum.INTERMITTENT_ENOXAPARIN.getCode(), TimeUnit.HOURS.toMillis(25));
+      put(MedsSetEnum.INTERMITTENT_DABIGATRAN_ENTERAL.getCode(), TimeUnit.HOURS.toMillis(25));
+      put(MedsSetEnum.INTERMITTENT_APIXABAN_ENTERAL.getCode(), TimeUnit.HOURS.toMillis(13));
+      put(MedsSetEnum.INTERMITTENT_RIVAROXABAN_ENTERAL.getCode(), TimeUnit.HOURS.toMillis(25));
+      put(MedsSetEnum.INTERMITTENT_EDOXABAN_ENTERAL.getCode(), TimeUnit.HOURS.toMillis(25));
+      put(MedsSetEnum.INTERMITTENT_FONDAPARINUX_SC.getCode(), TimeUnit.HOURS.toMillis(25));
+      put(MedsSetEnum.INTERMITTENT_WARFARIN_ENTERAL.getCode(), TimeUnit.HOURS.toMillis(3));
     }
   };
 

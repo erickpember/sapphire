@@ -46,7 +46,7 @@ public class PharmacologicVteProphylaxis {
             if (atEnum.getCode().equals(ident.getValue())) {
 
               // Check dose ratio for Intermittent Enoxaparin SC
-              if (ident.equals(AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN_SC.getCode())) {
+              if (ident.equals(AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN.getCode())) {
                 MedicationOrder.DosageInstruction dosage =
                     medicationOrder.getDosageInstructionFirstRep();
                 IDatatype dose = dosage.getDose();

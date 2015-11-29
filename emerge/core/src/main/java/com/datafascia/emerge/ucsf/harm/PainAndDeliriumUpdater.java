@@ -178,6 +178,10 @@ public class PainAndDeliriumUpdater {
   public void updateVerbalPainLevel(HarmEvidence harmEvidence, Encounter encounter) {
     String encounterId = encounter.getId().getIdPart();
 
+    PainGoal painGoal = new PainGoal().withDataEntryTime(Date.from(Instant.now(clock)))
+        .withGoal(painGoalImpl.getPainGoal(encounterId));
+    getPain(harmEvidence).setPainGoal(painGoal);
+
     VerbalPainLevel.CurrentPainLevel currentLevel = verbalPainLevelImpl.getCurrentPainLevel(
         encounterId);
     CurrentScore_ currentScore = new CurrentScore_()

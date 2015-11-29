@@ -4,12 +4,14 @@ package com.datafascia.emerge.ucsf.harm.paindelirium;
 
 import com.datafascia.emerge.ucsf.Cam;
 import com.datafascia.emerge.ucsf.CurrentScore;
+import com.datafascia.emerge.ucsf.CurrentScore_;
 import com.datafascia.emerge.ucsf.CurrentScore___;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.Numerical;
 import com.datafascia.emerge.ucsf.PainGoal;
 import com.datafascia.emerge.ucsf.RASS;
 import com.datafascia.emerge.ucsf.RassGoal;
+import com.datafascia.emerge.ucsf.Verbal;
 import com.datafascia.emerge.ucsf.harm.HarmEvidenceTestSupport;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -50,6 +52,66 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
   }
 
   @Test
+  public void should_export_verbal_none() throws Exception {
+    processMessage("verbal-pain-none.hl7");
+    processTimer();
+
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
+    Verbal verbal =
+        harmEvidence.getMedicalData().getDelirium().getPain().getVerbal();
+
+    CurrentScore_ currentScore = verbal.getCurrentScore();
+    assertEquals(currentScore.getPainScore(), 0);
+    assertEquals(
+        currentScore.getTimeOfDataAquisition().toInstant().toString(), "2014-09-29T21:50:59Z");
+  }
+
+  @Test
+  public void should_export_verbal_mild() throws Exception {
+    processMessage("verbal-pain-mild.hl7");
+    processTimer();
+
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
+    Verbal verbal =
+        harmEvidence.getMedicalData().getDelirium().getPain().getVerbal();
+
+    CurrentScore_ currentScore = verbal.getCurrentScore();
+    assertEquals(currentScore.getPainScore(), 1);
+    assertEquals(
+        currentScore.getTimeOfDataAquisition().toInstant().toString(), "2014-09-29T21:50:59Z");
+  }
+
+  @Test
+  public void should_export_verbal_moderate() throws Exception {
+    processMessage("verbal-pain-moderate.hl7");
+    processTimer();
+
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
+    Verbal verbal =
+        harmEvidence.getMedicalData().getDelirium().getPain().getVerbal();
+
+    CurrentScore_ currentScore = verbal.getCurrentScore();
+    assertEquals(currentScore.getPainScore(), 5);
+    assertEquals(
+        currentScore.getTimeOfDataAquisition().toInstant().toString(), "2014-09-29T21:50:59Z");
+  }
+
+  @Test
+  public void should_export_verbal_severe() throws Exception {
+    processMessage("verbal-pain-severe.hl7");
+    processTimer();
+
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
+    Verbal verbal =
+        harmEvidence.getMedicalData().getDelirium().getPain().getVerbal();
+
+    CurrentScore_ currentScore = verbal.getCurrentScore();
+    assertEquals(currentScore.getPainScore(), 7);
+    assertEquals(
+        currentScore.getTimeOfDataAquisition().toInstant().toString(), "2014-09-29T21:50:59Z");
+  }
+
+  @Test
   public void should_export_pain_goal_8() throws Exception {
     processMessage("numerical-pain-8.hl7");
     processMessage("pain-goal.hl7");
@@ -59,6 +121,34 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
     PainGoal goal = harmEvidence.getMedicalData().getDelirium().getPain().getPainGoal();
 
     assertEquals(goal.getGoal(), 8);
+    assertEquals(
+        goal.getDataEntryTime().toInstant().toString(), "2014-09-29T23:48:59Z");
+  }
+
+  @Test
+  public void should_export_pain_goal_no_pain() throws Exception {
+    processMessage("numerical-pain-8.hl7");
+    processMessage("pain-goal-no-pain.hl7");
+    processTimer();
+
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
+    PainGoal goal = harmEvidence.getMedicalData().getDelirium().getPain().getPainGoal();
+
+    assertEquals(goal.getGoal(), 0);
+    assertEquals(
+        goal.getDataEntryTime().toInstant().toString(), "2014-09-29T23:48:59Z");
+  }
+
+  @Test
+  public void should_export_pain_goal_other() throws Exception {
+    processMessage("numerical-pain-8.hl7");
+    processMessage("pain-goal-other.hl7");
+    processTimer();
+
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
+    PainGoal goal = harmEvidence.getMedicalData().getDelirium().getPain().getPainGoal();
+
+    assertEquals(goal.getGoal(), 11);
     assertEquals(
         goal.getDataEntryTime().toInstant().toString(), "2014-09-29T23:48:59Z");
   }

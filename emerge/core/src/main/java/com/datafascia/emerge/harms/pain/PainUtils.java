@@ -54,10 +54,16 @@ public class PainUtils {
     for (Observation observation : observations) {
       if (observation.getCode().getCodingFirstRep().getCode().equals(code)) {
 
-        Integer score = (verbalOrNumerical == PainType.NUMERICAL) ? getPainScoreFromValue(
-            observation) : getVerbalPainScoreFromValue(observation);
-        if (score != null) {
-          return score;
+        switch (ObservationUtils.getValueAsString(observation)) {
+          case "No pain":
+            return 0;
+          case "Other (comment)":
+            return 11;
+          default:
+            Integer score = getPainScoreFromValue(observation);
+            if (score != null) {
+              return score;
+            }
         }
       }
     }

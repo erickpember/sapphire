@@ -38,7 +38,7 @@ public class OralCare {
       "Patient refused",
       "Other (Comment)");
   private static final Set<String> CONTRAINDICATED_VALUES = ImmutableSet.of(
-      "Contraindicated (bleeding, “no oral care” order)",
+      "Contraindicated (bleeding, \"no oral care\" order)",
       "Patient unavailable (off unit, procedure in progress)");
 
   /**

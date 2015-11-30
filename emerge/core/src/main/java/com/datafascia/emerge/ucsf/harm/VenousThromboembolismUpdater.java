@@ -10,6 +10,7 @@ import com.datafascia.emerge.harms.vte.PharmacologicVteProphylaxisAdministered;
 import com.datafascia.emerge.harms.vte.ProphylaxisContraindicated;
 import com.datafascia.emerge.harms.vte.SCDsInUse;
 import com.datafascia.emerge.harms.vte.SCDsOrdered;
+import com.datafascia.emerge.ucsf.Administered;
 import com.datafascia.emerge.ucsf.Anticoagulation;
 import com.datafascia.emerge.ucsf.Contraindicated;
 import com.datafascia.emerge.ucsf.HarmEvidence;
@@ -287,14 +288,14 @@ public class VenousThromboembolismUpdater {
   public void updatePharmacologicVTEProphylaxisAdministered(
       HarmEvidence harmEvidence, Encounter encounter) {
 
-    PharmacologicVTEProphylaxis prophylaxis = getPharmacologicVTEProphylaxis(harmEvidence);
-
     String encounterId = encounter.getId().getIdPart();
-    TimestampedBoolean prophylaxisAdministered = new TimestampedBoolean()
+
+    Administered prophylaxisAdministered = new Administered()
         .withValue(
             pharmacologicVteProphylaxisAdministered.isPharmacologicVteProphylaxisAdministered(
                 encounterId))
         .withUpdateTime(Date.from(Instant.now(clock)));
-    prophylaxis.setAdministered(prophylaxisAdministered);
+
+    getPharmacologicVTEProphylaxis(harmEvidence).setAdministered(prophylaxisAdministered);
   }
 }

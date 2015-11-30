@@ -382,6 +382,18 @@
                       }
                     }
                   }
+                },
+                "nmba": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "boolean"
+                    },
+                    "dataEntryTime": {
+                      "type": "string",
+                      "format": "date-time"
+                    }
+                  }
                 }
               }
             },
@@ -527,10 +539,9 @@
                         ],
                         "description": "How the medication is administered."
                       },
-                      "updateTime": {
+                      "orderId": {
                         "type": "string",
-                        "format": "date-time",
-                        "description": "An explanation about the purpose of this instance described by this schema."
+                        "description": "Order identifier assigned by institution"
                       },
                       "status": {
                         "type": "string",
@@ -542,6 +553,11 @@
                           "stopped",
                           "draft"
                         ]
+                      },
+                      "updateTime": {
+                        "type": "string",
+                        "format": "date-time",
+                        "description": "When this element was updated"
                       }
                     }
                   }
@@ -907,7 +923,20 @@
                   "$ref": "#/definitions/TimestampedBoolean"
                 },
                 "administered": {
-                  "$ref": "#/definitions/TimestampedBoolean"
+                  "type": "object",
+                  "properties": {
+                    "value": {
+                      "type": "boolean"
+                    },
+                    "type": {
+                      "type": "string"
+                    },
+                    "updateTime": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "When the value was updated"
+                    }
+                  }
                 }
               }
             }

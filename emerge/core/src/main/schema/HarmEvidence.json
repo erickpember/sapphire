@@ -825,10 +825,10 @@
                     "value": {
                       "type": "string",
                       "enum": [
-                        "Continuous Infusion Heparain IV",
+                        "Continuous Infusion Heparin IV",
                         "Continuous Infusion Argatroban IV",
                         "Continuous Infusion Bivalirudian IV",
-                        "Intermittent Enoxaparin SC",
+                        "Intermittent Enoxaparin",
                         "Intermittent Dabigatran Enteral",
                         "Intermittent Apixaban Enteral",
                         "Intermittent Rivaroxaban Enteral",

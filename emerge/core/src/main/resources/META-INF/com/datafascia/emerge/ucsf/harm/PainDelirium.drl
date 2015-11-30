@@ -59,6 +59,14 @@ then
   painAndDeliriumUpdater.updateCpotLevel(harmEvidence, $encounter);
 end
 
+rule "Update NMBA"
+when
+  Event( type in (EventType.ADMIT_PATIENT, EventType.TIMER) )
+  $encounter: Encounter()
+then
+  painAndDeliriumUpdater.updateNmba(harmEvidence, $encounter);
+end
+
 rule "Update CPOT Level from observation"
 when
   Event( type == EventType.UPDATE_OBSERVATIONS )

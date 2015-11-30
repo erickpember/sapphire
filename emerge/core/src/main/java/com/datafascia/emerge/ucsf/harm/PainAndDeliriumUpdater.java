@@ -20,6 +20,8 @@ import com.datafascia.emerge.harms.rass.RassGoalImpl.RassGoalResult;
 import com.datafascia.emerge.harms.rass.RassLevel;
 import com.datafascia.emerge.harms.rass.RassLevel.CurrentRassLevel;
 import com.datafascia.emerge.harms.rass.RassLevel.MinimumOrMaximumRassLevel;
+import com.datafascia.emerge.harms.vae.DailySedationInterruptionCandidate;
+import com.datafascia.emerge.harms.vae.DailySedationInterruptionCandidate.CandidateResult;
 import com.datafascia.emerge.ucsf.Cam;
 import com.datafascia.emerge.ucsf.Cpot;
 import com.datafascia.emerge.ucsf.CurrentScore;
@@ -37,6 +39,7 @@ import com.datafascia.emerge.ucsf.DailyMin___;
 import com.datafascia.emerge.ucsf.Delirium;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.MedicalData;
+import com.datafascia.emerge.ucsf.Nmba;
 import com.datafascia.emerge.ucsf.Numerical;
 import com.datafascia.emerge.ucsf.Order;
 import com.datafascia.emerge.ucsf.Pain;
@@ -93,6 +96,9 @@ public class PainAndDeliriumUpdater {
 
   @Inject
   private CpotImpl cpotImpl;
+
+  @Inject
+  private DailySedationInterruptionCandidate dailySedationInterruptionCandidate;
 
   @Inject
   private CamImpl camImpl;
@@ -248,6 +254,28 @@ public class PainAndDeliriumUpdater {
         .withCurrentScore(currentScore);
 
     getPain(harmEvidence).setCpot(cpot);
+  }
+
+  /**
+   * Updates NMBA.
+   *
+   * @param harmEvidence
+   *     to modify
+   * @param encounter
+   *     encounter
+   */
+  public void updateNmba(HarmEvidence harmEvidence, Encounter encounter) {
+    String encounterId = encounter.getId().getIdPart();
+
+    CandidateResult candidateResult =
+        dailySedationInterruptionCandidate.getDailySedationInterruptionCandidate(encounterId);
+    boolean status = candidateResult == CandidateResult.RECEIVING_NMBA;
+
+    Nmba nmba = new Nmba()
+        .withStatus(status)
+        .withDataEntryTime(Date.from(Instant.now(clock)));
+
+    getPain(harmEvidence).setNmba(nmba);
   }
 
   /**

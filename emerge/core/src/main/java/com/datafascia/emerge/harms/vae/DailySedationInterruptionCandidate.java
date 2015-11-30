@@ -24,8 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
 /**
  * Daily Sedation Interruption Candidate
@@ -35,36 +34,28 @@ public class DailySedationInterruptionCandidate {
   /**
    * Result container for daily sedation interruption candidate.
    */
-  @AllArgsConstructor
-  @Data
-  public static class CandidateResult {
+  @Getter
+  public enum CandidateResult {
+    OFF_SEDATION(false, "Off Sedation"),
+    RECEIVING_NMBA(false, "Receiving NMBA"),
+    STATUS_EPILEPTICUS(false, "Status Epilepticus"),
+    RESPIRATORY_INSTABILITY(false, "Respiratory Instability"),
+    THERAPEUTIC_HYPOTHERMIA(false, "Theraputic Hypothermia"),
+    RASS_2_OR_GREATER(false, "RASS 2+ or Greater"),
+    WITHDRAWAL_SEIZURE_RISK(false, "Withdrawal Seizure Risk"),
+    HEMODYNAMIC_INSTABILITY(false, "Hemodynamic Instability"),
+    OTHER(false, "Other"),
+    YES(true, null),
+    INVALID(false, "No specified conditions were met");
+
+    CandidateResult(boolean candidate, String notCandidateReason) {
+      this.candidate = candidate;
+      this.notCandidateReason = notCandidateReason;
+    }
+
     private boolean candidate;
     private String notCandidateReason;
   }
-
-  // Potential results
-  private static final CandidateResult OFF_SEDATION =
-      new CandidateResult(false, "Off Sedation");
-  private static final CandidateResult RECEIVING_NMBA =
-      new CandidateResult(false, "Receiving NMBA");
-  private static final CandidateResult STATUS_EPILEPTICUS =
-      new CandidateResult(false, "Status Epilepticus");
-  private static final CandidateResult RESPIRATORY_INSTABILITY =
-      new CandidateResult(false, "Respiratory Instability");
-  private static final CandidateResult THERAPEUTIC_HYPOTHERMIA =
-      new CandidateResult(false, "Theraputic Hypothermia");
-  private static final CandidateResult RASS_2_OR_GREATER =
-      new CandidateResult(false, "RASS 2+ or Greater");
-  private static final CandidateResult WITHDRAWAL_SEIZURE_RISK =
-      new CandidateResult(false, "Withdrawal Seizure Risk");
-  private static final CandidateResult HEMODYNAMIC_INSTABILITY =
-      new CandidateResult(false, "Hemodynamic Instability");
-  private static final CandidateResult OTHER =
-      new CandidateResult(false, "Other");
-  private static final CandidateResult YES =
-      new CandidateResult(true, null);
-  private static final CandidateResult INVALID =
-      new CandidateResult(false, "No specified conditions were met");
 
   @Inject
   private Clock clock;
@@ -110,7 +101,7 @@ public class DailySedationInterruptionCandidate {
       }
     }
     if (!sedativeInUse) {
-      return OFF_SEDATION;
+      return CandidateResult.OFF_SEDATION;
     }
 
     /* if notInfusing(MedicationAdministrations) then Daily Sedation Interruption Candidate = “No:
@@ -125,7 +116,7 @@ public class DailySedationInterruptionCandidate {
       }
     }
     if (allAdminOffSedation) {
-      return OFF_SEDATION;
+      return CandidateResult.OFF_SEDATION;
     }
 
     PeriodDt twoHourPeriod = new PeriodDt();
@@ -150,7 +141,7 @@ public class DailySedationInterruptionCandidate {
                   MedsSetEnum.INTERMITTENT_ROCURONIUM_IV.getCode())
               || MedicationAdministrationUtils.hasMedsSet(admin,
                   MedsSetEnum.INTERMITTENT_PANCURONIUM_IV.getCode())) {
-            return RECEIVING_NMBA;
+            return CandidateResult.RECEIVING_NMBA;
           }
         }
       }
@@ -168,7 +159,7 @@ public class DailySedationInterruptionCandidate {
           switch (admin.getIdentifierFirstRep().getValue()) {
             case "Continuous Infusion Cisatracurium IV":
             case "Continuous Infusion Vecuronium IV":
-              return RECEIVING_NMBA;
+              return CandidateResult.RECEIVING_NMBA;
           }
         }
       }
@@ -218,7 +209,7 @@ public class DailySedationInterruptionCandidate {
       case "1":
       case "2":
       case "3":
-        return RECEIVING_NMBA;
+        return CandidateResult.RECEIVING_NMBA;
     }
 
     /* if freshestSedationWakeUpAction.getValue() == “No: Receiving NMBA” then Daily Sedation
@@ -230,11 +221,11 @@ public class DailySedationInterruptionCandidate {
      */
     switch (freshestWakeUpAction) {
       case "No: Receiving NMBA":
-        return RECEIVING_NMBA;
+        return CandidateResult.RECEIVING_NMBA;
       case "No - Status epilepticus":
-        return STATUS_EPILEPTICUS;
+        return CandidateResult.STATUS_EPILEPTICUS;
       case "No - Deep sedation for ventilator tolerance":
-        return RESPIRATORY_INSTABILITY;
+        return CandidateResult.RESPIRATORY_INSTABILITY;
     }
 
     /* if all coolingPadPatientTemperatureFromPast48Hours.getQuantity().getValue <= 36.5c since
@@ -260,7 +251,7 @@ public class DailySedationInterruptionCandidate {
       }
     }
     if (freshestCoolingPadStatus != null && allOverEqualThreeSixPointFive) {
-      return THERAPEUTIC_HYPOTHERMIA;
+      return CandidateResult.THERAPEUTIC_HYPOTHERMIA;
     }
 
     /* if hypothermiaBlanketOrders is not empty and currentNonMedOrder(hypothermiaBlanketOrders)
@@ -272,7 +263,7 @@ public class DailySedationInterruptionCandidate {
             ProcedureRequestCodeEnum.HYPOTHERMIA_BLANKET_ORDER_1.getCode())
         || ProcedureRequestUtils.activeNonMedicationOrder(apiClient, encounterId,
             ProcedureRequestCodeEnum.HYPOTHERMIA_BLANKET_ORDER_2.getCode()))) {
-      return THERAPEUTIC_HYPOTHERMIA;
+      return CandidateResult.THERAPEUTIC_HYPOTHERMIA;
     }
 
     /* if freshestCoolingPadStatus.getValue() == “on” within the past 2 hours then Daily Sedation
@@ -282,7 +273,7 @@ public class DailySedationInterruptionCandidate {
         && freshestCoolingPadStatusFromPast25Hours.get().getValue().toString().equals("on")
         && ObservationUtils.getEffectiveDate(freshestCoolingPadStatusFromPast25Hours.get())
             .after(twoHoursAgo)) {
-      return THERAPEUTIC_HYPOTHERMIA;
+      return CandidateResult.THERAPEUTIC_HYPOTHERMIA;
     }
 
     /* if any coolingPadWaterTemperature.getQuantity().getValue() != null then Daily Sedation
@@ -290,7 +281,7 @@ public class DailySedationInterruptionCandidate {
      */
     for (Observation obv : coolingPadWaterTemperatureFromPast48Hours) {
       if (obv.getValue() != null) {
-        return THERAPEUTIC_HYPOTHERMIA;
+        return CandidateResult.THERAPEUTIC_HYPOTHERMIA;
       }
     }
 
@@ -311,7 +302,7 @@ public class DailySedationInterruptionCandidate {
       }
 
       if (allBelow36p5) {
-        return THERAPEUTIC_HYPOTHERMIA;
+        return CandidateResult.THERAPEUTIC_HYPOTHERMIA;
       }
 
       /* if freshestCoolingPadStatus.getValue() == “off” and, since the time of this value, all
@@ -330,7 +321,7 @@ public class DailySedationInterruptionCandidate {
       }
 
       if (allBelow36p5) {
-        return THERAPEUTIC_HYPOTHERMIA;
+        return CandidateResult.THERAPEUTIC_HYPOTHERMIA;
       }
     }
 
@@ -346,7 +337,7 @@ public class DailySedationInterruptionCandidate {
                 .getEffectiveDate(freshestCoolingPadWaterTemperatureFromPast2Hours.get()))
             && obv.getValue() instanceof QuantityDt
             && ((QuantityDt) obv.getValue()).getValue().doubleValue() <= 36.5) {
-          return THERAPEUTIC_HYPOTHERMIA;
+          return CandidateResult.THERAPEUTIC_HYPOTHERMIA;
         }
       }
     }
@@ -355,7 +346,7 @@ public class DailySedationInterruptionCandidate {
      * Sedation Interruption Candidate = “No: Theraputic Hypothermia”
      */
     if (freshestWakeUpAction.equals("No - Theraputic Hypothermia")) {
-      return THERAPEUTIC_HYPOTHERMIA;
+      return CandidateResult.THERAPEUTIC_HYPOTHERMIA;
     }
 
     /* if freshestActualRASS.getValue() == (“+2”, “+3”, or “+4”) or if
@@ -373,19 +364,19 @@ public class DailySedationInterruptionCandidate {
         case "+2":
         case "+3":
         case "+4":
-          return RASS_2_OR_GREATER;
+          return CandidateResult.RASS_2_OR_GREATER;
       }
     }
 
     switch (freshestWakeUpAction) {
       case "No - RASS 2+ or Greater":
-        return RASS_2_OR_GREATER;
+        return CandidateResult.RASS_2_OR_GREATER;
       case "No - Benzodiazepine infusion for alcohol withdrawal":
-        return WITHDRAWAL_SEIZURE_RISK;
+        return CandidateResult.WITHDRAWAL_SEIZURE_RISK;
       case "No - Hemodynamic instability":
-        return HEMODYNAMIC_INSTABILITY;
+        return CandidateResult.HEMODYNAMIC_INSTABILITY;
       case "No - Other reason (Comment)":
-        return OTHER;
+        return CandidateResult.OTHER;
     }
 
     /* if there are one or more MedicationAdministration.identifier.value == (“Continuous Infusion
@@ -407,7 +398,7 @@ public class DailySedationInterruptionCandidate {
           for (IdentifierDt id : admin.getIdentifier()) {
             if (MedicationAdministrationUtils
                 .activelyInfusing(apiClient, encounterId, id.getValue())) {
-              return YES;
+              return CandidateResult.YES;
             }
           }
         }
@@ -415,6 +406,6 @@ public class DailySedationInterruptionCandidate {
     }
 
     // None of the specified circumstances were met.
-    return INVALID;
+    return CandidateResult.INVALID;
   }
 }

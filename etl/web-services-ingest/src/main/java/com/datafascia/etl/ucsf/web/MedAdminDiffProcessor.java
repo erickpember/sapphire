@@ -253,11 +253,13 @@ public class MedAdminDiffProcessor extends DependencyInjectingProcessor {
       rxNormIngredients.addAll(
           UcsfMedicationUtils.extractRxNormIngredients((JSONArray) orderJson.get("RxNorm")));
     } else {
-      for (Object mixobj : (JSONArray) orderJson.get("Mixture")) {
-        JSONObject mixjson = (JSONObject) mixobj;
-        if (mixjson.get("rxNormMix") != null) {
-          rxNormIngredients.addAll(
-              UcsfMedicationUtils.extractRxNormIngredients((JSONArray) mixjson.get("rxNormMix")));
+      if (orderJson.get("Mixture") != null) {
+        for (Object mixobj : (JSONArray) orderJson.get("Mixture")) {
+          JSONObject mixjson = (JSONObject) mixobj;
+          if (mixjson.get("rxNormMix") != null) {
+            rxNormIngredients.addAll(
+                UcsfMedicationUtils.extractRxNormIngredients((JSONArray) mixjson.get("rxNormMix")));
+          }
         }
       }
     }

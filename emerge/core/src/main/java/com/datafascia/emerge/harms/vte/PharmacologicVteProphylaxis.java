@@ -56,7 +56,8 @@ public class PharmacologicVteProphylaxis {
                   if (weight.compareTo(NEGATIVE_ONE) == 0) {
                     return Optional.empty();
                   } else {
-                    if (quantity.getValue().divide(weight, 10, BigDecimal.ROUND_HALF_UP)
+                    if (quantity.getValue() != null &&
+                        quantity.getValue().divide(weight, 10, BigDecimal.ROUND_HALF_UP)
                         .compareTo(ZERO_POINT_EIGHT_SIX) < 0) {
                       type = atEnum.getCode();
                     }

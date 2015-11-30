@@ -6,6 +6,7 @@ import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
 import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.domain.fhir.CodingSystems;
+import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.emerge.ucsf.MedicationOrderDateWrittenComparator;
 import com.datafascia.emerge.ucsf.MedicationOrderUtils;
 import com.datafascia.emerge.ucsf.codes.MedsSetEnum;
@@ -68,6 +69,7 @@ public class SedativeOrder {
     private String dosageRoute;
     private String drug;
     private String status;
+    private String orderId;
   }
 
   /**
@@ -106,6 +108,7 @@ public class SedativeOrder {
           .dosageRoute(null)
           .drug(null)
           .status(null)
+          .orderId(null)
           .build();
 
       List<IdentifierDt> idents = MedicationOrderUtils.findIdentifiers(order,
@@ -118,6 +121,8 @@ public class SedativeOrder {
             if (medsSet.contains(sedativeName)) {
               result.setDrug(sedativeName);
               result.setStatus(order.getStatus());
+              result.setOrderId(MedicationOrderUtils.findIdentifiers(order,
+                  IdentifierSystems.INSTITUTION_MEDICATION_ORDER).get(0).getValue());
               if (medsSet.contains("Continuous")) {
                 if (medsSet.contains(" IV")) {
                   result.setDosageRoute(SedativeOrderDosageRouteEnum.CONTINUOUS_INFUSION_IV

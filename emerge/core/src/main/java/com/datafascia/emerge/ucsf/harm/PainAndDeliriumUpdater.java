@@ -375,6 +375,7 @@ public class PainAndDeliriumUpdater {
                 .withStatus(
                     (result.getStatus() != null)
                         ? Order.Status.fromValue(result.getStatus()) : null)
+                .withOrderId(result.getOrderId())
                 .withUpdateTime(
                     Date.from(Instant.now(clock)));
             orders.add(order);

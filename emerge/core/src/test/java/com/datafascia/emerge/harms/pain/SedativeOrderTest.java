@@ -4,6 +4,7 @@ package com.datafascia.emerge.harms.pain;
 
 import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import com.datafascia.domain.fhir.CodingSystems;
+import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.emerge.ucsf.codes.MedsSetEnum;
 import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
@@ -52,6 +53,9 @@ public class SedativeOrderTest {
     MedicationOrder prescription = new MedicationOrder();
     prescription.addIdentifier()
         .setSystem(CodingSystems.UCSF_MEDICATION_GROUP_NAME)
+        .setValue(identifier);
+    prescription.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_MEDICATION_ORDER)
         .setValue(identifier);
     return prescription;
   }

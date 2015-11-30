@@ -19,7 +19,6 @@ import com.datafascia.emerge.ucsf.MedicalData;
 import com.datafascia.emerge.ucsf.PharmacologicVTEProphylaxis;
 import com.datafascia.emerge.ucsf.SCDs;
 import com.datafascia.emerge.ucsf.TimestampedBoolean;
-import com.datafascia.emerge.ucsf.TimestampedString;
 import com.datafascia.emerge.ucsf.Type;
 import com.datafascia.emerge.ucsf.VTE;
 import java.time.Clock;
@@ -209,30 +208,6 @@ public class VenousThromboembolismUpdater {
   }
 
   /**
-   * Updates pharmacologic VTE prophylaxis type.
-   *
-   * @param harmEvidence
-   *     to modify
-   * @param encounter
-   *     encounter
-   */
-  public void updatePharmacologicVTEProphylaxisType(
-      HarmEvidence harmEvidence, Encounter encounter) {
-
-    PharmacologicVTEProphylaxis prophylaxis = getPharmacologicVTEProphylaxis(harmEvidence);
-
-    String encounterId = encounter.getId().getIdPart();
-    pharmacologicVteProphylaxis.getPharmacologicVteProphylaxisType(encounterId)
-        .ifPresent(value -> {
-          TimestampedString pharmacologicVteProphylaxisType = new TimestampedString()
-              .withValue(value)
-              .withUpdateTime(Date.from(Instant.now(clock)));
-
-          prophylaxis.setType(pharmacologicVteProphylaxisType);
-        });
-  }
-
-  /**
    * Updates lower extremity SCDs contraindicated.
    *
    * @param harmEvidence
@@ -289,11 +264,15 @@ public class VenousThromboembolismUpdater {
       HarmEvidence harmEvidence, Encounter encounter) {
 
     String encounterId = encounter.getId().getIdPart();
+    boolean value =
+        pharmacologicVteProphylaxisAdministered.isPharmacologicVteProphylaxisAdministered(
+            encounterId);
+    String type = pharmacologicVteProphylaxis.getPharmacologicVteProphylaxisType(encounterId)
+        .orElse(null);
 
     Administered prophylaxisAdministered = new Administered()
-        .withValue(
-            pharmacologicVteProphylaxisAdministered.isPharmacologicVteProphylaxisAdministered(
-                encounterId))
+        .withValue(value)
+        .withType(type)
         .withUpdateTime(Date.from(Instant.now(clock)));
 
     getPharmacologicVTEProphylaxis(harmEvidence).setAdministered(prophylaxisAdministered);

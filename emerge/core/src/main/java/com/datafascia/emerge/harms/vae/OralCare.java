@@ -61,11 +61,12 @@ public class OralCare {
 
     if (freshestOralCareAction.isPresent()) {
       String value = freshestOralCareAction.get().getValue().toString();
-      if (YES_VALUES.contains(value)) {
+      if (YES_VALUES.stream().anyMatch(yesValue -> value.contains(yesValue))) {
         return MaybeEnum.YES;
-      } else if (NO_VALUES.contains(value)) {
+      } else if (NO_VALUES.stream().anyMatch(noValue -> value.contains(noValue))) {
         return MaybeEnum.NO;
-      } else if (CONTRAINDICATED_VALUES.contains(value)) {
+      } else if (CONTRAINDICATED_VALUES.stream().anyMatch(contraindicatedValue -> value.contains(
+          contraindicatedValue))) {
         return MaybeEnum.CONTRAINDICATED;
       } else {
         log.warn("Unrecognized value for oral care observation [{}]", value);

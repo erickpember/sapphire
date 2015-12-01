@@ -19,6 +19,7 @@ import javax.inject.Inject;
  */
 public class PharmacologicVteProphylaxisAdministered {
   private static final BigDecimal ZERO_POINT_EIGHT_SIX = new BigDecimal("0.86");
+  private static final BigDecimal NEGATIVE_ONE = new BigDecimal("-1");
 
   @Inject
   private ClientBuilder apiClient;
@@ -56,8 +57,10 @@ public class PharmacologicVteProphylaxisAdministered {
                 PharmacologicVtePpxTypeEnum.INTERMITTENT_ENOXAPARIN.getCode())) {
               BigDecimal dose = administration.getDosage().getQuantity().getValue();
               BigDecimal weight = HarmsLookups.getPatientWeight(apiClient, encounterId);
-              administered = dose.divide(weight, 10, BigDecimal.ROUND_HALF_UP)
-                      .compareTo(ZERO_POINT_EIGHT_SIX) < 0;
+              administered = dose != null
+                  && !weight.equals(NEGATIVE_ONE)
+                  && dose.divide(weight, 10, BigDecimal.ROUND_HALF_UP)
+                  .compareTo(ZERO_POINT_EIGHT_SIX) < 0;
               break;
             } else {
               administered = true;

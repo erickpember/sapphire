@@ -69,7 +69,7 @@ public class DiscreteHeadOfBedGreaterThan30Degrees {
         .filter(request ->
             CONTRAINDICATED_BED_ORDER_CODES.contains(
                 request.getCode().getCodingFirstRep().getCode()))
-        .anyMatch(request -> ProcedureRequestUtils.isScheduledBefore(request, Date.from(now)));
+        .anyMatch(request -> ProcedureRequestUtils.isCurrent(request, Date.from(now)));
     if (contraindicated) {
       return MaybeEnum.CONTRAINDICATED;
     }

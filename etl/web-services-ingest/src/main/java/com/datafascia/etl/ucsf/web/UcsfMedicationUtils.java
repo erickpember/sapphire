@@ -90,7 +90,13 @@ public class UcsfMedicationUtils {
     admin.setPrescription(prescriptionRef);
 
     if (encounterId != null) {
-      Encounter encounter = clientBuilder.getEncounterClient().getEncounter(encounterId);
+      Encounter encounter = null;
+
+      try {
+        encounter = clientBuilder.getEncounterClient().getEncounter(encounterId);
+      } catch (ResourceNotFoundException e) {
+        // The encounter will remain empty, and the warning below will trigger.
+      }
       if (encounter != null) {
         admin.setEncounter(new ResourceReferenceDt(encounter.getId()));
       } else {

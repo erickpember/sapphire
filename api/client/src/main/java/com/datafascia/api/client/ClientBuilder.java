@@ -19,6 +19,7 @@ public class ClientBuilder {
   private static final FhirContext ctx = FhirContext.forDstu2();
   private final IGenericClient client;
   private static Injector injector;
+  private ObservationClient observationClient;
 
   /**
    * Constructs a ClientBuilder using local config.
@@ -66,8 +67,14 @@ public class ClientBuilder {
     return new MedicationOrderClient(client);
   }
 
-  public ObservationClient getObservationClient() {
-    return new ObservationClient(client);
+  /**
+   * @return observation client
+   */
+  public synchronized ObservationClient getObservationClient() {
+    if (observationClient == null) {
+      observationClient = new ObservationClient(client);
+    }
+    return observationClient;
   }
 
   public ProcedureRequestClient getProcedureRequestClient() {
@@ -88,6 +95,16 @@ public class ClientBuilder {
 
   public SubstanceClient getSubstanceClient() {
     return new SubstanceClient(client);
+  }
+
+  /**
+   * Invalidates cache entry for encounter.
+   *
+   * @param encounterId
+   *     encounter ID
+   */
+  public void invalidate(String encounterId) {
+    getObservationClient().invalidate(encounterId);
   }
 
   /**

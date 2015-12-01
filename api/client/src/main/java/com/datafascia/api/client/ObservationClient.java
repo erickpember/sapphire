@@ -4,17 +4,31 @@ package com.datafascia.api.client;
 
 import ca.uhn.fhir.model.api.Bundle;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
-import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.IGenericClient;
 import ca.uhn.fhir.rest.gclient.StringClientParam;
 import com.google.common.base.Strings;
-import java.util.ArrayList;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Client utilities for Observation resources.
  */
 public class ObservationClient extends BaseClient<Observation> {
+
+  private LoadingCache<String, List<Observation>> encounterIdToObservationsMap =
+      CacheBuilder.newBuilder()
+      .expireAfterWrite(5, TimeUnit.SECONDS)
+      .build(
+          new CacheLoader<String, List<Observation>>() {
+            public List<Observation> load(String encounterId) {
+              return list(encounterId);
+            }
+          });
+
   /**
    * Builds a ObservationClient
    *
@@ -24,69 +38,51 @@ public class ObservationClient extends BaseClient<Observation> {
     super(client);
   }
 
-  /**
-   * Save a given Observation.
-   *
-   * @param observation
-   *  The Observation to save.
-   * @return The Observation with populated native ID.
-   */
-  public Observation saveObservation(Observation observation) {
-    MethodOutcome outcome = client.create().resource(observation).execute();
-    observation.setId(outcome.getId());
-    return observation;
-  }
-
-  /**
-   * Updates a Observation.
-   *
-   * @param observation The Observation to update.
-   */
-  public void updateObservation(Observation observation) {
-    client.update().resource(observation).execute();
-  }
-
-  /**
-   * Searches Observations
-   *
-   * @param encounterId
-   *  The ID of the encounter to which the observations belong.
-   * @param code
-   *  Code of observation, optional.
-   * @param status
-   *  Status of observation, optional.
-   * @return A list Observations.
-   */
-  public List<Observation> searchObservation(String encounterId, String code,
-      String status) {
-    Bundle results = client.search().forResource(Observation.class)
+  private List<Observation> list(String encounterId) {
+    Bundle results = client.search()
+        .forResource(Observation.class)
         .where(new StringClientParam(Observation.SP_ENCOUNTER)
             .matches()
             .value(encounterId))
         .execute();
 
-    List<Observation> observations = extractBundle(results, Observation.class);
+    return extractBundle(results, Observation.class);
+  }
 
-    if (!Strings.isNullOrEmpty(code)) {
-      List<Observation> filteredResults = new ArrayList<>();
-      for (Observation observation : observations) {
-        if (observation.getCode().getCodingFirstRep().getCode().equalsIgnoreCase(code)) {
-          filteredResults.add(observation);
-        }
-      }
-      observations = filteredResults;
+  /**
+   * Searches observations
+   *
+   * @param encounterId
+   *     encounter to which the observations belong
+   * @param code
+   *     code of observation, optional
+   * @param status
+   *     status of observation, optional
+   * @return observations
+   */
+  public List<Observation> searchObservation(String encounterId, String code, String status) {
+    List<Observation> observations = encounterIdToObservationsMap.getUnchecked(encounterId);
+    if (Strings.isNullOrEmpty(code) && Strings.isNullOrEmpty(status)) {
+      return observations;
     }
 
-    if (!Strings.isNullOrEmpty(status)) {
-      List<Observation> filteredResults = new ArrayList<>();
-      for (Observation observation : observations) {
-        if (observation.getStatus().equalsIgnoreCase(status)) {
-          filteredResults.add(observation);
-        }
-      }
-      observations = filteredResults;
-    }
+    return observations.stream()
+        .filter(observation ->
+            Strings.isNullOrEmpty(code) ||
+            code.equals(observation.getCode().getCodingFirstRep().getCode()))
+        .filter(observation ->
+            Strings.isNullOrEmpty(status) ||
+            status.equals(observation.getStatus()))
+        .collect(Collectors.toList());
+  }
 
-    return observations;
+  /**
+   * Invalidates cache entry for encounter.
+   *
+   * @param encounterId
+   *     encounter ID
+   */
+  public void invalidate(String encounterId) {
+    encounterIdToObservationsMap.invalidate(encounterId);
   }
 }

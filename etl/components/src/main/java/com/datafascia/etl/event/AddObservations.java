@@ -6,6 +6,7 @@ import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.primitive.IdDt;
+import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.persist.EncounterRepository;
@@ -28,6 +29,9 @@ public class AddObservations {
 
   @Inject
   private ObservationRepository observationRepository;
+
+  @Inject
+  private ClientBuilder apiClient;
 
   @Inject
   private FlagRepository flagRepository;
@@ -84,6 +88,8 @@ public class AddObservations {
       flagBuilder.add(observation);
       procedureBuilder.add(observation);
     }
+
+    apiClient.invalidate(encounterIdentifier);
 
     flagBuilder.build()
         .forEach(flag -> {

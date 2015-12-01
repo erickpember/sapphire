@@ -8,6 +8,7 @@ import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.parser.CanonicalModelClassFactory;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
 import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
 import com.datafascia.common.accumulo.ConnectorFactory;
@@ -48,6 +49,8 @@ public class ComponentsModule extends AbstractModule {
         .in(Singleton.class);
     bind(AvroSchemaRegistry.class)
         .to(MemorySchemaRegistry.class)
+        .in(Singleton.class);
+    bind(ClientBuilder.class)
         .in(Singleton.class);
     bind(Clock.class)
         .toInstance(Clock.system(ZONE_ID));

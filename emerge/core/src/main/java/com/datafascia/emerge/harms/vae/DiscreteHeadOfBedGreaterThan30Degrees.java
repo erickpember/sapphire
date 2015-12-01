@@ -2,19 +2,19 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.harms.vae;
 
+import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
+import com.datafascia.emerge.ucsf.ShiftUtils;
 import com.datafascia.emerge.ucsf.codes.MaybeEnum;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
 import com.google.common.collect.ImmutableSet;
 import java.time.Clock;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -61,7 +61,7 @@ public class DiscreteHeadOfBedGreaterThan30Degrees {
    */
   public MaybeEnum getHeadOfBedGreaterThan30Degrees(String encounterId) {
     Instant now = Instant.now(clock);
-    Date thirteenHoursAgo = Date.from(now.minus(13, ChronoUnit.HOURS));
+    PeriodDt currentOrPriorShift = ShiftUtils.getCurrentOrPreviousShift(clock);
 
     boolean contraindicated = apiClient.getProcedureRequestClient()
         .list(encounterId)
@@ -74,10 +74,14 @@ public class DiscreteHeadOfBedGreaterThan30Degrees {
       return MaybeEnum.CONTRAINDICATED;
     }
 
-    Optional<Observation> freshestDiscreteHOB = ObservationUtils.getFreshestByCodeAfterTime(
-        apiClient, encounterId, ObservationCodeEnum.HEAD_OF_BED.getCode(), thirteenHoursAgo);
-    if (freshestDiscreteHOB.isPresent()) {
-      String value = ObservationUtils.getValueAsString(freshestDiscreteHOB.get());
+    Observation freshestDiscreteHOB = ObservationUtils.getFreshestByCodeInTimeFrame(
+        apiClient,
+        encounterId,
+        ObservationCodeEnum.HEAD_OF_BED.getCode(),
+        currentOrPriorShift);
+
+    if (freshestDiscreteHOB != null) {
+      String value = ObservationUtils.getValueAsString(freshestDiscreteHOB);
       switch (value) {
         case "HOB 30":
         case "HOB 45":

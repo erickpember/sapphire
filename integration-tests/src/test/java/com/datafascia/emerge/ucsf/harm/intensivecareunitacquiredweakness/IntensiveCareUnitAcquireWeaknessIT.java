@@ -2,7 +2,6 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.ucsf.harm.intensivecareunitacquiredweakness;
 
-import com.datafascia.common.persist.Id;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.MobilityAchieved;
 import com.datafascia.emerge.ucsf.harm.HarmEvidenceTestSupport;
@@ -33,8 +32,7 @@ public class IntensiveCareUnitAcquireWeaknessIT extends HarmEvidenceTestSupport 
   public void should_export_mobility_achieved() throws Exception {
     processMessage("mobility-achieved.hl7");
 
-    Id<HarmEvidence> patientId = Id.of(PATIENT_IDENTIFIER);
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(patientId).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     MobilityAchieved mobilityAchieved =
         harmEvidence.getMedicalData().getIAW().getMobilityAchieved();
 

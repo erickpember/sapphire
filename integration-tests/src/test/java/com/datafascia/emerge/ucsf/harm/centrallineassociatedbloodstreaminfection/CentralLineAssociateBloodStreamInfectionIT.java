@@ -2,10 +2,6 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.ucsf.harm.centrallineassociatedbloodstreaminfection;
 
-import ca.uhn.fhir.model.dstu2.resource.Encounter;
-import com.datafascia.common.persist.Id;
-import com.datafascia.common.persist.entity.EntityId;
-import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.emerge.ucsf.CLABSI;
 import com.datafascia.emerge.ucsf.CentralLine;
 import com.datafascia.emerge.ucsf.DailyNeedsAssessment;
@@ -33,8 +29,7 @@ public class CentralLineAssociateBloodStreamInfectionIT extends HarmEvidenceTest
 
   @AfterMethod
   public void deletePatient() throws Exception {
-    entityStore.delete(new EntityId(Encounter.class, ENCOUNTER_ID));
-    entityStore.delete(new EntityId(UnitedStatesPatient.class, PATIENT_ID));
+    deleteIngestedData();
   }
 
   @Test
@@ -43,7 +38,7 @@ public class CentralLineAssociateBloodStreamInfectionIT extends HarmEvidenceTest
     processMessage("daily-needs-assessment-yes.hl7");
     processTimer();
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     DailyNeedsAssessment dailyNeedsAssessment =
         harmEvidence.getMedicalData().getCLABSI().getDailyNeedsAssessment();
     assertEquals(dailyNeedsAssessment.getPerformed(), DailyNeedsAssessment.Performed.YES);
@@ -54,7 +49,7 @@ public class CentralLineAssociateBloodStreamInfectionIT extends HarmEvidenceTest
   public void should_export_introducer_femoral_right() throws Exception {
     processMessage("introducer-femoral-right.hl7");
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     CLABSI clabsi = harmEvidence.getMedicalData().getCLABSI();
     CentralLine centralLine = clabsi.getCentralLine().get(0);
     assertEquals(centralLine.getType(), CentralLine.Type.INTRODUCER);
@@ -68,7 +63,7 @@ public class CentralLineAssociateBloodStreamInfectionIT extends HarmEvidenceTest
   public void should_export_picc_double_lumen_arm_right() throws Exception {
     processMessage("picc-double-lumen-arm-right.hl7");
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     CLABSI clabsi = harmEvidence.getMedicalData().getCLABSI();
     CentralLine centralLine = clabsi.getCentralLine().get(0);
     assertEquals(centralLine.getType(), CentralLine.Type.PICC_DOUBLE_LUMEN);
@@ -84,7 +79,7 @@ public class CentralLineAssociateBloodStreamInfectionIT extends HarmEvidenceTest
 
     processMessage("triple-lumen-hemodialysis-pheresis-catheter-internal-jugular-left.hl7");
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_ID.toString())).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     CLABSI clabsi = harmEvidence.getMedicalData().getCLABSI();
     CentralLine centralLine = clabsi.getCentralLine().get(0);
     assertEquals(
@@ -99,7 +94,7 @@ public class CentralLineAssociateBloodStreamInfectionIT extends HarmEvidenceTest
   public void should_export_tunneled_cvc_single_lumen_femoral_left() throws Exception {
     processMessage("tunneled-cvc-single-lumen-femoral-left.hl7");
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     CLABSI clabsi = harmEvidence.getMedicalData().getCLABSI();
     CentralLine centralLine = clabsi.getCentralLine().get(0);
     assertEquals(centralLine.getType(), CentralLine.Type.TUNNELED_CVC_SINGLE_LUMEN);
@@ -114,7 +109,7 @@ public class CentralLineAssociateBloodStreamInfectionIT extends HarmEvidenceTest
     processMessage("tunneled-cvc-single-lumen-femoral-left.hl7");
     processMessage("removed-tunneled-cvc-single-lumen-femoral-left.hl7");
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     CLABSI clabsi = harmEvidence.getMedicalData().getCLABSI();
     assertEquals(clabsi.getCentralLine().size(), 0);
   }

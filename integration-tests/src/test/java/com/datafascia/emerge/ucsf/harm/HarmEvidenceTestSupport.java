@@ -15,7 +15,6 @@ import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.emerge.ucsf.HarmEvidence;
-import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater;
 import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
 import com.datafascia.etl.hl7.HL7MessageProcessor;
 import com.datafascia.etl.ucsf.web.NursingOrdersTransformer;
@@ -24,6 +23,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
+import java.util.Optional;
 import javax.inject.Inject;
 import org.testng.annotations.BeforeClass;
 
@@ -33,10 +33,9 @@ import org.testng.annotations.BeforeClass;
 public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
 
   protected static final String PATIENT_IDENTIFIER = "97546762";
-  protected static final Id<UnitedStatesPatient> PATIENT_ID = Id.of(PATIENT_IDENTIFIER);
-  protected static final String ENCOUNTER_IDENTIFIER = "5014212";
-  protected static final Id<Encounter> ENCOUNTER_ID = Id.of(ENCOUNTER_IDENTIFIER);
-  protected static final Id<HarmEvidence> HARM_EVIDENCE_ID = Id.of(PATIENT_IDENTIFIER);
+  private static final Id<UnitedStatesPatient> PATIENT_ID = Id.of(PATIENT_IDENTIFIER);
+  private static final String ENCOUNTER_IDENTIFIER = "5014212";
+  private static final Id<Encounter> ENCOUNTER_ID = Id.of(ENCOUNTER_IDENTIFIER);
 
   @Inject
   private HL7MessageProcessor hl7MessageProcessor;
@@ -45,16 +44,13 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
   private NursingOrdersTransformer nursingOrdersTransformer;
 
   @Inject
-  protected HarmEvidenceRepository harmEvidenceRepository;
+  private HarmEvidenceRepository harmEvidenceRepository;
 
   @Inject
-  protected HarmEvidenceUpdater harmEvidenceUpdater;
+  private HarmEvidenceUpdater harmEvidenceUpdater;
 
   @Inject
-  protected EncounterRepository encounterRepository;
-
-  @Inject
-  protected AccumuloReflectEntityStore entityStore;
+  private AccumuloReflectEntityStore entityStore;
 
   @Inject
   protected Clock clock;
@@ -67,7 +63,8 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
   protected static UnitedStatesPatient getPatient() {
     UnitedStatesPatient patient = new UnitedStatesPatient();
     patient.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_PATIENT).setValue(PATIENT_IDENTIFIER);
+        .setSystem(IdentifierSystems.INSTITUTION_PATIENT)
+        .setValue(PATIENT_IDENTIFIER);
     patient.setId(new IdDt(PatientRepository.generateId(patient).toString()));
     return patient;
   }
@@ -75,7 +72,8 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
   protected static Encounter getEncounter() {
     Encounter encounter = new Encounter();
     encounter.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue(ENCOUNTER_IDENTIFIER);
+        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER)
+        .setValue(ENCOUNTER_IDENTIFIER);
     encounter.setId(new IdDt(EncounterRepository.generateId(encounter).toString()));
 
     encounter.setPatient(new ResourceReferenceDt(getPatient()));
@@ -83,19 +81,27 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
   }
 
   protected void processMessage(String hl7File) throws IOException {
-    URL url = getClass().getResource(hl7File);
+    URL url = Resources.getResource(getClass(), hl7File);
     String hl7 = Resources.toString(url, StandardCharsets.UTF_8).replace('\n', '\r');
     hl7MessageProcessor.accept(hl7);
   }
 
   protected void processNursingOrder(String jsonFile) throws IOException {
-    URL url = getClass().getResource(jsonFile);
+    URL url = Resources.getResource(getClass(), jsonFile);
     String json = Resources.toString(url, StandardCharsets.UTF_8);
     nursingOrdersTransformer.accept(json);
   }
 
   protected void processTimer() {
     harmEvidenceUpdater.processTimer(getEncounter());
+  }
+
+  protected Optional<HarmEvidence> readOptionalHarmEvidence() {
+    return harmEvidenceRepository.read(ENCOUNTER_ID);
+  }
+
+  protected HarmEvidence readHarmEvidence() {
+    return readOptionalHarmEvidence().get();
   }
 
   protected void deleteIngestedData() {

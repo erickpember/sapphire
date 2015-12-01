@@ -2,10 +2,6 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.ucsf.harm.respectdignity;
 
-import ca.uhn.fhir.model.dstu2.resource.Encounter;
-import com.datafascia.common.persist.Id;
-import com.datafascia.common.persist.entity.EntityId;
-import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.emerge.ucsf.CareProvider;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.harm.HarmEvidenceTestSupport;
@@ -22,9 +18,6 @@ import static org.testng.Assert.assertEquals;
 @Test(singleThreaded = true)
 public class RespectDignityIT extends HarmEvidenceTestSupport {
 
-  private static final Id<UnitedStatesPatient> PATIENT_ID = Id.of("96093233");
-  private static final Id<Encounter> ENCOUNTER_ID = Id.of("2088442");
-
   @BeforeMethod
   public void admitPatient() throws Exception {
     processMessage("ADT_A01.hl7");
@@ -32,16 +25,14 @@ public class RespectDignityIT extends HarmEvidenceTestSupport {
 
   @AfterMethod
   public void deletePatient() throws Exception {
-    entityStore.delete(new EntityId(Encounter.class, ENCOUNTER_ID));
-    entityStore.delete(new EntityId(UnitedStatesPatient.class, PATIENT_ID));
+    deleteIngestedData();
   }
 
   @Test
   public void should_export_icu_attending() throws Exception {
     processMessage("icu-attending.hl7");
 
-    Id<HarmEvidence> patientId = Id.of(PATIENT_ID.toString());
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(patientId).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     CareProvider careProvider =
         harmEvidence.getMedicalData().getRespectDignity().getIcuAttending();
 
@@ -54,8 +45,7 @@ public class RespectDignityIT extends HarmEvidenceTestSupport {
   public void should_export_primary_care_attending() throws Exception {
     processMessage("primary-care-attending.hl7");
 
-    Id<HarmEvidence> patientId = Id.of(PATIENT_ID.toString());
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(patientId).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     CareProvider careProvider =
         harmEvidence.getMedicalData().getRespectDignity().getPrimaryServiceAttending();
 
@@ -68,8 +58,7 @@ public class RespectDignityIT extends HarmEvidenceTestSupport {
   public void should_export_clinical_nurse() throws Exception {
     processMessage("clinical-nurse.hl7");
 
-    Id<HarmEvidence> patientId = Id.of(PATIENT_ID.toString());
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(patientId).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     CareProvider careProvider =
         harmEvidence.getMedicalData().getRespectDignity().getRN();
 

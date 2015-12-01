@@ -36,7 +36,7 @@ public class VenousThromboembolismIT extends HarmEvidenceTestSupport {
 
   @Test
   public void should_export_default_values() {
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     VTE vte = harmEvidence.getMedicalData().getVTE();
     PharmacologicVTEProphylaxis prophylaxis = vte.getPharmacologicVTEProphylaxis();
 
@@ -47,9 +47,9 @@ public class VenousThromboembolismIT extends HarmEvidenceTestSupport {
 
   @Test
   public void should_export_scds_in_use_false() throws Exception {
-    harmEvidenceUpdater.processTimer(getEncounter());
+    processTimer();
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     SCDs scds = harmEvidence.getMedicalData().getVTE().getSCDs();
 
     TimestampedBoolean scdsInUse = scds.getInUse();
@@ -60,9 +60,9 @@ public class VenousThromboembolismIT extends HarmEvidenceTestSupport {
   @Test
   public void should_export_scds_in_use_true() throws Exception {
     processMessage("sequential-compression-devices.hl7");
-    harmEvidenceUpdater.processTimer(getEncounter());
+    processTimer();
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     SCDs scds = harmEvidence.getMedicalData().getVTE().getSCDs();
 
     TimestampedBoolean scdsInUse = scds.getInUse();

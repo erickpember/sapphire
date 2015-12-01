@@ -160,14 +160,11 @@ public class UpdateHarmEvidence extends DependencyInjectingProcessor {
 
   private void process(ProcessSession session, Encounter encounter) {
     String encounterId = encounter.getId().getIdPart();
-    String patientId = encounter.getPatient().getReference().getIdPart();
 
-    Id<HarmEvidence> recordId = Id.of(patientId);
-    Optional<HarmEvidence> optionalRecord = harmEvidenceRepository.read(recordId);
+    Optional<HarmEvidence> optionalRecord = harmEvidenceRepository.read(Id.of(encounterId));
     if (!optionalRecord.isPresent()) {
       log.warn(
-          "HarmEvidence record not found for encounter ID {}, patient ID {}",
-          new Object[] { encounterId, patientId });
+          "HarmEvidence record not found for encounter ID {}", new Object[] { encounterId });
       return;
     }
 
@@ -176,10 +173,7 @@ public class UpdateHarmEvidence extends DependencyInjectingProcessor {
       update(record, encounter);
       writeSuccess(session, encounterId);
     } catch (RuntimeException e) {
-      log.error(
-          "Cannot update for encounter ID {}, patient ID {}",
-          new Object[] { encounterId, patientId },
-          e);
+      log.error("Cannot update for encounter ID {}", new Object[] { encounterId }, e);
       writeFailure(session, record, e);
     }
   }

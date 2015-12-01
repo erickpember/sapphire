@@ -2,10 +2,6 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.ucsf.harm.alignmentofgoals;
 
-import ca.uhn.fhir.model.dstu2.resource.Encounter;
-import com.datafascia.common.persist.Id;
-import com.datafascia.common.persist.entity.EntityId;
-import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.emerge.ucsf.ADPOLST;
 import com.datafascia.emerge.ucsf.AOG;
 import com.datafascia.emerge.ucsf.CodeStatus;
@@ -35,13 +31,12 @@ public class AlignmentOfGoalsIT extends HarmEvidenceTestSupport {
 
   @AfterMethod
   public void deletePatient() throws Exception {
-    entityStore.delete(new EntityId(Encounter.class, ENCOUNTER_ID));
-    entityStore.delete(new EntityId(UnitedStatesPatient.class, PATIENT_ID));
+    deleteIngestedData();
   }
 
   @Test
   public void should_export_default_values() {
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
 
     AOG aog = harmEvidence.getMedicalData().getAOG();
 
@@ -62,7 +57,7 @@ public class AlignmentOfGoalsIT extends HarmEvidenceTestSupport {
   public void should_export_advance_directive() throws Exception {
     processMessage("advance-directive.hl7");
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     ADPOLST adpolst = harmEvidence.getMedicalData().getAOG().getADPOLST();
     assertTrue(adpolst.isAdValue());
     assertEquals(adpolst.getUpdateTime(), Date.from(Instant.now(clock)));
@@ -72,7 +67,7 @@ public class AlignmentOfGoalsIT extends HarmEvidenceTestSupport {
   public void should_export_patient_care_conference_note() throws Exception {
     processMessage("patient-care-conference-note.hl7");
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     PatientCareConferenceNote note =
         harmEvidence.getMedicalData().getAOG().getPatientCareConferenceNote();
     assertTrue(note.isValue());
@@ -85,7 +80,7 @@ public class AlignmentOfGoalsIT extends HarmEvidenceTestSupport {
   public void should_export_physician_orders_for_life_sustaining_treatment() throws Exception {
     processMessage("physician-orders-for-life-sustaining-treatment.hl7");
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     ADPOLST adpolst = harmEvidence.getMedicalData().getAOG().getADPOLST();
     assertTrue(adpolst.isPolstValue());
     assertEquals(adpolst.getUpdateTime(), Date.from(Instant.now(clock)));
@@ -96,7 +91,7 @@ public class AlignmentOfGoalsIT extends HarmEvidenceTestSupport {
     processNursingOrder("code-status-attending-dnr-dni.json");
     processTimer();
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_ID.toString())).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     CodeStatus codeStatus = harmEvidence.getMedicalData().getAOG().getCodeStatus();
     assertEquals(codeStatus.getValue(), CodeStatus.Value.ATTENDING_DNR_DNI);
     assertEquals(codeStatus.getUpdateTime(), Date.from(Instant.now(clock)));

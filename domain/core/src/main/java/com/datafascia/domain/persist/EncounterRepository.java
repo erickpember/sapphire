@@ -37,7 +37,7 @@ public class EncounterRepository extends FhirEntityStoreRepository {
    * @param encounterId encounter ID
    * @return entity ID
    */
-  static EntityId toEntityId(Id<Encounter> encounterId) {
+  public static EntityId toEntityId(Id<Encounter> encounterId) {
     return new EntityId(Encounter.class, encounterId);
   }
 

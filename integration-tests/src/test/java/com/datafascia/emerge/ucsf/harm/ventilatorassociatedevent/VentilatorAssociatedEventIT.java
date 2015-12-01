@@ -2,7 +2,6 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.ucsf.harm.ventilatorassociatedevent;
 
-import com.datafascia.common.persist.Id;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.Mode;
 import com.datafascia.emerge.ucsf.TimestampedBoolean;
@@ -36,7 +35,7 @@ public class VentilatorAssociatedEventIT extends HarmEvidenceTestSupport {
 
   @Test
   public void should_export_default_values() {
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     VAE vae = harmEvidence.getMedicalData().getVAE();
 
     TimestampedMaybe subglotticSuctionSurgicalAirway = vae.getSubglotticSuctionSurgicalAirway();
@@ -55,7 +54,7 @@ public class VentilatorAssociatedEventIT extends HarmEvidenceTestSupport {
   public void should_export_ventilated() throws Exception {
     processMessage("ventilated-true.hl7");
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     TimestampedBoolean ventilated =
         harmEvidence.getMedicalData().getVAE().getVentilation().getVentilated();
     assertTrue(ventilated.isValue());
@@ -66,7 +65,7 @@ public class VentilatorAssociatedEventIT extends HarmEvidenceTestSupport {
   public void should_export_discrete_hob_greater_than_30_deg_yes() throws Exception {
     processMessage("discrete-hob-greater-than-30-deg-yes.hl7");
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     TimestampedMaybe headOfBed = harmEvidence.getMedicalData()
         .getVAE()
         .getDiscreteHOBGreaterThan30Deg();
@@ -78,21 +77,21 @@ public class VentilatorAssociatedEventIT extends HarmEvidenceTestSupport {
   public void should_export_ventilation_mode() throws Exception {
     processMessage("ventilation-mode-volume-control-ac.hl7");
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     Mode mode = harmEvidence.getMedicalData().getVAE().getVentilation().getMode();
     assertEquals(mode.getValue().toString(), "Volume Control (AC)");
     assertEquals(mode.getUpdateTime(), Date.from(Instant.now(clock)));
 
     processMessage("ventilation-mode-aprv1.hl7");
 
-    harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    harmEvidence = readHarmEvidence();
     mode = harmEvidence.getMedicalData().getVAE().getVentilation().getMode();
     assertEquals(mode.getValue().toString(), "Airway Pressure Release Ventilation (APRV)");
     assertEquals(mode.getUpdateTime(), Date.from(Instant.now(clock)));
 
     processMessage("ventilation-mode-aprv2.hl7");
 
-    harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    harmEvidence = readHarmEvidence();
     mode = harmEvidence.getMedicalData().getVAE().getVentilation().getMode();
     assertEquals(mode.getValue().toString(), "Airway Pressure Release Ventilation (APRV)");
     assertEquals(mode.getUpdateTime(), Date.from(Instant.now(clock)));
@@ -102,7 +101,7 @@ public class VentilatorAssociatedEventIT extends HarmEvidenceTestSupport {
   public void should_export_subglottic_suction_non_surgical_airway() throws Exception {
     processMessage("subglottic-suction-non-surgical-airway-true.hl7");
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     TimestampedMaybe subglotticSuctionNonSurgicalAirway =
         harmEvidence.getMedicalData().getVAE().getSubglotticSuctionNonSurgicalAirway();
     assertEquals(subglotticSuctionNonSurgicalAirway.getValue(), TimestampedMaybe.Value.YES);
@@ -114,9 +113,8 @@ public class VentilatorAssociatedEventIT extends HarmEvidenceTestSupport {
     processMessage("inline-suction-true.hl7");
     processTimer();
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
-    TimestampedBoolean inlineSuction =
-        harmEvidence.getMedicalData().getVAE().getInlineSuction();
+    HarmEvidence harmEvidence = readHarmEvidence();
+    TimestampedBoolean inlineSuction = harmEvidence.getMedicalData().getVAE().getInlineSuction();
     assertTrue(inlineSuction.isValue());
     assertEquals(inlineSuction.getUpdateTime(), Date.from(Instant.now(clock)));
   }

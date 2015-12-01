@@ -118,10 +118,9 @@ public class HarmEvidenceUpdater {
 
   private HarmEvidence getHarmEvidence(Encounter encounter) {
     String encounterIdentifier = encounter.getIdentifierFirstRep().getValue();
-    String patientIdentifier = encounter.getPatient().getReference().getIdPart();
 
-    Id<HarmEvidence> patientId = Id.of(patientIdentifier);
-    Optional<HarmEvidence> optionalHarmEvidence = harmEvidenceRepository.read(patientId);
+    Id<Encounter> encounterId = Id.of(encounterIdentifier);
+    Optional<HarmEvidence> optionalHarmEvidence = harmEvidenceRepository.read(encounterId);
     if (!optionalHarmEvidence.isPresent()) {
       return new HarmEvidence()
           .withEncounterID(
@@ -204,9 +203,9 @@ public class HarmEvidenceUpdater {
   public void dischargePatient(Encounter encounter) {
     execute(EventType.DISCHARGE_PATIENT, encounter);
 
-    String patientIdString = encounter.getPatient().getReference().getIdPart();
-    Id<HarmEvidence> patientId = Id.of(patientIdString);
-    harmEvidenceRepository.delete(patientId);
+    String encounterIdentifier = encounter.getIdentifierFirstRep().getValue();
+    Id<Encounter> encounterId = Id.of(encounterIdentifier);
+    harmEvidenceRepository.delete(encounterId);
   }
 
   /**

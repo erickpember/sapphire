@@ -71,10 +71,10 @@ public class HarmEvidenceResource {
   private List<HarmEvidence> getRecords(List<Encounter> encounters) {
     return encounters.stream()
         .flatMap(encounter -> {
-          String patientId = encounter.getPatient().getReference().getIdPart();
-          Optional<HarmEvidence> record = harmEvidenceRepository.read(Id.of(patientId));
+          String encounterId = encounter.getId().getIdPart();
+          Optional<HarmEvidence> record = harmEvidenceRepository.read(Id.of(encounterId));
           if (!record.isPresent()) {
-            log.warn("Harm evidence record not found for patientId [{}]", patientId);
+            log.warn("Harm evidence record not found for encounter ID [{}]", encounterId);
             return Stream.empty();
           }
           return Stream.of(record.get());

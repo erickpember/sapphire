@@ -2,7 +2,6 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.ucsf.harm.demographic;
 
-import com.datafascia.common.persist.Id;
 import com.datafascia.emerge.ucsf.DemographicData;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.harm.HarmEvidenceTestSupport;
@@ -23,16 +22,15 @@ import static org.testng.Assert.assertTrue;
 public class DemographicIT extends HarmEvidenceTestSupport {
 
   @AfterMethod
-  public void deleteEncounter() throws Exception {
-    encounterRepository.delete(Id.of(ENCOUNTER_IDENTIFIER));
+  public void deletePatient() throws Exception {
+    deleteIngestedData();
   }
 
   @Test
   public void should_export_demographic_data() throws Exception {
     processMessage("ADT_A01.hl7");
 
-    Id<HarmEvidence> patientId = Id.of(PATIENT_IDENTIFIER);
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(patientId).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     DemographicData demographicData = harmEvidence.getDemographicData();
 
     assertEquals(demographicData.getPatientName(), "ONE A NATUS-ADULT");
@@ -45,20 +43,18 @@ public class DemographicIT extends HarmEvidenceTestSupport {
     assertEquals(demographicData.getAdmissionWeight(), new BigDecimal("100.0"));
     assertEquals(demographicData.getRoomNumber(), "0009-A");
     assertEquals(demographicData.getUpdateTime().toInstant(), Instant.now(clock));
-
-    processMessage("ADT_A03.hl7");
   }
 
   @Test
   public void should_delete_harm_evidence() throws Exception {
     processMessage("ADT_A01.hl7");
 
-    Id<HarmEvidence> patientId = Id.of(PATIENT_IDENTIFIER);
-    Optional<HarmEvidence> harmEvidence = harmEvidenceRepository.read(patientId);
+    Optional<HarmEvidence> harmEvidence = readOptionalHarmEvidence();
     assertTrue(harmEvidence.isPresent());
 
     processMessage("ADT_A03.hl7");
-    harmEvidence = harmEvidenceRepository.read(patientId);
+
+    harmEvidence = readOptionalHarmEvidence();
     assertFalse(harmEvidence.isPresent());
   }
 
@@ -67,8 +63,7 @@ public class DemographicIT extends HarmEvidenceTestSupport {
     processMessage("ADT_A01.hl7");
     processMessage("height-weight.hl7");
 
-    Id<HarmEvidence> patientId = Id.of(PATIENT_IDENTIFIER);
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(patientId).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     DemographicData demographicData = harmEvidence.getDemographicData();
 
     assertEquals(demographicData.getAdmissionHeight(), new BigDecimal("185"));
@@ -81,8 +76,7 @@ public class DemographicIT extends HarmEvidenceTestSupport {
   public void should_export_height_weight_absent() throws Exception {
     processMessage("height-weight-absent.hl7");
 
-    Id<HarmEvidence> patientId = Id.of(PATIENT_IDENTIFIER);
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(patientId).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     DemographicData demographicData = harmEvidence.getDemographicData();
 
     assertEquals(demographicData.getAdmissionHeight(), new BigDecimal(-1));

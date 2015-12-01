@@ -41,9 +41,8 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
     processMessage("numerical-pain-8.hl7");
     processTimer();
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
-    Numerical numerical =
-        harmEvidence.getMedicalData().getDelirium().getPain().getNumerical();
+    HarmEvidence harmEvidence = readHarmEvidence();
+    Numerical numerical = harmEvidence.getMedicalData().getDelirium().getPain().getNumerical();
 
     CurrentScore currentScore = numerical.getCurrentScore();
     assertEquals(currentScore.getPainScore(), 8);
@@ -56,9 +55,8 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
     processMessage("verbal-pain-none.hl7");
     processTimer();
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
-    Verbal verbal =
-        harmEvidence.getMedicalData().getDelirium().getPain().getVerbal();
+    HarmEvidence harmEvidence = readHarmEvidence();
+    Verbal verbal = harmEvidence.getMedicalData().getDelirium().getPain().getVerbal();
 
     CurrentScore_ currentScore = verbal.getCurrentScore();
     assertEquals(currentScore.getPainScore(), 0);
@@ -71,9 +69,8 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
     processMessage("verbal-pain-mild.hl7");
     processTimer();
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
-    Verbal verbal =
-        harmEvidence.getMedicalData().getDelirium().getPain().getVerbal();
+    HarmEvidence harmEvidence = readHarmEvidence();
+    Verbal verbal = harmEvidence.getMedicalData().getDelirium().getPain().getVerbal();
 
     CurrentScore_ currentScore = verbal.getCurrentScore();
     assertEquals(currentScore.getPainScore(), 1);
@@ -86,9 +83,8 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
     processMessage("verbal-pain-moderate.hl7");
     processTimer();
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
-    Verbal verbal =
-        harmEvidence.getMedicalData().getDelirium().getPain().getVerbal();
+    HarmEvidence harmEvidence = readHarmEvidence();
+    Verbal verbal = harmEvidence.getMedicalData().getDelirium().getPain().getVerbal();
 
     CurrentScore_ currentScore = verbal.getCurrentScore();
     assertEquals(currentScore.getPainScore(), 5);
@@ -101,9 +97,8 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
     processMessage("verbal-pain-severe.hl7");
     processTimer();
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
-    Verbal verbal =
-        harmEvidence.getMedicalData().getDelirium().getPain().getVerbal();
+    HarmEvidence harmEvidence = readHarmEvidence();
+    Verbal verbal = harmEvidence.getMedicalData().getDelirium().getPain().getVerbal();
 
     CurrentScore_ currentScore = verbal.getCurrentScore();
     assertEquals(currentScore.getPainScore(), 7);
@@ -117,7 +112,7 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
     processMessage("pain-goal.hl7");
     processTimer();
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     PainGoal goal = harmEvidence.getMedicalData().getDelirium().getPain().getPainGoal();
 
     assertEquals(goal.getGoal(), 8);
@@ -131,7 +126,7 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
     processMessage("pain-goal-no-pain.hl7");
     processTimer();
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     PainGoal goal = harmEvidence.getMedicalData().getDelirium().getPain().getPainGoal();
 
     assertEquals(goal.getGoal(), 0);
@@ -145,7 +140,7 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
     processMessage("pain-goal-other.hl7");
     processTimer();
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     PainGoal goal = harmEvidence.getMedicalData().getDelirium().getPain().getPainGoal();
 
     assertEquals(goal.getGoal(), 11);
@@ -158,7 +153,7 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
     processMessage("rass-3.hl7");
     processTimer();
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     RASS rass = harmEvidence.getMedicalData().getDelirium().getRASS();
 
     CurrentScore___ currentScore = rass.getCurrentScore();
@@ -171,7 +166,7 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
   public void should_export_rass_goal_2() throws Exception {
     processNursingOrder("rass-goal-2.json");
 
-    HarmEvidence harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
+    HarmEvidence harmEvidence = readHarmEvidence();
     RASS rass = harmEvidence.getMedicalData().getDelirium().getRASS();
 
     RassGoal rassGoal = rass.getRassGoal();
@@ -187,7 +182,7 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
     processMessage("cam-uta.hl7");
     processTimer();
 
-    harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
+    harmEvidence = readHarmEvidence();
     cam = harmEvidence.getMedicalData().getDelirium().getCam();
 
     assertEquals(cam.getResult(), Cam.Result.UTA);
@@ -196,7 +191,7 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
     processMessage("cam-positive.hl7");
     processTimer();
 
-    harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
+    harmEvidence = readHarmEvidence();
     cam = harmEvidence.getMedicalData().getDelirium().getCam();
 
     assertEquals(cam.getResult(), Cam.Result.POSITIVE);
@@ -205,7 +200,7 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
     processMessage("cam-negative.hl7");
     processTimer();
 
-    harmEvidence = harmEvidenceRepository.read(HARM_EVIDENCE_ID).get();
+    harmEvidence = readHarmEvidence();
     cam = harmEvidence.getMedicalData().getDelirium().getCam();
 
     assertEquals(cam.getResult(), Cam.Result.NEGATIVE);

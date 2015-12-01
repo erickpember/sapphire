@@ -51,7 +51,7 @@ public class OralCare {
    */
   public MaybeEnum apply(String encounterId) {
     Instant now = Instant.now(clock);
-    Date effectiveLowerBound = Date.from(now.minus(7, ChronoUnit.HOURS));
+    Date effectiveLowerBound = Date.from(now.minus(5, ChronoUnit.HOURS));
 
     Optional<Observation> freshestOralCareAction = ObservationUtils.getFreshestByCodeAfterTime(
         apiClient,

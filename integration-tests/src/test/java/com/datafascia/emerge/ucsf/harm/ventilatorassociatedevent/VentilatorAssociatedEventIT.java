@@ -108,4 +108,16 @@ public class VentilatorAssociatedEventIT extends HarmEvidenceTestSupport {
     assertEquals(subglotticSuctionNonSurgicalAirway.getValue(), TimestampedMaybe.Value.YES);
     assertEquals(subglotticSuctionNonSurgicalAirway.getUpdateTime(), Date.from(Instant.now(clock)));
   }
+
+  @Test
+  public void should_export_inline_suction() throws Exception {
+    processMessage("inline-suction-true.hl7");
+    processTimer();
+
+    HarmEvidence harmEvidence = harmEvidenceRepository.read(Id.of(PATIENT_IDENTIFIER)).get();
+    TimestampedBoolean inlineSuction =
+        harmEvidence.getMedicalData().getVAE().getInlineSuction();
+    assertTrue(inlineSuction.isValue());
+    assertEquals(inlineSuction.getUpdateTime(), Date.from(Instant.now(clock)));
+  }
 }

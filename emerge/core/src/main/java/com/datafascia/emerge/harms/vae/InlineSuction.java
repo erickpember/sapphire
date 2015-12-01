@@ -39,8 +39,8 @@ public class InlineSuction {
 
     Observation freshestInlinePlacement = ObservationUtils.findFreshestObservationForCode(
         apiClient,
-        ObservationCodeEnum.INLINE_PLACEMENT.getCode(),
-        encounterId);
+        encounterId,
+        ObservationCodeEnum.INLINE_PLACEMENT.getCode());
 
     List<Observation> airwayDevices = ObservationUtils.getObservationByCodeAfterTime(
         apiClient,

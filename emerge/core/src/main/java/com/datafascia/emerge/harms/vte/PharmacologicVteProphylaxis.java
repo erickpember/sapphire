@@ -42,11 +42,11 @@ public class PharmacologicVteProphylaxis {
 
         for (IdentifierDt ident : MedicationOrderUtils.findIdentifiers(medicationOrder,
             CodingSystems.UCSF_MEDICATION_GROUP_NAME)) {
-          for (AnticoagulationTypeEnum atEnum : AnticoagulationTypeEnum.values()) {
+          for (PharmacologicVtePpxTypeEnum atEnum : PharmacologicVtePpxTypeEnum.values()) {
             if (atEnum.getCode().equals(ident.getValue())) {
 
               // Check dose ratio for Intermittent Enoxaparin SC
-              if (ident.equals(AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN.getCode())) {
+              if (ident.equals(PharmacologicVtePpxTypeEnum.INTERMITTENT_ENOXAPARIN.getCode())) {
                 MedicationOrder.DosageInstruction dosage =
                     medicationOrder.getDosageInstructionFirstRep();
                 IDatatype dose = dosage.getDose();

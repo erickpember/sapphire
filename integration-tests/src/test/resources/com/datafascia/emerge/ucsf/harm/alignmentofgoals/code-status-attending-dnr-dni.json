@@ -1,6 +1,6 @@
 {
   "Error": "",
-  "ExtractDateTime": "/Date(1447148221000-0800)/",
+  "ExtractDateTime": "/Date(1411948801000-0800)/",
   "Patient": [
     {
       "CSN": "5014212",
@@ -11,16 +11,16 @@
           "OrderDesc": "Maintain sequential compression device",
           "OrderID": "1733733",
           "OrderStatus": "2^Sent",
-          "OrderedDate": "/Date(1446472916000-0800)/",
+          "OrderedDate": "/Date(1411948801000-0800)/",
           "ProcID": "7936",
           "Questions": null,
-          "StartDate": "/Date(1456567900000-0800)/"
+          "StartDate": "/Date(1411948801000-0800)/"
         },
         {
           "Audit": [
             {
               "Action": "3^Signed",
-              "DateTime": "/Date(1446567927000-0800)/",
+              "DateTime": "/Date(1411948801000-0800)/",
               "ID": "1",
               "User": "       ^"
             }
@@ -29,7 +29,7 @@
           "OrderDesc": "Attending DNR/DNI (Do Not Resuscitate)",
           "OrderID": "1734252",
           "OrderStatus": "2^Sent",
-          "OrderedDate": "/Date(1446567927000-0800)/",
+          "OrderedDate": "/Date(1411948801000-0800)/",
           "ProcID": "517",
           "Questions": [
             {
@@ -48,7 +48,7 @@
               "ID": "100102"
             }
           ],
-          "StartDate": "/Date(1446472920000-0800)/"
+          "StartDate": "/Date(1411948801000-0800)/"
         }
       ]
     }

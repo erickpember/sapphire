@@ -8,6 +8,9 @@ import com.datafascia.emerge.ucsf.CodeStatus;
 import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
 import com.datafascia.emerge.ucsf.codes.CodeStatusCodeMap;
 import com.google.common.collect.Lists;
+import java.time.Clock;
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
 
@@ -15,6 +18,9 @@ import javax.inject.Inject;
  * Code Status Implementation
  */
 public class CodeStatusImpl {
+
+  @Inject
+  private Clock clock;
 
   @Inject
   private ClientBuilder apiClient;
@@ -53,7 +59,8 @@ public class CodeStatusImpl {
         .sortProcedureRequests(codeStatusRequests));
 
     for (ProcedureRequest request : sortedRequests) {
-      if (isRelevant(request)) {
+      if (ProcedureRequestUtils.isCurrent(request, Date.from(Instant.now(clock))) &&
+          isRelevant(request)) {
         return CodeStatus.Value.fromValue(CodeStatusCodeMap.getName(request.getCode()
             .getCodingFirstRep().getCode()));
       }

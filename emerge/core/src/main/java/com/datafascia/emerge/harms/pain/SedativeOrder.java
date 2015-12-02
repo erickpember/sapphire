@@ -36,7 +36,9 @@ public class SedativeOrder {
       SedativeOrderDrugEnum.CLONAZEPAM.getCode(),
       SedativeOrderDrugEnum.DIAZEPAM.getCode(),
       SedativeOrderDrugEnum.CHLORADIAZEPOXIDE.getCode(),
-      SedativeOrderDrugEnum.ALPRAZOLOM.getCode());
+      SedativeOrderDrugEnum.ALPRAZOLOM.getCode(),
+      SedativeOrderDrugEnum.DEXMETOMIDINE.getCode(),
+      SedativeOrderDrugEnum.PROPOFOL.getCode());
 
   private static final Set<String> SEDATIVE_MEDS_SETS = ImmutableSet.of(
       MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode(),
@@ -48,7 +50,9 @@ public class SedativeOrder {
       MedsSetEnum.INTERMITTENT_DIAZEPAM_IV.getCode(),
       MedsSetEnum.INTERMITTENT_LORAZEPAM_ENTERAL.getCode(),
       MedsSetEnum.INTERMITTENT_LORAZEPAM_IV.getCode(),
-      MedsSetEnum.INTERMITTENT_MIDAZOLAM_IV.getCode());
+      MedsSetEnum.INTERMITTENT_MIDAZOLAM_IV.getCode(),
+      MedsSetEnum.CONTINUOUS_INFUSION_DEXMEDETOMIDINE_IV.getCode(),
+      MedsSetEnum.CONTINUOUS_INFUSION_PROPOFOL_IV.getCode());
 
   private static final Set<String> DOSAGE_ROUTES = ImmutableSet.of(
       SedativeOrderDosageRouteEnum.INTERMITTENT_IV.getCode(),

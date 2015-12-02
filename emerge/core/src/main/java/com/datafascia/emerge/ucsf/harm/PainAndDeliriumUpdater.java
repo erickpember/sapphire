@@ -64,7 +64,7 @@ import javax.inject.Inject;
  */
 public class PainAndDeliriumUpdater {
 
-  private static final Set<String> BENZODIAZEPINE_NAMES = ImmutableSet.of(
+  private static final Set<String> SEDATIVE_NAMES = ImmutableSet.of(
       MedsSetEnum.INTERMITTENT_LORAZEPAM_IV.getCode(),
       MedsSetEnum.INTERMITTENT_LORAZEPAM_ENTERAL.getCode(),
       MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode(),
@@ -74,7 +74,9 @@ public class PainAndDeliriumUpdater {
       MedsSetEnum.INTERMITTENT_DIAZEPAM_IV.getCode(),
       MedsSetEnum.INTERMITTENT_DIAZEPAM_ENTERAL.getCode(),
       MedsSetEnum.INTERMITTENT_CHLORADIAZEPOXIDE_ENTERAL.getCode(),
-      MedsSetEnum.INTERMITTENT_ALPRAZALOM_ENTERAL.getCode());
+      MedsSetEnum.INTERMITTENT_ALPRAZALOM_ENTERAL.getCode(),
+      MedsSetEnum.CONTINUOUS_INFUSION_DEXMEDETOMIDINE_IV.getCode(),
+      MedsSetEnum.CONTINUOUS_INFUSION_PROPOFOL_IV.getCode());
 
   @Inject
   private Clock clock;
@@ -362,7 +364,7 @@ public class PainAndDeliriumUpdater {
         .withUpdateTime(Date.from(Instant.now(clock)));
 
     List<Order> orders = new ArrayList<>();
-    for (String medsSet : BENZODIAZEPINE_NAMES) {
+    for (String medsSet : SEDATIVE_NAMES) {
       sedativeOrderImpl.getValue(encounterId, medsSet)
           .ifPresent(result -> {
             Order order = new Order()

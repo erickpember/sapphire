@@ -19,17 +19,19 @@ import static org.testng.Assert.assertTrue;
  */
 public class SedativeOrderTest {
 
-  Set<String> BENZODIAZEPINE_NAMES = ImmutableSet.of(
-      MedsSetEnum.INTERMITTENT_LORAZEPAM_IV.getCode(),
-      MedsSetEnum.INTERMITTENT_LORAZEPAM_ENTERAL.getCode(),
+  private static final Set<String> SEDATIVE_NAMES = ImmutableSet.of(
       MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode(),
-      MedsSetEnum.INTERMITTENT_MIDAZOLAM_IV.getCode(),
       MedsSetEnum.CONTINUOUS_INFUSION_MIDAZOLAM_IV.getCode(),
-      MedsSetEnum.INTERMITTENT_CLONAZEPAM_ENTERAL.getCode(),
-      MedsSetEnum.INTERMITTENT_DIAZEPAM_IV.getCode(),
-      MedsSetEnum.INTERMITTENT_DIAZEPAM_ENTERAL.getCode(),
+      MedsSetEnum.INTERMITTENT_ALPRAZALOM_ENTERAL.getCode(),
       MedsSetEnum.INTERMITTENT_CHLORADIAZEPOXIDE_ENTERAL.getCode(),
-      MedsSetEnum.INTERMITTENT_ALPRAZALOM_ENTERAL.getCode());
+      MedsSetEnum.INTERMITTENT_CLONAZEPAM_ENTERAL.getCode(),
+      MedsSetEnum.INTERMITTENT_DIAZEPAM_ENTERAL.getCode(),
+      MedsSetEnum.INTERMITTENT_DIAZEPAM_IV.getCode(),
+      MedsSetEnum.INTERMITTENT_LORAZEPAM_ENTERAL.getCode(),
+      MedsSetEnum.INTERMITTENT_LORAZEPAM_IV.getCode(),
+      MedsSetEnum.INTERMITTENT_MIDAZOLAM_IV.getCode(),
+      MedsSetEnum.CONTINUOUS_INFUSION_DEXMEDETOMIDINE_IV.getCode(),
+      MedsSetEnum.CONTINUOUS_INFUSION_PROPOFOL_IV.getCode());
 
   /**
    * Test of processOrders method, of class SedativeOrder.
@@ -39,11 +41,12 @@ public class SedativeOrderTest {
 
     SedativeOrder sedativeOrderImpl = new SedativeOrder();
 
-    for (String benzo : BENZODIAZEPINE_NAMES) {
+    for (String sedagive : SEDATIVE_NAMES) {
       List<MedicationOrder> orders = new ArrayList<>();
-      orders.add(createMedicationOrder(benzo));
+      orders.add(createMedicationOrder(sedagive));
 
-      assertTrue(sedativeOrderImpl.processOrders(orders).isPresent());
+      assertTrue(sedativeOrderImpl.processOrders(orders).isPresent(), "failed to process "
+          + sedagive);
     }
   }
 

@@ -357,7 +357,20 @@ public class ProcedureBuilder {
 
   private Optional<Procedure> insertLine() {
     Optional<Observation> inputLineType = getObservation(
-        LINE_LOCATION2, LINE_LOCATION7, LINE_LOCATION0, LINE_LOCATION4, LINE_TYPE0, LINE_TYPE9);
+        LINE_TYPE0,
+        LINE_TYPE9,
+        LINE_PLACEMENT_DATE,
+        LINE_PLACEMENT_TIME,
+        LINE_ORIENTATION1,
+        LINE_ORIENTATION2,
+        LINE_ORIENTATION3,
+        LINE_LOCATION2,
+        LINE_LOCATION7,
+        LINE_LOCATION0,
+        LINE_LOCATION4,
+        LINE_ACCESS_TYPE,
+        LINE_ACCESS_LOCATION,
+        LINE_LUMENS);
     if (!inputLineType.isPresent()) {
       return Optional.empty();
     }

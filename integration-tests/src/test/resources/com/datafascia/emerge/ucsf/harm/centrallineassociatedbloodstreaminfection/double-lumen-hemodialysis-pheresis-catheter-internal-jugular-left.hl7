@@ -1,0 +1,10 @@
+MSH|^~\&|APeX|UCSF|IE|UCSF|20151201160417|IPRN|ORU^R01|1178|T|2.3
+PID|1||97546762||SIX^AEMERGE||19810303|M||W|3333 TESTING LANE^^SAN FRANCISCO^CA^94114^000^P||(415)987-3425^P^PH||ENG|S||3005022|928357932||Six^Aemergemom|N||||||||N
+PV1|1||M9I^DGRM9I^P^HOSP^R^^^^^^OUTADT|||||||Hos|||||||83252^AGARWAL^PRIYANKA||5014212|KAISER||||||||||||||||||||||||20151201
+OBR|1||||||20151201000000
+OBX|1|ST|304890094^Lumens-Hemodialysis/Pheresis  Catheter 12/01/15 Non-tunneled catheter Left Neck|1|2||||||F|||20151201160413||Model User^INPATIENT^NURSE
+OBX|2|DT|304890002^Placement Date-Hemodialysis/Pheresis  Catheter 12/01/15 Non-tunneled catheter Left Neck|1|20151105||||||F|||20151201160413||Model User^INPATIENT^NURSE
+OBX|3|TM|304890078^Placement Time-Hemodialysis/Pheresis  Catheter 12/01/15 Non-tunneled catheter Left Neck|1|085700||||||F|||20151201160413||Model User^INPATIENT^NURSE
+OBX|4|ST|304890091^Access Type-Hemodialysis/Pheresis  Catheter 12/01/15 Non-tunneled catheter Left Neck|1|Non-tunneled catheter||||||F|||20151201160413||Model User^INPATIENT^NURSE
+OBX|5|ST|304890092^Orientation-Hemodialysis/Pheresis  Catheter 12/01/15 Non-tunneled catheter Left Neck|1|Left||||||F|||20151201160413||Model User^INPATIENT^NURSE
+OBX|6|ST|304890093^Access Location-Hemodialysis/Pheresis  Catheter 12/01/15 Non-tunneled catheter Left Neck|1|Neck||||||F|||20151201160413||Model User^INPATIENT^NURSE

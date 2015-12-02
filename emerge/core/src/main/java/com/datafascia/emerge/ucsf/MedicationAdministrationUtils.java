@@ -72,9 +72,8 @@ public class MedicationAdministrationUtils {
   }
 
   /**
-   * Given an encounter and a Meds Set group name, return true if, of the administrations
-   * for this encounter and meds set, the freshest administration has a status of in-progress
-   * and a dosage over zero.
+   * Given an encounter and a Meds Set group name, return true if the freshest administration
+   * with a given meds set has a status of in-progress and a dosage over zero.
    *
    * @param encounterId
    *    encounter to search for medication administrations
@@ -87,8 +86,26 @@ public class MedicationAdministrationUtils {
    *    infusion.
    */
   public static boolean activelyInfusing(ClientBuilder client, String encounterId, String medsSet) {
-    return client.getMedicationAdministrationClient()
-        .search(encounterId).stream()
+    return activelyInfusing(
+        client.getMedicationAdministrationClient().search(encounterId),
+        medsSet);
+  }
+
+  /**
+   * Given a full list of med admins for an encounter, return true if the freshest administration
+   * with a given meds set has a status of in-progress and a dosage over zero.
+   *
+   * @param allAdminsPerEncounter
+   *    A full list of medication administrations for an encounter.
+   * @param medsSet
+   *    Meds group name that UCSF uses.
+   * @return
+   *    True if there is a medicationAdministration that matches criteria for in progress
+   *    infusion.
+   */
+  public static boolean activelyInfusing(List<MedicationAdministration> allAdminsPerEncounter,
+      String medsSet) {
+    return allAdminsPerEncounter.stream()
         .filter(admin -> hasMedsSet(admin, medsSet))
         .max(new MedicationAdministrationEffectiveTimeComparator())
         .filter(medicationAdministration -> medicationAdministration.getStatusElement().

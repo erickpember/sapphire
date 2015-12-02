@@ -148,7 +148,7 @@ public class DailySedationInterruption {
       for (IdentifierDt ident : MedicationAdministrationUtils.findIdentifiers(admin,
           CodingSystems.UCSF_MEDICATION_GROUP_NAME)) {
         String medsSet = ident.getValue();
-        if (MedicationAdministrationUtils.activelyInfusing(apiClient, encounterId, medsSet)) {
+        if (MedicationAdministrationUtils.activelyInfusing(admins, medsSet)) {
           return false;
         }
       }

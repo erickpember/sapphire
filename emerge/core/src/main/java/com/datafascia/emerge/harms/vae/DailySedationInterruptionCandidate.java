@@ -110,8 +110,11 @@ public class DailySedationInterruptionCandidate {
     boolean allAdminOffSedation = true;
     for (MedicationAdministration admin : medicationAdministrations) {
       for (IdentifierDt id : admin.getIdentifier()) {
-        if (MedicationAdministrationUtils.notInfusing(apiClient, encounterId, id.getValue())) {
+        if (!MedicationAdministrationUtils.activelyInfusing(
+            medicationAdministrations,
+            id.getValue())) {
           allAdminOffSedation = false;
+          break;
         }
       }
     }
@@ -155,7 +158,7 @@ public class DailySedationInterruptionCandidate {
     for (MedicationAdministration admin : medicationAdministrations) {
       for (IdentifierDt id : admin.getIdentifier()) {
         if (MedicationAdministrationUtils
-            .activelyInfusing(apiClient, encounterId, id.getValue())) {
+            .activelyInfusing(medicationAdministrations, id.getValue())) {
           switch (admin.getIdentifierFirstRep().getValue()) {
             case "Continuous Infusion Cisatracurium IV":
             case "Continuous Infusion Vecuronium IV":
@@ -397,7 +400,7 @@ public class DailySedationInterruptionCandidate {
         if (activelyInfusingDrugNames.contains(medsSet)) {
           for (IdentifierDt id : admin.getIdentifier()) {
             if (MedicationAdministrationUtils
-                .activelyInfusing(apiClient, encounterId, id.getValue())) {
+                .activelyInfusing(medicationAdministrations, id.getValue())) {
               return CandidateResult.YES;
             }
           }

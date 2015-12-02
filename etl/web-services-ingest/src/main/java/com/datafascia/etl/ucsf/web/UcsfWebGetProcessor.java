@@ -4,8 +4,13 @@
 package com.datafascia.etl.ucsf.web;
 
 import com.datafascia.etl.ucsf.web.config.UcsfWebGetConfig;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
@@ -15,10 +20,10 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 import javax.net.ssl.SSLContext;
 import org.apache.commons.io.IOUtils;
@@ -89,7 +94,9 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
   private Set<Relationship> relationships;
   private List<PropertyDescriptor> properties;
   private UcsfWebGetConfig config;
-  private HashMap<String, String> lastTimestamps = new HashMap<String, String>();
+  private static final String TIMESTORE_FILENAME = "/tmp/df-etl-webget-timestore";
+  private static File timeStore;
+  private static ConcurrentHashMap<String, String> lastTimestamps;
 
   @Override
   protected void init(final ProcessorInitializationContext context) {
@@ -100,6 +107,64 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
     final List<PropertyDescriptor> properties = new ArrayList<>();
     properties.add(YAMLPATH);
     this.properties = Collections.unmodifiableList(properties);
+
+    createTimeStore();
+  }
+
+  /**
+   * Clears stored dates for the query interval, forcing a full refresh.
+   */
+  public static void clearFetchTimer() {
+    lastTimestamps.clear();
+    updateTimeStore();
+  }
+
+  private static void createTimeStore() {
+    if (timeStore != null) {
+      try {
+        timeStore.createNewFile();
+      } catch (IOException ex) {
+        throw new IllegalStateException("Could not create timestore file.", ex);
+      }
+    } else {
+      timeStore = new File(TIMESTORE_FILENAME);
+      createTimeStore();
+    }
+  }
+
+  private static void updateTimeStore() {
+    try {
+      FileOutputStream fos = new FileOutputStream(timeStore);
+      ObjectOutputStream oos = new ObjectOutputStream(fos);
+      oos.writeObject(lastTimestamps);
+      oos.close();
+      fos.close();
+    } catch (IOException ex) {
+      throw new IllegalStateException("Could not update timestore file.", ex);
+    }
+  }
+
+  private static void loadTimeStore() {
+    if (lastTimestamps == null) {
+      try {
+        if (timeStore == null) {
+          timeStore = new File(TIMESTORE_FILENAME);
+        }
+        FileInputStream fis = new FileInputStream(timeStore);
+        ObjectInputStream ois = new ObjectInputStream(fis);
+        lastTimestamps = (ConcurrentHashMap) ois.readObject();
+        ois.close();
+        fis.close();
+      } catch (IOException ex) {
+        createTimeStore();
+      } catch (ClassNotFoundException ex) {
+        throw new IllegalStateException("Error loading timestore.", ex);
+      }
+    }
+
+    if (lastTimestamps == null) {
+      lastTimestamps = new ConcurrentHashMap<String, String>();
+    }
   }
 
   @Override
@@ -168,6 +233,7 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
   public void onTrigger(final ProcessContext context, final ProcessSessionFactory sessionFactory)
       throws ProcessException {
     final ProcessorLog logger = getLogger();
+    loadTimeStore();
 
     if (!initialized) {
       String yamlFilename = context.getProperty(YAMLPATH).getValue();
@@ -332,6 +398,7 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
         logger.info("Successfully received {} from {} at a rate of {}; transferred to success",
             new Object[]{flowFile, url, dataRate});
         session.commit();
+        updateTimeStore();
       } catch (final IOException e) {
         context.yield();
         session.rollback();

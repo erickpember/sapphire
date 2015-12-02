@@ -9,12 +9,10 @@ import io.dropwizard.setup.Bootstrap;
 import io.dropwizard.setup.Environment;
 import javax.inject.Inject;
 import javax.servlet.ServletRegistration;
-import lombok.extern.slf4j.Slf4j;
 
 /**
- * Initialize the FHIR web API setup
+ * Enables the FHIR servlet.
  */
-@Slf4j
 public class FhirBundle implements ConfiguredBundle<APIConfiguration> {
 
   @Inject
@@ -26,12 +24,11 @@ public class FhirBundle implements ConfiguredBundle<APIConfiguration> {
 
   @Override
   public void run(APIConfiguration configuration, Environment environment) {
-    log.info("Running HAPI FHIR bundle for DropWizard.");
-    final ServletRegistration.Dynamic fhirServletRegistratration =
+    final ServletRegistration.Dynamic servletRegistration =
         environment.servlets().addServlet("fhir", fhirServlet);
-    fhirServletRegistratration.setAsyncSupported(true);
-    fhirServletRegistratration.addMapping("/fhir/*");
-    fhirServletRegistratration.setInitParameter(
+    servletRegistration.setAsyncSupported(true);
+    servletRegistration.addMapping("/fhir/*");
+    servletRegistration.setInitParameter(
         "com.sun.jersey.config.property.packages", FhirServlet.class.getPackage().getName());
   }
 }

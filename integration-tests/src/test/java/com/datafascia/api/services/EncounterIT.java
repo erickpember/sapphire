@@ -11,7 +11,6 @@ import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
-import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -29,7 +28,7 @@ public class EncounterIT extends ApiTestSupport {
 
     List<IResource> encounters = ApiUtil.extractBundle(results, Encounter.class);
 
-    assertEquals(encounters.size(), 2);
+    assertTrue(encounters.size() > 1);
 
     results = client.search()
         .forResource(Encounter.class)

@@ -4,22 +4,13 @@
 package com.datafascia.etl.ucsf.web;
 
 import com.datafascia.etl.ucsf.web.config.UcsfWebGetConfig;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
-import java.security.KeyManagementException;
-import java.security.KeyStore;
-import java.security.KeyStoreException;
-import java.security.NoSuchAlgorithmException;
-import java.security.UnrecoverableKeyException;
-import java.security.cert.CertificateException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -42,11 +33,9 @@ import org.apache.http.config.RegistryBuilder;
 import org.apache.http.conn.HttpClientConnectionManager;
 import org.apache.http.conn.socket.ConnectionSocketFactory;
 import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.impl.auth.BasicScheme;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.conn.BasicHttpClientConnectionManager;
-import org.apache.http.ssl.SSLContexts;
 import org.apache.nifi.annotation.behavior.WritesAttribute;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
@@ -64,7 +53,6 @@ import org.apache.nifi.processor.Relationship;
 import org.apache.nifi.processor.exception.ProcessException;
 import org.apache.nifi.processor.io.OutputStreamCallback;
 import org.apache.nifi.processor.util.StandardValidators;
-import org.apache.nifi.ssl.SSLContextService;
 import org.apache.nifi.util.StopWatch;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
@@ -122,27 +110,6 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
   @Override
   protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
     return properties;
-  }
-
-  private SSLContext createSSLContext(final SSLContextService service)
-      throws KeyStoreException, IOException, NoSuchAlgorithmException, CertificateException,
-      KeyManagementException, UnrecoverableKeyException {
-    final KeyStore truststore = KeyStore.getInstance(service.getTrustStoreType());
-    try (final InputStream in = new FileInputStream(new File(service.getTrustStoreFile()))) {
-      truststore.load(in, service.getTrustStorePassword().toCharArray());
-    }
-
-    final KeyStore keystore = KeyStore.getInstance(service.getKeyStoreType());
-    try (final InputStream in = new FileInputStream(new File(service.getKeyStoreFile()))) {
-      keystore.load(in, service.getKeyStorePassword().toCharArray());
-    }
-
-    final SSLContext sslContext = SSLContexts.custom()
-        .loadTrustMaterial(truststore, new TrustSelfSignedStrategy())
-        .loadKeyMaterial(keystore, service.getKeyStorePassword().toCharArray())
-        .build();
-
-    return sslContext;
   }
 
   /**
@@ -244,13 +211,12 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
     } else {
       try {
         sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(null, null, null);
       } catch (final GeneralSecurityException e) {
         throw new ProcessException(e);
       }
 
-      final SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext,
-          new String[]{"TLSv1"}, null,
-          SSLConnectionSocketFactory.getDefaultHostnameVerifier());
+      final SSLConnectionSocketFactory sslsf = new SSLConnectionSocketFactory(sslContext);
 
       final Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder
           .<ConnectionSocketFactory>create().register("https", sslsf).build();

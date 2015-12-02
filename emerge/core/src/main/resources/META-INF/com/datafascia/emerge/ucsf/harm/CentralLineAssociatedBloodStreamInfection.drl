@@ -4,6 +4,7 @@ package com.datafascia.emerge.ucsf.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Procedure;
+import com.datafascia.emerge.harms.clabsi.DailyNeedsAssessmentImpl;
 import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater.Event;
 import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater.EventType;
 
@@ -13,6 +14,16 @@ global com.datafascia.emerge.ucsf.harm.CentralLineAssociatedBloodStreamInfection
 rule "Update daily needs assessment"
 when
   Event( type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  centralLineAssociatedBloodStreamInfectionUpdater.updateDailyNeedsAssessment(
+      harmEvidence, $encounter);
+end
+
+rule "Update daily needs assessment from observation"
+when
+  Event( type == EventType.UPDATE_OBSERVATIONS )
+  $observation: Observation( DailyNeedsAssessmentImpl.isRelevant($observation) )
   $encounter: Encounter()
 then
   centralLineAssociatedBloodStreamInfectionUpdater.updateDailyNeedsAssessment(

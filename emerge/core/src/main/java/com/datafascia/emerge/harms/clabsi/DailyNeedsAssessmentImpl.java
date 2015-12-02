@@ -29,6 +29,17 @@ public class DailyNeedsAssessmentImpl {
   @Inject
   private ClientBuilder apiClient;
 
+  /**
+   * Checks if observation is relevant to Verbal Pain.
+   *
+   * @param observation
+   *     the observation to check
+   * @return true if observation is relevant to Verbal Pain.
+   */
+  public static boolean isRelevant(Observation observation) {
+    return ObservationCodeEnum.NEEDS_ASSESSMENT.isCodeEquals(observation.getCode());
+  }
+
   private static boolean isCentralLine(Procedure procedure) {
     return procedure.getCategory().getCodingFirstRep().getCode()
         .equals(ProcedureCategoryEnum.CENTRAL_LINE.getCode());

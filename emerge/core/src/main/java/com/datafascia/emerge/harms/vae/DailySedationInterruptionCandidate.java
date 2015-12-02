@@ -135,7 +135,7 @@ public class DailySedationInterruptionCandidate {
     for (MedicationAdministration admin : medicationAdministrations) {
       for (IdentifierDt id : admin.getIdentifier()) {
         if (MedicationAdministrationUtils
-            .beenAdministered(apiClient, encounterId, twoHourPeriod, id.getValue())) {
+            .beenAdministered(medicationAdministrations, twoHourPeriod, id.getValue())) {
           if (MedicationAdministrationUtils.hasMedsSet(admin,
               MedsSetEnum.INTERMITTENT_CISATRACURIUM_IV.getCode())
               || MedicationAdministrationUtils.hasMedsSet(admin,

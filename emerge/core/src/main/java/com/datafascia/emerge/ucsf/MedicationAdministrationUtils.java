@@ -121,10 +121,8 @@ public class MedicationAdministrationUtils {
    *   - Reason Not Given is null
    *   - Inside a given time frame.
    *
-   * @param encounterId
-   *    encounter to search for medication administrations
-   * @param client
-   *    API client
+   * @param allAdminsPerEncounter
+   *    A full list of medication administrations for an encounter.
    * @param timeFrame
    *    Time window constraint for search.
    * @param medsSet
@@ -133,13 +131,9 @@ public class MedicationAdministrationUtils {
    *    True if there is a medicationAdministration that matches criteria for in progress
    *    infusion.
    */
-  public static boolean beenAdministered(ClientBuilder client, String encounterId,
+  public static boolean beenAdministered(List<MedicationAdministration> allAdminsPerEncounter,
       PeriodDt timeFrame, String medsSet) {
-    List<MedicationAdministration> medicationAdministrations = client.
-        getMedicationAdministrationClient().search(encounterId);
-    medicationAdministrations.addAll(client.getMedicationAdministrationClient()
-        .search(encounterId));
-    return medicationAdministrations.stream()
+    return allAdminsPerEncounter.stream()
         .filter(medicationAdministration -> medicationAdministration.getStatusElement().
             getValueAsEnum().equals(MedicationAdministrationStatusEnum.IN_PROGRESS)
             || medicationAdministration.getStatusElement().getValueAsEnum()

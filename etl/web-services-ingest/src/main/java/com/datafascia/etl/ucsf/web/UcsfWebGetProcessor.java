@@ -369,9 +369,9 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
           JSONObject jsonObject = (JSONObject) new JSONParser().parse(jsonString);
           String extractDateTime = jsonObject.get("ExtractDateTime").toString();
           Instant correctTime = epicDateToInstant(extractDateTime);
-          // The webservice is off by (UTC offset * 2), we need to account for that.
+          // The webservice is off by its UTC offset, we need to account for that.
           Instant incorrectTime
-              = correctTime.minus(getOffset(extractDateTime) * 2, ChronoUnit.MILLIS);
+              = correctTime.minus(getOffset(extractDateTime), ChronoUnit.MILLIS);
           lastTimestamps.put(baseUrl, incorrectTime.toString());
         } catch (ParseException e) {
           throw new ProcessException(e);

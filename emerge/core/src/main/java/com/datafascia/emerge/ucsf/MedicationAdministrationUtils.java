@@ -109,7 +109,7 @@ public class MedicationAdministrationUtils {
         .filter(admin -> hasMedsSet(admin, medsSet))
         .max(new MedicationAdministrationEffectiveTimeComparator())
         .filter(medicationAdministration -> medicationAdministration.getStatusElement().
-            getValueAsEnum().equals(MedicationAdministrationStatusEnum.IN_PROGRESS))
+            getValueAsEnum() == MedicationAdministrationStatusEnum.IN_PROGRESS)
         .filter(medicationAdministration -> dosageOverZero(medicationAdministration)).isPresent();
   }
 
@@ -135,9 +135,9 @@ public class MedicationAdministrationUtils {
       PeriodDt timeFrame, String medsSet) {
     return allAdminsPerEncounter.stream()
         .filter(medicationAdministration -> medicationAdministration.getStatusElement().
-            getValueAsEnum().equals(MedicationAdministrationStatusEnum.IN_PROGRESS)
+            getValueAsEnum() == MedicationAdministrationStatusEnum.IN_PROGRESS
             || medicationAdministration.getStatusElement().getValueAsEnum()
-            .equals(MedicationAdministrationStatusEnum.COMPLETED))
+            == MedicationAdministrationStatusEnum.COMPLETED)
         .filter(admin -> hasMedsSet(admin, medsSet))
         .filter(medicationAdministration -> dosageOverZero(medicationAdministration))
         .filter(medicationAdministration -> insideTimeFrame(medicationAdministration, timeFrame))
@@ -170,12 +170,10 @@ public class MedicationAdministrationUtils {
         .search(encounterId));
 
     return medicationAdministrations.stream()
-        .filter(medicationAdministration ->
-            medicationAdministration.getStatusElement().getValueAsEnum() != null
-            && (medicationAdministration.getStatusElement().getValueAsEnum()
-                .equals(MedicationAdministrationStatusEnum.IN_PROGRESS)
+        .filter(medicationAdministration -> (medicationAdministration.getStatusElement()
+            .getValueAsEnum() == MedicationAdministrationStatusEnum.IN_PROGRESS
             || medicationAdministration.getStatusElement().getValueAsEnum()
-            .equals(MedicationAdministrationStatusEnum.COMPLETED)))
+            == MedicationAdministrationStatusEnum.COMPLETED))
         .filter(admin -> hasMedsSet(admin, medsSet))
         .anyMatch(medicationAdministration -> insideTimeFrame(medicationAdministration, timeFrame));
   }
@@ -205,10 +203,8 @@ public class MedicationAdministrationUtils {
     medicationAdministrations.addAll(client.getMedicationAdministrationClient()
         .search(encounterId));
     return medicationAdministrations.stream()
-        .filter(medicationAdministration ->
-            medicationAdministration.getStatusElement().getValueAsEnum() != null
-            && (medicationAdministration.getStatusElement().
-            getValueAsEnum().equals(MedicationAdministrationStatusEnum.IN_PROGRESS)))
+        .filter(medicationAdministration -> (medicationAdministration.getStatusElement().
+            getValueAsEnum() == MedicationAdministrationStatusEnum.IN_PROGRESS))
         .filter(admin -> hasMedsSet(admin, medsSet))
         .anyMatch(medicationAdministration -> insideTimeFrame(medicationAdministration, timeFrame));
   }

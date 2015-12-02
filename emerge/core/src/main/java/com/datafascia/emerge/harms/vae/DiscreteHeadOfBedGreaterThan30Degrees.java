@@ -91,6 +91,8 @@ public class DiscreteHeadOfBedGreaterThan30Degrees {
         case "HOB Flat":
         case "HOB less than 20":
           return MaybeEnum.NO;
+        case "Self regulated":
+          return MaybeEnum.NOT_DOCUMENTED;
         default:
           log.warn("Unexpected head of bed value [{}]", value);
       }

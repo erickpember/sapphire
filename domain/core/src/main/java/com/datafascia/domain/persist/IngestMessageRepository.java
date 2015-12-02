@@ -3,13 +3,15 @@
 package com.datafascia.domain.persist;
 
 import com.datafascia.common.accumulo.AccumuloTemplate;
+import com.datafascia.common.accumulo.Limit;
 import com.datafascia.common.accumulo.RowMapper;
-import com.datafascia.common.persist.Id;
+import com.datafascia.common.time.InstantFormatter;
 import com.datafascia.domain.model.IngestMessage;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.time.Instant;
+import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
@@ -96,21 +98,6 @@ public class IngestMessageRepository extends BaseRepository {
   }
 
   /**
-   * Reads message.
-   *
-   * @param messageId
-   *     primary key
-   * @return optional entity, not present if not found
-   */
-  public Optional<IngestMessage> read(Id<IngestMessage> messageId) {
-    Scanner scanner = accumuloTemplate.createScanner(Tables.INGEST_MESSAGE);
-    scanner.setRange(Range.exact(messageId.toString()));
-    scanner.fetchColumnFamily(new Text(COLUMN_FAMILY));
-
-    return accumuloTemplate.queryForObject(scanner, MESSAGE_ROW_MAPPER);
-  }
-
-  /**
    * Saves message to archive.
    *
    * @param message
@@ -130,5 +117,23 @@ public class IngestMessageRepository extends BaseRepository {
                 .put(SOURCE, message.getSource())
                 .put(PAYLOAD_TYPE, message.getPayloadType())
                 .put(PAYLOAD, new Value(message.getPayload())));
+  }
+
+  /**
+   * Lists messages.
+   *
+   * @param timeLower
+   *     time lower bound (inclusive)
+   * @param limit
+   *     maximum number of messages to return
+   * @return messages
+   */
+  public List<IngestMessage> list(Instant timeLower, int limit) {
+    Scanner scanner = accumuloTemplate.createScanner(Tables.INGEST_MESSAGE);
+    scanner.setRange(new Range(InstantFormatter.ISO_INSTANT_MILLI.format(timeLower), null));
+    scanner.fetchColumnFamily(new Text(COLUMN_FAMILY));
+
+    return accumuloTemplate.queryForList(
+        scanner, MESSAGE_ROW_MAPPER, entity -> true, new Limit<>(limit));
   }
 }

@@ -40,7 +40,7 @@ public class DailySedationInterruptionCandidate {
     RECEIVING_NMBA(false, "Receiving NMBA"),
     STATUS_EPILEPTICUS(false, "Status Epilepticus"),
     RESPIRATORY_INSTABILITY(false, "Respiratory Instability"),
-    THERAPEUTIC_HYPOTHERMIA(false, "Theraputic Hypothermia"),
+    THERAPEUTIC_HYPOTHERMIA(false, "Therapeutic Hypothermia"),
     RASS_2_OR_GREATER(false, "RASS 2+ or Greater"),
     WITHDRAWAL_SEIZURE_RISK(false, "Withdrawal Seizure Risk"),
     HEMODYNAMIC_INSTABILITY(false, "Hemodynamic Instability"),

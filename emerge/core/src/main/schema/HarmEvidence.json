@@ -587,7 +587,8 @@
                 "Respiratory Instability",
                 "RASS 2+ or Greater",
                 "Withdrawal Seizure Risk",
-                "Hemodynamic Instability"
+                "Hemodynamic Instability",
+                "No specified conditions were met"
               ],
               "description": "An explanation about the purpose of this instance described by this schema."
             },

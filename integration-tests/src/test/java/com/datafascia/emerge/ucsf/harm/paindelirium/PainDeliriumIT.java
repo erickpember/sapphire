@@ -121,6 +121,20 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
   }
 
   @Test
+  public void should_export_cpot_pain_goal_2() throws Exception {
+    processMessage("cpot-8.hl7");
+    processMessage("pain-goal.hl7");
+    processTimer();
+
+    HarmEvidence harmEvidence = readHarmEvidence();
+    PainGoal goal = harmEvidence.getMedicalData().getDelirium().getPain().getPainGoal();
+
+    assertEquals(goal.getGoal(), 2);
+    assertEquals(
+        goal.getDataEntryTime().toInstant().toString(), "2014-09-29T23:48:59Z");
+  }
+
+  @Test
   public void should_export_pain_goal_no_pain() throws Exception {
     processMessage("numerical-pain-8.hl7");
     processMessage("pain-goal-no-pain.hl7");

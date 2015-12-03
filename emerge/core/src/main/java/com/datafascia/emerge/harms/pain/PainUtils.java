@@ -147,6 +147,25 @@ public class PainUtils {
   }
 
   /**
+   * Given a list of observations, returns the freshest of a list of observations
+   * that contains the appropriate code for CPOT.
+   *
+   * @param observations
+   *     observations to search
+   * @return Freshest observation found with the code. {@code null} if not found.
+   */
+  public static Observation freshestCpot(List<Observation> observations) {
+    observations.sort(new ObservationEffectiveComparator().reversed());
+
+    for (Observation observation : observations) {
+      if (ObservationCodeEnum.CPOT.isCodeEquals(observation.getCode())) {
+        return observation;
+      }
+    }
+    return null;
+  }
+
+  /**
    * Given a list of observations, returns the observation with the lowest pain score.
    *
    * @param observations

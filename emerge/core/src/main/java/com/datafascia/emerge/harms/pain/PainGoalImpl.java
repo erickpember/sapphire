@@ -62,11 +62,20 @@ public class PainGoalImpl {
         observationsSinceMidnight);
     Observation freshestVerbalScore = PainUtils.freshestHighestVerbalPainScore(
         observationsSinceMidnight);
+    Observation freshestCpotScore = PainUtils.freshestCpot(observationsSinceMidnight);
 
-    if (ObservationUtils.firstIsFresher(freshestVerbalScore, freshestNumericalScore)) {
+    if (ObservationUtils.firstIsFresher(freshestVerbalScore, freshestNumericalScore)
+        && ObservationUtils.firstIsFresher(freshestVerbalScore, freshestCpotScore)) {
       freshestPainType = PainUtils.PainType.VERBAL;
-    } else if (ObservationUtils.firstIsFresher(freshestNumericalScore, freshestVerbalScore)) {
+    } else if (ObservationUtils.firstIsFresher(freshestNumericalScore, freshestVerbalScore)
+        && ObservationUtils.firstIsFresher(freshestNumericalScore, freshestCpotScore)) {
       freshestPainType = PainUtils.PainType.NUMERICAL;
+    } else if (ObservationUtils.firstIsFresher(freshestCpotScore, freshestVerbalScore)
+        && ObservationUtils.firstIsFresher(freshestCpotScore, freshestNumericalScore)) {
+      freshestPainType = PainUtils.PainType.CPOT;
+    } else {
+      // No pain type found
+      return 11;
     }
 
     if (acceptableLevelOfPainAssessments.isEmpty() || !acceptableLevelOfPainAssessments.stream()
@@ -79,8 +88,9 @@ public class PainGoalImpl {
     }
 
     Observation freshestScore = null;
-    if (freshestPainType != null && (freshestPainType.equals(PainUtils.PainType.NUMERICAL)
-        || freshestPainType.equals(PainUtils.PainType.VERBAL))) {
+
+    if (freshestPainType.equals(PainUtils.PainType.NUMERICAL)
+        || freshestPainType.equals(PainUtils.PainType.VERBAL)) {
       if (freshestPainType.equals(PainUtils.PainType.NUMERICAL)) {
         freshestScore = freshestNumericalScore;
       } else if (freshestPainType.equals(PainUtils.PainType.VERBAL)) {
@@ -115,7 +125,10 @@ public class PainGoalImpl {
               freshestPainType);
         }
       } // end if freshestScore is not null
-    } // end if freshestPainType is verbal or numerical
+    } else if (freshestPainType.equals(PainUtils.PainType.CPOT)) {
+      return 2;
+    }
+
     return 11;
   }
 

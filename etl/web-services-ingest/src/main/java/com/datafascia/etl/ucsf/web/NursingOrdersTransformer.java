@@ -155,8 +155,7 @@ public class NursingOrdersTransformer {
       log.warn(
           "Encounter ID [{}] not found. Discarded nursing order ID {}",
           encounterId,
-          order.get("OrderID"),
-          e);
+          order.get("OrderID"));
       return;
     }
 

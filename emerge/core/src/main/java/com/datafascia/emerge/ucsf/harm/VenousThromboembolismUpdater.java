@@ -4,6 +4,7 @@ package com.datafascia.emerge.ucsf.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import com.datafascia.emerge.harms.vte.AnticoagulationImpl;
+import com.datafascia.emerge.harms.vte.AnticoagulationTypeEnum;
 import com.datafascia.emerge.harms.vte.LowerExtremitySCDsContraindicatedImpl;
 import com.datafascia.emerge.harms.vte.PharmacologicVteProphylaxis;
 import com.datafascia.emerge.harms.vte.PharmacologicVteProphylaxisAdministered;
@@ -24,6 +25,7 @@ import com.datafascia.emerge.ucsf.VTE;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Optional;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
@@ -104,43 +106,33 @@ public class VenousThromboembolismUpdater {
   }
 
   /**
-   * Updates on systemic anticoagulation.
+   * Updates anticoagulation, both for type and onSystemicAnticoagulation.
    *
    * @param harmEvidence
    *     to modify
    * @param encounter
    *     encounter
    */
-  public void updateOnSystemicAnticoagulation(HarmEvidence harmEvidence, Encounter encounter) {
+  public void updateAnticoagulation(HarmEvidence harmEvidence, Encounter encounter) {
     Anticoagulation anticoagulation = getAnticoagulation(harmEvidence);
-
     String encounterId = encounter.getId().getIdPart();
-    TimestampedBoolean anticoagulated = new TimestampedBoolean()
-        .withValue(anticoagulationImpl.isAnticoagulated(encounterId))
+
+    Optional<AnticoagulationTypeEnum> antiCoagType = anticoagulationImpl
+        .getAnticoagulationType(encounterId);
+
+    // Set Type
+    antiCoagType.ifPresent(value -> {
+      Type anticoagulationType = new Type()
+          .withValue(Type.Value.fromValue(value.getCode()))
+          .withUpdateTime(Date.from(Instant.now(clock)));
+
+      anticoagulation.setType(anticoagulationType);
+    });
+
+    TimestampedBoolean isAnticoagulated = new TimestampedBoolean()
+        .withValue(antiCoagType.isPresent())
         .withUpdateTime(Date.from(Instant.now(clock)));
-    anticoagulation.setOnSystemicAnticoagulation(anticoagulated);
-  }
-
-  /**
-   * Updates anticoagulation type.
-   *
-   * @param harmEvidence
-   *     to modify
-   * @param encounter
-   *     encounter
-   */
-  public void updateAnticoagulationType(HarmEvidence harmEvidence, Encounter encounter) {
-    Anticoagulation anticoagulation = getAnticoagulation(harmEvidence);
-
-    String encounterId = encounter.getId().getIdPart();
-    anticoagulationImpl.getAnticoagulationType(encounterId)
-        .ifPresent(value -> {
-          Type anticoagulationType = new Type()
-              .withValue(Type.Value.fromValue(value.getCode()))
-              .withUpdateTime(Date.from(Instant.now(clock)));
-
-          anticoagulation.setType(anticoagulationType);
-        });
+    anticoagulation.setOnSystemicAnticoagulation(isAnticoagulated);
   }
 
   /**

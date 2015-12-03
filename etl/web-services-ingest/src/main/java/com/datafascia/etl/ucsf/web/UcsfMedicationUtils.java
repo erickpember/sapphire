@@ -249,7 +249,12 @@ public class UcsfMedicationUtils {
     String dateTimeOrdered = orderJson.get("DateTimeOrdered").toString();
     String orderStatus = orderJson.get("OrderStatus").toString();
     if (!orderStatus.isEmpty()) {
-      orderStatus = orderStatus.split("\\^")[0];
+      String[] orderStatusParts = orderStatus.split("\\^");
+      if (orderStatusParts.length != 0) {
+        orderStatus = orderStatusParts[0];
+      } else {
+        log.warn("Order " + orderId + " does has an improper status [" + orderStatus + "].");
+      }
     } else {
       log.warn("Order " + orderId + " does not have a status.");
     }

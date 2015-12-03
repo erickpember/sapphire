@@ -58,8 +58,6 @@ public class ProcedureBuilder {
   private static final String LINE_TYPE9 = "304890099";
   private static final String LINE_PLACEMENT_DATE = "304890002";
   private static final String LINE_PLACEMENT_TIME = "304890078";
-  private static final String LINE_REMOVAL_DATE = "304890084";
-  private static final String LINE_REMOVAL_TIME = "304890085";
   private static final String LINE_ORIENTATION1 = "304890081";
   private static final String LINE_ORIENTATION2 = "304890092";
   private static final String LINE_ORIENTATION3 = "304890103";
@@ -70,6 +68,11 @@ public class ProcedureBuilder {
   private static final String LINE_ACCESS_TYPE = "304890091";
   private static final String LINE_ACCESS_LOCATION = "304890093";
   private static final String LINE_LUMENS = "304890094";
+  private static final String LINE_REMOVAL_DATE = "304890084";
+  private static final String LINE_REMOVAL_TIME = "304890085";
+  private static final String LINE_REMOVAL_REASON86 = "304890086";
+  private static final String LINE_REMOVAL_REASON96 = "304890096";
+  private static final String LINE_REMOVAL_REASON28 = "304894228";
 
   private static final String REMOVED = "[REMOVED]";
   private static final DateTimeFormatter LOCAL_TIME = DateTimeFormatter.ofPattern("HHmmss");
@@ -417,11 +420,16 @@ public class ProcedureBuilder {
     return Optional.of(procedure);
   }
 
+  private Optional<Observation> getRemovedLine() {
+    return getObservation(
+        LINE_REMOVAL_DATE,
+        LINE_REMOVAL_REASON86,
+        LINE_REMOVAL_REASON96,
+        LINE_REMOVAL_REASON28);
+  }
+
   private Optional<Procedure> removeLine() {
-    Optional<Observation> inputLineType = getObservation(LINE_REMOVAL_DATE);
-    if (!inputLineType.isPresent()) {
-      return Optional.empty();
-    }
+    Optional<Observation> inputLineType = getRemovedLine();
 
     Optional<LineType> optionalLineType =
         extractBasicLineType(inputLineType.get().getCode().getText());
@@ -458,7 +466,7 @@ public class ProcedureBuilder {
   }
 
   private Optional<Procedure> toLineProcedure() {
-    if (getObservation(LINE_REMOVAL_DATE).isPresent()) {
+    if (getRemovedLine().isPresent()) {
       return removeLine();
     }
 

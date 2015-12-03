@@ -60,6 +60,16 @@ public class CentralLineAssociateBloodStreamInfectionIT extends HarmEvidenceTest
   }
 
   @Test
+  public void should_not_export_removed_introducer_femoral_right() throws Exception {
+    processMessage("introducer-femoral-right.hl7");
+    processMessage("removed-introducer-femoral-right.hl7");
+
+    HarmEvidence harmEvidence = readHarmEvidence();
+    CLABSI clabsi = harmEvidence.getMedicalData().getCLABSI();
+    assertEquals(clabsi.getCentralLine().size(), 0);
+  }
+
+  @Test
   public void should_export_picc_double_lumen_arm_right() throws Exception {
     processMessage("picc-double-lumen-arm-right.hl7");
 

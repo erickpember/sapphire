@@ -58,29 +58,27 @@ public class MedicationOrderUtils {
   }
 
   /**
-   * Finds any MedicationOrder for status of either Active or Draft with a date written before
+   * Finds any MedicationOrder for a given medication set name with a date written before
    * a given time.
    *
    * @param encounterId
-   *    encounter to search for medication orders
+   *     Encounter to search for medication orders.
    * @param client
-   *    API client
-   * @param medication
+   *     API client.
+   * @param medsSet
    *     Medication identifier, AKA MedsSet, optional.
-   * @param startTime
-   *     Start time for search.
+   * @param endTime
+   *     End time for search.
    * @return
-   *    freshest medicationOrder for status of either Active or Draft,
-   *    or {@code null} if no match is found.
+   *     Medication Orders for a given meds set before a given time or {@code null}
+   *     if no match is found.
    */
-  public static List<MedicationOrder> findActiveOrDraftOrderForMedicationBeforeTime(
-      ClientBuilder client, String encounterId, String medication, Date startTime) {
+  public static List<MedicationOrder> findMedicationBefore(
+      ClientBuilder client, String encounterId, String medsSet, Date endTime) {
     List<MedicationOrder> medicationOrders = client.getMedicationOrderClient().search(encounterId,
-        MedicationOrderStatusEnum.ACTIVE.getCode(), medication);
-    medicationOrders.addAll(client.getMedicationOrderClient().search(encounterId,
-        MedicationOrderStatusEnum.DRAFT.getCode(), medication));
+        null, medsSet);
     return medicationOrders.stream()
-        .filter(order -> isBefore(order, startTime))
+        .filter(order -> isBefore(order, endTime))
         .collect(Collectors.toList());
   }
 

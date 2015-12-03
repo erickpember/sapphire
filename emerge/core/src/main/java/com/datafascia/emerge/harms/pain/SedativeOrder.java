@@ -89,7 +89,7 @@ public class SedativeOrder {
     Date now = Date.from(Instant.now(clock));
 
     List<MedicationOrder> medOrders = MedicationOrderUtils
-        .findActiveOrDraftOrderForMedicationBeforeTime(
+        .findMedicationBefore(
             apiClient,
             encounterId,
             medication,
@@ -153,12 +153,15 @@ public class SedativeOrder {
 
   private Optional<OrderResult> verifyResult(OrderResult result) {
     if (!SEDATIVE_NAMES.contains(result.getDrug())) {
-      log.warn("Unexpected pain and delerium sedative drug name found [{}]", result.getDrug());
+      log.warn("Unexpected pain and delirium sedative drug name found [{}], order id [{}]",
+          result.getDrug(),
+          result.getOrderId());
       return Optional.empty();
     }
     if (!DOSAGE_ROUTES.contains(result.getDosageRoute())) {
-      log.warn("Unexpected pain and delerium sedative dosage route found [{}]", result
-          .getDosageRoute());
+      log.warn("Unexpected pain and delirium sedative dosage route found [{}], order id [{}]",
+          result.getDosageRoute(),
+          result.getOrderId());
       return Optional.empty();
     }
     return Optional.of(result);

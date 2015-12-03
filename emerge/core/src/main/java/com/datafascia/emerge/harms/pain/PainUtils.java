@@ -265,6 +265,9 @@ public class PainUtils {
       QuantityDt value = (QuantityDt) observation.getValue();
       painScore = value.getValue().intValueExact();
     } else if (observation.getValue() instanceof StringDt) {
+      if (ObservationUtils.getValueAsString(observation).equals("Unable to Assess")) {
+        return 11;
+      }
       try {
         painScore = Integer.parseInt(ObservationUtils.getValueAsString(observation));
       } catch (NumberFormatException ex) {

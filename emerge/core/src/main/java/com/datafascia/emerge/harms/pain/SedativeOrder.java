@@ -13,9 +13,6 @@ import com.datafascia.emerge.ucsf.codes.MedsSetEnum;
 import com.datafascia.emerge.ucsf.codes.painAndDelerium.SedativeOrderDosageRouteEnum;
 import com.datafascia.emerge.ucsf.codes.painAndDelerium.SedativeOrderDrugEnum;
 import com.google.common.collect.ImmutableSet;
-import java.time.Clock;
-import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -62,8 +59,6 @@ public class SedativeOrder {
   @Inject
   private ClientBuilder apiClient;
 
-  @Inject
-  private Clock clock;
 
   /**
    * Result container for sedative orders.
@@ -81,19 +76,18 @@ public class SedativeOrder {
    *
    * @param encounterId
    *     encounter to check.
-   * @param medication
+   * @param medsSet
    *     Medication identifier, AKA MedsSet.
    * @return Drug name, route and order status, empty if not found.
    */
-  public Optional<OrderResult> getValue(String encounterId, String medication) {
-    Date now = Date.from(Instant.now(clock));
+  public Optional<OrderResult> getValue(String encounterId, String medsSet) {
 
-    List<MedicationOrder> medOrders = MedicationOrderUtils
-        .findMedicationBefore(
-            apiClient,
-            encounterId,
-            medication,
-            now);
+    List<MedicationOrder> medOrders = apiClient.getMedicationOrderClient().search(encounterId,
+        null, medsSet);
+    if (medOrders == null || medOrders.isEmpty()) {
+      return Optional.empty();
+    }
+
     medOrders.sort(new MedicationOrderDateWrittenComparator().reversed());
 
     return processOrders(medOrders);

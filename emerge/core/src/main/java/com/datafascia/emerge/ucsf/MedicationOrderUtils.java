@@ -58,31 +58,6 @@ public class MedicationOrderUtils {
   }
 
   /**
-   * Finds any MedicationOrder for a given medication set name with a date written before
-   * a given time.
-   *
-   * @param encounterId
-   *     Encounter to search for medication orders.
-   * @param client
-   *     API client.
-   * @param medsSet
-   *     Medication identifier, AKA MedsSet, optional.
-   * @param endTime
-   *     End time for search.
-   * @return
-   *     Medication Orders for a given meds set before a given time or {@code null}
-   *     if no match is found.
-   */
-  public static List<MedicationOrder> findMedicationBefore(
-      ClientBuilder client, String encounterId, String medsSet, Date endTime) {
-    List<MedicationOrder> medicationOrders = client.getMedicationOrderClient().search(encounterId,
-        null, medsSet);
-    return medicationOrders.stream()
-        .filter(order -> isBefore(order, endTime))
-        .collect(Collectors.toList());
-  }
-
-  /**
    * Finds an identifier for a given coding system. Given multiple matches, return all.
    *
    * @param order

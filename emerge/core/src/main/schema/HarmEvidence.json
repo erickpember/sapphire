@@ -964,11 +964,11 @@
                     "value": {
                       "type": "string",
                        "enum": [
-                         "Volume Control (AC)",
+                         "Assist Control Volume Control (ACVC)",
                          "Synchronous Intermittent Mandatory Ventilation (SIMV)",
                          "Pressure Support (PS)",
                          "Volume Support (VS)",
-                         "Pressure Control (PC)",
+                         "Assist Control Pressure Control (ACPC)",
                          "Pressure Regulated Volume Control (PRVC)",
                          "Airway Pressure Release Ventilation (APRV)",
                          "High Frequency Oscillation (HFO)",

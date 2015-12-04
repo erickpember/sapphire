@@ -10,12 +10,12 @@ import java.util.Optional;
  * Enumerates types of Ventilation modes as reported to Emerge
  */
 public enum VentModeEmergeEnum implements SystemDefinedCode<String> {
-  VOLUME_CONTROL_AC("Volume Control (AC)"),
+  ASSIST_CONTROL_VOLUME_CONTROL_ACVC("Assist Control Volume Control (ACVC)"),
   SYNCHRONOUS_INTERMITTENT_MANDATORY_VENTILATION_SIMV(
       "Synchronous Intermittent Mandatory Ventilation (SIMV)"),
   PRESSURE_SUPPORT_PS("Pressure Support (PS)"),
   VOLUME_SUPPORT_VS("Volume Support (VS)"),
-  PRESSURE_CONTROL_PC("Pressure Control (PC)"),
+  ASSIST_CONTROL_PRESSURE_CONTROL_ACPC("Assist Control Pressure Control (ACPC)"),
   PRESSURE_REGULATED_VOLUME_CONTROL_PRVC("Pressure Regulated Volume Control (PRVC)"),
   AIRWAY_PRESSURE_RELEASE_VENTILATION_APRV("Airway Pressure Release Ventilation (APRV)"),
   HIGH_FREQUENCY_OSCILLATION_HFO("High Frequency Oscillation (HFO)"),

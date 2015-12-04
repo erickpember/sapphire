@@ -79,7 +79,7 @@ public class VentilatorAssociatedEventIT extends HarmEvidenceTestSupport {
 
     HarmEvidence harmEvidence = readHarmEvidence();
     Mode mode = harmEvidence.getMedicalData().getVAE().getVentilation().getMode();
-    assertEquals(mode.getValue().toString(), "Volume Control (AC)");
+    assertEquals(mode.getValue().toString(), "Assist Control Volume Control (ACVC)");
     assertEquals(mode.getUpdateTime(), Date.from(Instant.now(clock)));
 
     processMessage("ventilation-mode-aprv1.hl7");

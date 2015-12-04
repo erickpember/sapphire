@@ -104,7 +104,7 @@ public class VentilationModeImpl {
   private Optional<String> eitherBreathOrVentIsFreshest(Observation breath, Observation vent) {
     if (breath.getValue().toString().equals(BreathTypeEnum.VOLUME_CONTROL.getCode())
         && vent.getValue().toString().equals(VentModeObservationEnum.AC.getCode())) {
-      return Optional.of(VentModeEmergeEnum.VOLUME_CONTROL_AC.getCode());
+      return Optional.of(VentModeEmergeEnum.ASSIST_CONTROL_VOLUME_CONTROL_ACVC.getCode());
     }
 
     if ((breath.getValue().toString().equals(BreathTypeEnum.VOLUME_CONTROL.getCode()) || breath
@@ -129,7 +129,7 @@ public class VentilationModeImpl {
 
     if (breath.getValue().toString().equals(BreathTypeEnum.PRESSURE_CONTROL.getCode())
         && vent.getValue().toString().equals(VentModeObservationEnum.AC.getCode())) {
-      return Optional.of(VentModeEmergeEnum.PRESSURE_CONTROL_PC.getCode());
+      return Optional.of(VentModeEmergeEnum.ASSIST_CONTROL_PRESSURE_CONTROL_ACPC.getCode());
     }
 
     if (breath.getValue().toString().equals(BreathTypeEnum.DUAL_MODE_PRVC_OR_VC.getCode()) && vent
@@ -191,7 +191,7 @@ public class VentilationModeImpl {
 
     if (ObservationUtils.getValueAsString(nonInvasive)
         .equals(NonInvasiveDeviceModeEnum.PCV.getCode())) {
-      return Optional.of(VentModeEmergeEnum.PRESSURE_CONTROL_PC.getCode());
+      return Optional.of(VentModeEmergeEnum.ASSIST_CONTROL_PRESSURE_CONTROL_ACPC.getCode());
     }
 
     if (ObservationUtils.getValueAsString(nonInvasive)

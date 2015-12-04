@@ -19,19 +19,17 @@ import static org.testng.Assert.assertTrue;
  */
 public class SedativeOrderTest {
 
-  private static final Set<String> SEDATIVE_NAMES = ImmutableSet.of(
-      MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode(),
-      MedsSetEnum.CONTINUOUS_INFUSION_MIDAZOLAM_IV.getCode(),
-      MedsSetEnum.INTERMITTENT_ALPRAZALOM_ENTERAL.getCode(),
-      MedsSetEnum.INTERMITTENT_CHLORADIAZEPOXIDE_ENTERAL.getCode(),
-      MedsSetEnum.INTERMITTENT_CLONAZEPAM_ENTERAL.getCode(),
-      MedsSetEnum.INTERMITTENT_DIAZEPAM_ENTERAL.getCode(),
-      MedsSetEnum.INTERMITTENT_DIAZEPAM_IV.getCode(),
-      MedsSetEnum.INTERMITTENT_LORAZEPAM_ENTERAL.getCode(),
+  Set<String> BENZODIAZEPINE_NAMES = ImmutableSet.of(
       MedsSetEnum.INTERMITTENT_LORAZEPAM_IV.getCode(),
+      MedsSetEnum.INTERMITTENT_LORAZEPAM_ENTERAL.getCode(),
+      MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode(),
       MedsSetEnum.INTERMITTENT_MIDAZOLAM_IV.getCode(),
-      MedsSetEnum.CONTINUOUS_INFUSION_DEXMEDETOMIDINE_IV.getCode(),
-      MedsSetEnum.CONTINUOUS_INFUSION_PROPOFOL_IV.getCode());
+      MedsSetEnum.CONTINUOUS_INFUSION_MIDAZOLAM_IV.getCode(),
+      MedsSetEnum.INTERMITTENT_CLONAZEPAM_ENTERAL.getCode(),
+      MedsSetEnum.INTERMITTENT_DIAZEPAM_IV.getCode(),
+      MedsSetEnum.INTERMITTENT_DIAZEPAM_ENTERAL.getCode(),
+      MedsSetEnum.INTERMITTENT_CHLORADIAZEPOXIDE_ENTERAL.getCode(),
+      MedsSetEnum.INTERMITTENT_ALPRAZALOM_ENTERAL.getCode());
 
   /**
    * Test of processOrders method, of class SedativeOrder.
@@ -41,12 +39,11 @@ public class SedativeOrderTest {
 
     SedativeOrder sedativeOrderImpl = new SedativeOrder();
 
-    for (String sedagive : SEDATIVE_NAMES) {
+    for (String benzo : BENZODIAZEPINE_NAMES) {
       List<MedicationOrder> orders = new ArrayList<>();
-      orders.add(createMedicationOrder(sedagive));
+      orders.add(createMedicationOrder(benzo));
 
-      assertTrue(sedativeOrderImpl.processOrders(orders).isPresent(), "failed to process "
-          + sedagive);
+      assertTrue(sedativeOrderImpl.processOrders(orders).isPresent());
     }
   }
 

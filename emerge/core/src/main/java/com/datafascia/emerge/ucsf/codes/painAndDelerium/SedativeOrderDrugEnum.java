@@ -15,9 +15,7 @@ public enum SedativeOrderDrugEnum implements Code<String> {
   CLONAZEPAM("Clonazepam"),
   DIAZEPAM("Diazepam"),
   CHLORADIAZEPOXIDE("Chloradiazepoxide"),
-  ALPRAZOLOM("Alprazalom"),
-  PROPOFOL("Propofol"),
-  DEXMETOMIDINE("Dexmedetomidine");
+  ALPRAZOLOM("Alprazalom");
 
   private final String code;
 

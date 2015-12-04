@@ -53,8 +53,7 @@ public class PainGoalImpl {
     List<Observation> observationsSinceMidnight = ObservationUtils.searchByTimeFrame(apiClient,
         encounterId, sinceMidnight);
 
-    List<Observation> acceptableLevelOfPainAssessments = PainUtils
-        .getAcceptableLevelOfPainAssessments(apiClient, encounterId, currentOrPriorShift);
+
 
     PainUtils.PainType freshestPainType = null;
 
@@ -78,19 +77,23 @@ public class PainGoalImpl {
       return 11;
     }
 
-    if (acceptableLevelOfPainAssessments.isEmpty() || !acceptableLevelOfPainAssessments.stream()
-        .anyMatch(observation -> !ObservationUtils.getValueAsString(observation).equals(
-                "Unable to assess"))) {
-      return 11;
-    } else if (!acceptableLevelOfPainAssessments.stream().anyMatch(observation
-        -> !ObservationUtils.getValueAsString(observation).equals("No Pain"))) {
-      return 0;
-    }
 
     Observation freshestScore = null;
 
     if (freshestPainType.equals(PainUtils.PainType.NUMERICAL)
         || freshestPainType.equals(PainUtils.PainType.VERBAL)) {
+      List<Observation> acceptableLevelOfPainAssessments = PainUtils
+          .getAcceptableLevelOfPainAssessments(apiClient, encounterId, currentOrPriorShift);
+
+      if (acceptableLevelOfPainAssessments.isEmpty() || !acceptableLevelOfPainAssessments.stream()
+          .anyMatch(observation -> !ObservationUtils.getValueAsString(observation).equals(
+                  "Unable to assess"))) {
+        return 11;
+      } else if (!acceptableLevelOfPainAssessments.stream().anyMatch(observation
+          -> !ObservationUtils.getValueAsString(observation).equals("No Pain"))) {
+        return 0;
+      }
+
       if (freshestPainType.equals(PainUtils.PainType.NUMERICAL)) {
         freshestScore = freshestNumericalScore;
       } else if (freshestPainType.equals(PainUtils.PainType.VERBAL)) {

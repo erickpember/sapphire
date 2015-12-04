@@ -27,7 +27,7 @@ public class MechanicalVentilationGreaterThan48Hours {
   @Inject
   private Ventilated ventilatedImpl;
 
-  private static final boolean DEFAULT_RESULT = true;
+  private static final boolean DEFAULT_RESULT = false;
 
   /**
    * Checks if there is mechanical ventilation greater than 48 hours.
@@ -77,7 +77,8 @@ public class MechanicalVentilationGreaterThan48Hours {
     List<Observation> intubations = apiClient.getObservationClient().searchObservation(encounterId,
         ObservationCodeEnum.INTUBATION.getCode(), null);
     for (Observation intubation : intubations) {
-      if (intubation.getValue().toString().equals("Yes")) {
+      if (intubation.getValue().toString().equals("Yes")
+          && !ObservationUtils.isAfter(intubation, fortyEightHoursAgo)) {
         return true;
       }
     }

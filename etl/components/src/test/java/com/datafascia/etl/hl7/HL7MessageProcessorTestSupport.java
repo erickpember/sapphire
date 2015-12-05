@@ -2,10 +2,16 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.hl7;
 
+import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.Message;
+import ca.uhn.hl7v2.parser.Parser;
+import ca.uhn.hl7v2.util.Terser;
 import com.datafascia.common.accumulo.AccumuloConfiguration;
 import com.datafascia.common.accumulo.ConnectorFactory;
 import com.datafascia.common.configuration.guice.ConfigureModule;
+import com.datafascia.common.persist.Id;
 import com.datafascia.domain.persist.EncounterRepository;
+import com.datafascia.domain.persist.IngestMessageRepository;
 import com.datafascia.domain.persist.LocationRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.domain.persist.PractitionerRepository;
@@ -60,6 +66,12 @@ public class HL7MessageProcessorTestSupport {
   }
 
   @Inject
+  private Parser parser;
+
+  @Inject
+  private IngestMessageRepository ingestMessageRepository;
+
+  @Inject
   private HL7MessageProcessor hl7MessageProcessor;
 
   @Inject
@@ -84,9 +96,16 @@ public class HL7MessageProcessorTestSupport {
     injector.injectMembers(this);
   }
 
-  protected void processMessage(String hl7File) throws IOException {
-    URL url = HL7MessageProcessorTest.class.getResource(hl7File);
+  protected void processMessage(String hl7File) throws HL7Exception, IOException {
+    URL url = Resources.getResource(getClass(), hl7File);
     String hl7 = Resources.toString(url, StandardCharsets.UTF_8).replace('\n', '\r');
+
+    Message message = parser.parse(hl7);
+    Terser terser = new Terser(message);
+    String encounterIdentifier = terser.get("/.PV1-19");
+
+    ingestMessageRepository.save(Id.of(encounterIdentifier), hl7);
+
     hl7MessageProcessor.accept(hl7);
   }
 }

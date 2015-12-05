@@ -28,12 +28,12 @@ public class ADT_A17_Processor extends AdmitDischargeProcessor {
 
     try {
       admitPatient(
+          message,
           message.getMSH(),
           message.getPID(),
           message.getPV1(),
           Collections.emptyList(),
           Collections.emptyList());
-      addObservations(message, message.getPID(), message.getPV1());
     } catch (HL7Exception e) {
       log.error("Failed to process message {}", message);
       throw new IllegalStateException("Failed to process message", e);

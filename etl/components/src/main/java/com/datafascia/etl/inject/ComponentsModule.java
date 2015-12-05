@@ -23,6 +23,7 @@ import com.datafascia.common.persist.entity.ReflectEntityStore;
 import com.datafascia.domain.persist.Tables;
 import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater;
 import com.datafascia.etl.hl7.EncounterStatusTransition;
+import com.datafascia.etl.hl7.HL7MessageProcessor;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.name.Names;
@@ -63,6 +64,8 @@ public class ComponentsModule extends AbstractModule {
         .toInstance(FhirContext.forDstu2());
     bind(FhirEntityStore.class)
         .to(AccumuloFhirEntityStore.class)
+        .in(Singleton.class);
+    bind(HL7MessageProcessor.class)
         .in(Singleton.class);
     bind(HarmEvidenceUpdater.class)
         .in(Singleton.class);

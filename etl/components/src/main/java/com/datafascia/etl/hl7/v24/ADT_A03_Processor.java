@@ -26,9 +26,13 @@ public class ADT_A03_Processor extends AdmitDischargeProcessor {
     ADT_A03 message = (ADT_A03) input;
 
     try {
-      addObservations(message, message.getPID(), message.getPV1());
       dischargePatient(
-          message.getMSH(), message.getPV1(), message.getROLAll(), message.getROL2All());
+          message,
+          message.getMSH(),
+          message.getPID(),
+          message.getPV1(),
+          message.getROLAll(),
+          message.getROL2All());
     } catch (HL7Exception e) {
       log.error("Failed to process message {}", message);
       throw new IllegalStateException("Failed to process message", e);

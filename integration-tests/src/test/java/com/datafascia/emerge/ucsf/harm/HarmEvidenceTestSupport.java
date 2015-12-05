@@ -5,6 +5,10 @@ package com.datafascia.emerge.ucsf.harm;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.primitive.IdDt;
+import ca.uhn.hl7v2.HL7Exception;
+import ca.uhn.hl7v2.model.Message;
+import ca.uhn.hl7v2.parser.Parser;
+import ca.uhn.hl7v2.util.Terser;
 import com.datafascia.api.services.ApiTestSupport;
 import com.datafascia.common.inject.Injectors;
 import com.datafascia.common.persist.Id;
@@ -13,6 +17,7 @@ import com.datafascia.common.persist.entity.EntityId;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.persist.EncounterRepository;
+import com.datafascia.domain.persist.IngestMessageRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
@@ -36,6 +41,12 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
   private static final Id<UnitedStatesPatient> PATIENT_ID = Id.of(PATIENT_IDENTIFIER);
   private static final String ENCOUNTER_IDENTIFIER = "5014212";
   private static final Id<Encounter> ENCOUNTER_ID = Id.of(ENCOUNTER_IDENTIFIER);
+
+  @Inject
+  private Parser parser;
+
+  @Inject
+  private IngestMessageRepository ingestMessageRepository;
 
   @Inject
   private HL7MessageProcessor hl7MessageProcessor;
@@ -80,9 +91,16 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
     return encounter;
   }
 
-  protected void processMessage(String hl7File) throws IOException {
+  protected void processMessage(String hl7File) throws HL7Exception, IOException {
     URL url = Resources.getResource(getClass(), hl7File);
     String hl7 = Resources.toString(url, StandardCharsets.UTF_8).replace('\n', '\r');
+
+    Message message = parser.parse(hl7);
+    Terser terser = new Terser(message);
+    String encounterIdentifier = terser.get("/.PV1-19");
+
+    ingestMessageRepository.save(Id.of(encounterIdentifier), hl7);
+
     hl7MessageProcessor.accept(hl7);
   }
 
@@ -107,5 +125,6 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
   protected void deleteIngestedData() {
     entityStore.delete(new EntityId(Encounter.class, ENCOUNTER_ID));
     entityStore.delete(new EntityId(UnitedStatesPatient.class, PATIENT_ID));
+    ingestMessageRepository.delete(ENCOUNTER_ID);
   }
 }

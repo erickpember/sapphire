@@ -30,16 +30,20 @@ public class ADT_A09_Processor extends AdmitDischargeProcessor {
       String triggerEvent = message.getMSH().getMessageType().getTriggerEvent().getValue();
       if (triggerEvent.equals("A12")) {
         admitPatient(
+            message,
             message.getMSH(),
             message.getPID(),
             message.getPV1(),
             Collections.emptyList(),
             Collections.emptyList());
-        addObservations(message, message.getPID(), message.getPV1());
       } else {
-        addObservations(message, message.getPID(), message.getPV1());
         dischargePatient(
-            message.getMSH(), message.getPV1(), Collections.emptyList(), Collections.emptyList());
+            message,
+            message.getMSH(),
+            message.getPID(),
+            message.getPV1(),
+            Collections.emptyList(),
+            Collections.emptyList());
       }
     } catch (HL7Exception e) {
       log.error("Failed to process message {}", message);

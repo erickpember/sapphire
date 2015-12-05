@@ -2,13 +2,16 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.domain.persist;
 
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import com.datafascia.common.accumulo.AccumuloTemplate;
 import com.datafascia.common.accumulo.Limit;
 import com.datafascia.common.accumulo.RowMapper;
+import com.datafascia.common.persist.Id;
 import com.datafascia.common.time.InstantFormatter;
 import com.datafascia.domain.model.IngestMessage;
 import java.net.URI;
 import java.nio.ByteBuffer;
+import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -53,6 +56,9 @@ public class IngestMessageRepository extends BaseRepository {
   @Inject
   public IngestMessageRepository(AccumuloTemplate accumuloTemplate) {
     super(accumuloTemplate);
+
+    accumuloTemplate.createTableIfNotExist(Tables.ENCOUNTER);
+    accumuloTemplate.createTableIfNotExist(Tables.INGEST_MESSAGE);
   }
 
   private static class MessageRowMapper implements RowMapper<IngestMessage> {
@@ -135,5 +141,56 @@ public class IngestMessageRepository extends BaseRepository {
 
     return accumuloTemplate.queryForList(
         scanner, MESSAGE_ROW_MAPPER, entity -> true, new Limit<>(limit));
+  }
+
+  private static String toRowIdPrefix(Id<Encounter> encounterId) {
+    return encounterId.toString() + '|';
+  }
+
+  /**
+   * Saves message for an encounter.
+   *
+   * @param encounterId
+   *     encounter ID
+   * @param payload
+   *     payload
+   */
+  public void save(Id<Encounter> encounterId, String payload) {
+    String rowId =
+        toRowIdPrefix(encounterId) +
+            InstantFormatter.ISO_INSTANT_MILLI.format(Instant.now());
+
+    accumuloTemplate.save(
+        Tables.ENCOUNTER,
+        rowId,
+        mutationBuilder ->
+            mutationBuilder
+                .columnFamily(COLUMN_FAMILY)
+                .put(PAYLOAD, new Value(payload.getBytes(StandardCharsets.UTF_8))));
+  }
+
+  /**
+   * Finds messages for an encounter.
+   *
+   * @param encounterId
+   *     encounter ID
+   * @return messages
+   */
+  public List<IngestMessage> findByEncounterId(Id<Encounter> encounterId) {
+    Scanner scanner = accumuloTemplate.createScanner(Tables.ENCOUNTER);
+    scanner.setRange(Range.prefix(toRowIdPrefix(encounterId)));
+    scanner.fetchColumnFamily(new Text(COLUMN_FAMILY));
+
+    return accumuloTemplate.queryForList(scanner, MESSAGE_ROW_MAPPER);
+  }
+
+  /**
+   * Deletes messages for an encounter.
+   *
+   * @param encounterId
+   *     encounter ID
+   */
+  public void delete(Id<Encounter> encounterId) {
+    accumuloTemplate.deleteRowIdPrefix(Tables.ENCOUNTER, toRowIdPrefix(encounterId));
   }
 }

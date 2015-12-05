@@ -10,6 +10,7 @@ public class Tables {
   /** entity table name prefix */
   public static final String ENTITY_PREFIX = "Entity";
 
+  public static final String ENCOUNTER = "Encounter";
   public static final String INGEST_MESSAGE = "IngestMessage";
 
   // Private constructor disallows creating instances of this class

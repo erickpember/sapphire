@@ -526,6 +526,8 @@
                           "Clonazepam",
                           "Diazepam",
                           "Chloradiazepoxide",
+                          "Propofol",
+                          "Dexmedetomidine",
                           "Alprazalom"
                         ],
                         "description": "An explanation about the purpose of this instance described by this schema."

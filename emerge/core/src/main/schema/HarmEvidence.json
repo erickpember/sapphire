@@ -967,6 +967,8 @@
                       "type": "string",
                        "enum": [
                          "Assist Control Volume Control (ACVC)",
+                         "Pressure Control (PC)",
+                         "Volume Control (AC)",
                          "Synchronous Intermittent Mandatory Ventilation (SIMV)",
                          "Pressure Support (PS)",
                          "Volume Support (VS)",

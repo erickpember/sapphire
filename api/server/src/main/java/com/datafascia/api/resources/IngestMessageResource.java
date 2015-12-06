@@ -11,6 +11,7 @@ import java.time.Instant;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.zip.GZIPOutputStream;
@@ -62,13 +63,15 @@ public class IngestMessageResource {
   }
 
   private void generateArchive(Instant timeLower, OutputStream output) throws IOException {
-    TarArchiveOutputStream tarOutput = new TarArchiveOutputStream(new GZIPOutputStream(output));
+    GZIPOutputStream gzipOutput = new GZIPOutputStream(output);
+    TarArchiveOutputStream tarOutput = new TarArchiveOutputStream(gzipOutput);
 
     int count = 0;
-    List<IngestMessage> messages = ingestMessageRepository.list(timeLower, 10000);
+    List<IngestMessage> messages = ingestMessageRepository.list(timeLower, 100_000);
     for (IngestMessage message : messages) {
-      String fileName = String.format("%04d", count++);
+      String fileName = String.format("%05d", count++);
       TarArchiveEntry file = new TarArchiveEntry(fileName);
+      file.setModTime(Date.from(message.getTimestamp()));
       byte[] payload = message.getPayload().array();
       file.setSize(payload.length);
       tarOutput.putArchiveEntry(file);
@@ -76,7 +79,10 @@ public class IngestMessageResource {
       tarOutput.closeArchiveEntry();
     }
 
-    tarOutput.close();
+    tarOutput.finish();
+    tarOutput.flush();
+    gzipOutput.finish();
+    gzipOutput.flush();
   }
 
   /**

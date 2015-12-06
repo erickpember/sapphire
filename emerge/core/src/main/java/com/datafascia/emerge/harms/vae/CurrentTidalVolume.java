@@ -76,6 +76,7 @@ public class CurrentTidalVolume {
       case "Pressure Support (PS)":
       case "Airway Pressure Release Ventilation (APRV)":
       case "Indeterminate":
+      case "Assist Control Pressure Control (ACPC)":
         break;
       default:
         log.warn("Ventilation mode value [{}] does not set tidal volume", ventilationMode);

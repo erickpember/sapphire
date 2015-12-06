@@ -53,7 +53,7 @@ public class ProphylaxisContraindicated {
     List<AnnotationDt> notes = freshestInProgressPpxRequest.getNotes();
     for (AnnotationDt note : notes) {
       switch (note.getText()) {
-        case "High risk or recurrent CNS procedure/drain":
+        case "High bleeding risk or recent CNS procedure/drain":
           return "High risk or recurrent CNS procedure/drain";
         case "Allergy to heparin or HIT":
           return "Allergy to heparin or HIT";

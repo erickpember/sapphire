@@ -4,6 +4,7 @@ package com.datafascia.emerge.harms.vae;
 
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
+import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
@@ -175,9 +176,13 @@ public class DailySpontaneousBreathingTrialImpl {
       return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.OTHER);
     }
 
+    List<MedicationAdministration> adminsForEncounter = apiClient.
+        getMedicationAdministrationClient()
+        .search(encounterId);
+
     for (String medsSet : HAVE_THESE_BEEN_ADMINISTERED) {
       boolean administered = MedicationAdministrationUtils.inProgressOrCompletedInTimeFrame(
-          apiClient, encounterId, lastTwoHours, medsSet);
+          adminsForEncounter, lastTwoHours, medsSet);
       if (administered) {
         return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.RECEIVING_NMBA);
       }
@@ -185,7 +190,7 @@ public class DailySpontaneousBreathingTrialImpl {
 
     for (String medsSet : ARE_THESE_IN_PROGRESS) {
       boolean inProgress = MedicationAdministrationUtils.inProgressInTimeFrame(
-          apiClient, encounterId, lastTwoHours, medsSet);
+          adminsForEncounter, lastTwoHours, medsSet);
       if (inProgress) {
         return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.RECEIVING_NMBA);
       }

@@ -145,15 +145,13 @@ public class MedicationAdministrationUtils {
   }
 
   /**
-   * Returns true if there exists a MedicationAdministration for a given encounter for
+   * Returns true if there exists a MedicationAdministration for a specific encounter for
    * a given Meds Set name with
    *   - Status: In Progress or Completed
    *   - Inside a given time frame.
    *
-   * @param encounterId
-   *    encounter to search for medication administrations
-   * @param client
-   *    API client
+   * @param medicationAdministrations
+   *    A full list of med admins for a certain encounter.
    * @param timeFrame
    *    Time window constraint for search.
    * @param medsSet
@@ -162,13 +160,9 @@ public class MedicationAdministrationUtils {
    *    True if there is a medicationAdministration that matches criteria for in progress
    *    or completed administration.
    */
-  public static boolean inProgressOrCompletedInTimeFrame(ClientBuilder client, String encounterId,
+  public static boolean inProgressOrCompletedInTimeFrame(
+      List<MedicationAdministration> medicationAdministrations,
       PeriodDt timeFrame, String medsSet) {
-    List<MedicationAdministration> medicationAdministrations = client.
-        getMedicationAdministrationClient().search(encounterId);
-    medicationAdministrations.addAll(client.getMedicationAdministrationClient()
-        .search(encounterId));
-
     return medicationAdministrations.stream()
         .filter(medicationAdministration -> (medicationAdministration.getStatusElement()
             .getValueAsEnum() == MedicationAdministrationStatusEnum.IN_PROGRESS
@@ -184,10 +178,8 @@ public class MedicationAdministrationUtils {
    *   - Status: In Progress
    *   - Inside a given time frame.
    *
-   * @param encounterId
-   *    encounter to search for medication administrations
-   * @param client
-   *    API client
+   * @param medicationAdministrations
+   *    A full list of med admins for a certain encounter.
    * @param timeFrame
    *    Time window constraint for search.
    * @param medsSet
@@ -196,12 +188,9 @@ public class MedicationAdministrationUtils {
    *    True if there is a medicationAdministration that matches criteria for in progress
    *    administration.
    */
-  public static boolean inProgressInTimeFrame(ClientBuilder client, String encounterId,
+  public static boolean inProgressInTimeFrame(
+      List<MedicationAdministration> medicationAdministrations,
       PeriodDt timeFrame, String medsSet) {
-    List<MedicationAdministration> medicationAdministrations = client.
-        getMedicationAdministrationClient().search(encounterId);
-    medicationAdministrations.addAll(client.getMedicationAdministrationClient()
-        .search(encounterId));
     return medicationAdministrations.stream()
         .filter(medicationAdministration -> (medicationAdministration.getStatusElement().
             getValueAsEnum() == MedicationAdministrationStatusEnum.IN_PROGRESS))

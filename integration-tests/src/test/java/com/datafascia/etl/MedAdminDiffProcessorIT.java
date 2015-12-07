@@ -117,7 +117,6 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
 
     processor = (MedAdminDiffProcessor) runner.getProcessor();
     processor.setDiffListener(this);
-    processor.setConnector(connector);
 
     // Positive tests of new data and diffs.
     runner.enqueue(addContent("GetMedAdminUnit{questionMark}ListID=15860.json"));

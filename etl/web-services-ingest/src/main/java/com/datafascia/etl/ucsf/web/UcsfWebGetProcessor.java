@@ -94,7 +94,7 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
   private Set<Relationship> relationships;
   private List<PropertyDescriptor> properties;
   private UcsfWebGetConfig config;
-  private static final String TIMESTORE_FILENAME = "/tmp/df-etl-webget-timestore";
+  public static final String TIMESTORE_FILENAME = "/tmp/df-etl-webget-timestore";
   private static File timeStore;
   private static ConcurrentHashMap<String, String> lastTimestamps;
 
@@ -145,21 +145,19 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
   }
 
   private static void loadTimeStore() {
-    if (lastTimestamps == null) {
-      try {
-        if (timeStore == null) {
-          timeStore = new File(TIMESTORE_FILENAME);
-        }
-        FileInputStream fis = new FileInputStream(timeStore);
-        ObjectInputStream ois = new ObjectInputStream(fis);
-        lastTimestamps = (ConcurrentHashMap) ois.readObject();
-        ois.close();
-        fis.close();
-      } catch (IOException ex) {
-        createTimeStore();
-      } catch (ClassNotFoundException ex) {
-        throw new IllegalStateException("Error loading timestore.", ex);
+    try {
+      if (timeStore == null) {
+        timeStore = new File(TIMESTORE_FILENAME);
       }
+      FileInputStream fis = new FileInputStream(timeStore);
+      ObjectInputStream ois = new ObjectInputStream(fis);
+      lastTimestamps = (ConcurrentHashMap) ois.readObject();
+      ois.close();
+      fis.close();
+    } catch (IOException ex) {
+      createTimeStore();
+    } catch (ClassNotFoundException ex) {
+      throw new IllegalStateException("Error loading timestore.", ex);
     }
 
     if (lastTimestamps == null) {

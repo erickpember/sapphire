@@ -32,7 +32,8 @@ import javax.inject.Inject;
  */
 public abstract class AdmitDischargeProcessor extends BaseProcessor {
 
-  private static final String OBX_PATH_PATTERN = "/OBX" + ObservationsBuilder.SUBSCRIPT_PLACEHOLDER;
+  private static final String OBX_PATH_PATTERN = "/OBX(%d)";
+  private static final String NTE_PATH_PATTERN = null;
 
   @Inject
   private AdmitPatient admitPatient;
@@ -210,7 +211,7 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
    */
   protected void addObservations(Message message, PID pid, PV1 pv1) throws HL7Exception {
     ObservationsBuilder observationsBuilder =
-        new ObservationsBuilder(message, OBX_PATH_PATTERN, "");
+        new ObservationsBuilder(message, OBX_PATH_PATTERN, NTE_PATH_PATTERN);
     if (observationsBuilder.hasObservations()) {
       List<Observation> observations = observationsBuilder.toObservations();
       addObservations.accept(

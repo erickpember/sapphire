@@ -23,11 +23,9 @@ public class ORU_R01_Processor extends BaseProcessor {
 
   // HAPI paths to retrieve the segments. Differs between some message types.
   private static final String OBX_PATH_PATTERN =
-      "/PATIENT_RESULT/ORDER_OBSERVATION/OBSERVATION" + ObservationsBuilder.SUBSCRIPT_PLACEHOLDER +
-      "/OBX";
+      "/PATIENT_RESULT/ORDER_OBSERVATION/OBSERVATION(%d)/OBX";
   private static final String NTE_PATH_PATTERN =
-      "/PATIENT_RESULT/ORDER_OBSERVATION/OBSERVATION" + ObservationsBuilder.SUBSCRIPT_PLACEHOLDER +
-      "/NTE";
+      "/PATIENT_RESULT/ORDER_OBSERVATION/OBSERVATION(%d)/NTE(%d)";
 
   @Inject
   private AddObservations addObservations;

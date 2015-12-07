@@ -42,9 +42,13 @@ public class ObservationsBuilder {
    * @param message
    *     HL7 message
    * @param obxPathPattern
-   *     pattern to generate path to each OBX segment
+   *     {@link String#format pattern} to generate path to each OBX segment. The pattern must
+   *     contain exactly one {@code %d} format specifier which will be replaced with an OBX
+   *     repetition index.
    * @param ntePathPattern
-   *     pattern to generate path to each NTE segment
+   *     {@link String#format pattern} to generate path to each NTE segment. The pattern must
+   *     contain exactly two {@code %d} format specifiers which will be replaced with an OBX
+   *     repetition index and NTE repetition index respectively.
    */
   public ObservationsBuilder(Message message, String obxPathPattern, String ntePathPattern) {
     this.obxPathPattern = obxPathPattern;

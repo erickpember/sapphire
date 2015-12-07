@@ -6,10 +6,7 @@ import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.composite.TimingDt;
-import ca.uhn.fhir.model.primitive.DateDt;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
-import ca.uhn.fhir.model.primitive.InstantDt;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -29,24 +26,20 @@ public class Dates {
   }
 
   /**
-   * Converts Java {@link LocalDate} to FHIR date with day precision.
+   * Provides null-safe date comparator. Nulls are ordered before non-nulls.
    *
-   * @param localDate
-   *     convert from
-   * @return FHIR date
+   * @return comparator
    */
-  public static DateDt toDate(LocalDate localDate) {
-    ZonedDateTime dateTime = ZonedDateTime.of(localDate, LocalTime.MIDNIGHT, TIME_ZONE);
-    return new DateDt(Date.from(dateTime.toInstant()), TemporalPrecisionEnum.DAY);
+  public static Comparator<Date> getDateComparator() {
+    return Comparator.nullsFirst(Comparator.naturalOrder());
   }
 
   /**
-   * Given a FHIR IDatatype of either PeriodDt, DateTimeDt or TimingDt, returns {@link Date} .
+   * Converts FHIR IDatatype of DateTimeDt, PeriodDt or TimingDt to Java {@link Date}.
    *
    * @param time
-   *     A FHIR Date, of one of three types.
-   * @return
-   *     A Java Date.
+   *     FHIR time, of one of three types
+   * @return Java Date
    */
   public static Date toDate(IDatatype time) {
     if (time instanceof TimingDt) {
@@ -61,15 +54,6 @@ public class Dates {
   }
 
   /**
-   * Null-safe date comparator
-   *
-   * @return comparator
-   */
-  public static Comparator<Date> getDateComparator() {
-    return Comparator.nullsFirst(Comparator.naturalOrder());
-  }
-
-  /**
    * Converts Java {@link LocalDate} and {@link LocalTime} to FHIR date time with second precision.
    *
    * @param localDate
@@ -81,35 +65,5 @@ public class Dates {
   public static DateTimeDt toDateTime(LocalDate localDate, LocalTime localTime) {
     ZonedDateTime dateTime = ZonedDateTime.of(localDate, localTime, TIME_ZONE);
     return new DateTimeDt(Date.from(dateTime.toInstant()), TemporalPrecisionEnum.SECOND);
-  }
-
-  /**
-   * Converts Java {@link Instant} to FHIR date time with second precision.
-   *
-   * @param instant
-   *     convert from
-   * @return FHIR date
-   */
-  public static DateTimeDt toDateTime(Instant instant) {
-    if (instant == null) {
-      return null;
-    }
-
-    return new DateTimeDt(Date.from(instant), TemporalPrecisionEnum.SECOND);
-  }
-
-  /**
-   * Converts Java {@link Instant} to FHIR instant with second precision.
-   *
-   * @param instant
-   *     convert from
-   * @return FHIR date
-   */
-  public static InstantDt toInstant(Instant instant) {
-    if (instant == null) {
-      return null;
-    }
-
-    return new InstantDt(Date.from(instant), TemporalPrecisionEnum.SECOND);
   }
 }

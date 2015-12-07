@@ -6,10 +6,8 @@ import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v24.message.ORU_R01;
-import ca.uhn.hl7v2.util.Terser;
 import com.datafascia.etl.event.AddObservations;
 import com.datafascia.etl.hl7.MessageProcessor;
-import com.google.common.base.Strings;
 import java.util.List;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -24,10 +22,12 @@ import org.kohsuke.MetaInfServices;
 public class ORU_R01_Processor extends BaseProcessor {
 
   // HAPI paths to retrieve the segments. Differs between some message types.
-  private static final String OBX_ROOT_PATH
-      = "/PATIENT_RESULT/ORDER_OBSERVATION/OBSERVATION" + SUBSCRIPT_PLACEHOLDER + "/OBX";
-  private static final String NTE_ROOT_PATH
-      = "/PATIENT_RESULT/ORDER_OBSERVATION/OBSERVATION" + SUBSCRIPT_PLACEHOLDER + "/NTE";
+  private static final String OBX_PATH_PATTERN =
+      "/PATIENT_RESULT/ORDER_OBSERVATION/OBSERVATION" + ObservationsBuilder.SUBSCRIPT_PLACEHOLDER +
+      "/OBX";
+  private static final String NTE_PATH_PATTERN =
+      "/PATIENT_RESULT/ORDER_OBSERVATION/OBSERVATION" + ObservationsBuilder.SUBSCRIPT_PLACEHOLDER +
+      "/NTE";
 
   @Inject
   private AddObservations addObservations;
@@ -42,12 +42,10 @@ public class ORU_R01_Processor extends BaseProcessor {
     ORU_R01 message = (ORU_R01) input;
 
     try {
-      Terser terser = new Terser(input);
-
-      // See if OBX exists. Message.getObx() and other Message methods don't work for some reason.
-      if (!Strings.isNullOrEmpty(terser.get(OBX_ROOT_PATH.replace(SUBSCRIPT_PLACEHOLDER, "")
-          + "-1"))) {
-        List<Observation> observations = toObservations(terser, OBX_ROOT_PATH, NTE_ROOT_PATH);
+      ObservationsBuilder observationsBuilder =
+          new ObservationsBuilder(message, OBX_PATH_PATTERN, NTE_PATH_PATTERN);
+      if (observationsBuilder.hasObservations()) {
+        List<Observation> observations = observationsBuilder.toObservations();
         addObservations.accept(
             observations,
             getPatientIdentifier(message.getPATIENT_RESULT().getPATIENT().getPID()),

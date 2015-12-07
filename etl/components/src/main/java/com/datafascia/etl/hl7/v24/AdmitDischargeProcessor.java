@@ -16,7 +16,6 @@ import ca.uhn.hl7v2.model.v24.segment.MSH;
 import ca.uhn.hl7v2.model.v24.segment.PID;
 import ca.uhn.hl7v2.model.v24.segment.PV1;
 import ca.uhn.hl7v2.model.v24.segment.ROL;
-import ca.uhn.hl7v2.util.Terser;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.emerge.ucsf.valueset.PractitionerRoleEnum;
@@ -25,7 +24,6 @@ import com.datafascia.etl.event.AddParticipant;
 import com.datafascia.etl.event.AdmitPatient;
 import com.datafascia.etl.event.DischargePatient;
 import com.datafascia.etl.hl7.GenderFormatter;
-import com.google.common.base.Strings;
 import java.util.List;
 import javax.inject.Inject;
 
@@ -34,7 +32,7 @@ import javax.inject.Inject;
  */
 public abstract class AdmitDischargeProcessor extends BaseProcessor {
 
-  private static final String OBX_ROOT_PATH = "/OBX" + SUBSCRIPT_PLACEHOLDER;
+  private static final String OBX_PATH_PATTERN = "/OBX" + ObservationsBuilder.SUBSCRIPT_PLACEHOLDER;
 
   @Inject
   private AdmitPatient admitPatient;
@@ -211,15 +209,12 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
    * @throws HL7Exception if HL7 message is malformed
    */
   protected void addObservations(Message message, PID pid, PV1 pv1) throws HL7Exception {
-    // See if OBX segment exists.
-    Terser terser = new Terser(message);
-    if (Strings.isNullOrEmpty(terser.get(OBX_ROOT_PATH.replace(SUBSCRIPT_PLACEHOLDER, "")
-        + "-1"))) {
-      return;
+    ObservationsBuilder observationsBuilder =
+        new ObservationsBuilder(message, OBX_PATH_PATTERN, "");
+    if (observationsBuilder.hasObservations()) {
+      List<Observation> observations = observationsBuilder.toObservations();
+      addObservations.accept(
+          observations, getPatientIdentifier(pid), getEncounterIdentifier(pv1));
     }
-
-    List<Observation> observations = toObservations(terser, OBX_ROOT_PATH, "");
-    addObservations.accept(
-        observations, getPatientIdentifier(pid), getEncounterIdentifier(pv1));
   }
 }

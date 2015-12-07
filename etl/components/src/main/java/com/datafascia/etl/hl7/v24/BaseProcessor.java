@@ -3,14 +3,12 @@
 package com.datafascia.etl.hl7.v24;
 
 import ca.uhn.fhir.model.api.IDatatype;
-import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.dstu2.resource.Observation.ReferenceRange;
 import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
 import ca.uhn.fhir.model.dstu2.valueset.ObservationStatusEnum;
-import ca.uhn.fhir.model.primitive.DateDt;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import ca.uhn.fhir.model.primitive.DecimalDt;
 import ca.uhn.fhir.model.primitive.StringDt;
@@ -18,7 +16,6 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Segment;
 import ca.uhn.hl7v2.model.v24.datatype.CE;
 import ca.uhn.hl7v2.model.v24.datatype.FT;
-import ca.uhn.hl7v2.model.v24.datatype.TS;
 import ca.uhn.hl7v2.model.v24.datatype.TSComponentOne;
 import ca.uhn.hl7v2.model.v24.segment.NTE;
 import ca.uhn.hl7v2.model.v24.segment.OBX;
@@ -73,24 +70,6 @@ public abstract class BaseProcessor implements MessageProcessor {
     return codeableConcept;
   }
 
-  protected static DateDt toDate(TS ts) throws HL7Exception {
-    TSComponentOne fromTime = ts.getTimeOfAnEvent();
-    if (fromTime.isEmpty()) {
-      return null;
-    }
-
-    return new DateDt(fromTime.getValueAsDate());
-  }
-
-  protected static DateTimeDt toDateTime(TS ts) throws HL7Exception {
-    TSComponentOne fromTime = ts.getTimeOfAnEvent();
-    if (fromTime.isEmpty()) {
-      return null;
-    }
-
-    return new DateTimeDt(fromTime.getValueAsDate(), TemporalPrecisionEnum.SECOND);
-  }
-
   private static ObservationStatusEnum toObservationStatus(String resultStatus) {
     if (resultStatus == null) {
       return null;
@@ -141,7 +120,7 @@ public abstract class BaseProcessor implements MessageProcessor {
         break;
     }
 
-    DateTimeDt effective = toDateTime(obx.getDateTimeOfTheObservation());
+    DateTimeDt effective = TimeStamps.toDateTime(obx.getDateTimeOfTheObservation());
     if (effective == null) {
       effective = new DateTimeDt(new Date());
     }

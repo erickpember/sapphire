@@ -68,7 +68,7 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
     patient
         .setRace(toRace(pid.getRace(0).getIdentifier().getValue()))
         .setGender(GenderFormatter.parse(pid.getAdministrativeSex().getValue()))
-        .setBirthDate(toDate(pid.getDateTimeOfBirth()))
+        .setBirthDate(TimeStamps.toDate(pid.getDateTimeOfBirth()))
         .setMaritalStatus(toMaritalStatus(pid.getMaritalStatus().getIdentifier().getValue()))
         .setActive(true);
     return patient;
@@ -91,8 +91,8 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
         .setValue(getEncounterIdentifier(pv1));
 
     PeriodDt period = new PeriodDt()
-        .setStart(toDateTime(pv1.getAdmitDateTime()))
-        .setEnd(toDateTime(pv1.getDischargeDateTime(0)));
+        .setStart(TimeStamps.toDateTime(pv1.getAdmitDateTime()))
+        .setEnd(TimeStamps.toDateTime(pv1.getDischargeDateTime(0)));
     encounter.setPeriod(period);
     return encounter;
   }
@@ -133,8 +133,8 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
 
   private Encounter.Participant toParticipant(ROL rol) throws HL7Exception {
     PeriodDt period = new PeriodDt()
-        .setStart(toDateTime(rol.getRoleBeginDateTime()))
-        .setEnd(toDateTime(rol.getRoleEndDateTime()));
+        .setStart(TimeStamps.toDateTime(rol.getRoleBeginDateTime()))
+        .setEnd(TimeStamps.toDateTime(rol.getRoleEndDateTime()));
     Encounter.Participant participant = new Encounter.Participant()
         .setPeriod(period);
     return participant;

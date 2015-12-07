@@ -31,7 +31,7 @@ public class MDM_T02_Processor extends AdmitDischargeProcessor {
     TXA txa = message.getTXA();
     addFlag.accept(
         txa.getDocumentType().getValue(),
-        toDateTime(txa.getActivityDateTime()),
+        TimeStamps.toDateTime(txa.getActivityDateTime()),
         getPatientIdentifier(message.getPID()),
         getEncounterIdentifier(message.getPV1()));
   }

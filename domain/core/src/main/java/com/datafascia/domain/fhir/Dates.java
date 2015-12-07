@@ -19,8 +19,6 @@ import java.util.Date;
  */
 public class Dates {
 
-  private static final ZoneId TIME_ZONE = ZoneId.of("America/Los_Angeles");
-
   // Private constructor disallows creating instances of this class.
   private Dates() {
   }
@@ -60,10 +58,12 @@ public class Dates {
    *     convert from
    * @param localTime
    *     convert from
+   * @param zoneId
+   *     time zone
    * @return FHIR date
    */
-  public static DateTimeDt toDateTime(LocalDate localDate, LocalTime localTime) {
-    ZonedDateTime dateTime = ZonedDateTime.of(localDate, localTime, TIME_ZONE);
+  public static DateTimeDt toDateTime(LocalDate localDate, LocalTime localTime, ZoneId zoneId) {
+    ZonedDateTime dateTime = ZonedDateTime.of(localDate, localTime, zoneId);
     return new DateTimeDt(Date.from(dateTime.toInstant()), TemporalPrecisionEnum.SECOND);
   }
 }

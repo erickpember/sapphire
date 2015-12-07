@@ -344,7 +344,7 @@ public class ProcedureBuilder {
         .map(string -> LocalTime.parse(string, LOCAL_TIME))
         .orElse(LocalTime.MIDNIGHT);
 
-    return Optional.of(Dates.toDateTime(date.get(), time));
+    return Optional.of(Dates.toDateTime(date.get(), time, clock.getZone()));
   }
 
   private static String computeLineProcedureCode(String... parts) {

@@ -76,7 +76,7 @@ public class ProcedureBuilderTest {
     CodeableConceptDt orientation = procedure.getBodySite().get(1);
     assertEquals(orientation.getCodingFirstRep().getCode(), "Left");
     DateTimeDt expectedPerformed = Dates.toDateTime(
-        LocalDate.parse("2015-02-08"), LocalTime.parse("18:19:00"));
+        LocalDate.parse("2015-02-08"), LocalTime.parse("18:19:00"), clock.getZone());
     assertEquals(procedure.getPerformed(), expectedPerformed);
     InstantDt updated = ResourceMetadataKeyEnum.UPDATED.get(procedure);
     assertEquals(updated.getValue(), Date.from(Instant.now(clock)));

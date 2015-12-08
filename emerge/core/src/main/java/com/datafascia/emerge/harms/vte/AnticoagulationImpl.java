@@ -117,12 +117,20 @@ public class AnticoagulationImpl {
   private boolean isEnoxaparinOverPoint86(MedicationAdministration admin, String encounterId) {
     BigDecimal dose = admin.getDosage().getQuantity().getValue();
     String unit = admin.getDosage().getQuantity().getUnit();
+
+    if (dose == null || unit == null) {
+      log.warn(
+          "Retrieved null dosage in enoxaparin administration for encounter [{}],"
+          + " affecting anticoagulation logic", encounterId);
+      return false;
+    }
+
     if ("mg/kg".equals(unit)) {
       return (dose.compareTo(ZERO_POINT_EIGHT_SIX) >= 0);
     } else if ("mg".equals(unit)) {
       BigDecimal weight = getPatientWeight(encounterId);
       if (weight.compareTo(NEGATIVE_ONE) == 0) {
-        log.error(
+        log.warn(
             "Failed to retrieve patient weight for enoxaparin dosage for encounter [{}], "
             + "affecting anticoagulation logic", encounterId);
         return false;
@@ -131,7 +139,7 @@ public class AnticoagulationImpl {
             .compareTo(ZERO_POINT_EIGHT_SIX) >= 0);
       }
     } else {
-      log.error(
+      log.warn(
           "Retrieved unrecognized dosage unit [{}]] for encounter [{}], "
           + "affecting anticoagulation logic", unit, encounterId);
       return false;

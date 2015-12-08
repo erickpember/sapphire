@@ -38,8 +38,8 @@ import org.kie.api.builder.KieFileSystem;
 import org.kie.api.builder.Message;
 import org.kie.api.builder.ReleaseId;
 import org.kie.api.runtime.KieContainer;
-import org.kie.api.runtime.KieSession;
 import org.kie.api.runtime.KieSessionConfiguration;
+import org.kie.api.runtime.StatelessKieSession;
 import org.kie.internal.io.ResourceFactory;
 
 /**
@@ -367,13 +367,13 @@ public class UcsfMedicationUtils {
   }
 
   /**
-   * Creates a new KieSession (Stateful) that will be used for the rules. Its KieBase contains the
+   * Creates a new KieSession (Stateless) that will be used for the rules. Its KieBase contains the
    * drl files sent by parameter.
    *
    * @param drlResourcesPaths Paths for drools rules.
    * @return the new KieSession
    */
-  public static KieSession createKieSession(String... drlResourcesPaths) {
+  public static StatelessKieSession createKieSession(String... drlResourcesPaths) {
     KieServices ks = KieServices.Factory.get();
     KieContainer kcontainer = createKieContainer(ks, drlResourcesPaths);
 
@@ -383,7 +383,7 @@ public class UcsfMedicationUtils {
 
     // Configure and create the KieSession
     KieSessionConfiguration ksconf = ks.newKieSessionConfiguration();
-    return kbase.newKieSession(ksconf, null);
+    return kbase.newStatelessKieSession(ksconf);
   }
 
   private static final HashMap<String, Medication> orderMedicationCache = new HashMap<>();

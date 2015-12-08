@@ -36,7 +36,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-import org.kie.api.runtime.KieSession;
+import org.kie.api.runtime.StatelessKieSession;
 
 /**
  * Transforms UCSF medication orders and administration to FHIR objects.
@@ -44,7 +44,7 @@ import org.kie.api.runtime.KieSession;
 @ConfigurationNode("UcsfMedAdminProcessor")
 @Slf4j
 public class MedAdminDiffTransformer {
-  private KieSession kieSession;
+  private StatelessKieSession kieSession;
   private String tableName;
   private MedAdminDiffListener diffListener;
   private RxNormLookup rxNormDb;
@@ -216,8 +216,7 @@ public class MedAdminDiffTransformer {
       kieSession.setGlobal("log", log);
     }
 
-    kieSession.insert(droolNorm);
-    kieSession.fireAllRules();
+    kieSession.execute(droolNorm);
 
     // If we don't have an SCD, then we can't populate a medication.
     Medication medication = null;

@@ -11,12 +11,15 @@ import com.datafascia.emerge.harms.HarmsLookups;
 import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
 import java.math.BigDecimal;
 import java.time.Clock;
+import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Pharmacologic VTE Prophylaxis Administered implementation
  */
+@Slf4j
 public class PharmacologicVteProphylaxisAdministered {
   private static final BigDecimal ZERO_POINT_EIGHT_SIX = new BigDecimal("0.86");
   private static final BigDecimal NEGATIVE_ONE = new BigDecimal("-1");
@@ -35,10 +38,24 @@ public class PharmacologicVteProphylaxisAdministered {
    * @return true if VTE prophylaxis was administered
    */
   public boolean isPharmacologicVteProphylaxisAdministered(String encounterId) {
-    boolean administered = false;
-
     List<MedicationAdministration> administrations = apiClient.getMedicationAdministrationClient()
         .search(encounterId);
+
+    return isPharmacologicVteProphylaxisAdministered(administrations, encounterId);
+  }
+
+  /**
+   * Checks if pharmacologic VTE prophylaxis was administered
+   *
+   * @param administrations
+   *     All medication administrations for a specific encounter.
+   * @param encounterId
+   *     ID for the same encounter, to use for patient weight retrieval in case of Enoxaparin.
+   * @return true if VTE prophylaxis was administered
+   */
+  public boolean isPharmacologicVteProphylaxisAdministered(
+      List<MedicationAdministration> administrations, String encounterId) {
+    boolean administered = false;
 
     // Check if any recent VTE prophylactic administrations have been made.
     for (MedicationAdministration administration : administrations) {
@@ -50,17 +67,12 @@ public class PharmacologicVteProphylaxisAdministered {
           DateTimeDt timeTaken = (DateTimeDt) administration.getEffectiveTime();
           Long period = HarmsLookups.efficacyList.get(medsSet);
           if (vtePpx.getCode().equals(medsSet)
-              && HarmsLookups.withinDrugPeriod(timeTaken.getValue(), period, clock)) {
+              && withinDrugPeriod(timeTaken.getValue(), period, clock)) {
 
             // Check dose ratio for Enoxaparin SC
             if (vtePpx.getCode().equals(
                 PharmacologicVtePpxTypeEnum.INTERMITTENT_ENOXAPARIN.getCode())) {
-              BigDecimal dose = administration.getDosage().getQuantity().getValue();
-              BigDecimal weight = HarmsLookups.getPatientWeight(apiClient, encounterId);
-              administered = dose != null
-                  && !weight.equals(NEGATIVE_ONE)
-                  && dose.divide(weight, 10, BigDecimal.ROUND_HALF_UP)
-                  .compareTo(ZERO_POINT_EIGHT_SIX) < 0;
+              administered = isEnoxaparinUnderPoint86(administration, encounterId);
               break;
             } else {
               administered = true;
@@ -72,5 +84,64 @@ public class PharmacologicVteProphylaxisAdministered {
     }
 
     return administered;
+  }
+
+  private boolean isEnoxaparinUnderPoint86(MedicationAdministration admin, String encounterId) {
+    BigDecimal dose = admin.getDosage().getQuantity().getValue();
+    String unit = admin.getDosage().getQuantity().getUnit();
+
+    if (dose == null || unit == null) {
+      log.error(
+          "Retrieved null dosage for Enoxaparin administration in encounter [{}],"
+          + " affecting VTE Prophylaxis Administered logic", unit, encounterId);
+      return false;
+    }
+
+    if ("mg/kg".equals(unit)) {
+      return (dose.compareTo(ZERO_POINT_EIGHT_SIX) < 0);
+    } else if ("mg".equals(unit)) {
+      BigDecimal weight = getPatientWeight(encounterId);
+      if (weight.compareTo(NEGATIVE_ONE) == 0) {
+        log.error(
+            "Failed to retrieve patient weight for enoxaparin dosage for encounter [{}], "
+            + "affecting VTE Prophylaxis Administered logic", encounterId);
+        return false;
+      } else {
+        return (dose.divide(weight, 10, BigDecimal.ROUND_HALF_UP)
+            .compareTo(ZERO_POINT_EIGHT_SIX) < 0);
+      }
+    } else {
+      log.error(
+          "Retrieved unrecognized dosage unit [{}]] for encounter [{}], "
+          + "affecting VTE Prophylaxis Administered logic", unit, encounterId);
+      return false;
+    }
+  }
+
+  /**
+   * Wraps HarmsLookups patient weight method to facilitate unit testing.
+   *
+   * @param encounterId
+   *     Encounter of the patient whose weight we want.
+   * @return
+   *     Patient weight in kg.
+   */
+  public BigDecimal getPatientWeight(String encounterId) {
+    return HarmsLookups.getPatientWeight(apiClient, encounterId);
+  }
+
+  /**
+   * Wraps HarmsLookups within drug period method to facilitate unit testing.
+   *
+   * @param timeTaken
+   *    The time the drug was administered.
+   * @param period
+   *    The period, in seconds, that the drug is active.
+   * @param clock
+   *    Shared configurable timekeeping instance.
+   * @return Whether the time taken is within the period of efficacy for the drug to now.
+   */
+  public boolean withinDrugPeriod(Date timeTaken, long period, Clock clock) {
+    return HarmsLookups.withinDrugPeriod(timeTaken, period, clock);
   }
 }

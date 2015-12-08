@@ -4,10 +4,10 @@ package com.datafascia.api.resources.fhir;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
-import ca.uhn.fhir.rest.annotation.Create;
 import ca.uhn.fhir.rest.annotation.OptionalParam;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Search;
+import ca.uhn.fhir.rest.annotation.Update;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
@@ -43,20 +43,21 @@ public class ObservationResourceProvider implements IResourceProvider {
   }
 
   /**
-   * Store a new observation.
+   * Updates resource, or creates resource if no resource already exists for the id.
    *
-   * @param observation The new observation to store.
-   * @return Outcome of create method. Resource ID of Observation.
+   * @param observation
+   *     new content to store
+   * @return method outcome
    */
-  @Create
-  public MethodOutcome create(@ResourceParam Observation observation) {
-    if (observation.getEncounter() != null) {
-      observationRepository.save(observation);
-      return new MethodOutcome(observation.getId());
-    } else {
-      throw new UnprocessableEntityException("Can not create Observation:"
-          + " encounter reference can not be null.");
+  @Update
+  public MethodOutcome update(@ResourceParam Observation observation) {
+    if (observation.getEncounter() == null) {
+      throw new UnprocessableEntityException(
+          "Cannot create Observation: missing encounter reference");
     }
+
+    observationRepository.save(observation);
+    return new MethodOutcome(observation.getId());
   }
 
   /**

@@ -10,6 +10,7 @@ import ca.uhn.fhir.model.dstu2.resource.Observation.ReferenceRange;
 import ca.uhn.fhir.model.dstu2.valueset.ObservationStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import ca.uhn.fhir.model.primitive.DecimalDt;
+import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
@@ -21,6 +22,9 @@ import ca.uhn.hl7v2.model.v24.segment.OBX;
 import ca.uhn.hl7v2.util.Terser;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.google.common.base.Strings;
+import com.google.common.hash.Hashing;
+import com.google.common.io.BaseEncoding;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -32,9 +36,13 @@ import java.util.StringJoiner;
  */
 public class ObservationsBuilder {
 
+  private static final BaseEncoding ENCODING = BaseEncoding.base64Url().omitPadding();
+
+  private Message message;
   private String obxPathPattern;
   private String ntePathPattern;
   private Terser terser;
+  private String messageHash;
 
   /**
    * Constructor
@@ -51,9 +59,14 @@ public class ObservationsBuilder {
    *     repetition index and NTE repetition index respectively.
    */
   public ObservationsBuilder(Message message, String obxPathPattern, String ntePathPattern) {
+    this.message = message;
     this.obxPathPattern = obxPathPattern;
     this.ntePathPattern = ntePathPattern;
     terser = new Terser(message);
+  }
+
+  private static String hash(String input) {
+    return ENCODING.encode(Hashing.sha1().hashString(input, StandardCharsets.UTF_8).asBytes());
   }
 
   private String formatObxPath(int obxIndex) {
@@ -167,6 +180,9 @@ public class ObservationsBuilder {
         .setMethod(
             toCodeableConcept(obx.getObservationMethod(0)));
 
+    String id = hash(messageHash + obx.encode());
+    observation.setId(new IdDt(Observation.class.getSimpleName(), id));
+
     observation.addIdentifier()
         .setSystem(IdentifierSystems.INSTITUTION_OBSERVATION_SUB_IDENTIFIER)
         .setValue(obx.getObservationSubId().getValue());
@@ -219,6 +235,8 @@ public class ObservationsBuilder {
    * @throws HL7Exception if HL7 message is malformed
    */
   public List<Observation> toObservations() throws HL7Exception {
+    messageHash = hash(message.encode());
+
     List<Observation> observations = new ArrayList<>();
     for (int obxIndex = 0; true; ++obxIndex) {
       String obxPath = formatObxPath(obxIndex);

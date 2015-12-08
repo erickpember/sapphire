@@ -19,6 +19,7 @@ import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
 import ca.uhn.fhir.model.primitive.DateDt;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import ca.uhn.fhir.model.primitive.DecimalDt;
+import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.IGenericClient;
@@ -286,43 +287,33 @@ public abstract class ApiTestSupport {
     return Arrays.asList(encounter1, encounter2, encounter3);
   }
 
-  private List<Observation> addObservations(List<UnitedStatesPatient> patients,
-      List<Encounter> encounters) {
+  private List<Observation> addObservations(
+      List<UnitedStatesPatient> patients, List<Encounter> encounters) {
+
     Observation observation1 = new Observation();
+    observation1.setId(new IdDt(Observation.class.getSimpleName(), "observation1"));
     QuantityDt observationValue = new QuantityDt()
         .setValue(new DecimalDt("170"))
         .setUnit("cm");
-    observation1.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("observation1");
     observation1.setCode(new CodeableConceptDt("system", "304894102"));
     observation1.setValue(observationValue);
     observation1.setSubject(new ResourceReferenceDt(patients.get(0)));
     observation1.setEncounter(new ResourceReferenceDt(encounters.get(0)));
-    MethodOutcome outcome = client.create().resource(observation1)
-        .encodedJson().execute();
-    IIdType id = outcome.getId();
-    observation1.setId(id);
-    log.info("observation 1 ID: {}", id.getValue());
+    client.update().resource(observation1).encodedJson().execute();
 
     Observation observation2 = new Observation();
+    observation2.setId(new IdDt(Observation.class.getSimpleName(), "observation2"));
     observationValue = new QuantityDt()
         .setValue(new DecimalDt("70"))
         .setUnit("kg");
-    observation2.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("observation2");
     observation2.setCode(new CodeableConceptDt("system", "WT"));
     observation2.setValue(observationValue);
     observation2.setSubject(new ResourceReferenceDt(patients.get(0)));
     observation2.setEncounter(new ResourceReferenceDt(encounters.get(0)));
-    outcome = client.create().resource(observation2)
-        .encodedJson().execute();
-    id = outcome.getId();
-    observation2.setId(id);
-    log.info("observation 2 ID: {}", id.getValue());
+    client.update().resource(observation2).encodedJson().execute();
 
     Observation observation3 = new Observation();
-    observation3.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("observation3");
+    observation3.setId(new IdDt(Observation.class.getSimpleName(), "observation3"));
     observationValue = new QuantityDt()
         .setValue(new DecimalDt("72"))
         .setUnit("in");
@@ -330,31 +321,21 @@ public abstract class ApiTestSupport {
     observation3.setValue(observationValue);
     observation3.setSubject(new ResourceReferenceDt(patients.get(1)));
     observation3.setEncounter(new ResourceReferenceDt(encounters.get(1)));
-    outcome = client.create().resource(observation3)
-        .encodedJson().execute();
-    id = outcome.getId();
-    observation3.setId(id);
-    log.info("observation 3 ID: {}", id.getValue());
+    client.update().resource(observation3).encodedJson().execute();
 
     Observation observation4 = new Observation();
+    observation4.setId(new IdDt(Observation.class.getSimpleName(), "observation4"));
     observationValue = new QuantityDt()
         .setValue(new DecimalDt("50"))
         .setUnit("kg");
-    observation4.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("observation4");
     observation4.setCode(new CodeableConceptDt("system", "WT"));
     observation4.setValue(observationValue);
     observation4.setSubject(new ResourceReferenceDt(patients.get(1)));
     observation4.setEncounter(new ResourceReferenceDt(encounters.get(1)));
-    outcome = client.create().resource(observation4)
-        .encodedJson().execute();
-    id = outcome.getId();
-    observation4.setId(id);
-    log.info("observation 4 ID: {}", id.getValue());
+    client.update().resource(observation4).encodedJson().execute();
 
     Observation observation5 = new Observation();
-    observation5.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("observation5");
+    observation5.setId(new IdDt(Observation.class.getSimpleName(), "observation5"));
     observationValue = new QuantityDt()
         .setValue(new DecimalDt("71"))
         .setUnit("in");
@@ -362,59 +343,40 @@ public abstract class ApiTestSupport {
     observation5.setValue(observationValue);
     observation5.setSubject(new ResourceReferenceDt(patients.get(2)));
     observation5.setEncounter(new ResourceReferenceDt(encounters.get(2)));
-    outcome = client.create().resource(observation5)
-        .encodedJson().execute();
-    id = outcome.getId();
-    observation5.setId(id);
-    log.info("observation 5 ID: {}", id.getValue());
+    client.update().resource(observation5).encodedJson().execute();
 
     Observation observation6 = new Observation();
+    observation6.setId(new IdDt(Observation.class.getSimpleName(), "observation6"));
     observationValue = new QuantityDt()
         .setValue(new DecimalDt("50"))
         .setUnit("kg");
-    observation6.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("observation4");
     observation6.setCode(new CodeableConceptDt("system", "WT"));
     observation6.setValue(observationValue);
     observation6.setSubject(new ResourceReferenceDt(patients.get(2)));
     observation6.setEncounter(new ResourceReferenceDt(encounters.get(2)));
-    outcome = client.create().resource(observation6)
-        .encodedJson().execute();
-    id = outcome.getId();
-    observation6.setId(id);
-    log.info("observation 6 ID: {}", id.getValue());
+    client.update().resource(observation6).encodedJson().execute();
 
     DateTimeDt myApplies = new DateTimeDt();
     StringDt myValue = new StringDt("+");
     Observation observation7 = new Observation();
-    observation7.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("observation4");
+    observation7.setId(new IdDt(Observation.class.getSimpleName(), "observation7"));
     observation7.setCode(new CodeableConceptDt("system", "304890023"));
     observation7.setValue(myValue);
     observation7.setEffective(myApplies.withCurrentTime());
     observation7.setSubject(new ResourceReferenceDt(patients.get(2)));
     observation7.setEncounter(new ResourceReferenceDt(encounters.get(2)));
-    outcome = client.create().resource(observation7)
-        .encodedJson().execute();
-    id = outcome.getId();
-    observation7.setId(id);
-    log.info("observation 7 ID: {}", id.getValue());
+    client.update().resource(observation7).encodedJson().execute();
 
     DateTimeDt myApplies8 = new DateTimeDt();
     StringDt myValue8 = new StringDt("UTA (RASS -4 or -5)");
     Observation observation8 = new Observation();
-    observation7.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue("observation4");
+    observation8.setId(new IdDt(Observation.class.getSimpleName(), "observation8"));
     observation8.setCode(new CodeableConceptDt("system", "304890023"));
     observation8.setValue(myValue8);
     observation8.setEffective(myApplies8.withCurrentTime());
     observation8.setSubject(new ResourceReferenceDt(patients.get(2)));
     observation8.setEncounter(new ResourceReferenceDt(encounters.get(2)));
-    outcome = client.create().resource(observation8)
-        .encodedJson().execute();
-    id = outcome.getId();
-    observation8.setId(id);
-    log.info("observation 8 ID: {}", id.getValue());
+    client.update().resource(observation8).encodedJson().execute();
 
     return Arrays.asList(
         observation1, observation2, observation3, observation4, observation5, observation6,

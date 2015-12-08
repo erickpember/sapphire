@@ -4,13 +4,11 @@ package com.datafascia.domain.persist;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
-import ca.uhn.fhir.model.primitive.IdDt;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.persist.entity.EntityId;
 import com.datafascia.common.persist.entity.FhirEntityStore;
 import com.datafascia.domain.fhir.Ids;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -40,17 +38,19 @@ public class ObservationRepository extends FhirEntityStoreRepository {
   }
 
   /**
-   * Generates primary key from institution observation identifier.
+   * Generates primary key from observation resource ID.
    *
    * @param observation
    *      observation to read property from
-   * @return
-   *      primary key
+   * @return primary key
+   * @throws IllegalArgumentException if observation does not have a resource ID
    */
   public static Id<Observation> generateId(Observation observation) {
-    String identifierValue = (observation.getId().isEmpty())
-        ? UUID.randomUUID().toString() : observation.getId().getIdPart();
-    return Id.of(identifierValue);
+    if (observation.getId().isEmpty()) {
+      throw new IllegalArgumentException("Observation missing id");
+    }
+
+    return Id.of(observation.getId().getIdPart());
   }
 
   /**
@@ -63,24 +63,7 @@ public class ObservationRepository extends FhirEntityStoreRepository {
    */
   public void save(Encounter encounter, Observation observation) {
     Id<Observation> observationId = generateId(observation);
-    observation.setId(new IdDt(Observation.class.getSimpleName(), observationId.toString()));
-
     Id<Encounter> encounterId = Ids.toPrimaryKey(encounter.getId());
-    entityStore.save(toEntityId(encounterId, observationId), observation);
-  }
-
-  /**
-   * Saves entity.
-   *
-   * @param encounterId
-   *     parent entity ID
-   * @param observation
-   *     to save
-   */
-  public void save(Id<Encounter> encounterId, Observation observation) {
-    Id<Observation> observationId = generateId(observation);
-    observation.setId(new IdDt(Observation.class.getSimpleName(), observationId.toString()));
-
     entityStore.save(toEntityId(encounterId, observationId), observation);
   }
 
@@ -91,8 +74,6 @@ public class ObservationRepository extends FhirEntityStoreRepository {
    */
   public void save(Observation observation) {
     Id<Observation> observationId = generateId(observation);
-    observation.setId(new IdDt(Observation.class.getSimpleName(), observationId.toString()));
-
     Id<Encounter> encounterId = Ids.toPrimaryKey(observation.getEncounter().getReference());
     entityStore.save(toEntityId(encounterId, observationId), observation);
   }

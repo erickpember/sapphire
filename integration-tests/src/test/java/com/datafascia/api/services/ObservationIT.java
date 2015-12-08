@@ -14,6 +14,7 @@ import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
 import ca.uhn.fhir.model.primitive.DateDt;
+import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.model.primitive.StringDt;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.gclient.StringClientParam;
@@ -58,15 +59,11 @@ public class ObservationIT extends ApiTestSupport {
 
     Observation observation1 = createObservation(NUMERICAL_PAIN_LEVEL_LOW, "1");
     observation1.setEncounter(new ResourceReferenceDt(encounter));
-    outcome = client.create().resource(observation1)
-        .encodedJson().execute();
-    observation1.setId(outcome.getId());
+    client.update().resource(observation1).encodedJson().execute();
 
     Observation observation2 = createObservation(NUMERICAL_PAIN_LEVEL_HIGH, "2");
     observation2.setEncounter(new ResourceReferenceDt(encounter));
-    outcome = client.create().resource(observation2)
-        .encodedJson().execute();
-    observation2.setId(outcome.getId());
+    client.update().resource(observation2).encodedJson().execute();
 
     Bundle results = client.search().forResource(Observation.class)
         .where(new StringClientParam("encounter")
@@ -135,13 +132,11 @@ public class ObservationIT extends ApiTestSupport {
   }
 
   private Observation createObservation(String code, String value) {
-    StringDt observationValue = new StringDt();
-    observationValue.setValue(value);
-
-    Observation observation = new Observation();
-    observation.setCode(new CodeableConceptDt("system", code));
-    observation.setValue(observationValue);
-    observation.setIssued(new Date(), TemporalPrecisionEnum.SECOND);
+    Observation observation = new Observation()
+        .setCode(new CodeableConceptDt("system", code))
+        .setValue(new StringDt(value))
+        .setIssued(new Date(), TemporalPrecisionEnum.SECOND);
+    observation.setId(new IdDt(Observation.class.getSimpleName(), code));
     return observation;
   }
 }

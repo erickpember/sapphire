@@ -11,6 +11,7 @@ import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.dstu2.valueset.AdministrativeGenderEnum;
 import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
 import ca.uhn.fhir.model.primitive.DateDt;
+import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.model.primitive.StringDt;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.fhir.IdentifierSystems;
@@ -77,13 +78,11 @@ public class ObservationRepositoryTest extends RepositoryTestSupport {
   }
 
   private Observation createObservation(String code, String value) {
-    StringDt observationValue = new StringDt();
-    observationValue.setValue(value);
-
-    Observation observation = new Observation();
-    observation.setCode(new CodeableConceptDt("system", code));
-    observation.setValue(observationValue);
-    observation.setIssued(new Date(), TemporalPrecisionEnum.SECOND);
+    Observation observation = new Observation()
+        .setCode(new CodeableConceptDt("system", code))
+        .setValue(new StringDt(value))
+        .setIssued(new Date(), TemporalPrecisionEnum.SECOND);
+    observation.setId(new IdDt(Observation.class.getSimpleName(), code));
     return observation;
   }
 

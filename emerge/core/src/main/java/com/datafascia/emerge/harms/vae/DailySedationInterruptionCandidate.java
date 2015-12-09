@@ -15,6 +15,7 @@ import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
 import com.datafascia.emerge.ucsf.codes.MedsSetEnum;
+import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
 import java.time.Clock;
 import java.time.Instant;
@@ -170,12 +171,12 @@ public class DailySedationInterruptionCandidate {
 
     // Gather observations needed.
     String freshestTrainOfFour = ObservationUtils.getFreshestByCodeAfterTime(
-        apiClient, encounterId, "304500964", twoHoursAgo)
+        apiClient, encounterId, ObservationCodeEnum.TRAIN_OF_FOUR.getCode(), twoHoursAgo)
         .map(observation -> observation.getValue().toString())
         .orElse("");
 
     String freshestWakeUpAction = ObservationUtils.getFreshestByCodeAfterTime(
-        apiClient, encounterId, "304890033", twentyFiveHoursAgo)
+        apiClient, encounterId, ObservationCodeEnum.SEDATION_WAKE_UP.getCode(), twentyFiveHoursAgo)
         .map(observation -> observation.getValue().toString())
         .orElse("");
 
@@ -187,22 +188,27 @@ public class DailySedationInterruptionCandidate {
         twentyFiveHoursAgo));
 
     Optional<Observation> freshestCoolingPadStatusFromPast25Hours = ObservationUtils
-        .getFreshestByCodeAfterTime(apiClient, encounterId, "3045000709", twentyFiveHoursAgo);
+        .getFreshestByCodeAfterTime(apiClient, encounterId,
+            ObservationCodeEnum.COOLING_PAD_STATUS.getCode(), twentyFiveHoursAgo);
 
     List<Observation> temperatureFromPast48Hours = ObservationUtils.getObservationByCodeAfterTime(
-        apiClient, encounterId, "3045000001", fourtyEightHoursAgo);
+        apiClient, encounterId, ObservationCodeEnum.TEMPERATURE.getCode(), fourtyEightHoursAgo);
 
     List<Observation> coolingPadPatientTemperatureFromPast48Hours = ObservationUtils
-        .getObservationByCodeAfterTime(apiClient, encounterId, "3045000458", fourtyEightHoursAgo);
+        .getObservationByCodeAfterTime(apiClient, encounterId,
+            ObservationCodeEnum.COOLING_PAD_PATIENT_TEMPERATURE.getCode(), fourtyEightHoursAgo);
 
     List<Observation> coolingPadWaterTemperatureFromPast48Hours = ObservationUtils
-        .getObservationByCodeAfterTime(apiClient, encounterId, "304894100", fourtyEightHoursAgo);
+        .getObservationByCodeAfterTime(apiClient, encounterId,
+            ObservationCodeEnum.COOLING_PAD_WATER_TEMPERATURE.getCode(), fourtyEightHoursAgo);
 
     Optional<Observation> freshestCoolingPadWaterTemperatureFromPast2Hours = ObservationUtils
-        .getFreshestByCodeAfterTime(apiClient, encounterId, "304894100", twoHoursAgo);
+        .getFreshestByCodeAfterTime(apiClient, encounterId,
+            ObservationCodeEnum.COOLING_PAD_WATER_TEMPERATURE.getCode(), twoHoursAgo);
 
     Optional<Observation> freshestActualRASSFromPast7Hours = ObservationUtils
-        .getFreshestByCodeAfterTime(apiClient, encounterId, "3045000021", sevenHoursAgo);
+        .getFreshestByCodeAfterTime(apiClient, encounterId, ObservationCodeEnum.ACTUAL_RASS
+            .getCode(), sevenHoursAgo);
 
     /* if freshestTrainOfFour.getValue() == (“0”, “1”, “2”, “3”) then Daily Sedation Interruption
      * Candidate = “No: Receiving NMBA”
@@ -335,8 +341,7 @@ public class DailySedationInterruptionCandidate {
      */
     if (freshestCoolingPadWaterTemperatureFromPast2Hours.isPresent()) {
       for (Observation obv : coolingPadPatientTemperatureFromPast48Hours) {
-        if (freshestCoolingPadWaterTemperatureFromPast2Hours != null
-            && ObservationUtils.getEffectiveDate(obv).after(ObservationUtils
+        if (ObservationUtils.getEffectiveDate(obv).after(ObservationUtils
                 .getEffectiveDate(freshestCoolingPadWaterTemperatureFromPast2Hours.get()))
             && obv.getValue() instanceof QuantityDt
             && ((QuantityDt) obv.getValue()).getValue().doubleValue() <= 36.5) {

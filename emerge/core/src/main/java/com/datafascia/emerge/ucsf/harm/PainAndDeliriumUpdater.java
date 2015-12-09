@@ -229,6 +229,10 @@ public class PainAndDeliriumUpdater {
   public void updateCpotLevel(HarmEvidence harmEvidence, Encounter encounter) {
     String encounterId = encounter.getId().getIdPart();
 
+    PainGoal painGoal = new PainGoal().withDataEntryTime(Date.from(Instant.now(clock)))
+        .withGoal(painGoalImpl.getPainGoal(encounterId));
+    getPain(harmEvidence).setPainGoal(painGoal);
+
     CurrentCpotLevel currentLevel = cpotImpl.getCurrentCpotLevel(encounterId);
     CurrentScore__ currentScore = new CurrentScore__()
         .withPainScore(currentLevel.getPainScore())

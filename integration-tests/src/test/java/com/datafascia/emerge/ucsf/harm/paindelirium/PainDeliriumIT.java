@@ -123,7 +123,6 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
   @Test
   public void should_export_cpot_pain_goal_2() throws Exception {
     processMessage("cpot-8.hl7");
-    processTimer();
 
     HarmEvidence harmEvidence = readHarmEvidence();
     PainGoal goal = harmEvidence.getMedicalData().getDelirium().getPain().getPainGoal();

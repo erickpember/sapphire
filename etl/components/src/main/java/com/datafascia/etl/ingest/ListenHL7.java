@@ -11,11 +11,13 @@ import ca.uhn.hl7v2.protocol.ReceivingApplication;
 import ca.uhn.hl7v2.protocol.ReceivingApplicationException;
 import ca.uhn.hl7v2.protocol.ReceivingApplicationExceptionHandler;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import com.datafascia.common.time.InstantFormatter;
 import com.google.common.collect.ImmutableSet;
-import java.io.ByteArrayInputStream;
+import com.google.common.hash.Hashing;
+import com.google.common.io.BaseEncoding;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.Instant;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -28,6 +30,7 @@ import org.apache.nifi.annotation.lifecycle.OnScheduled;
 import org.apache.nifi.annotation.lifecycle.OnUnscheduled;
 import org.apache.nifi.components.PropertyDescriptor;
 import org.apache.nifi.flowfile.FlowFile;
+import org.apache.nifi.flowfile.attributes.CoreAttributes;
 import org.apache.nifi.processor.AbstractProcessor;
 import org.apache.nifi.processor.ProcessContext;
 import org.apache.nifi.processor.ProcessSession;
@@ -44,6 +47,8 @@ import org.kohsuke.MetaInfServices;
 @MetaInfServices(Processor.class)
 @Tags({"HL7", "health level 7", "healthcare", "ingest", "listen", "MLLP"})
 public class ListenHL7 extends AbstractProcessor {
+
+  private static final BaseEncoding ENCODING = BaseEncoding.base64Url().omitPadding();
 
   public static final Relationship SUCCESS = new Relationship.Builder()
       .name("success")
@@ -142,6 +147,12 @@ public class ListenHL7 extends AbstractProcessor {
     server.stop();
   }
 
+  private String generateFilename(byte[] content) {
+    return
+        InstantFormatter.ISO_INSTANT_MILLI.format(Instant.now()) + '|' +
+        ENCODING.encode(Hashing.sha1().hashBytes(content).asBytes());
+  }
+
   @Override
   public void onTrigger(ProcessContext context, ProcessSession session) throws ProcessException {
     String message = receivedMessages.poll();
@@ -150,12 +161,13 @@ public class ListenHL7 extends AbstractProcessor {
       return;
     }
 
+    byte[] content = message.getBytes(StandardCharsets.UTF_8);
+
     FlowFile flowFile = session.create();
-    InputStream input = new ByteArrayInputStream(message.getBytes(StandardCharsets.UTF_8));
-    flowFile = session.importFrom(input, flowFile);
-
+    flowFile = session.write(flowFile, output -> output.write(content));
+    flowFile = session.putAttribute(
+        flowFile, CoreAttributes.FILENAME.key(), generateFilename(content));
     session.getProvenanceReporter().receive(flowFile, "Unknown");
-
     session.transfer(flowFile, SUCCESS);
   }
 }

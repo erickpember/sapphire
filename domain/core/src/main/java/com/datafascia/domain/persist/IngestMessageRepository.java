@@ -9,6 +9,8 @@ import com.datafascia.common.accumulo.RowMapper;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.time.InstantFormatter;
 import com.datafascia.domain.model.IngestMessage;
+import com.google.common.hash.Hashing;
+import com.google.common.io.BaseEncoding;
 import java.net.URI;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -46,6 +48,7 @@ public class IngestMessageRepository extends BaseRepository {
   private static final String PAYLOAD_TYPE = "payloadType";
   private static final String PAYLOAD = "payload";
   private static final MessageRowMapper MESSAGE_ROW_MAPPER = new MessageRowMapper();
+  private static final BaseEncoding ENCODING = BaseEncoding.base64Url().omitPadding();
 
   /**
    * Constructor
@@ -156,9 +159,12 @@ public class IngestMessageRepository extends BaseRepository {
    *     payload
    */
   public void save(Id<Encounter> encounterId, String payload) {
+    byte[] value = payload.getBytes(StandardCharsets.UTF_8);
+
     String rowId =
         toRowIdPrefix(encounterId) +
-            InstantFormatter.ISO_INSTANT_MILLI.format(Instant.now());
+        InstantFormatter.ISO_INSTANT_MILLI.format(Instant.now()) + '|' +
+        ENCODING.encode(Hashing.sha1().hashBytes(value).asBytes());
 
     accumuloTemplate.save(
         Tables.ENCOUNTER,
@@ -166,7 +172,7 @@ public class IngestMessageRepository extends BaseRepository {
         mutationBuilder ->
             mutationBuilder
                 .columnFamily(COLUMN_FAMILY)
-                .put(PAYLOAD, new Value(payload.getBytes(StandardCharsets.UTF_8))));
+                .put(PAYLOAD, new Value(value)));
   }
 
   /**

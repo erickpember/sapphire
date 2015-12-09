@@ -91,16 +91,27 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
     return encounter;
   }
 
-  protected void processMessage(String hl7File) throws HL7Exception, IOException {
+  private String readResource(String hl7File) throws IOException {
     URL url = Resources.getResource(getClass(), hl7File);
-    String hl7 = Resources.toString(url, StandardCharsets.UTF_8).replace('\n', '\r');
+    return Resources.toString(url, StandardCharsets.UTF_8).replace('\n', '\r');
+  }
 
+  private void saveMessageByEncounter(String hl7) throws HL7Exception {
     Message message = parser.parse(hl7);
     Terser terser = new Terser(message);
     String encounterIdentifier = terser.get("/.PV1-19");
 
     ingestMessageRepository.save(Id.of(encounterIdentifier), hl7);
+  }
 
+  protected void saveMessage(String hl7File) throws HL7Exception, IOException {
+    String hl7 = readResource(hl7File);
+    saveMessageByEncounter(hl7);
+  }
+
+  protected void processMessage(String hl7File) throws HL7Exception, IOException {
+    String hl7 = readResource(hl7File);
+    saveMessageByEncounter(hl7);
     hl7MessageProcessor.accept(hl7);
   }
 

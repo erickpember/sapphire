@@ -27,7 +27,7 @@ public class DemographicIT extends HarmEvidenceTestSupport {
   }
 
   @Test
-  public void should_export_demographic_data() throws Exception {
+  public void admit_should_export_demographic_data() throws Exception {
     processMessage("ADT_A01.hl7");
 
     HarmEvidence harmEvidence = readHarmEvidence();
@@ -37,6 +37,26 @@ public class DemographicIT extends HarmEvidenceTestSupport {
     assertEquals(demographicData.getMedicalRecordNumber(), PATIENT_IDENTIFIER);
     assertEquals(demographicData.getICUadmitDate().toInstant().toString(), "2014-10-01T19:01:00Z");
     assertEquals(demographicData.getDateOfBirth(), "1984-10-01");
+    assertEquals(demographicData.getGender(), DemographicData.Gender.FEMALE);
+    assertEquals(demographicData.getRace(), "White");
+    assertEquals(demographicData.getAdmissionHeight(), new BigDecimal("183"));
+    assertEquals(demographicData.getAdmissionWeight(), new BigDecimal("100.0"));
+    assertEquals(demographicData.getRoomNumber(), "0009-A");
+    assertEquals(demographicData.getUpdateTime().toInstant(), Instant.now(clock));
+  }
+
+  @Test
+  public void transfer_should_export_demographic_data() throws Exception {
+    saveMessage("ADT_A01.hl7");
+    processMessage("ADT_A02.hl7");
+
+    HarmEvidence harmEvidence = readHarmEvidence();
+    DemographicData demographicData = harmEvidence.getDemographicData();
+
+    assertEquals(demographicData.getPatientName(), "ONE A NATUS-ADULT");
+    assertEquals(demographicData.getMedicalRecordNumber(), PATIENT_IDENTIFIER);
+    assertEquals(demographicData.getICUadmitDate().toInstant().toString(), "2014-10-01T19:01:00Z");
+    assertEquals(demographicData.getDateOfBirth(), "1999-10-01");
     assertEquals(demographicData.getGender(), DemographicData.Gender.FEMALE);
     assertEquals(demographicData.getRace(), "White");
     assertEquals(demographicData.getAdmissionHeight(), new BigDecimal("183"));

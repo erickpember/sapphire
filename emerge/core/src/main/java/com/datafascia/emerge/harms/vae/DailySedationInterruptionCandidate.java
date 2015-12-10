@@ -191,15 +191,15 @@ public class DailySedationInterruptionCandidate {
         .getFreshestByCodeAfterTime(apiClient, encounterId,
             ObservationCodeEnum.COOLING_PAD_STATUS.getCode(), twentyFiveHoursAgo);
 
-    List<Observation> temperatureFromPast48Hours = ObservationUtils.getObservationByCodeAfterTime(
+    List<Observation> temperatureFromPast48Hours = ObservationUtils.getByCodeAfterTime(
         apiClient, encounterId, ObservationCodeEnum.TEMPERATURE.getCode(), fourtyEightHoursAgo);
 
     List<Observation> coolingPadPatientTemperatureFromPast48Hours = ObservationUtils
-        .getObservationByCodeAfterTime(apiClient, encounterId,
+        .getByCodeAfterTime(apiClient, encounterId,
             ObservationCodeEnum.COOLING_PAD_PATIENT_TEMPERATURE.getCode(), fourtyEightHoursAgo);
 
     List<Observation> coolingPadWaterTemperatureFromPast48Hours = ObservationUtils
-        .getObservationByCodeAfterTime(apiClient, encounterId,
+        .getByCodeAfterTime(apiClient, encounterId,
             ObservationCodeEnum.COOLING_PAD_WATER_TEMPERATURE.getCode(), fourtyEightHoursAgo);
 
     Optional<Observation> freshestCoolingPadWaterTemperatureFromPast2Hours = ObservationUtils

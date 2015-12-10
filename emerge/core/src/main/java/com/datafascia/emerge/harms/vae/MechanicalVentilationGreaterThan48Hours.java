@@ -45,7 +45,7 @@ public class MechanicalVentilationGreaterThan48Hours {
       return false;
     }
 
-    List<Observation> extubations = ObservationUtils.getObservationByCodeAfterTime(apiClient,
+    List<Observation> extubations = ObservationUtils.getByCodeAfterTime(apiClient,
         encounterId, ObservationCodeEnum.EXTUBATION.getCode(), fortyEightHoursAgo);
     for (Observation extubation : extubations) {
       if (extubation.getValue().toString().equals("Yes")) {
@@ -53,7 +53,7 @@ public class MechanicalVentilationGreaterThan48Hours {
       }
     }
 
-    List<Observation> ettInvasiveVentStatuses = ObservationUtils.getObservationByCodeAfterTime(
+    List<Observation> ettInvasiveVentStatuses = ObservationUtils.getByCodeAfterTime(
         apiClient, encounterId, ObservationCodeEnum.ETT_INVASIVE_VENT_STATUS.getCode(),
         fortyEightHoursAgo);
     for (Observation ettInvasiveVentStatus : ettInvasiveVentStatuses) {
@@ -63,7 +63,7 @@ public class MechanicalVentilationGreaterThan48Hours {
       }
     }
 
-    List<Observation> trachInvasiveVentStatuses = ObservationUtils.getObservationByCodeAfterTime(
+    List<Observation> trachInvasiveVentStatuses = ObservationUtils.getByCodeAfterTime(
         apiClient, encounterId, ObservationCodeEnum.TRACH_INVASIVE_VENT_STATUS.getCode(),
         fortyEightHoursAgo);
     for (Observation trachInvasiveVentStatus : trachInvasiveVentStatuses) {

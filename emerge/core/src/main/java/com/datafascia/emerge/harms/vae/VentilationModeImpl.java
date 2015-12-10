@@ -47,13 +47,13 @@ public class VentilationModeImpl {
    * @return ventilation mode
    */
   public String getVentilationMode(String encounterId) {
-    Observation freshestVentMode = ObservationUtils.findFreshestObservationForCode(
+    Observation freshestVentMode = ObservationUtils.findFreshestForCode(
         apiClient, encounterId, ObservationCodeEnum.VENT_MODE.getCode());
 
-    Observation freshestBreathType = ObservationUtils.findFreshestObservationForCode(
+    Observation freshestBreathType = ObservationUtils.findFreshestForCode(
         apiClient, encounterId, ObservationCodeEnum.BREATH_TYPE.getCode());
 
-    Observation freshestNonInvasiveDeviceMode = ObservationUtils.findFreshestObservationForCode(
+    Observation freshestNonInvasiveDeviceMode = ObservationUtils.findFreshestForCode(
         apiClient, encounterId, ObservationCodeEnum.NON_INVASIVE_DEVICE_MODE.getCode());
 
     // For when either breath type or vent mode are fresher than non-invasive device mode

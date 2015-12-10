@@ -43,7 +43,7 @@ public class SubglotticSuctionNonSurgicalAirway {
       return false;
     }
 
-    Observation freshestAirwayDevice = ObservationUtils.findFreshestObservation(airwayDevices);
+    Observation freshestAirwayDevice = ObservationUtils.findFreshest(airwayDevices);
 
     if (freshestAirwayDevice != null && freshestAirwayDevice.getValue() != null) {
 

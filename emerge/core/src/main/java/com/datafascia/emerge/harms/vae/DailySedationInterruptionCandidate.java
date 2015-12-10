@@ -17,6 +17,7 @@ import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
 import com.datafascia.emerge.ucsf.codes.MedsSetEnum;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
+import com.google.common.collect.ImmutableSet;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -24,6 +25,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import javax.inject.Inject;
 import lombok.Getter;
 
@@ -31,6 +33,15 @@ import lombok.Getter;
  * Daily Sedation Interruption Candidate
  */
 public class DailySedationInterruptionCandidate {
+
+  private static final Set<String> RELEVANT_OBSERVATION_CODES = ImmutableSet.of(
+      ObservationCodeEnum.TRAIN_OF_FOUR.getCode(),
+      ObservationCodeEnum.SEDATION_WAKE_UP.getCode(),
+      ObservationCodeEnum.COOLING_PAD_STATUS.getCode(),
+      ObservationCodeEnum.TEMPERATURE.getCode(),
+      ObservationCodeEnum.COOLING_PAD_PATIENT_TEMPERATURE.getCode(),
+      ObservationCodeEnum.COOLING_PAD_WATER_TEMPERATURE.getCode(),
+      ObservationCodeEnum.ACTUAL_RASS.getCode());
 
   /**
    * Result container for daily sedation interruption candidate.
@@ -78,6 +89,10 @@ public class DailySedationInterruptionCandidate {
     Date sevenHoursAgo = Date.from(nowInstance.minus(7, ChronoUnit.HOURS));
     Date twentyFiveHoursAgo = Date.from(nowInstance.minus(25, ChronoUnit.HOURS));
     Date fourtyEightHoursAgo = Date.from(nowInstance.minus(48, ChronoUnit.HOURS));
+
+    // Gather a list of observations filtered by all the codes this logic needs.
+    List<Observation> relevantObservations = ObservationUtils.getByCodes(apiClient, encounterId,
+        RELEVANT_OBSERVATION_CODES);
 
     // Gather the list of medication administrations we will be using.
     List<MedicationAdministration> medicationAdministrations =
@@ -171,12 +186,12 @@ public class DailySedationInterruptionCandidate {
 
     // Gather observations needed.
     String freshestTrainOfFour = ObservationUtils.getFreshestByCodeAfterTime(
-        apiClient, encounterId, ObservationCodeEnum.TRAIN_OF_FOUR.getCode(), twoHoursAgo)
+        relevantObservations, ObservationCodeEnum.TRAIN_OF_FOUR.getCode(), twoHoursAgo)
         .map(observation -> observation.getValue().toString())
         .orElse("");
 
     String freshestWakeUpAction = ObservationUtils.getFreshestByCodeAfterTime(
-        apiClient, encounterId, ObservationCodeEnum.SEDATION_WAKE_UP.getCode(), twentyFiveHoursAgo)
+        relevantObservations, ObservationCodeEnum.SEDATION_WAKE_UP.getCode(), twentyFiveHoursAgo)
         .map(observation -> observation.getValue().toString())
         .orElse("");
 
@@ -188,26 +203,26 @@ public class DailySedationInterruptionCandidate {
         twentyFiveHoursAgo));
 
     Optional<Observation> freshestCoolingPadStatusFromPast25Hours = ObservationUtils
-        .getFreshestByCodeAfterTime(apiClient, encounterId,
+        .getFreshestByCodeAfterTime(relevantObservations,
             ObservationCodeEnum.COOLING_PAD_STATUS.getCode(), twentyFiveHoursAgo);
 
     List<Observation> temperatureFromPast48Hours = ObservationUtils.getByCodeAfterTime(
-        apiClient, encounterId, ObservationCodeEnum.TEMPERATURE.getCode(), fourtyEightHoursAgo);
+        relevantObservations, ObservationCodeEnum.TEMPERATURE.getCode(), fourtyEightHoursAgo);
 
     List<Observation> coolingPadPatientTemperatureFromPast48Hours = ObservationUtils
-        .getByCodeAfterTime(apiClient, encounterId,
+        .getByCodeAfterTime(relevantObservations,
             ObservationCodeEnum.COOLING_PAD_PATIENT_TEMPERATURE.getCode(), fourtyEightHoursAgo);
 
     List<Observation> coolingPadWaterTemperatureFromPast48Hours = ObservationUtils
-        .getByCodeAfterTime(apiClient, encounterId,
+        .getByCodeAfterTime(relevantObservations,
             ObservationCodeEnum.COOLING_PAD_WATER_TEMPERATURE.getCode(), fourtyEightHoursAgo);
 
     Optional<Observation> freshestCoolingPadWaterTemperatureFromPast2Hours = ObservationUtils
-        .getFreshestByCodeAfterTime(apiClient, encounterId,
+        .getFreshestByCodeAfterTime(relevantObservations,
             ObservationCodeEnum.COOLING_PAD_WATER_TEMPERATURE.getCode(), twoHoursAgo);
 
     Optional<Observation> freshestActualRASSFromPast7Hours = ObservationUtils
-        .getFreshestByCodeAfterTime(apiClient, encounterId, ObservationCodeEnum.ACTUAL_RASS
+        .getFreshestByCodeAfterTime(relevantObservations, ObservationCodeEnum.ACTUAL_RASS
             .getCode(), sevenHoursAgo);
 
     /* if freshestTrainOfFour.getValue() == (“0”, “1”, “2”, “3”) then Daily Sedation Interruption

@@ -10,10 +10,10 @@ import ca.uhn.fhir.model.primitive.DateTimeDt;
 import ca.uhn.fhir.model.primitive.StringDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.google.common.base.Strings;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -105,11 +105,28 @@ public class ObservationUtils {
    * @return A list of observations for the given codes, or {@code null} if no match is found.
    */
   public static List<Observation> filterByCodes(List<Observation> observations,
-      ArrayList<String> codes) {
+      Set<String> codes) {
     return observations.stream()
         .filter(observation -> codes != null && codes.contains(observation.getCode()
                 .getCodingFirstRep().getCode()))
         .collect(Collectors.toList());
+  }
+
+  /**
+   * Retrieves observations for a given encounter of multiple codes.
+   *
+   * @param client
+   *     client to use
+   * @param encounterId
+   *     encounter to search
+   * @param codes
+   *     One or many observation codes to search for.
+   * @return A list of observations for the given codes, or {@code null} if no match is found.
+   */
+  public static List<Observation> getByCodes(ClientBuilder client, String encounterId,
+      Set<String> codes) {
+    return filterByCodes(client.getObservationClient().searchObservation(encounterId, null, null),
+        codes);
   }
 
   /**
@@ -246,8 +263,8 @@ public class ObservationUtils {
     return observations.stream()
         .filter(observation -> !Strings.isNullOrEmpty(code)
             && code.equals(observation.getCode()
-                .getCodingFirstRep().getCode())).filter(
-                  observation -> insideTimeFrame(observation, timeFrame))
+                .getCodingFirstRep().getCode()))
+        .filter(observation -> insideTimeFrame(observation, timeFrame))
                     .collect(Collectors.toList());
   }
 
@@ -354,6 +371,28 @@ public class ObservationUtils {
   public static Observation findFreshestForCodeAndValue(ClientBuilder client,
       String encounterId, String code, String value) {
     return client.getObservationClient().searchObservation(encounterId, code, null).stream()
+        .filter(observation -> observation.getValue().toString().equals(value))
+        .max(new ObservationEffectiveComparator())
+        .orElse(null);
+  }
+
+  /**
+   * Finds freshest observation from a list with a given code and value.
+   *
+   * @param observations
+   *     A list of observations for a specific encounter.
+   * @param code
+   *     Observation code to search for.
+   * @param value
+   *     Filter condition for Observation's value member.
+   * @return freshest observation for the given code, or {@code null} if no match is found
+   */
+  public static Observation findFreshestForCodeAndValue(List<Observation> observations, String code,
+      String value) {
+    return observations.stream()
+        .filter(observation -> !Strings.isNullOrEmpty(code)
+            && code.equals(observation.getCode()
+                .getCodingFirstRep().getCode()))
         .filter(observation -> observation.getValue().toString().equals(value))
         .max(new ObservationEffectiveComparator())
         .orElse(null);

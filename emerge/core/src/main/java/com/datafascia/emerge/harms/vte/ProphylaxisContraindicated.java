@@ -34,6 +34,18 @@ public class ProphylaxisContraindicated {
    * @return pharmacologic VTE prophylaxis contraindicated reason, or {@code null} if not found
    */
   public String getProphylaxisContraindicatedReason(String encounterId) {
+    if (HarmsLookups.plateletCountLessThan50000(apiClient, encounterId)) {
+      return "Platelet Count <50,000";
+    }
+
+    if (HarmsLookups.inrOver1point5(apiClient, encounterId)) {
+      return "INR >1.5";
+    }
+
+    if (HarmsLookups.aPttRatioOver1point5(apiClient, encounterId)) {
+      return "aPTT Ratio >1.5";
+    }
+
     List<ProcedureRequest> inProgressPpxRequests = apiClient.getProcedureRequestClient()
         .search(encounterId,
             ProcedureRequestCodeEnum.VTE_PPX_CONTRAINDICATIONS.getCode(),
@@ -58,18 +70,6 @@ public class ProphylaxisContraindicated {
         case "Allergy to heparin or HIT":
           return "Allergy to heparin or HIT";
       }
-    }
-
-    if (HarmsLookups.plateletCountLessThan50000(apiClient, encounterId)) {
-      return "Platelet Count <50,000";
-    }
-
-    if (HarmsLookups.inrOver1point5(apiClient, encounterId)) {
-      return "INR >1.5";
-    }
-
-    if (HarmsLookups.aPttRatioOver1point5(apiClient, encounterId)) {
-      return "aPTT Ratio >1.5";
     }
 
     return null;

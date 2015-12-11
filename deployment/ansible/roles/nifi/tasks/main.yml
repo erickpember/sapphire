@@ -27,6 +27,7 @@
     src: "{{ item }}"
     dest: "{{ nifi_home }}/conf/{{ item }}"
   with_items:
+    - bootstrap.conf
     - logback.xml
     - nifi.properties
   tags:

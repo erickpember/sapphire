@@ -10,4 +10,5 @@ ansible-playbook \
     --tags=run \
     df-etl.yml
 
-exec {{ nifi_home }}/bin/nifi.sh run
+{{ nifi_home }}/bin/nifi.sh start
+exec tail -F {{ nifi_log_dir }}/nifi-app.log

@@ -188,6 +188,8 @@
       {{ docker_run_command }}
           etl1.local.datafascia.com
           --detach
+          --publish=3333:3333
+          --publish=8000:8000
           --publish=8080:8080
           --publish=9520:9520
           --volume={{ company_data_prefix }}:{{ company_data_prefix }}

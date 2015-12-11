@@ -32,6 +32,7 @@ public class FhirRowMapper<T extends IBaseResource> implements RowMapper<T> {
   private final FhirContext fhirContext;
   private final Class<T> entityType;
   private ObjectNode rootObjectNode;
+  private long lastTimestamp;
 
   /**
    * Constructor
@@ -73,7 +74,12 @@ public class FhirRowMapper<T extends IBaseResource> implements RowMapper<T> {
   public void onReadEntry(Map.Entry<Key, Value> entry) {
     String fieldNamePath = entry.getKey().getColumnQualifier().toString();
     if (ReflectMutationSetter.SCHEMA_ID.equals(fieldNamePath)) {
-      // Ignore entry containing schema ID.
+      lastTimestamp = entry.getKey().getTimestamp();
+      return;
+    }
+
+    if (entry.getKey().getTimestamp() < lastTimestamp) {
+      // Ignore old version entry.
       return;
     }
 

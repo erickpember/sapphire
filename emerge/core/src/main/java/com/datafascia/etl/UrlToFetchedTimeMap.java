@@ -8,6 +8,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.nio.file.NoSuchFileException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
@@ -75,11 +76,11 @@ public class UrlToFetchedTimeMap {
       lastTimestamps = (ConcurrentHashMap) ois.readObject();
       ois.close();
       fis.close();
-    } catch (IOException ex) {
-      log.info("Could not read file {}. Performing full refresh.", FILE_PATH, ex);
+    } catch (NoSuchFileException ex) {
+      log.info("Could not read file {}. Performing full refresh.", FILE_PATH);
       clear();
-    } catch (ClassNotFoundException ex) {
-      throw new IllegalStateException("Error loading timestore.", ex);
+    } catch (ClassNotFoundException | IOException ex) {
+      throw new IllegalStateException("Could not load time store.", ex);
     }
   }
 

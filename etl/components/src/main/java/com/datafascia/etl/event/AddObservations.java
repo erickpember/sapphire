@@ -89,7 +89,7 @@ public class AddObservations {
       procedureBuilder.add(observation);
     }
 
-    apiClient.invalidate(encounterIdentifier);
+    apiClient.invalidateEncounter(encounterIdentifier);
 
     flagBuilder.build()
         .forEach(flag -> {

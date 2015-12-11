@@ -20,6 +20,7 @@ public class ClientBuilder {
   private final IGenericClient client;
   private static Injector injector;
   private ObservationClient observationClient;
+  private PractitionerClient practitionerClient;
 
   /**
    * Constructs a ClientBuilder using local config.
@@ -89,8 +90,14 @@ public class ClientBuilder {
     return new MedicationClient(client);
   }
 
-  public PractitionerClient getPractitionerClient() {
-    return new PractitionerClient(client);
+  /**
+   * @return practitioner client
+   */
+  public synchronized PractitionerClient getPractitionerClient() {
+    if (practitionerClient == null) {
+      practitionerClient = new PractitionerClient(client);
+    }
+    return practitionerClient;
   }
 
   public SubstanceClient getSubstanceClient() {
@@ -103,8 +110,18 @@ public class ClientBuilder {
    * @param encounterId
    *     encounter ID
    */
-  public void invalidate(String encounterId) {
+  public void invalidateEncounter(String encounterId) {
     getObservationClient().invalidate(encounterId);
+  }
+
+  /**
+   * Invalidates cache entry for a practitioner.
+   *
+   * @param practitionerId
+   *     practitioner ID
+   */
+  public void invalidatePractitioner(String practitionerId) {
+    getPractitionerClient().invalidate(practitionerId);
   }
 
   /**

@@ -5,6 +5,7 @@ package com.datafascia.etl.event;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Practitioner;
+import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.PractitionerRepository;
@@ -31,6 +32,9 @@ public class AddParticipant {
 
   @Inject
   private HarmEvidenceUpdater harmEvidenceUpdater;
+
+  @Inject
+  private ClientBuilder apiClient;
 
   /**
    * Adds participant.
@@ -59,6 +63,8 @@ public class AddParticipant {
     }
 
     practitionerRepository.save(practitioner);
+    apiClient.invalidatePractitioner(practitioner.getId().getIdPart());
+
     participant.setIndividual(new ResourceReferenceDt(practitioner));
 
     // Remove any existing participant for practitioner from the encounter.

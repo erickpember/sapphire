@@ -45,7 +45,8 @@ public class DemographicIT extends HarmEvidenceTestSupport {
     assertEquals(demographicData.getUpdateTime().toInstant(), Instant.now(clock));
   }
 
-  @Test
+  // TODO: Enable this test when we process data from before the patient was transfered to the ICU.
+  @Test(enabled = false)
   public void transfer_should_export_demographic_data() throws Exception {
     saveMessage("ADT_A01.hl7");
     processMessage("ADT_A02.hl7");

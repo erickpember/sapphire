@@ -66,7 +66,7 @@ public class CurrentTidalVolume {
       case "Synchronous Intermittent Mandatory Ventilation (SIMV)":
         if (freshestBreathType != null && freshestBreathType.getValue().toString().equals(
             "Volume Control")) {
-          if (freshestVentSetTidalVolume == null) {
+          if (!freshestVentSetTidalVolume.isPresent()) {
             return -1;
           } else {
             return getAbsValue(freshestVentSetTidalVolume.get());

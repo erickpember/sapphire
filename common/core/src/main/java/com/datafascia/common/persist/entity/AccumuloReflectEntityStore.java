@@ -26,14 +26,32 @@ public class AccumuloReflectEntityStore implements ReflectEntityStore {
   private static final char COMPONENT_SEPARATOR = '=';
   private static final char KEY_SEPARATOR = '&';
 
-  @Inject
   private AvroSchemaRegistry schemaRegistry;
-
-  @Inject @Named("entityTableNamePrefix")
-  private String tableNamePrefix;
-
-  @Inject
+  private String dataTableName;
   private AccumuloTemplate accumuloTemplate;
+
+  /**
+   * Constructor
+   *
+   * @param schemaRegistry
+   *     Avro schema registry
+   * @param tableNamePrefix
+   *     prefix for generating table names
+   * @param accumuloTemplate
+   *     data access operations template
+   */
+  @Inject
+  public AccumuloReflectEntityStore(
+      AvroSchemaRegistry schemaRegistry,
+      @Named("entityTableNamePrefix") String tableNamePrefix,
+      AccumuloTemplate accumuloTemplate) {
+
+    this.schemaRegistry = schemaRegistry;
+    this.accumuloTemplate = accumuloTemplate;
+
+    dataTableName = tableNamePrefix + DATA;
+    accumuloTemplate.createTableIfNotExist(dataTableName);
+  }
 
   /**
    * Gets name of Accumulo table storing entity data.
@@ -41,8 +59,6 @@ public class AccumuloReflectEntityStore implements ReflectEntityStore {
    * @return Accumulo table name
    */
   public String getDataTableName() {
-    String dataTableName = tableNamePrefix + DATA;
-    accumuloTemplate.createTableIfNotExist(dataTableName);
     return dataTableName;
   }
 
@@ -74,7 +90,9 @@ public class AccumuloReflectEntityStore implements ReflectEntityStore {
     long schemaId = schemaRegistry.putSchema(object.getClass().getSimpleName(), schema);
 
     accumuloTemplate.save(
-        getDataTableName(), toRowId(entityId), new ReflectMutationSetter(schemaId, object));
+        getDataTableName(),
+        toRowId(entityId),
+        new ReflectMutationSetter(schemaId, object));
   }
 
   @Override

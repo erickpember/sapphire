@@ -11,6 +11,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Spliterator;
 import java.util.Spliterators;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -39,6 +40,7 @@ public class AccumuloTemplate {
   private final ColumnVisibilityPolicy columnVisibilityPolicy;
   private final AuthorizationsSupplier authorizationsSupplier;
   private final MetricRegistry metrics;
+  private final ConcurrentHashMap<String, BatchWriter> tableToWriterMap = new ConcurrentHashMap<>();
   private final Map<String, Timer> nameToTimerMap = new HashMap<>();
 
   /**
@@ -92,6 +94,12 @@ public class AccumuloTemplate {
     }
   }
 
+  private BatchWriter getBatchWriter(String tableName) {
+    return tableToWriterMap.computeIfAbsent(
+        tableName,
+        table -> createBatchWriter(table));
+  }
+
   /**
    * Writes entries to a row.
    *
@@ -103,12 +111,13 @@ public class AccumuloTemplate {
    *     puts write operations in a mutation
    */
   public void save(String tableName, String rowId, MutationSetter mutationSetter) {
-    BatchWriter writer = createBatchWriter(tableName);
+    BatchWriter writer = getBatchWriter(tableName);
+
     MutationBuilder mutationBuilder = new MutationBuilder(tableName, rowId, columnVisibilityPolicy);
     mutationSetter.putWriteOperations(mutationBuilder);
     try {
       writer.addMutation(mutationBuilder.build());
-      writer.close();
+      writer.flush();
     } catch (MutationsRejectedException e) {
       throw new IllegalStateException("Cannot save row ID " + rowId, e);
     }

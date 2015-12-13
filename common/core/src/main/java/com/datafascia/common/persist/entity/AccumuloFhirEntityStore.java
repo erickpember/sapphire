@@ -29,21 +29,39 @@ public class AccumuloFhirEntityStore implements FhirEntityStore {
   private static final char COMPONENT_SEPARATOR = '=';
   private static final char KEY_SEPARATOR = '&';
 
-  @Inject
   private FhirContext fhirContext;
-
-  @Inject
   private AvroSchemaRegistry schemaRegistry;
-
-  @Inject @Named("entityTableNamePrefix")
-  private String tableNamePrefix;
-
-  @Inject
+  private String dataTableName;
   private AccumuloTemplate accumuloTemplate;
 
-  private String getDataTableName() {
-    String dataTableName = tableNamePrefix + DATA;
+  /**
+   * Constructor
+   *
+   * @param fhirContext
+   *     FHIR context
+   * @param schemaRegistry
+   *     Avro schema registry
+   * @param tableNamePrefix
+   *     prefix for generating table names
+   * @param accumuloTemplate
+   *     data access operations template
+   */
+  @Inject
+  public AccumuloFhirEntityStore(
+      FhirContext fhirContext,
+      AvroSchemaRegistry schemaRegistry,
+      @Named("entityTableNamePrefix") String tableNamePrefix,
+      AccumuloTemplate accumuloTemplate) {
+
+    this.fhirContext = fhirContext;
+    this.schemaRegistry = schemaRegistry;
+    this.accumuloTemplate = accumuloTemplate;
+
+    dataTableName = tableNamePrefix + DATA;
     accumuloTemplate.createTableIfNotExist(dataTableName);
+  }
+
+  private String getDataTableName() {
     return dataTableName;
   }
 

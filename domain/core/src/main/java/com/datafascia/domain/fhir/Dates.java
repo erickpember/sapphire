@@ -7,6 +7,7 @@ import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.composite.TimingDt;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.ZoneId;
@@ -35,20 +36,34 @@ public class Dates {
   /**
    * Converts FHIR IDatatype of DateTimeDt, PeriodDt or TimingDt to Java {@link Date}.
    *
-   * @param time
+   * @param fhirTime
    *     FHIR time, of one of three types
    * @return Java Date
    */
-  public static Date toDate(IDatatype time) {
-    if (time instanceof TimingDt) {
-      return toDate(((TimingDt) time).getRepeat().getBounds());
-    } else if (time instanceof PeriodDt) {
-      return ((PeriodDt) time).getStart();
-    } else if (time instanceof DateTimeDt) {
-      return ((DateTimeDt) time).getValue();
+  public static Date toDate(IDatatype fhirTime) {
+    if (fhirTime == null) {
+      return null;
+    } else if (fhirTime instanceof DateTimeDt) {
+      return ((DateTimeDt) fhirTime).getValue();
+    } else if (fhirTime instanceof PeriodDt) {
+      return ((PeriodDt) fhirTime).getStart();
+    } else if (fhirTime instanceof TimingDt) {
+      return toDate(((TimingDt) fhirTime).getRepeat().getBounds());
     } else {
-      throw new IllegalArgumentException("Cannot convert from " + time);
+      throw new IllegalArgumentException("Cannot convert from " + fhirTime);
     }
+  }
+
+  /**
+   * Converts FHIR IDatatype of DateTimeDt, PeriodDt or TimingDt to Java {@link Instant}.
+   *
+   * @param fhirTime
+   *     FHIR time, of one of three types
+   * @return Java Instant
+   */
+  public static Instant toInstant(IDatatype fhirTime) {
+    Date date = toDate(fhirTime);
+    return (date != null) ? date.toInstant() : null;
   }
 
   /**

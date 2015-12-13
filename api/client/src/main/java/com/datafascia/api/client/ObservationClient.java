@@ -19,13 +19,23 @@ import java.util.stream.Collectors;
  */
 public class ObservationClient extends BaseClient<Observation> {
 
-  private LoadingCache<String, List<Observation>> encounterIdToObservationsMap =
+  private LoadingCache<String, List<Observation>> encounterIdToObservationListMap =
       CacheBuilder.newBuilder()
       .expireAfterWrite(5, TimeUnit.SECONDS)
       .build(
           new CacheLoader<String, List<Observation>>() {
             public List<Observation> load(String encounterId) {
-              return list(encounterId);
+              return search(encounterId);
+            }
+          });
+
+  private LoadingCache<String, Observations> encounterIdToObservationsMap =
+      CacheBuilder.newBuilder()
+      .expireAfterWrite(5, TimeUnit.SECONDS)
+      .build(
+          new CacheLoader<String, Observations>() {
+            public Observations load(String encounterId) {
+              return new Observations(encounterIdToObservationListMap.getUnchecked(encounterId));
             }
           });
 
@@ -38,7 +48,7 @@ public class ObservationClient extends BaseClient<Observation> {
     super(client);
   }
 
-  private List<Observation> list(String encounterId) {
+  private List<Observation> search(String encounterId) {
     Bundle results = client.search()
         .forResource(Observation.class)
         .where(new StringClientParam(Observation.SP_ENCOUNTER)
@@ -47,6 +57,17 @@ public class ObservationClient extends BaseClient<Observation> {
         .execute();
 
     return extractBundle(results, Observation.class);
+  }
+
+  /**
+   * Lists observations for an encounter.
+   *
+   * @param encounterId
+   *     encounter to which the observations belong
+   * @return observations
+   */
+  public Observations list(String encounterId) {
+    return encounterIdToObservationsMap.getUnchecked(encounterId);
   }
 
   /**
@@ -61,7 +82,7 @@ public class ObservationClient extends BaseClient<Observation> {
    * @return observations
    */
   public List<Observation> searchObservation(String encounterId, String code, String status) {
-    List<Observation> observations = encounterIdToObservationsMap.getUnchecked(encounterId);
+    List<Observation> observations = encounterIdToObservationListMap.getUnchecked(encounterId);
     if (Strings.isNullOrEmpty(code) && Strings.isNullOrEmpty(status)) {
       return observations;
     }
@@ -83,6 +104,7 @@ public class ObservationClient extends BaseClient<Observation> {
    *     encounter ID
    */
   public void invalidate(String encounterId) {
+    encounterIdToObservationListMap.invalidate(encounterId);
     encounterIdToObservationsMap.invalidate(encounterId);
   }
 }

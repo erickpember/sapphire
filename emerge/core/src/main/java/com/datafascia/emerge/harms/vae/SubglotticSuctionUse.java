@@ -39,7 +39,7 @@ public class SubglotticSuctionUse {
     Instant now = Instant.now(clock);
     Date effectiveLowerBound = Date.from(now.minus(7, ChronoUnit.HOURS));
 
-    List<Observation> observations = ObservationUtils.getByCodeAfterTime(
+    List<Observation> observations = ObservationUtils.getObservationByCodeAfterTime(
         apiClient,
         encounterId,
         ObservationCodeEnum.SUBGLOTTIC_SUCTION.getCode(),
@@ -48,7 +48,7 @@ public class SubglotticSuctionUse {
       return MaybeEnum.NOT_DOCUMENTED;
     }
 
-    Observation freshestSubglotticStatus = ObservationUtils.findFreshest(observations);
+    Observation freshestSubglotticStatus = ObservationUtils.findFreshestObservation(observations);
 
     if (freshestSubglotticStatus != null && freshestSubglotticStatus.getValue() != null) {
       String value = freshestSubglotticStatus.getValue().toString();

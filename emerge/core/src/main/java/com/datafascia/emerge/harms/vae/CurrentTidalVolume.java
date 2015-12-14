@@ -51,7 +51,7 @@ public class CurrentTidalVolume {
         .getFreshestByCodeAfterTime(apiClient, encounterId,
             ObservationCodeEnum.TIDAL_VOLUME.getCode(), thirteenHoursAgo);
 
-    Observation freshestBreathType = ObservationUtils.findFreshestForCode(
+    Observation freshestBreathType = ObservationUtils.findFreshestObservationForCode(
         apiClient, encounterId, ObservationCodeEnum.BREATH_TYPE.getCode());
 
     switch (ventilationMode) {

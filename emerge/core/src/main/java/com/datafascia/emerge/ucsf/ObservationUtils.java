@@ -9,8 +9,6 @@ import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import ca.uhn.fhir.model.primitive.StringDt;
 import com.datafascia.api.client.ClientBuilder;
-import com.google.common.base.Strings;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -32,7 +30,7 @@ public class ObservationUtils {
    *     observations to search
    * @return freshest observation, or {@code null} if input observations is empty
    */
-  public static Observation findFreshest(List<Observation> observations) {
+  public static Observation findFreshestObservation(List<Observation> observations) {
     return observations.stream()
         .max(new ObservationEffectiveComparator())
         .orElse(null);
@@ -70,46 +68,11 @@ public class ObservationUtils {
    *     Observation code to search for.
    * @return freshest observation for the given code, or {@code null} if no match is found
    */
-  public static Observation findFreshestForCode(ClientBuilder client,
+  public static Observation findFreshestObservationForCode(ClientBuilder client,
       String encounterId, String code) {
     return client.getObservationClient().searchObservation(encounterId, code, null).stream()
         .max(new ObservationEffectiveComparator())
         .orElse(null);
-  }
-
-  /**
-   * Finds freshest observation for a given list of observations and code.
-   *
-   * @param observations
-   *     A list of observations for a specific encounter.
-   * @param code
-   *     Observation code to search for.
-   * @return freshest observation for the given code, or {@code null} if no match is found
-   */
-  public static Observation findFreshestForCode(List<Observation> observations,
-      String code) {
-    return observations.stream()
-        .filter(observation -> !Strings.isNullOrEmpty(code) && code.equals(observation.getCode()
-                .getCodingFirstRep().getCode()))
-        .max(new ObservationEffectiveComparator())
-        .orElse(null);
-  }
-
-  /**
-   * Filters observations by a list of multiple codes.
-   *
-   * @param observations
-   *     A list of observations for a specific encounter.
-   * @param codes
-   *     One or many observation codes to search for.
-   * @return A list of observations for the given codes, or {@code null} if no match is found.
-   */
-  public static List<Observation> filterByCodes(List<Observation> observations,
-      ArrayList<String> codes) {
-    return observations.stream()
-        .filter(observation -> codes != null && codes.contains(observation.getCode()
-                .getCodingFirstRep().getCode()))
-        .collect(Collectors.toList());
   }
 
   /**
@@ -134,32 +97,7 @@ public class ObservationUtils {
       return Optional.empty();
     }
 
-    Observation freshestObservation = findFreshest(observations);
-    if (ObservationUtils.isAfter(freshestObservation, effectiveLowerBound)) {
-      return Optional.of(freshestObservation);
-    }
-
-    return Optional.empty();
-  }
-
-  /**
-   * Finds the freshest observation from a list with the given code and after the given time.
-   *
-   * @param observations
-   *     A list of observations for a specific encounter.
-   * @param code
-   *     observation code to match
-   * @param effectiveLowerBound
-   *     observation effective time lower bound
-   * @return optional observation, empty if not found
-   */
-  public static Optional<Observation> getFreshestByCodeAfterTime(
-      List<Observation> observations, String code, Date effectiveLowerBound) {
-    if (observations.isEmpty()) {
-      return Optional.empty();
-    }
-
-    Observation freshestObservation = ObservationUtils.findFreshestForCode(observations, code);
+    Observation freshestObservation = findFreshestObservation(observations);
     if (ObservationUtils.isAfter(freshestObservation, effectiveLowerBound)) {
       return Optional.of(freshestObservation);
     }
@@ -180,31 +118,10 @@ public class ObservationUtils {
    *     The lower time bound.
    * @return A list of observations.
    */
-  public static List<Observation> getByCodeAfterTime(ClientBuilder client,
+  public static List<Observation> getObservationByCodeAfterTime(ClientBuilder client,
       String encounterId, String code, Date date) {
     return client.getObservationClient().searchObservation(encounterId, code, null).stream().filter(
         observation -> isAfter(observation, date)).collect(Collectors.toList());
-  }
-
-  /**
-   * Returns the observations from a list with the given code and after the given time.
-   *
-   * @param observations
-   *     A list of observations for a specific encounter.
-   * @param code
-   *     The code to search by.
-   * @param date
-   *     The lower time bound.
-   * @return A list of observations.
-   */
-  public static List<Observation> getByCodeAfterTime(List<Observation> observations,
-      String code, Date date) {
-    return observations.stream()
-        .filter(observation -> !Strings.isNullOrEmpty(code)
-            && code.equals(observation.getCode()
-                .getCodingFirstRep().getCode()))
-        .filter(
-            observation -> isAfter(observation, date)).collect(Collectors.toList());
   }
 
   /**
@@ -229,29 +146,6 @@ public class ObservationUtils {
   }
 
   /**
-   * Returns the observations from a list with the given code inside a specified time
-   * frame.
-   *
-   * @param observations
-   *     A list of observations for a specific encounter.
-   * @param code
-   *     The code to search by.
-   * @param timeFrame
-   *     Time window constraint for search.
-   * @return
-   *     A list of observations.
-   */
-  public static List<Observation> searchByCodeInTimeFrame(List<Observation> observations,
-      String code, PeriodDt timeFrame) {
-    return observations.stream()
-        .filter(observation -> !Strings.isNullOrEmpty(code)
-            && code.equals(observation.getCode()
-                .getCodingFirstRep().getCode())).filter(
-                  observation -> insideTimeFrame(observation, timeFrame))
-                    .collect(Collectors.toList());
-  }
-
-  /**
    * Returns the observations for a given encounter inside a specified time frame.
    *
    * @param client
@@ -266,22 +160,6 @@ public class ObservationUtils {
   public static List<Observation> searchByTimeFrame(ClientBuilder client,
       String encounterId, PeriodDt timeFrame) {
     return client.getObservationClient().searchObservation(encounterId, null, null).stream().filter(
-        observation -> insideTimeFrame(observation, timeFrame)).collect(Collectors.toList());
-  }
-
-  /**
-   * Returns the observations from a list inside a specified time frame.
-   *
-   * @param observations
-   *     A list of observations for a specific encounter.
-   * @param timeFrame
-   *     Time window constraint for search.
-   * @return
-   *     A list of observations.
-   */
-  public static List<Observation> filterByTimeFrame(List<Observation> observations,
-      PeriodDt timeFrame) {
-    return observations.stream().filter(
         observation -> insideTimeFrame(observation, timeFrame)).collect(Collectors.toList());
   }
 
@@ -302,7 +180,7 @@ public class ObservationUtils {
    */
   public static Observation getFreshestByCodeInTimeFrame(ClientBuilder client,
       String encounterId, String code, PeriodDt timeFrame) {
-    return findFreshest(searchByCodeInTimeFrame(client, encounterId, code, timeFrame));
+    return findFreshestObservation(searchByCodeInTimeFrame(client, encounterId, code, timeFrame));
   }
 
   /**
@@ -351,7 +229,7 @@ public class ObservationUtils {
    *     Filter condition for Observation's value member.
    * @return freshest observation for the given code, or {@code null} if no match is found
    */
-  public static Observation findFreshestForCodeAndValue(ClientBuilder client,
+  public static Observation findFreshestObservationForCodeAndValue(ClientBuilder client,
       String encounterId, String code, String value) {
     return client.getObservationClient().searchObservation(encounterId, code, null).stream()
         .filter(observation -> observation.getValue().toString().equals(value))

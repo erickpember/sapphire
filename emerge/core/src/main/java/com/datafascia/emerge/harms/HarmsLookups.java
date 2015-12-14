@@ -83,7 +83,7 @@ public class HarmsLookups {
   public static boolean plateletCountLessThan50000(ClientBuilder client, String encounterId) {
     List<Observation> pltObservations = client.getObservationClient().searchObservation(encounterId,
         ObservationCodeEnum.PLT.getCode(), null);
-    Observation freshestPltObservation = ObservationUtils.findFreshest(pltObservations);
+    Observation freshestPltObservation = ObservationUtils.findFreshestObservation(pltObservations);
     if (freshestPltObservation == null || freshestPltObservation.getValue() == null) {
       return false;
     }
@@ -108,7 +108,7 @@ public class HarmsLookups {
   public static boolean inrOver1point5(ClientBuilder client, String encounterId) {
     List<Observation> pltObservations = client.getObservationClient().searchObservation(encounterId,
         ObservationCodeEnum.INR.getCode(), null);
-    Observation freshestInrObservation = ObservationUtils.findFreshest(pltObservations);
+    Observation freshestInrObservation = ObservationUtils.findFreshestObservation(pltObservations);
 
     if (freshestInrObservation == null || freshestInrObservation.getValue() == null) {
       return false;
@@ -134,7 +134,7 @@ public class HarmsLookups {
   public static boolean aPttRatioOver1point5(ClientBuilder client, String encounterId) {
     List<Observation> pttObservations = client.getObservationClient().searchObservation(encounterId,
         ObservationCodeEnum.PTT.getCode(), null);
-    Observation freshestPttObservation = ObservationUtils.findFreshest(pttObservations);
+    Observation freshestPttObservation = ObservationUtils.findFreshestObservation(pttObservations);
 
     if (freshestPttObservation == null || freshestPttObservation.getValue() == null) {
       return false;
@@ -160,15 +160,15 @@ public class HarmsLookups {
   public static BigDecimal getPatientWeight(ClientBuilder client, String encounterId) {
     List<Observation> dosingWeight = client.getObservationClient().searchObservation(encounterId,
         ObservationCodeEnum.DOSING_WEIGHT.getCode(), null);
-    Observation freshestDosingWeight = ObservationUtils.findFreshest(dosingWeight);
+    Observation freshestDosingWeight = ObservationUtils.findFreshestObservation(dosingWeight);
 
     List<Observation> clinicalWeight = client.getObservationClient().searchObservation(encounterId,
         ObservationCodeEnum.CLINICAL_WEIGHT.getCode(), null);
-    Observation freshestClinicalWeight = ObservationUtils.findFreshest(clinicalWeight);
+    Observation freshestClinicalWeight = ObservationUtils.findFreshestObservation(clinicalWeight);
 
     List<Observation> admissionWeight = client.getObservationClient().searchObservation(encounterId,
         ObservationCodeEnum.ADMISSION_WEIGHT.getCode(), null);
-    Observation freshestAdmissionWeight = ObservationUtils.findFreshest(admissionWeight);
+    Observation freshestAdmissionWeight = ObservationUtils.findFreshestObservation(admissionWeight);
 
     if (ObservationUtils.firstIsFresher(freshestDosingWeight, freshestClinicalWeight)) {
       IDatatype quantity = freshestDosingWeight.getValue();

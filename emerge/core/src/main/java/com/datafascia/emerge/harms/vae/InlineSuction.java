@@ -37,12 +37,12 @@ public class InlineSuction {
     Instant now = Instant.now(clock);
     Date effectiveLowerBound = Date.from(now.minus(13, ChronoUnit.HOURS));
 
-    Observation freshestInlinePlacement = ObservationUtils.findFreshestForCode(
+    Observation freshestInlinePlacement = ObservationUtils.findFreshestObservationForCode(
         apiClient,
         encounterId,
         ObservationCodeEnum.INLINE_PLACEMENT.getCode());
 
-    List<Observation> airwayDevices = ObservationUtils.getByCodeAfterTime(
+    List<Observation> airwayDevices = ObservationUtils.getObservationByCodeAfterTime(
         apiClient,
         encounterId,
         ObservationCodeEnum.AIRWAY_DEVICE.getCode(),

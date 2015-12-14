@@ -45,7 +45,7 @@ public class MobilityScore {
       return Optional.empty();
     }
 
-    return Optional.of(ObservationUtils.findFreshest(observations));
+    return Optional.of(ObservationUtils.findFreshestObservation(observations));
   }
 
   /**

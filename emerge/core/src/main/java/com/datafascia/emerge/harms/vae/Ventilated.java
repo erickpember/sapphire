@@ -52,17 +52,14 @@ public class Ventilated {
   public boolean isVentilated(String encounterId) {
     List<Observation> invasiveVentStatus = new ArrayList<>();
 
-    List<Observation> relevantObservations = ObservationUtils.getByCodes(apiClient, encounterId,
-        RELEVANT_OBSERVATION_CODES);
-
     Observation freshestETTInvasiveVentStatus = ObservationUtils.findFreshestForCode(
-        relevantObservations, ObservationCodeEnum.ETT_INVASIVE_VENT_STATUS.getCode());
+        apiClient, encounterId, ObservationCodeEnum.ETT_INVASIVE_VENT_STATUS.getCode());
     if (freshestETTInvasiveVentStatus != null) {
       invasiveVentStatus.add(freshestETTInvasiveVentStatus);
     }
 
     Observation freshestTrachInvasiveVentStatus = ObservationUtils.findFreshestForCode(
-        relevantObservations, ObservationCodeEnum.TRACH_INVASIVE_VENT_STATUS.getCode());
+        apiClient, encounterId, ObservationCodeEnum.TRACH_INVASIVE_VENT_STATUS.getCode());
     if (freshestTrachInvasiveVentStatus != null) {
       invasiveVentStatus.add(freshestTrachInvasiveVentStatus);
     }
@@ -71,22 +68,22 @@ public class Ventilated {
         invasiveVentStatus);
 
     Observation freshestIntubation = ObservationUtils.findFreshestForCodeAndValue(
-        relevantObservations, ObservationCodeEnum.INTUBATION.getCode(), "Yes");
+        apiClient, encounterId, ObservationCodeEnum.INTUBATION.getCode(), "Yes");
 
     Observation freshestExtubation = ObservationUtils.findFreshestForCodeAndValue(
-        relevantObservations, ObservationCodeEnum.EXTUBATION.getCode(), "Yes");
+        apiClient, encounterId, ObservationCodeEnum.EXTUBATION.getCode(), "Yes");
 
     Observation freshestETTInvasiveVentInitiation = ObservationUtils.findFreshestForCode(
-        relevantObservations, ObservationCodeEnum.ETT_INVASIVE_VENT_INITIATION.getCode());
+        apiClient, encounterId, ObservationCodeEnum.ETT_INVASIVE_VENT_INITIATION.getCode());
 
     Observation freshestETTOngoingInvasiveVent = ObservationUtils.findFreshestForCode(
-        relevantObservations, ObservationCodeEnum.ETT_ONGOING_INVASIVE_VENT.getCode());
+        apiClient, encounterId, ObservationCodeEnum.ETT_ONGOING_INVASIVE_VENT.getCode());
 
     Observation freshestTrachInvasiveVentInitiation = ObservationUtils.findFreshestForCode(
-            relevantObservations, ObservationCodeEnum.TRACH_INVASIVE_VENT_INITIATION.getCode());
+            apiClient, encounterId, ObservationCodeEnum.TRACH_INVASIVE_VENT_INITIATION.getCode());
 
     Observation freshestTrachOngoingInvasiveVent = ObservationUtils
-        .findFreshestForCodeAndValue(relevantObservations,
+        .findFreshestForCodeAndValue(apiClient, encounterId,
             ObservationCodeEnum.TRACH_ONGOING_INVASIVE_VENT.getCode(), "Yes");
 
     ObservationEffectiveComparator comparator = new ObservationEffectiveComparator();

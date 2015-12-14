@@ -23,8 +23,10 @@ import com.datafascia.etl.event.AddObservations;
 import com.datafascia.etl.event.AddParticipant;
 import com.datafascia.etl.event.AdmitPatient;
 import com.datafascia.etl.event.DischargePatient;
+import com.datafascia.etl.event.ReplayMessages;
 import com.datafascia.etl.hl7.GenderFormatter;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 
 /**
@@ -34,6 +36,12 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
 
   private static final String OBX_PATH_PATTERN = "/OBX(%d)";
   private static final String NTE_PATH_PATTERN = null;
+
+  private static ConcurrentHashMap<String, Boolean> encounterIdentifierToReplayFlagMap =
+      new ConcurrentHashMap<>();
+
+  @Inject
+  private ReplayMessages replayMessages;
 
   @Inject
   private AdmitPatient admitPatient;
@@ -147,6 +155,10 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
     }
   }
 
+  private boolean isReplaying(String encounterIdentifier) {
+    return encounterIdentifierToReplayFlagMap.containsKey(encounterIdentifier);
+  }
+
   private void doAdmitPatient(
       Message message, MSH msh, PID pid, PV1 pv1, List<ROL> rolList, List<ROL> rol2List)
       throws HL7Exception {
@@ -164,7 +176,7 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
   }
 
   /**
-   * Admits patient.
+   * Admits, tranfers, updates patient.
    *
    * @param message
    *     HL7 message
@@ -184,7 +196,24 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
       Message message, MSH msh, PID pid, PV1 pv1, List<ROL> rolList, List<ROL> rol2List)
       throws HL7Exception {
 
-    doAdmitPatient(message, msh, pid, pv1, rolList, rol2List);
+    // Check if currently replaying messages to prevent infinite recursion.
+    String encounterIdentifier = getEncounterIdentifier(pv1);
+    if (!replayMessages.isEnabled() || isReplaying(encounterIdentifier)) {
+      doAdmitPatient(message, msh, pid, pv1, rolList, rol2List);
+      return;
+    }
+
+    if (AdmitPatient.isAdmitOrTransfer(msh.getMessageType().getTriggerEvent().getValue())) {
+      // Set flag indicating we are replaying messages for the encounter.
+      encounterIdentifierToReplayFlagMap.put(encounterIdentifier, true);
+
+      replayMessages.accept(encounterIdentifier);
+
+      // Clear flag indicating we are replaying messages for the encounter.
+      encounterIdentifierToReplayFlagMap.remove(encounterIdentifier);
+    } else {
+      doAdmitPatient(message, msh, pid, pv1, rolList, rol2List);
+    }
   }
 
   /**

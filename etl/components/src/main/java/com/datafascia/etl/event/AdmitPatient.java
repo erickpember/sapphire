@@ -16,7 +16,7 @@ import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Admits patient.
+ * Admits, transfers, updates patient.
  */
 @Slf4j
 public class AdmitPatient {
@@ -35,6 +35,17 @@ public class AdmitPatient {
 
   @Inject
   private HarmEvidenceUpdater harmEvidenceUpdater;
+
+  /**
+   * Checks if trigger event is admit or transfer.
+   *
+   * @param triggerEvent
+   *     trigger event
+   * @return true if trigger event is admit or transfer
+   */
+  public static boolean isAdmitOrTransfer(String triggerEvent) {
+    return "A01".equals(triggerEvent) || "A02".equals(triggerEvent);
+  }
 
   /**
    * Admits patient.
@@ -70,7 +81,7 @@ public class AdmitPatient {
 
     encounterRepository.save(encounter);
 
-    if ("A01".equals(triggerEvent)) {
+    if (isAdmitOrTransfer(triggerEvent)) {
       harmEvidenceUpdater.admitPatient(patient, location, encounter);
     } else {
       harmEvidenceUpdater.updatePatient(patient, location, encounter);

@@ -55,6 +55,7 @@ public class RassGoalImpl {
    **/
   public RassGoalResult getRassGoal(String encounterId) {
     RassGoalResult result = RassGoalResult.builder()
+        .dataEntryTime(Date.from(Instant.now(clock)))
         .goal(11)
         .build();
 

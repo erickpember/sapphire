@@ -12,6 +12,7 @@ import com.datafascia.emerge.harms.HarmsLookups;
 import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
 import java.math.BigDecimal;
 import java.time.Clock;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -54,7 +55,8 @@ public class AnticoagulationImpl {
    * @return optional anticoagulant type, or empty if none.
    */
   public Optional<AnticoagulationTypeEnum> getAnticoagulationType(
-      List<MedicationAdministration> administrations, String encounterId) {
+      Collection<MedicationAdministration> administrations, String encounterId) {
+    administrations = MedicationAdministrationUtils.freshestOfAllOrders(administrations).values();
 
     for (MedicationAdministration admin : administrations) {
       for (IdentifierDt ident : MedicationAdministrationUtils.findIdentifiers(admin,

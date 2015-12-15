@@ -11,10 +11,8 @@ import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.domain.fhir.CodingSystems;
-import com.datafascia.domain.fhir.Dates;
 import java.math.BigDecimal;
 import java.util.Collection;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -110,12 +108,12 @@ public class MedicationAdministrationUtils {
    */
   public static boolean activelyInfusing(Collection<MedicationAdministration> allAdminsPerEncounter,
       String medsSet) {
+    allAdminsPerEncounter = freshestOfAllOrders(allAdminsPerEncounter).values();
     return allAdminsPerEncounter.stream()
         .filter(admin -> hasMedsSet(admin, medsSet))
-        .max(new MedicationAdministrationEffectiveTimeComparator())
         .filter(medicationAdministration -> medicationAdministration.getStatusElement().
             getValueAsEnum() == MedicationAdministrationStatusEnum.IN_PROGRESS)
-        .filter(medicationAdministration -> dosageOverZero(medicationAdministration)).isPresent();
+        .filter(medicationAdministration -> dosageOverZero(medicationAdministration)).count() > 0;
   }
 
   /**
@@ -126,7 +124,7 @@ public class MedicationAdministrationUtils {
    * @return A mapping of medication orders to administrations.
    */
   public static Map<String, MedicationAdministration>
-      freshestOfAllOrders(List<MedicationAdministration> admins) {
+      freshestOfAllOrders(Collection<MedicationAdministration> admins) {
     Map<String, MedicationAdministration> freshestMap = new HashMap<>();
 
     for (MedicationAdministration admin: admins) {
@@ -134,7 +132,9 @@ public class MedicationAdministrationUtils {
 
       MedicationAdministration freshestAdmin = freshestMap.get(orderId);
       if (freshestAdmin != null) {
-        if (getEffectiveDate(freshestAdmin).before(getEffectiveDate(admin))) {
+        if (freshestAdmin.getEffectiveTime() != null
+            && admin.getEffectiveTime() != null
+            && getEffectiveDate(freshestAdmin).before(getEffectiveDate(admin))) {
           freshestMap.put(orderId, admin);
         }
       } else {
@@ -146,35 +146,7 @@ public class MedicationAdministrationUtils {
   }
 
   /**
-   * Compares effective date time property of medication administration.
-   *
-   * @return comparator
-   */
-  public static Comparator<MedicationAdministration> getEffectiveDateComparator() {
-    return Comparator.nullsFirst(
-        Comparator.comparing(
-            request -> getEffectiveDate(request),
-            Dates.getDateComparator()));
-  }
-
-  /**
-   * Finds freshest MedicationAdministration.
-   *
-   * @param medicationAdministrations
-   *     MedicationAdministrations to search
-   * @return freshest medicationAdministration, or {@code null} if input medicationAdministration
-   * is empty
-   */
-  public static MedicationAdministration findFreshestMedicationAdministration(
-      List<MedicationAdministration> medicationAdministrations) {
-    return medicationAdministrations.stream()
-        .max(getEffectiveDateComparator())
-        .orElse(null);
-  }
-
-  /**
-   * Returns true if there exists a MedicationAdministration for a given encounter for
-   * a given Meds Set name with
+   * Returns true if the latest administration of any order with a given Meds Set name with
    *   - Status: In Progress or Completed
    *   - Dosage.quantity > 0
    *   - Reason Not Given is null
@@ -190,8 +162,10 @@ public class MedicationAdministrationUtils {
    *    True if there is a medicationAdministration that matches criteria for in progress
    *    infusion.
    */
-  public static boolean beenAdministered(List<MedicationAdministration> allAdminsPerEncounter,
+  public static boolean beenAdministered(
+      Collection<MedicationAdministration> allAdminsPerEncounter,
       PeriodDt timeFrame, String medsSet) {
+    allAdminsPerEncounter = freshestOfAllOrders(allAdminsPerEncounter).values();
     return allAdminsPerEncounter.stream()
         .filter(medicationAdministration -> medicationAdministration.getStatusElement().
             getValueAsEnum() == MedicationAdministrationStatusEnum.IN_PROGRESS
@@ -220,8 +194,9 @@ public class MedicationAdministrationUtils {
    *    or completed administration.
    */
   public static boolean inProgressOrCompletedInTimeFrame(
-      List<MedicationAdministration> medicationAdministrations,
+      Collection<MedicationAdministration> medicationAdministrations,
       PeriodDt timeFrame, String medsSet) {
+    medicationAdministrations = freshestOfAllOrders(medicationAdministrations).values();
     return medicationAdministrations.stream()
         .filter(medicationAdministration -> (medicationAdministration.getStatusElement()
             .getValueAsEnum() == MedicationAdministrationStatusEnum.IN_PROGRESS
@@ -248,8 +223,9 @@ public class MedicationAdministrationUtils {
    *    administration.
    */
   public static boolean inProgressInTimeFrame(
-      List<MedicationAdministration> medicationAdministrations,
+      Collection<MedicationAdministration> medicationAdministrations,
       PeriodDt timeFrame, String medsSet) {
+    medicationAdministrations = freshestOfAllOrders(medicationAdministrations).values();
     return medicationAdministrations.stream()
         .filter(medicationAdministration -> (medicationAdministration.getStatusElement().
             getValueAsEnum() == MedicationAdministrationStatusEnum.IN_PROGRESS))

@@ -40,7 +40,8 @@ public class RecentStressUlcerProphylaxisAdministration {
     Date effectiveLowerBound = Date.from(now.minus(25, ChronoUnit.HOURS));
 
     List<MedicationAdministration> admins = apiClient.getMedicationAdministrationClient()
-        .search(encounterId)
+        .search(encounterId);
+    admins = MedicationAdministrationUtils.freshestOfAllOrders(admins).values()
         .stream()
         .filter(administration ->
             MedicationAdministrationUtils.isAfter(administration, effectiveLowerBound))

@@ -133,22 +133,15 @@ public class DailySedationInterruptionCandidate {
      * beenAdministered(MedicationAdministration) within the last 2 hours then Daily Sedation
      * Interruption Candidate = “No: Receiving NMBA”
      */
-    for (MedicationAdministration admin : medicationAdministrations) {
-      for (IdentifierDt id : admin.getIdentifier()) {
-        if (MedicationAdministrationUtils
-            .beenAdministered(medicationAdministrations, twoHourPeriod, id.getValue())) {
-          if (MedicationAdministrationUtils.hasMedsSet(admin,
-              MedsSetEnum.INTERMITTENT_CISATRACURIUM_IV.getCode())
-              || MedicationAdministrationUtils.hasMedsSet(admin,
-                  MedsSetEnum.INTERMITTENT_VECURONIUM_IV.getCode())
-              || MedicationAdministrationUtils.hasMedsSet(admin,
-                  MedsSetEnum.INTERMITTENT_ROCURONIUM_IV.getCode())
-              || MedicationAdministrationUtils.hasMedsSet(admin,
-                  MedsSetEnum.INTERMITTENT_PANCURONIUM_IV.getCode())) {
-            return CandidateResult.RECEIVING_NMBA;
-          }
-        }
-      }
+    if (MedicationAdministrationUtils.beenAdministered(medicationAdministrations, twoHourPeriod,
+        MedsSetEnum.INTERMITTENT_CISATRACURIUM_IV.getCode())
+        || MedicationAdministrationUtils.beenAdministered(medicationAdministrations, twoHourPeriod,
+            MedsSetEnum.INTERMITTENT_VECURONIUM_IV.getCode())
+        || MedicationAdministrationUtils.beenAdministered(medicationAdministrations, twoHourPeriod,
+            MedsSetEnum.INTERMITTENT_ROCURONIUM_IV.getCode())
+        || MedicationAdministrationUtils.beenAdministered(medicationAdministrations, twoHourPeriod,
+            MedsSetEnum.INTERMITTENT_PANCURONIUM_IV.getCode())) {
+      return CandidateResult.RECEIVING_NMBA;
     }
 
     /* if there are any MedicationAdministration resources where

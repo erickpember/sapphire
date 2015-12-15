@@ -10,7 +10,6 @@ import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import com.datafascia.api.client.ClientBuilder;
-import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
@@ -20,7 +19,6 @@ import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -88,8 +86,12 @@ public class DailySedationInterruptionCandidate {
      * “Continuous Infusion Propofol IV”, “Continuous Infusion Lorazepam IV” or “Continuous Infusion
      * Midazolam IV”) then Daily Sedation Interruption Candidate = “No: Off Sedation”
      */
-    if (!MedicationAdministrationUtils.activelyInfusing(medicationAdministrations,
+    boolean activelyInfusingSedative = false;
+    if (MedicationAdministrationUtils.activelyInfusing(medicationAdministrations,
         MedsSetEnum.ANY_SEDATIVE_INFUSION.getCode())) {
+      // Save this for returning YES later on.
+      activelyInfusingSedative = true;
+    } else {
       return CandidateResult.OFF_SEDATION;
     }
 
@@ -355,25 +357,8 @@ public class DailySedationInterruptionCandidate {
      * “Continuous Infusion Midazolam IV”) and activelyInfusing(MedicationAdministrations) then
      * Daily Sedation Interruption Candidate = “Yes”
      */
-    List<String> activelyInfusingDrugNames = Arrays.asList(
-        MedsSetEnum.CONTINUOUS_INFUSION_DEXMEDETOMIDINE_IV.getCode(),
-        MedsSetEnum.CONTINUOUS_INFUSION_PROPOFOL_IV.getCode(),
-        MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode(),
-        MedsSetEnum.CONTINUOUS_INFUSION_MIDAZOLAM_IV.getCode());
-    for (MedicationAdministration admin : medicationAdministrations) {
-      for (IdentifierDt ident : MedicationAdministrationUtils.findIdentifiers(admin,
-          CodingSystems.UCSF_MEDICATION_GROUP_NAME)) {
-        String medsSet = ident.getValue();
-
-        if (activelyInfusingDrugNames.contains(medsSet)) {
-          for (IdentifierDt id : admin.getIdentifier()) {
-            if (MedicationAdministrationUtils
-                .activelyInfusing(medicationAdministrations, id.getValue())) {
-              return CandidateResult.YES;
-            }
-          }
-        }
-      }
+    if (activelyInfusingSedative) {
+      return CandidateResult.YES;
     }
 
     // None of the specified circumstances were met.

@@ -11,9 +11,14 @@ import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.domain.fhir.CodingSystems;
+import com.datafascia.domain.fhir.Dates;
 import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
@@ -103,7 +108,7 @@ public class MedicationAdministrationUtils {
    *    True if there is a medicationAdministration that matches criteria for in progress
    *    infusion.
    */
-  public static boolean activelyInfusing(List<MedicationAdministration> allAdminsPerEncounter,
+  public static boolean activelyInfusing(Collection<MedicationAdministration> allAdminsPerEncounter,
       String medsSet) {
     return allAdminsPerEncounter.stream()
         .filter(admin -> hasMedsSet(admin, medsSet))
@@ -111,6 +116,60 @@ public class MedicationAdministrationUtils {
         .filter(medicationAdministration -> medicationAdministration.getStatusElement().
             getValueAsEnum() == MedicationAdministrationStatusEnum.IN_PROGRESS)
         .filter(medicationAdministration -> dosageOverZero(medicationAdministration)).isPresent();
+  }
+
+  /**
+   * Given a list of medication administrations, this will get the freshest for each medication
+   * order.
+   *
+   * @param admins A list of administrations.
+   * @return A mapping of medication orders to administrations.
+   */
+  public static Map<String, MedicationAdministration>
+      freshestOfAllOrders(List<MedicationAdministration> admins) {
+    Map<String, MedicationAdministration> freshestMap = new HashMap<>();
+
+    for (MedicationAdministration admin: admins) {
+      String orderId = admin.getPrescription().getReference().getIdPart();
+
+      MedicationAdministration freshestAdmin = freshestMap.get(orderId);
+      if (freshestAdmin != null) {
+        if (getEffectiveDate(freshestAdmin).before(getEffectiveDate(admin))) {
+          freshestMap.put(orderId, admin);
+        }
+      } else {
+        freshestMap.put(orderId, admin);
+      }
+    }
+
+    return freshestMap;
+  }
+
+  /**
+   * Compares effective date time property of medication administration.
+   *
+   * @return comparator
+   */
+  public static Comparator<MedicationAdministration> getEffectiveDateComparator() {
+    return Comparator.nullsFirst(
+        Comparator.comparing(
+            request -> getEffectiveDate(request),
+            Dates.getDateComparator()));
+  }
+
+  /**
+   * Finds freshest MedicationAdministration.
+   *
+   * @param medicationAdministrations
+   *     MedicationAdministrations to search
+   * @return freshest medicationAdministration, or {@code null} if input medicationAdministration
+   * is empty
+   */
+  public static MedicationAdministration findFreshestMedicationAdministration(
+      List<MedicationAdministration> medicationAdministrations) {
+    return medicationAdministrations.stream()
+        .max(getEffectiveDateComparator())
+        .orElse(null);
   }
 
   /**

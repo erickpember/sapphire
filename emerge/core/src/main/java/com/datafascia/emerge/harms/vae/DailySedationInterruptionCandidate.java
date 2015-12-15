@@ -18,6 +18,7 @@ import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -80,13 +81,16 @@ public class DailySedationInterruptionCandidate {
     List<MedicationAdministration> medicationAdministrations =
         apiClient.getMedicationAdministrationClient().search(encounterId);
 
+    Collection<MedicationAdministration> freshestAdminForOrders
+        = MedicationAdministrationUtils.freshestOfAllOrders(medicationAdministrations).values();
+
     /* If there are no MedicationAdministration resources where
      * MedicationAdministration.identifier.value == (“Continuous Infusion Dexmedetomidine IV”,
      * “Continuous Infusion Propofol IV”, “Continuous Infusion Lorazepam IV” or “Continuous Infusion
      * Midazolam IV”) then Daily Sedation Interruption Candidate = “No: Off Sedation”
      */
     boolean activelyInfusingSedative = false;
-    if (MedicationAdministrationUtils.activelyInfusing(medicationAdministrations,
+    if (MedicationAdministrationUtils.activelyInfusing(freshestAdminForOrders,
         MedsSetEnum.ANY_SEDATIVE_INFUSION.getCode())) {
       // Save this for returning YES later on.
       activelyInfusingSedative = true;

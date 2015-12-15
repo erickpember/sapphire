@@ -58,8 +58,8 @@ public class SCDsInUse {
     String freshestInterventionValue =
         ObservationUtils.getValueAsString(freshestInterventionFromShift);
 
-    return freshestInterventionValue != null
-        && "Sequential compression device(s) (SCDs)".equals(freshestDeviceValue)
+    return freshestInterventionValue != null && freshestDeviceValue != null
+        && freshestDeviceValue.contains("Sequential compression device(s) (SCDs)")
         && (freshestInterventionValue.contains("On left lower extremity")
         || freshestInterventionValue.contains("On right lower extremity"));
   }

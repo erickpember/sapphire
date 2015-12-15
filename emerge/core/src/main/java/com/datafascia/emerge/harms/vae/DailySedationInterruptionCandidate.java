@@ -3,7 +3,6 @@
 package com.datafascia.emerge.harms.vae;
 
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
-import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
@@ -106,13 +105,7 @@ public class DailySedationInterruptionCandidate {
      * Interruption Candidate = “No: Receiving NMBA”
      */
     if (MedicationAdministrationUtils.beenAdministered(medicationAdministrations, twoHourPeriod,
-        MedsSetEnum.INTERMITTENT_CISATRACURIUM_IV.getCode())
-        || MedicationAdministrationUtils.beenAdministered(medicationAdministrations, twoHourPeriod,
-            MedsSetEnum.INTERMITTENT_VECURONIUM_IV.getCode())
-        || MedicationAdministrationUtils.beenAdministered(medicationAdministrations, twoHourPeriod,
-            MedsSetEnum.INTERMITTENT_ROCURONIUM_IV.getCode())
-        || MedicationAdministrationUtils.beenAdministered(medicationAdministrations, twoHourPeriod,
-            MedsSetEnum.INTERMITTENT_PANCURONIUM_IV.getCode())) {
+        MedsSetEnum.ANY_BOLUS_NMBA.getCode())) {
       return CandidateResult.RECEIVING_NMBA;
     }
 
@@ -121,17 +114,9 @@ public class DailySedationInterruptionCandidate {
      * “Continuous Infusion Vecuronium IV”) and activelyInfusing(MedicationAdministrations) then
      * Daily Sedation Interruption Candidate = “No: Receiving NMBA”
      */
-    for (MedicationAdministration admin : medicationAdministrations) {
-      for (IdentifierDt id : admin.getIdentifier()) {
-        if (MedicationAdministrationUtils
-            .activelyInfusing(medicationAdministrations, id.getValue())) {
-          switch (admin.getIdentifierFirstRep().getValue()) {
-            case "Continuous Infusion Cisatracurium IV":
-            case "Continuous Infusion Vecuronium IV":
-              return CandidateResult.RECEIVING_NMBA;
-          }
-        }
-      }
+    if (MedicationAdministrationUtils.beenAdministered(medicationAdministrations, twoHourPeriod,
+        MedsSetEnum.ANY_INFUSION_NMBA.getCode())) {
+      return CandidateResult.RECEIVING_NMBA;
     }
 
     // Gather observations needed.

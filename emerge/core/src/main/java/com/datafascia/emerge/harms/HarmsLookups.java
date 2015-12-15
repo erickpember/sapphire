@@ -23,7 +23,7 @@ import java.util.concurrent.TimeUnit;
  */
 public class HarmsLookups {
   private static final BigDecimal ONE_POINT_FIVE = new BigDecimal("1.5");
-  private static final BigDecimal FIFTY_THOUSAND = new BigDecimal("50000");
+  private static final BigDecimal FIFTY = new BigDecimal("50");
   private static final BigDecimal OUNCES_PER_KILOGRAM = new BigDecimal("35.274");
 
   /*
@@ -90,7 +90,7 @@ public class HarmsLookups {
 
     IDatatype quantity = freshestPltObservation.getValue();
     if (quantity instanceof QuantityDt) {
-      return ((QuantityDt) quantity).getValue().compareTo(FIFTY_THOUSAND) < 0;
+      return ((QuantityDt) quantity).getValue().compareTo(FIFTY) < 0;
     } else {
       throw new NumberFormatException("Observation value is not of type QuantityDt.");
     }

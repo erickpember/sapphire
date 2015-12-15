@@ -41,6 +41,10 @@ public enum MedsSetEnum implements Code<String> {
 
   STRESS_ULCER_PROPHYLACTICS("Stress Ulcer Prophylactics"),
 
+  ANY_SEDATIVE_INFUSION("Any sedative infusion"),
+  ANY_INFUSION_NMBA("Any infusion NMBA"),
+  ANY_BOLUS_NMBA("Any bolus NMBA"),
+
   LAST_MEDS_SET_NAME("DO NOT USE");
 
   private final String code;

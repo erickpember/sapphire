@@ -88,38 +88,8 @@ public class DailySedationInterruptionCandidate {
      * “Continuous Infusion Propofol IV”, “Continuous Infusion Lorazepam IV” or “Continuous Infusion
      * Midazolam IV”) then Daily Sedation Interruption Candidate = “No: Off Sedation”
      */
-    boolean sedativeInUse = false;
-    for (MedicationAdministration admin : medicationAdministrations) {
-      if (MedicationAdministrationUtils.hasMedsSet(admin,
-          MedsSetEnum.CONTINUOUS_INFUSION_DEXMEDETOMIDINE_IV.getCode())
-          || MedicationAdministrationUtils.hasMedsSet(admin,
-              MedsSetEnum.CONTINUOUS_INFUSION_PROPOFOL_IV.getCode())
-          || MedicationAdministrationUtils.hasMedsSet(admin,
-              MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode())
-          || MedicationAdministrationUtils.hasMedsSet(admin,
-              MedsSetEnum.CONTINUOUS_INFUSION_MIDAZOLAM_IV.getCode())) {
-        sedativeInUse = true;
-      }
-    }
-    if (!sedativeInUse) {
-      return CandidateResult.OFF_SEDATION;
-    }
-
-    /* if notInfusing(MedicationAdministrations) then Daily Sedation Interruption Candidate = “No:
-     * Off Sedation”
-     */
-    boolean allAdminOffSedation = true;
-    for (MedicationAdministration admin : medicationAdministrations) {
-      for (IdentifierDt id : admin.getIdentifier()) {
-        if (!MedicationAdministrationUtils.activelyInfusing(
-            medicationAdministrations,
-            id.getValue())) {
-          allAdminOffSedation = false;
-          break;
-        }
-      }
-    }
-    if (allAdminOffSedation) {
+    if (!MedicationAdministrationUtils.activelyInfusing(medicationAdministrations,
+        MedsSetEnum.ANY_SEDATIVE_INFUSION.getCode())) {
       return CandidateResult.OFF_SEDATION;
     }
 

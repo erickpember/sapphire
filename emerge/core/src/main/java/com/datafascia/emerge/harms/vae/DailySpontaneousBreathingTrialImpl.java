@@ -29,7 +29,6 @@ import javax.inject.Inject;
  */
 public class DailySpontaneousBreathingTrialImpl {
 
-  private static final BigDecimal FOUR = new BigDecimal("4");
   private static final BigDecimal FIVE = new BigDecimal("5");
   private static final BigDecimal EIGHT = new BigDecimal("8");
   private static final BigDecimal FIFTY = new BigDecimal("50");
@@ -92,7 +91,7 @@ public class DailySpontaneousBreathingTrialImpl {
     if (freshestPressureSupport.isPresent()
         && freshestPEEP.isPresent()
         && freshestFIO2.isPresent()
-        && ((QuantityDt) freshestPressureSupport.get().getValue()).getValue().compareTo(FOUR) < 1
+        && ((QuantityDt) freshestPressureSupport.get().getValue()).getValue().compareTo(FIVE) < 1
         && ((QuantityDt) freshestPEEP.get().getValue()).getValue().compareTo(FIVE) < 1
         && ((QuantityDt) freshestFIO2.get().getValue()).getValue().compareTo(FIFTY) < 1) {
       return DailySpontaneousBreathingTrialValueEnum.GIVEN;

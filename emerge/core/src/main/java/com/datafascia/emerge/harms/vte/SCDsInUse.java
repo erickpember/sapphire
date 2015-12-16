@@ -5,10 +5,12 @@ package com.datafascia.emerge.harms.vte;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
-import com.datafascia.emerge.ucsf.ObservationUtils;
+import com.datafascia.api.client.Observations;
 import com.datafascia.emerge.ucsf.ShiftUtils;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import java.time.Clock;
+import java.time.Instant;
+import java.util.Optional;
 import javax.inject.Inject;
 
 /**
@@ -43,24 +45,28 @@ public class SCDsInUse {
    */
   public boolean isSCDsInUse(String encounterId) {
     PeriodDt currentOrPriorShift = ShiftUtils.getCurrentOrPreviousShift(clock);
+    Instant effectiveLower = currentOrPriorShift.getStart().toInstant();
+    Instant effectiveUpper = currentOrPriorShift.getEnd().toInstant();
 
-    Observation freshestDeviceFromShift = ObservationUtils
-        .getFreshestByCodeInTimeFrame(apiClient, encounterId,
-            ObservationCodeEnum.MECHANICAL_PPX_DEVICES.getCode(), currentOrPriorShift);
+    Observations observations = apiClient.getObservationClient().list(encounterId);
 
-    String freshestDeviceValue =
-        ObservationUtils.getValueAsString(freshestDeviceFromShift);
+    Optional<Observation> freshestDeviceFromShift = observations.findFreshest(
+        ObservationCodeEnum.MECHANICAL_PPX_DEVICES.getCode(),
+        effectiveLower,
+        effectiveUpper);
+    Optional<String> freshestDeviceValue = freshestDeviceFromShift
+        .map(observation -> observation.getValue().toString());
 
-    Observation freshestInterventionFromShift = ObservationUtils
-        .getFreshestByCodeInTimeFrame(apiClient, encounterId,
-            ObservationCodeEnum.MECHANICAL_PPX_INTERVENTIONS.getCode(), currentOrPriorShift);
+    Optional<Observation> freshestInterventionFromShift = observations.findFreshest(
+        ObservationCodeEnum.MECHANICAL_PPX_INTERVENTIONS.getCode(),
+        effectiveLower,
+        effectiveUpper);
+    Optional<String> freshestInterventionValue = freshestInterventionFromShift
+        .map(observation -> observation.getValue().toString());
 
-    String freshestInterventionValue =
-        ObservationUtils.getValueAsString(freshestInterventionFromShift);
-
-    return freshestInterventionValue != null && freshestDeviceValue != null
-        && freshestDeviceValue.contains("Sequential compression device(s) (SCDs)")
-        && (freshestInterventionValue.contains("On left lower extremity")
-        || freshestInterventionValue.contains("On right lower extremity"));
+    return freshestInterventionValue.isPresent() && freshestDeviceValue.isPresent()
+        && freshestDeviceValue.get().contains("Sequential compression device(s) (SCDs)")
+        && (freshestInterventionValue.get().contains("On left lower extremity")
+        || freshestInterventionValue.get().contains("On right lower extremity"));
   }
 }

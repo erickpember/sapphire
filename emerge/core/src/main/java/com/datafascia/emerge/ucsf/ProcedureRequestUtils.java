@@ -96,8 +96,10 @@ public class ProcedureRequestUtils {
    *    True if the request is before now and in progress. Otherwise false.
    */
   public static boolean isCurrent(ProcedureRequest request, Date now) {
-    return (request != null && isScheduledBefore(request, now) && request.getStatusElement()
-        .getValueAsEnum().equals(ProcedureRequestStatusEnum.IN_PROGRESS));
+    return
+        request != null &&
+        isScheduledBefore(request, now) &&
+        request.getStatusElement().getValueAsEnum() == ProcedureRequestStatusEnum.IN_PROGRESS;
   }
 
   /**

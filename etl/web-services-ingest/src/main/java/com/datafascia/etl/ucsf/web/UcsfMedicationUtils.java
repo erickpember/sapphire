@@ -146,6 +146,8 @@ public class UcsfMedicationUtils {
       } catch (NumberFormatException e) {
         log.error("Dose value of '" + dose + "' for admin " + adminId + " is not a valid number.");
       }
+    } else {
+      log.warn("No dose given for admin [{}] in order [{}]", adminId, orderId);
     }
 
     admin.setEffectiveTime(timeTakenDt);

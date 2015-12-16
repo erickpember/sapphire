@@ -92,8 +92,9 @@ public class PharmacologicVteProphylaxisAdministered {
 
     if (dose == null || unit == null) {
       log.error(
-          "Retrieved null dosage for Enoxaparin administration in encounter [{}],"
-          + " affecting VTE Prophylaxis Administered logic", unit, encounterId);
+          "Retrieved null dosage for Enoxaparin administration [{}] in encounter [{}],"
+          + " affecting VTE Prophylaxis Administered logic",
+          admin.getIdentifierFirstRep().getValue(), encounterId);
       return false;
     }
 

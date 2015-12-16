@@ -17,10 +17,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * A collection of simple API lookups commonly used as components in harms logic.
  */
+@Slf4j
 public class HarmsLookups {
   private static final BigDecimal ONE_POINT_FIVE = new BigDecimal("1.5");
   private static final BigDecimal FIFTY = new BigDecimal("50");
@@ -142,10 +144,26 @@ public class HarmsLookups {
 
     IDatatype quantity = freshestPttObservation.getValue();
     if (quantity instanceof QuantityDt) {
-      return ((QuantityDt) quantity).getValue().compareTo(ONE_POINT_FIVE) > 0;
+      if (freshestPttObservation.getReferenceRangeFirstRep().getText() != null) {
+        String[] rangeParts = freshestPttObservation
+            .getReferenceRangeFirstRep().getText().split("-");
+        if (rangeParts.length > 1) {
+          BigDecimal value = ((QuantityDt) quantity).getValue();
+          BigDecimal highEnd = new BigDecimal(rangeParts[1]);
+
+          return value.compareTo((highEnd.multiply(ONE_POINT_FIVE))) > 0;
+        } else {
+          log.warn("Reference range format is invalid: {}",
+              freshestPttObservation.getReferenceRangeFirstRep().getText());
+        }
+      } else {
+        log.warn("Reference range is null");
+      }
     } else {
       throw new NumberFormatException("Observation value is not of type QuantityDt.");
     }
+
+    return false;
   }
 
   /**

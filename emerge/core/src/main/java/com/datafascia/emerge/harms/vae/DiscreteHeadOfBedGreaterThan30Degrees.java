@@ -5,7 +5,7 @@ package com.datafascia.emerge.harms.vae;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
-import com.datafascia.emerge.ucsf.ObservationUtils;
+import com.datafascia.api.client.Observations;
 import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
 import com.datafascia.emerge.ucsf.ShiftUtils;
 import com.datafascia.emerge.ucsf.codes.MaybeEnum;
@@ -15,6 +15,7 @@ import com.google.common.collect.ImmutableSet;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Date;
+import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -61,7 +62,6 @@ public class DiscreteHeadOfBedGreaterThan30Degrees {
    */
   public MaybeEnum getHeadOfBedGreaterThan30Degrees(String encounterId) {
     Instant now = Instant.now(clock);
-    PeriodDt currentOrPriorShift = ShiftUtils.getCurrentOrPreviousShift(clock);
 
     boolean contraindicated = apiClient.getProcedureRequestClient()
         .list(encounterId)
@@ -74,14 +74,19 @@ public class DiscreteHeadOfBedGreaterThan30Degrees {
       return MaybeEnum.CONTRAINDICATED;
     }
 
-    Observation freshestDiscreteHOB = ObservationUtils.getFreshestByCodeInTimeFrame(
-        apiClient,
-        encounterId,
-        ObservationCodeEnum.HEAD_OF_BED.getCode(),
-        currentOrPriorShift);
+    PeriodDt currentOrPriorShift = ShiftUtils.getCurrentOrPreviousShift(clock);
+    Instant effectiveLower = currentOrPriorShift.getStart().toInstant();
+    Instant effectiveUpper = currentOrPriorShift.getEnd().toInstant();
 
-    if (freshestDiscreteHOB != null) {
-      String value = ObservationUtils.getValueAsString(freshestDiscreteHOB);
+    Observations observations = apiClient.getObservationClient().list(encounterId);
+
+    Optional<Observation> freshestDiscreteHOB = observations.findFreshest(
+        ObservationCodeEnum.HEAD_OF_BED.getCode(),
+        effectiveLower,
+        effectiveUpper);
+
+    if (freshestDiscreteHOB.isPresent()) {
+      String value = freshestDiscreteHOB.get().getValue().toString();
       switch (value) {
         case "HOB 30":
         case "HOB 45":

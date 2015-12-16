@@ -31,6 +31,14 @@ end
 
 rule "Update ventilated"
 when
+  Event( type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateVentilated(harmEvidence, $encounter);
+end
+
+rule "Update ventilated from observation"
+when
   Event( type == EventType.UPDATE_OBSERVATIONS )
   $observation: Observation( Ventilated.isRelevant($observation) )
   $encounter: Encounter()
@@ -82,6 +90,14 @@ then
 end
 
 rule "Update ventilation mode"
+when
+  Event( type == EventType.TIMER )
+  $encounter: Encounter()
+then
+  ventilatorAssociatedEventUpdater.updateVentilationMode(harmEvidence, $encounter);
+end
+
+rule "Update ventilation mode from observation"
 when
   Event( type == EventType.UPDATE_OBSERVATIONS )
   $observation: Observation( VentilationModeImpl.isRelevant($observation) )

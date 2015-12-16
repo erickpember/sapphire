@@ -55,11 +55,24 @@ public class SCDsOrdered {
    * @return true if SCDs have been ordered
    */
   public boolean isSCDsOrdered(String encounterId) {
-    boolean ordered = false;
-
     List<ProcedureRequest> requests = apiClient.getProcedureRequestClient()
         .search(
             encounterId, null, ProcedureRequestStatusEnum.IN_PROGRESS.getCode());
+
+    return isSCDsOrdered(requests);
+
+  }
+
+  /**
+   * SCDs Ordered Implementation
+   *
+   * @param requests
+   *     procedure requests for the encounter
+   * @return true if SCDs have been ordered
+   */
+  public boolean isSCDsOrdered(List<ProcedureRequest> requests) {
+
+    boolean ordered = false;
 
     Optional<DateTimeDt> placeStart =
         getStartTime(ProcedureRequestUtils.findFreshestPlaceSCDs(requests));

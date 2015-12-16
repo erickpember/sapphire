@@ -8,7 +8,7 @@ import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
-import com.datafascia.emerge.ucsf.ProcedureUtils;
+import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
 import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
 import java.time.Clock;
 import java.time.Instant;
@@ -29,11 +29,11 @@ public class SCDsOrdered {
   private ClientBuilder apiClient;
 
   /**
-   * Checks if preocedure request is relevant to SCDs Ordered.
+   * Checks if procedure request is relevant to SCDs Ordered.
    *
    * @param request
    *     the procedureRequest to check
-   * @return true if procedureRequest is relevant to cwSCDs Ordered.
+   * @return true if procedureRequest is relevant to SCDs Ordered.
    */
   public static boolean isRelevant(ProcedureRequest request) {
     return (ProcedureRequestCodeEnum.PLACE_SCDS.isCodeEquals(request.getCode()) ||
@@ -68,11 +68,11 @@ public class SCDsOrdered {
             encounterId, null, ProcedureRequestStatusEnum.IN_PROGRESS.getCode());
 
     Optional<DateTimeDt> placeStart =
-        getStartTime(ProcedureUtils.findFreshestPlaceSCDs(requests));
+        getStartTime(ProcedureRequestUtils.findFreshestPlaceSCDs(requests));
     Optional<DateTimeDt> maintainStart =
-        getStartTime(ProcedureUtils.findFreshestMaintainSCDs(requests));
+        getStartTime(ProcedureRequestUtils.findFreshestMaintainSCDs(requests));
     Optional<DateTimeDt> removeStart =
-        getStartTime(ProcedureUtils.findFreshestRemoveSCDs(requests));
+        getStartTime(ProcedureRequestUtils.findFreshestRemoveSCDs(requests));
 
     Date now = Date.from(Instant.now(clock));
     if (!removeStart.isPresent()) {

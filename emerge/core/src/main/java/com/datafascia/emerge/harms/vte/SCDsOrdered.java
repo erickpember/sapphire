@@ -10,9 +10,6 @@ import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
 import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
-import java.time.Clock;
-import java.time.Instant;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -21,9 +18,6 @@ import javax.inject.Inject;
  * VTE SCDs Ordered Implementation
  */
 public class SCDsOrdered {
-
-  @Inject
-  private Clock clock;
 
   @Inject
   private ClientBuilder apiClient;
@@ -74,18 +68,16 @@ public class SCDsOrdered {
     Optional<DateTimeDt> removeStart =
         getStartTime(ProcedureRequestUtils.findFreshestRemoveSCDs(requests));
 
-    Date now = Date.from(Instant.now(clock));
     if (!removeStart.isPresent()) {
-      if ((placeStart.isPresent() && !now.before(placeStart.get().getValue())) ||
-          (maintainStart.isPresent() && !now.before(maintainStart.get().getValue()))) {
+      if (placeStart.isPresent() || maintainStart.isPresent()) {
         ordered = true;
       }
     } else {
-      // there is at least one RemoveSCD and one PlaceSCD or MaintainSCD
-      if ((placeStart.isPresent() && !now.before(placeStart.get().getValue()) &&
-          (removeStart.get().getValue()).before(placeStart.get().getValue())) ||
-          (maintainStart.isPresent() && !now.before(maintainStart.get().getValue()) &&
-          (removeStart.get().getValue()).before(maintainStart.get().getValue()))) {
+      // there is at least one RemoveSCD
+      if ((placeStart.isPresent() &&
+            (removeStart.get().getValue()).before(placeStart.get().getValue())) ||
+          (maintainStart.isPresent() &&
+            (removeStart.get().getValue()).before(maintainStart.get().getValue()))) {
         ordered = true;
       }
     }

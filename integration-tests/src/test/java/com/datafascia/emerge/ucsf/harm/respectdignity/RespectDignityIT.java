@@ -49,8 +49,8 @@ public class RespectDignityIT extends HarmEvidenceTestSupport {
     CareProvider careProvider =
         harmEvidence.getMedicalData().getRespectDignity().getPrimaryServiceAttending();
 
-    assertEquals(careProvider.getName(), "Leanne Rorish");
-    assertEquals(careProvider.getAddedToCareTeam().toInstant().toString(), "2015-11-05T20:22:00Z");
+    assertEquals(careProvider.getName(), "BRADLEY A SHARPE");
+    assertEquals(careProvider.getAddedToCareTeam().toInstant(), Instant.now(clock));
     assertEquals(careProvider.getUpdateTime().toInstant(), Instant.now(clock));
   }
 

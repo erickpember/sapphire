@@ -8,6 +8,7 @@ import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Location;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.dstu2.resource.Practitioner;
+import ca.uhn.fhir.model.primitive.DateTimeDt;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.model.v24.datatype.XCN;
@@ -25,6 +26,9 @@ import com.datafascia.etl.event.AdmitPatient;
 import com.datafascia.etl.event.DischargePatient;
 import com.datafascia.etl.event.ReplayMessages;
 import com.datafascia.etl.hl7.GenderFormatter;
+import java.time.Clock;
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
@@ -39,6 +43,9 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
 
   private static ConcurrentHashMap<String, Boolean> encounterIdentifierToReplayFlagMap =
       new ConcurrentHashMap<>();
+
+  @Inject
+  private Clock clock;
 
   @Inject
   private ReplayMessages replayMessages;
@@ -122,29 +129,52 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
     return humanName;
   }
 
-  private Practitioner toPractitioner(ROL rol) throws HL7Exception {
-    XCN rolePerson = rol.getRolePerson(0);
-
+  private Practitioner toPractitioner(XCN person, String roleCode) throws HL7Exception {
     Practitioner practitioner = new Practitioner()
-        .setName(toHumanName(rolePerson));
+        .setName(toHumanName(person));
     practitioner.addIdentifier()
         .setSystem(IdentifierSystems.INSTITUTION_PRACTITIONER)
-        .setValue(rolePerson.getIDNumber().getValue());
+        .setValue(person.getIDNumber().getValue());
 
     practitioner.addPractitionerRole().getRole().addCoding()
         .setSystem(PractitionerRoleEnum.PRIMARY_CARE_ATTENDING.getSystem())
-        .setCode(rol.getRoleROL().getIdentifier().getValue());
+        .setCode(roleCode);
 
     return practitioner;
   }
 
-  private Encounter.Participant toParticipant(ROL rol) throws HL7Exception {
+  private Encounter.Participant toParticipant(
+      DateTimeDt start, DateTimeDt end) throws HL7Exception {
+
     PeriodDt period = new PeriodDt()
-        .setStart(TimeStamps.toDateTime(rol.getRoleBeginDateTime()))
-        .setEnd(TimeStamps.toDateTime(rol.getRoleEndDateTime()));
+        .setStart(start)
+        .setEnd(end);
     Encounter.Participant participant = new Encounter.Participant()
         .setPeriod(period);
     return participant;
+  }
+
+  private void readPrimaryCareAttending(PV1 pv1, Encounter encounter) throws HL7Exception {
+    XCN attending = pv1.getAttendingDoctor(0);
+    if (!attending.isEmpty()) {
+      Practitioner practitioner = toPractitioner(
+          attending, PractitionerRoleEnum.PRIMARY_CARE_ATTENDING.getCode());
+
+      Instant now = Instant.now(clock);
+      DateTimeDt start = new DateTimeDt(Date.from(now));
+      Encounter.Participant participant = toParticipant(start, null);
+      addParticipant.accept(practitioner, participant, encounter);
+    }
+  }
+
+  private Practitioner toPractitioner(ROL rol) throws HL7Exception {
+    return toPractitioner(rol.getRolePerson(0), rol.getRoleROL().getIdentifier().getValue());
+  }
+
+  private Encounter.Participant toParticipant(ROL rol) throws HL7Exception {
+    return toParticipant(
+        TimeStamps.toDateTime(rol.getRoleBeginDateTime()),
+        TimeStamps.toDateTime(rol.getRoleEndDateTime()));
   }
 
   private void readParticipants(List<ROL> rolList, Encounter encounter) throws HL7Exception {
@@ -169,6 +199,7 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
     admitPatient.accept(
         msh.getMessageType().getTriggerEvent().getValue(), patient, location, encounter);
 
+    readPrimaryCareAttending(pv1, encounter);
     readParticipants(rolList, encounter);
     readParticipants(rol2List, encounter);
 

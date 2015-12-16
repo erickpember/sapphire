@@ -29,7 +29,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 /**
@@ -88,10 +87,6 @@ public class ObservationIT extends ApiTestSupport {
               .getCode());
       }
     }
-
-    results = client.search().forResource(Observation.class).execute();
-    observations = ApiUtil.extractBundle(results, Observation.class);
-    assertTrue(observations.size() > 0, "No-argument search failed.");
 
     // Get rid of this particular encounter and patient so it doesn't mess up other tests.
     client.delete().resourceById(encounter.getId()).execute();

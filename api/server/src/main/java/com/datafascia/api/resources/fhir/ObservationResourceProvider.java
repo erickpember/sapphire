@@ -5,6 +5,7 @@ package com.datafascia.api.resources.fhir;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.rest.annotation.OptionalParam;
+import ca.uhn.fhir.rest.annotation.RequiredParam;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.annotation.Update;
@@ -13,20 +14,15 @@ import ca.uhn.fhir.rest.param.StringParam;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import com.datafascia.common.persist.Id;
-import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.ObservationRepository;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import javax.inject.Inject;
 
 /**
  * Observation resource endpoint
  */
 public class ObservationResourceProvider implements IResourceProvider {
-
-  @Inject
-  private EncounterRepository encounterRepository;
 
   @Inject
   private ObservationRepository observationRepository;
@@ -64,8 +60,6 @@ public class ObservationResourceProvider implements IResourceProvider {
    * Searches observations based on encounter. Returns list of Observations where
    * Observation.encounter matches a given Encounter resource ID.
    *
-   * If encounterId is left blank, observations for all encounters are retrieved.
-   *
    * @param encounterId Internal resource ID for the Encounter for which we want corresponding
    *                    observations.
    * @param code        Type of Observation, the code member of the first entry in the Observation
@@ -74,22 +68,12 @@ public class ObservationResourceProvider implements IResourceProvider {
    */
   @Search()
   public List<Observation> search(
-      @OptionalParam(name = Observation.SP_ENCOUNTER) StringParam encounterId,
+      @RequiredParam(name = Observation.SP_ENCOUNTER) StringParam encounterId,
       @OptionalParam(name = Observation.SP_CODE) StringParam code) {
     List<Observation> observations = new ArrayList<>();
 
-    if (encounterId != null) {
-      Id<Encounter> encounterInternalId = Id.of(encounterId.getValue());
-      observations.addAll(observationRepository.list(encounterInternalId));
-    } else {
-      // Pull records for all encounters.
-      List<Encounter> allEncounters = encounterRepository.list(Optional.empty());
-      for (Encounter eachEncounter : allEncounters) {
-        List<Observation> admins = observationRepository.list(
-            EncounterRepository.generateId(eachEncounter));
-        observations.addAll(admins);
-      }
-    }
+    Id<Encounter> encounterInternalId = Id.of(encounterId.getValue());
+    observations.addAll(observationRepository.list(encounterInternalId));
 
     if (code != null) {
       List<Observation> filteredResults = new ArrayList<>();

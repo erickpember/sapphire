@@ -7,6 +7,7 @@ import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.fhir.rest.annotation.Create;
 import ca.uhn.fhir.rest.annotation.OptionalParam;
+import ca.uhn.fhir.rest.annotation.RequiredParam;
 import ca.uhn.fhir.rest.annotation.ResourceParam;
 import ca.uhn.fhir.rest.annotation.Search;
 import ca.uhn.fhir.rest.annotation.Update;
@@ -70,7 +71,6 @@ public class MedicationOrderResourceProvider implements IResourceProvider {
    * Because the MedicationOrderRepository does not support single-argument reads, a
    * double-argument read method that requires the Encounter ID as well as the Medication
    * Order ID is implemented here in the API as a search method.
-   * Absent an encounterID, all encounters are searched.
    * Absent a medicationOrderId, all medication orders are searched.
    *
    * @param encounterId    Internal resource ID of the specific Encounter to search.
@@ -79,12 +79,12 @@ public class MedicationOrderResourceProvider implements IResourceProvider {
    */
   @Search()
   public List<MedicationOrder> search(
-      @OptionalParam(name = MedicationOrder.SP_ENCOUNTER) StringParam encounterId,
+      @RequiredParam(name = MedicationOrder.SP_ENCOUNTER) StringParam encounterId,
       @OptionalParam(name = MedicationOrder.SP_RES_ID) StringParam medicationOrderId) {
 
     List<MedicationOrder> medicationOrders = new ArrayList<>();
 
-    if (encounterId != null && medicationOrderId != null) {
+    if (medicationOrderId != null) {
       Id<Encounter> encounterInternalId = Id.of(encounterId.getValue());
       Id<MedicationOrder> orderInternalId = Id.of(medicationOrderId.getValue());
       Optional<MedicationOrder> result = medicationOrderRepository.read(
@@ -94,32 +94,8 @@ public class MedicationOrderResourceProvider implements IResourceProvider {
         medicationOrders.add(result.get());
       }
     } else {
-      // Pull records for one encounter.
-      if (encounterId != null) {
-        medicationOrders.addAll(
-            medicationOrderRepository.list(Id.of(encounterId.getValue())));
-      } else {
-        // Pull records for all encounters.
-        List<Encounter> allEncounters = encounterRepository.list(Optional.empty());
-        for (Encounter eachEncounter : allEncounters) {
-          List<MedicationOrder> encounterOrders = medicationOrderRepository.list(
-              EncounterRepository.generateId(eachEncounter));
-          medicationOrders.addAll(encounterOrders);
-        }
-
-        // Filter by prescription ID if necessary. This is a very inefficient 1-arg get.
-        if (medicationOrderId != null) {
-          List<MedicationOrder> filteredResults = new ArrayList<>();
-          for (MedicationOrder medicationOrder : medicationOrders) {
-            if (medicationOrder.getId().getIdPart().equalsIgnoreCase(
-                medicationOrderId.getValue())) {
-              filteredResults.add(medicationOrder);
-              break;
-            }
-          }
-          medicationOrders = filteredResults;
-        }
-      }
+      // Pull records for the encounter.
+      medicationOrders.addAll(medicationOrderRepository.list(Id.of(encounterId.getValue())));
     }
 
     return medicationOrders;

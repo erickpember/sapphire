@@ -30,7 +30,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
-import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
 /**
@@ -108,12 +107,6 @@ public class MedicationAdministrationIT extends ApiTestSupport {
     assertEquals(medicationAdministrations.size(), 1, "Two argument read/search failed.");
     assertEquals(medicationAdministrations.get(0).getId().getIdPart(),
         medicationAdministration1.getId().getIdPart(), "Two argument read/search failed.");
-
-    results = client.search().forResource(MedicationAdministration.class)
-        .execute();
-    medicationAdministrations = ApiUtil.extractBundle(results,
-        MedicationAdministration.class);
-    assertTrue(medicationAdministrations.size() > 1, "No-argument search failed.");
 
     // Get rid of this particular encounter and patient so it doesn't mess up other tests.
     client.delete().resourceById(encounter.getId()).execute();

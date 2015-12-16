@@ -18,7 +18,6 @@ import ca.uhn.fhir.rest.server.exceptions.InvalidRequestException;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.fhir.Ids;
-import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.MedicationAdministrationRepository;
 import java.util.ArrayList;
 import java.util.List;
@@ -29,9 +28,6 @@ import javax.inject.Inject;
  * MedicationAdministration resource endpoint
  */
 public class MedicationAdministrationResourceProvider implements IResourceProvider {
-
-  @Inject
-  private EncounterRepository encounterRepository;
 
   @Inject
   private MedicationAdministrationRepository medicationAdministrationRepository;
@@ -87,10 +83,6 @@ public class MedicationAdministrationResourceProvider implements IResourceProvid
    * double-argument read method that requires the Encounter ID as well as the Medication
    * Administration ID is implemented here in the API as a search method.
    *
-   * Absent an encounterId, all records will be searched for the administrationId.
-   *
-   * Absent all arguments, all records are returned.
-   *
    * @param encounterId    Resource ID for the Encounter used in looking up a Administration.
    * @param administrationId Resource ID of the MedicationAdministration we want to retrieve.
    * @param prescriptionId Resource ID of the associated Prescription, for optional filtering.
@@ -98,13 +90,13 @@ public class MedicationAdministrationResourceProvider implements IResourceProvid
    */
   @Search()
   public List<MedicationAdministration> search(
-      @OptionalParam(name = MedicationAdministration.SP_ENCOUNTER) StringParam encounterId,
+      @RequiredParam(name = MedicationAdministration.SP_ENCOUNTER) StringParam encounterId,
       @OptionalParam(name = MedicationAdministration.SP_RES_ID) StringParam administrationId,
       @OptionalParam(name = MedicationAdministration.SP_PRESCRIPTION) StringParam prescriptionId) {
     List<MedicationAdministration> medicationAdministrations = new ArrayList<>();
 
     // Retrieve single record
-    if (encounterId != null && administrationId != null) {
+    if (administrationId != null) {
       Id<Encounter> encounterInternalId = Id.of(encounterId.getValue());
       Id<MedicationAdministration> administrationInternalId = Id.of(administrationId.getValue());
       Optional<MedicationAdministration> result = medicationAdministrationRepository.
@@ -114,32 +106,9 @@ public class MedicationAdministrationResourceProvider implements IResourceProvid
         medicationAdministrations.add(result.get());
       }
     } else {
-      // Pull records for one encounter.
-      if (encounterId != null) {
-        medicationAdministrations.addAll(medicationAdministrationRepository.list(Id.of(encounterId.
-            getValue())));
-      } else {
-        // Pull records for all encounters
-        List<Encounter> allEncounters = encounterRepository.list(Optional.empty());
-        for (Encounter eachEncounter : allEncounters) {
-          List<MedicationAdministration> admins = medicationAdministrationRepository.list(
-              EncounterRepository.generateId(eachEncounter));
-          medicationAdministrations.addAll(admins);
-        }
-
-        // Filter by admin ID if necessary. This is a very inefficient 1-arg get.
-        if (administrationId != null) {
-          List<MedicationAdministration> filteredResults = new ArrayList<>();
-          for (MedicationAdministration medicationAdministration : medicationAdministrations) {
-            if (medicationAdministration.getId().getIdPart().equalsIgnoreCase(
-                administrationId.getValue())) {
-              filteredResults.add(medicationAdministration);
-              break;
-            }
-          }
-          medicationAdministrations = filteredResults;
-        }
-      }
+      // Pull records for the encounter.
+      medicationAdministrations.addAll(medicationAdministrationRepository.list(Id.of(encounterId.
+          getValue())));
     }
 
     if (prescriptionId != null) {

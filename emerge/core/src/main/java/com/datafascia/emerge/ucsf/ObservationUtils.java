@@ -217,7 +217,8 @@ public class ObservationUtils {
   }
 
   /**
-   * Returns true if a specified observation is inside a specified time window.
+   * Returns true if a specified observation is inside a specified time window,
+   * time bounds are beginning-inclusive and end-exclusive.
    *
    * @param observation
    *     Observation  resource.
@@ -233,21 +234,27 @@ public class ObservationUtils {
 
     IDatatype effectiveTime = observation.getEffective();
     if (effectiveTime instanceof TimingDt) {
-      return ((TimingDt) effectiveTime).getEventFirstRep().getValue().after(timeFrame.getStart())
-          && ((TimingDt) effectiveTime).getEventFirstRep().getValue().before(timeFrame.getEnd());
+      return (((TimingDt) effectiveTime).getEventFirstRep().getValue()
+          .compareTo(timeFrame.getStart()) >= 0)
+          && (((TimingDt) effectiveTime).getEventFirstRep().getValue()
+          .compareTo(timeFrame.getEnd()) < 0);
     } else if (effectiveTime instanceof PeriodDt) {
-      return ((PeriodDt) effectiveTime).getStart().after(timeFrame.getStart())
-          && ((PeriodDt) effectiveTime).getEnd().before(timeFrame.getEnd());
+      return (((PeriodDt) effectiveTime).getStart()
+          .compareTo(timeFrame.getStart()) >= 0)
+          && (((PeriodDt) effectiveTime).getEnd()
+          .compareTo(timeFrame.getEnd()) < 0);
     } else if (effectiveTime instanceof DateTimeDt) {
-      return ((DateTimeDt) effectiveTime).getValue().after(timeFrame.getStart())
-          && ((DateTimeDt) effectiveTime).getValue().before(timeFrame.getEnd());
+      return (((DateTimeDt) effectiveTime).getValue()
+          .compareTo(timeFrame.getStart()) >= 0)
+          && (((DateTimeDt) effectiveTime).getValue()
+          .compareTo(timeFrame.getEnd()) < 0);
     } else {
       throw new RuntimeException("Unexpected type: " + effectiveTime.getClass().getCanonicalName());
     }
   }
 
   /**
-   * Returns true if a specified observation  is after a specified time.
+   * Returns true if a specified observation is at or after a specified time.
    *
    * @param observation
    *     Observation  resource.
@@ -259,11 +266,11 @@ public class ObservationUtils {
   public static boolean isAfter(Observation observation, Date startTime) {
     IDatatype effectiveTime = observation.getEffective();
     if (effectiveTime instanceof TimingDt) {
-      return ((TimingDt) effectiveTime).getEventFirstRep().getValue().after(startTime);
+      return ((TimingDt) effectiveTime).getEventFirstRep().getValue().compareTo(startTime) >= 0;
     } else if (effectiveTime instanceof PeriodDt) {
-      return ((PeriodDt) effectiveTime).getStart().after(startTime);
+      return ((PeriodDt) effectiveTime).getStart().compareTo(startTime) >= 0;
     } else if (effectiveTime instanceof DateTimeDt) {
-      return ((DateTimeDt) effectiveTime).getValue().after(startTime);
+      return ((DateTimeDt) effectiveTime).getValue().compareTo(startTime) >= 0;
     } else {
       throw new RuntimeException("Unexpected type: " + effectiveTime.getClass().getCanonicalName());
     }

@@ -19,6 +19,17 @@ public class LowerExtremitySCDsContraindicatedImpl {
   private ClientBuilder apiClient;
 
   /**
+   * Checks if procedure request is relevant to lower extremity SCDs contraindicated.
+   *
+   * @param request
+   *     the procedure request to check
+   * @return true if procedure request is relevant to lower extremity SCDs contraindicated.
+   */
+  public static boolean isRelevant(ProcedureRequest request) {
+    return ProcedureRequestCodeEnum.VTE_PPX_CONTRAINDICATIONS.isCodeEquals(request.getCode());
+  }
+
+  /**
    * Gets Lower Extremity SCDs Contraindicated.
    *
    * @param encounterId

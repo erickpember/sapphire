@@ -5,6 +5,7 @@ package com.datafascia.emerge.ucsf.harm;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
+import com.datafascia.emerge.harms.vte.LowerExtremitySCDsContraindicatedImpl;
 import com.datafascia.emerge.harms.vte.SCDsInUse;
 import com.datafascia.emerge.harms.vte.SCDsOrdered;
 import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater.Event;
@@ -27,6 +28,15 @@ then
   venousThromboembolismUpdater.updatePharmacologicVTEProphylaxisOrdered(harmEvidence, $encounter);
   venousThromboembolismUpdater.updatePharmacologicVTEProphylaxisAdministered(
       harmEvidence, $encounter);
+end
+
+rule "Update lower extremity SCDs contraindicated by procedure request"
+when
+  Event( type == EventType.UPDATE_PROCEDURE_REQUEST )
+  $request: ProcedureRequest( LowerExtremitySCDsContraindicatedImpl.isRelevant($request) )
+  $encounter: Encounter()
+then
+  venousThromboembolismUpdater.updateLowerExtremitySCDsContraindicated(harmEvidence, $encounter);
 end
 
 rule "Update venous thromboembolism SCDs Ordered by procedure request"

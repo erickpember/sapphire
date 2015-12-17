@@ -49,32 +49,17 @@ import com.datafascia.emerge.ucsf.RassGoal;
 import com.datafascia.emerge.ucsf.Sedative;
 import com.datafascia.emerge.ucsf.TimestampedBoolean;
 import com.datafascia.emerge.ucsf.Verbal;
-import com.datafascia.emerge.ucsf.codes.MedsSetEnum;
-import com.google.common.collect.ImmutableSet;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Set;
 import javax.inject.Inject;
 
 /**
  * Updates pain and delirium associated data for a patient.
  */
 public class PainAndDeliriumUpdater {
-
-  private static final Set<String> BENZODIAZEPINE_NAMES = ImmutableSet.of(
-      MedsSetEnum.INTERMITTENT_LORAZEPAM_IV.getCode(),
-      MedsSetEnum.INTERMITTENT_LORAZEPAM_ENTERAL.getCode(),
-      MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode(),
-      MedsSetEnum.INTERMITTENT_MIDAZOLAM_IV.getCode(),
-      MedsSetEnum.CONTINUOUS_INFUSION_MIDAZOLAM_IV.getCode(),
-      MedsSetEnum.INTERMITTENT_CLONAZEPAM_ENTERAL.getCode(),
-      MedsSetEnum.INTERMITTENT_DIAZEPAM_IV.getCode(),
-      MedsSetEnum.INTERMITTENT_DIAZEPAM_ENTERAL.getCode(),
-      MedsSetEnum.INTERMITTENT_CHLORADIAZEPOXIDE_ENTERAL.getCode(),
-      MedsSetEnum.INTERMITTENT_ALPRAZALOM_ENTERAL.getCode());
 
   @Inject
   private Clock clock;
@@ -366,25 +351,23 @@ public class PainAndDeliriumUpdater {
         .withUpdateTime(Date.from(Instant.now(clock)));
 
     List<Order> orders = new ArrayList<>();
-    for (String medsSet : BENZODIAZEPINE_NAMES) {
-      sedativeOrderImpl.getValue(encounterId, medsSet)
-          .ifPresent(result -> {
-            Order order = new Order()
-                .withDosageRoute(
-                    (result.getDosageRoute() != null)
-                        ? Order.DosageRoute.fromValue(result.getDosageRoute()) : null)
-                .withDrug(
-                    (result.getDrug() != null)
-                        ? Order.Drug.fromValue(result.getDrug()) : null)
-                .withStatus(
-                    (result.getStatus() != null)
-                        ? Order.Status.fromValue(result.getStatus()) : null)
-                .withOrderId(result.getOrderId())
-                .withUpdateTime(
-                    Date.from(Instant.now(clock)));
-            orders.add(order);
-          });
-    }
+    sedativeOrderImpl.getAllSedativeOrders(encounterId)
+        .stream().forEach(result -> {
+          Order order = new Order()
+              .withDosageRoute(
+              (result.getDosageRoute() != null)
+                  ? Order.DosageRoute.fromValue(result.getDosageRoute()) : null)
+              .withDrug(
+              (result.getDrug() != null)
+                  ? Order.Drug.fromValue(result.getDrug()) : null)
+              .withStatus(
+              (result.getStatus() != null)
+                  ? Order.Status.fromValue(result.getStatus()) : null)
+              .withOrderId(result.getOrderId())
+              .withUpdateTime(
+              Date.from(Instant.now(clock)));
+          orders.add(order);
+        });
 
     Sedative sedative = new Sedative()
         .withContraindicated(benzodiazepineContraindicated)

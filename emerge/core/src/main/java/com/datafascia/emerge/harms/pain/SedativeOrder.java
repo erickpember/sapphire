@@ -13,8 +13,8 @@ import com.datafascia.emerge.ucsf.codes.MedsSetEnum;
 import com.datafascia.emerge.ucsf.codes.painAndDelerium.SedativeOrderDosageRouteEnum;
 import com.datafascia.emerge.ucsf.codes.painAndDelerium.SedativeOrderDrugEnum;
 import com.google.common.collect.ImmutableSet;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
 import lombok.Builder;
@@ -55,7 +55,6 @@ public class SedativeOrder {
   @Inject
   private ClientBuilder apiClient;
 
-
   /**
    * Result container for sedative orders.
    */
@@ -68,25 +67,24 @@ public class SedativeOrder {
   }
 
   /**
-   * Represents a medication order.
+   * Pulls Medication Orders for an encounter and returns all belonging to the sedative list.
    *
    * @param encounterId
    *     encounter to check.
-   * @param medsSet
-   *     Medication identifier, AKA MedsSet.
-   * @return Drug name, route and order status, empty if not found.
+   * @return
+   *     A list of results with drug name, route and order status, null if not found.
    */
-  public Optional<OrderResult> getValue(String encounterId, String medsSet) {
+  public List<OrderResult> getAllSedativeOrders(String encounterId) {
 
     List<MedicationOrder> medOrders = apiClient.getMedicationOrderClient().search(encounterId,
-        null, medsSet);
+        null, null);
     if (medOrders == null || medOrders.isEmpty()) {
-      return Optional.empty();
+      return null;
     }
 
     medOrders.sort(new MedicationOrderDateWrittenComparator().reversed());
 
-    return processOrders(medOrders);
+    return processSedativeOrders(medOrders);
   }
 
   /**
@@ -94,9 +92,10 @@ public class SedativeOrder {
    * @param medOrders
    *     A list of medication orders whose meds set identifiers we will scan.
    * @return
-   *     Drug name, route and order status, empty if not found.
+   *     A list of results with drug name, route and order status, null if not found.
    */
-  public Optional<OrderResult> processOrders(List<MedicationOrder> medOrders) {
+  public List<OrderResult> processSedativeOrders(List<MedicationOrder> medOrders) {
+    List<OrderResult> results = new ArrayList<>();
     for (MedicationOrder order : medOrders) {
       OrderResult result = OrderResult.builder()
           .dosageRoute(null)
@@ -131,29 +130,31 @@ public class SedativeOrder {
                       SedativeOrderDosageRouteEnum.INTERMITTENT_ENTERAL.getCode());
                 }
               }
-              return verifyResult(result);
+              if (resultIsValid(result)) {
+                results.add(result);
+              }
             }
           }
         }
       }
     }
 
-    return Optional.empty();
+    return results;
   }
 
-  private Optional<OrderResult> verifyResult(OrderResult result) {
+  private boolean resultIsValid(OrderResult result) {
     if (!SEDATIVE_NAMES.contains(result.getDrug())) {
       log.warn("Unexpected pain and delirium sedative drug name found [{}], order id [{}]",
           result.getDrug(),
           result.getOrderId());
-      return Optional.empty();
+      return false;
     }
     if (!DOSAGE_ROUTES.contains(result.getDosageRoute())) {
       log.warn("Unexpected pain and delirium sedative dosage route found [{}], order id [{}]",
           result.getDosageRoute(),
           result.getOrderId());
-      return Optional.empty();
+      return false;
     }
-    return Optional.of(result);
+    return true;
   }
 }

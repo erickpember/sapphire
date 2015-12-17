@@ -3,6 +3,7 @@
 package com.datafascia.etl.inject;
 
 import ca.uhn.fhir.context.FhirContext;
+import ca.uhn.fhir.rest.client.IRestfulClientFactory;
 import ca.uhn.hl7v2.DefaultHapiContext;
 import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.parser.CanonicalModelClassFactory;
@@ -32,8 +33,13 @@ import com.google.inject.name.Names;
 import java.time.Clock;
 import java.time.ZoneId;
 import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 import javax.inject.Singleton;
 import org.apache.accumulo.core.client.Connector;
+import org.apache.http.client.config.RequestConfig;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.impl.conn.PoolingHttpClientConnectionManager;
 
 /**
  * Provides objects to application.
@@ -67,8 +73,6 @@ public class ComponentsModule extends AbstractModule {
         .in(Singleton.class);
     bind(EncounterStatusTransition.class)
         .in(Singleton.class);
-    bind(FhirContext.class)
-        .toInstance(FhirContext.forDstu2());
     bind(FhirEntityStore.class)
         .to(AccumuloFhirEntityStore.class)
         .in(Singleton.class);
@@ -90,6 +94,36 @@ public class ComponentsModule extends AbstractModule {
   @Provides @Singleton
   public Connector connector(ConnectorFactory connectorFactory) {
     return connectorFactory.getConnector();
+  }
+
+  @Provides @Singleton
+  public FhirContext fhirContext() {
+    FhirContext fhirContext = FhirContext.forDstu2();
+
+    // The default maximum connections per route and total connections is too small.
+    // Configure an HttpClient with increased limits.
+    IRestfulClientFactory clientFactory = fhirContext.getRestfulClientFactory();
+
+    PoolingHttpClientConnectionManager connectionManager =
+        new PoolingHttpClientConnectionManager(5000, TimeUnit.MILLISECONDS);
+    connectionManager.setDefaultMaxPerRoute(20);
+    connectionManager.setMaxTotal(200);
+    connectionManager.setValidateAfterInactivity(5000);
+
+    RequestConfig defaultRequestConfig = RequestConfig.custom()
+        .setSocketTimeout(clientFactory.getSocketTimeout())
+        .setConnectTimeout(clientFactory.getConnectTimeout())
+        .setConnectionRequestTimeout(clientFactory.getConnectionRequestTimeout())
+        .build();
+
+    HttpClientBuilder httpClientBuilder = HttpClients.custom()
+        .setConnectionManager(connectionManager)
+        .setDefaultRequestConfig(defaultRequestConfig)
+        .disableCookieManagement();
+
+    clientFactory.setHttpClient(httpClientBuilder.build());
+
+    return fhirContext;
   }
 
   @Provides @Singleton

@@ -27,6 +27,7 @@ import com.datafascia.etl.hl7.EncounterStatusTransition;
 import com.datafascia.etl.hl7.HL7MessageProcessor;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.google.inject.matcher.Matchers;
 import com.google.inject.name.Names;
 import java.time.Clock;
 import java.time.ZoneId;
@@ -45,6 +46,11 @@ public class ComponentsModule extends AbstractModule {
   protected void configure() {
     // Set default time zone so HAPI will interpret times in this time zone.
     TimeZone.setDefault(TimeZone.getTimeZone(ZONE_ID));
+
+    bindInterceptor(
+        Matchers.inPackage(HarmEvidenceUpdater.class.getPackage()),
+        Matchers.any(),
+        new TracingInterceptor());
 
     bind(AuthorizationsSupplier.class)
         .to(FixedAuthorizationsSupplier.class)

@@ -166,6 +166,21 @@ public class Observations {
   }
 
   /**
+   * Finds freshest observation for given observation code and value.
+   *
+   * @param code
+   *     observation code to match
+   * @param value
+   *     observation value to match
+   * @return found observation, or empty if no match is found
+   */
+  public Optional<Observation> findFreshest(String code, String value) {
+    return filterToStream(Collections.singleton(code), null, null)
+        .filter(observation -> value.equals(observation.getValue().toString()))
+        .max(EFFECTIVE_COMPARATOR);
+  }
+
+  /**
    * Finds any observation for given observation code.
    *
    * @param code

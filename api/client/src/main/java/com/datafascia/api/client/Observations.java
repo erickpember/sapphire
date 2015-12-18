@@ -65,7 +65,7 @@ public class Observations {
    * @param codes
    *     observation codes to match
    * @param effectiveLower
-   *     effective date time lower bound (exclusive), null for no lower bound
+   *     effective date time lower bound (inclusive), null for no lower bound
    * @param effectiveUpper
    *     effective date time upper bound (exclusive), null for no upper bound
    * @return filtered observations
@@ -78,7 +78,7 @@ public class Observations {
     if (effectiveLower != null) {
       Date effectiveLowerDate = Date.from(effectiveLower);
       stream = stream.filter(
-          observation -> Dates.toDate(observation.getEffective()).after(effectiveLowerDate));
+          observation -> !Dates.toDate(observation.getEffective()).before(effectiveLowerDate));
     }
 
     if (effectiveUpper != null) {
@@ -93,10 +93,27 @@ public class Observations {
   /**
    * Filters observations.
    *
+   * @param code
+   *     observation code to match
+   * @param effectiveLower
+   *     effective date time lower bound (inclusive), null for no lower bound
+   * @param effectiveUpper
+   *     effective date time upper bound (exclusive), null for no upper bound
+   * @return filtered observations
+   */
+  public Stream<Observation> filterToStream(
+      String code, Instant effectiveLower, Instant effectiveUpper) {
+
+    return filterToStream(Collections.singleton(code), effectiveLower, effectiveUpper);
+  }
+
+  /**
+   * Filters observations.
+   *
    * @param codes
    *     observation codes to match
    * @param effectiveLower
-   *     effective date time lower bound (exclusive), null for no lower bound
+   *     effective date time lower bound (inclusive), null for no lower bound
    * @param effectiveUpper
    *     effective date time upper bound (exclusive), null for no upper bound
    * @return filtered observations
@@ -114,7 +131,7 @@ public class Observations {
    * @param code
    *     observation code to match
    * @param effectiveLower
-   *     effective date time lower bound (exclusive), null for no lower bound
+   *     effective date time lower bound (inclusive), null for no lower bound
    * @param effectiveUpper
    *     effective date time upper bound (exclusive), null for no upper bound
    * @return filtered observations
@@ -129,7 +146,7 @@ public class Observations {
    * @param codes
    *     observation codes to match
    * @param effectiveLower
-   *     effective date time lower bound (exclusive), null for no lower bound
+   *     effective date time lower bound (inclusive), null for no lower bound
    * @param effectiveUpper
    *     effective date time upper bound (exclusive), null for no upper bound
    * @return freshest observation for the given code, or empty if no match is found
@@ -147,7 +164,7 @@ public class Observations {
    * @param code
    *     observation code to match
    * @param effectiveLower
-   *     effective date time lower bound (exclusive), null for no lower bound
+   *     effective date time lower bound (inclusive), null for no lower bound
    * @param effectiveUpper
    *     effective date time upper bound (exclusive), null for no upper bound
    * @return freshest observation for the given code, or empty if no match is found
@@ -190,7 +207,7 @@ public class Observations {
    * @param code
    *     observation code to match
    * @param effectiveLower
-   *     effective date time lower bound (exclusive), null for no lower bound
+   *     effective date time lower bound (inclusive), null for no lower bound
    * @param effectiveUpper
    *     effective date time upper bound (exclusive), null for no upper bound
    * @return filtered observations

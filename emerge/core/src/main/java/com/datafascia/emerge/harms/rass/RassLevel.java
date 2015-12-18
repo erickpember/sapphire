@@ -90,7 +90,7 @@ public class RassLevel {
 
     Observations observations = apiClient.getObservationClient().list(encounterId);
 
-    Optional<Observation> freshestRassScore = observations.filterToStream(
+    Optional<Observation> freshestRassScore = observations.filter(
         ObservationCodeEnum.RASS.getCode(), midnight.toInstant(), now.toInstant())
         .max(Observations.EFFECTIVE_COMPARATOR);
 

@@ -96,7 +96,7 @@ public class Observations {
    *     effective date time upper bound (exclusive), null for no upper bound
    * @return filtered observations
    */
-  public Stream<Observation> filterToStream(
+  public Stream<Observation> filter(
       Set<String> codes, Instant effectiveLower, Instant effectiveUpper) {
 
     Stream<Observation> stream = filter(codes);
@@ -127,10 +127,10 @@ public class Observations {
    *     effective date time upper bound (exclusive), null for no upper bound
    * @return filtered observations
    */
-  public Stream<Observation> filterToStream(
+  public Stream<Observation> filter(
       String code, Instant effectiveLower, Instant effectiveUpper) {
 
-    return filterToStream(Collections.singleton(code), effectiveLower, effectiveUpper);
+    return filter(Collections.singleton(code), effectiveLower, effectiveUpper);
   }
 
   /**
@@ -144,10 +144,10 @@ public class Observations {
    *     effective date time upper bound (exclusive), null for no upper bound
    * @return filtered observations
    */
-  public List<Observation> filter(
+  public List<Observation> list(
       Set<String> codes, Instant effectiveLower, Instant effectiveUpper) {
 
-    return filterToStream(codes, effectiveLower, effectiveUpper)
+    return filter(codes, effectiveLower, effectiveUpper)
         .collect(Collectors.toList());
   }
 
@@ -162,8 +162,8 @@ public class Observations {
    *     effective date time upper bound (exclusive), null for no upper bound
    * @return filtered observations
    */
-  public List<Observation> filter(String code, Instant effectiveLower, Instant effectiveUpper) {
-    return filter(Collections.singleton(code), effectiveLower, effectiveUpper);
+  public List<Observation> list(String code, Instant effectiveLower, Instant effectiveUpper) {
+    return list(Collections.singleton(code), effectiveLower, effectiveUpper);
   }
 
   /**
@@ -180,7 +180,7 @@ public class Observations {
   public Optional<Observation> findFreshest(
       Set<String> codes, Instant effectiveLower, Instant effectiveUpper) {
 
-    return filterToStream(codes, effectiveLower, effectiveUpper)
+    return filter(codes, effectiveLower, effectiveUpper)
         .max(EFFECTIVE_COMPARATOR);
   }
 
@@ -222,7 +222,7 @@ public class Observations {
    * @return found observation, or empty if no match is found
    */
   public Optional<Observation> findFreshest(String code, String value) {
-    return filterToStream(Collections.singleton(code), null, null)
+    return filter(Collections.singleton(code), null, null)
         .filter(observation -> value.equals(observation.getValue().toString()))
         .max(EFFECTIVE_COMPARATOR);
   }
@@ -241,7 +241,7 @@ public class Observations {
   public Optional<Observation> findAny(
       String code, Instant effectiveLower, Instant effectiveUpper) {
 
-    return filterToStream(Collections.singleton(code), effectiveLower, effectiveUpper)
+    return filter(Collections.singleton(code), effectiveLower, effectiveUpper)
         .findAny();
   }
 }

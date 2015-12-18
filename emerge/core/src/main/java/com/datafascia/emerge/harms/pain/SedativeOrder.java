@@ -7,7 +7,6 @@ import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.domain.fhir.IdentifierSystems;
-import com.datafascia.emerge.ucsf.MedicationOrderDateWrittenComparator;
 import com.datafascia.emerge.ucsf.MedicationOrderUtils;
 import com.datafascia.emerge.ucsf.codes.MedsSetEnum;
 import com.datafascia.emerge.ucsf.codes.painAndDelerium.SedativeOrderDosageRouteEnum;
@@ -78,8 +77,6 @@ public class SedativeOrder {
 
     List<MedicationOrder> medOrders = apiClient.getMedicationOrderClient().search(encounterId,
         null, null);
-
-    medOrders.sort(new MedicationOrderDateWrittenComparator().reversed());
 
     return processSedativeOrders(medOrders);
   }

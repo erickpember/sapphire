@@ -59,6 +59,12 @@ public class PharmacologicVteProphylaxisAdministered {
 
     // Check if any recent VTE prophylactic administrations have been made.
     for (MedicationAdministration administration : administrations) {
+      if (administration.getEffectiveTime() == null) {
+        log.warn("Ignoring admin [{}] as it lacks an effective time.",
+            administration.getIdentifierFirstRep().getValue());
+        continue;
+      }
+
       for (IdentifierDt ident : MedicationAdministrationUtils.findIdentifiers(administration,
           CodingSystems.UCSF_MEDICATION_GROUP_NAME)) {
         String medsSet = ident.getValue();

@@ -59,6 +59,12 @@ public class AnticoagulationImpl {
     administrations = MedicationAdministrationUtils.freshestOfAllOrders(administrations).values();
 
     for (MedicationAdministration admin : administrations) {
+      if (admin.getEffectiveTime() == null) {
+        log.warn("Ignoring admin [{}] as it lacks an effective time.",
+            admin.getIdentifierFirstRep().getValue());
+        continue;
+      }
+
       for (IdentifierDt ident : MedicationAdministrationUtils.findIdentifiers(admin,
           CodingSystems.UCSF_MEDICATION_GROUP_NAME)) {
         String medsSet = ident.getValue();

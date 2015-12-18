@@ -6,6 +6,7 @@ import ca.uhn.fhir.model.dstu2.composite.RatioDt;
 import ca.uhn.fhir.model.dstu2.composite.SimpleQuantityDt;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
+import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import java.math.BigDecimal;
@@ -66,6 +67,7 @@ public class AnticoagulationImplTest extends AnticoagulationImpl {
         .setSystem(CodingSystems.UCSF_MEDICATION_GROUP_NAME)
         .setValue(medsSet);
     administration.setStatus(status);
+    administration.setEffectiveTime(DateTimeDt.withCurrentTime());
     MedicationAdministration.Dosage dosage = new MedicationAdministration.Dosage();
     dosage.setQuantity(new SimpleQuantityDt(dose, "", unit));
     dosage.setRate(new RatioDt());

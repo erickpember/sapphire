@@ -41,6 +41,7 @@ public class MedicationAdministrationUtils {
    */
   public static boolean isAfter(MedicationAdministration admin, Date startTime) {
     IDatatype effectiveTime = admin.getEffectiveTime();
+
     if (effectiveTime instanceof TimingDt) {
       return ((TimingDt) effectiveTime).getEventFirstRep().getValue().after(startTime);
     } else if (effectiveTime instanceof PeriodDt) {
@@ -245,6 +246,7 @@ public class MedicationAdministrationUtils {
    */
   public static boolean insideTimeFrame(MedicationAdministration admin, PeriodDt timeFrame) {
     IDatatype effectiveTime = admin.getEffectiveTime();
+
     if (effectiveTime instanceof TimingDt) {
       return ((TimingDt) effectiveTime).getEventFirstRep().getValue().after(timeFrame.getStart())
           && ((TimingDt) effectiveTime).getEventFirstRep().getValue().before(timeFrame.getEnd());

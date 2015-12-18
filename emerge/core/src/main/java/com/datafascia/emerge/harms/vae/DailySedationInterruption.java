@@ -25,10 +25,12 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Daily sedation interruption.
  */
+@Slf4j
 public class DailySedationInterruption {
 
   @Inject
@@ -71,6 +73,12 @@ public class DailySedationInterruption {
 
     // Filter only admins for the meds we care about from the last 25 hours.
     for (MedicationAdministration admin : admins) {
+      if (admin.getEffectiveTime() == null) {
+        log.warn("Ignoring admin [{}] as it lacks an effective time.",
+            admin.getIdentifierFirstRep().getValue());
+        continue;
+      }
+
       List<IdentifierDt> identifiers = MedicationAdministrationUtils.findIdentifiers(admin,
           CodingSystems.UCSF_MEDICATION_GROUP_NAME);
       for (IdentifierDt ident : identifiers) {
@@ -108,6 +116,11 @@ public class DailySedationInterruption {
 
       for (MedicationAdministration admin : orderAdmins.keySet()) {
         if (orderAdmins.containsValue(order)) {
+          if (admin.getEffectiveTime() == null) {
+            log.warn("Ignoring admin [{}] as it lacks an effective time.",
+                admin.getIdentifierFirstRep().getValue());
+            continue;
+          }
           Date effectiveTime = MedicationAdministrationUtils.getEffectiveDate(admin);
           if (admin.getStatus().equalsIgnoreCase("Stopped")) {
             end = effectiveTime;

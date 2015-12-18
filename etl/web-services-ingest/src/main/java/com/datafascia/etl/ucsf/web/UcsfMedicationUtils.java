@@ -151,6 +151,8 @@ public class UcsfMedicationUtils {
       Instant timeTakenInstant = UcsfWebGetProcessor.epicDateToInstant(timeTaken);
       DateTimeDt timeTakenDt = new DateTimeDt(Date.from(timeTakenInstant));
       admin.setEffectiveTime(timeTakenDt);
+    } else {
+      log.warn("No AdministrationTime given for admin [{}] in order [{}]", adminId, orderId);
     }
 
     log.info("Populated admin with encounter " + admin.getEncounter().getReference().getIdPart());

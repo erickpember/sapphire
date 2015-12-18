@@ -85,6 +85,7 @@ public class VentilationModeImpl {
     // For when non-invasive device mode is fresher than both the freshest vent mode and breath type
     if (freshestBreathType.isPresent() &&
         freshestVentMode.isPresent() &&
+        freshestNonInvasiveDeviceMode.isPresent() &&
         (isEffectiveAfter(freshestVentMode, freshestNonInvasiveDeviceMode) &&
          isEffectiveAfter(freshestBreathType, freshestNonInvasiveDeviceMode))) {
       Optional<String> result = nonInvasiveIsFresherThanVentOrBreath(

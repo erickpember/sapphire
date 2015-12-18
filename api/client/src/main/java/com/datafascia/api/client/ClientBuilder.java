@@ -50,6 +50,10 @@ public class ClientBuilder {
     return encounterClient;
   }
 
+  public EpisodeOfCareClient getEpisodeOfCareClient() {
+    return new EpisodeOfCareClient(client);
+  }
+
   public FlagClient getFlagClient() {
     return new FlagClient(client);
   }
@@ -122,6 +126,14 @@ public class ClientBuilder {
       procedureRequestClient = new ProcedureRequestClient(client);
     }
     return procedureRequestClient;
+  }
+
+  public QuestionnaireClient getQuestionnaireClient() {
+    return new QuestionnaireClient(client);
+  }
+
+  public QuestionnaireResponseClient getQuestionnaireResponseClient() {
+    return new QuestionnaireResponseClient(client);
   }
 
   public SubstanceClient getSubstanceClient() {

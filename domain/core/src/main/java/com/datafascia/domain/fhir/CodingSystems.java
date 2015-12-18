@@ -43,6 +43,14 @@ public class CodingSystems {
   public static final String MEDICATION_INGREDIENT =
       "http://datafascia.com/coding/MedicationIngredient";
 
+  /** dataFascia invented this coding system for Questionnaire Concept */
+  public static final String QUESTIONNAIRE_CONCEPT =
+      "http://datafascia.com/coding/QuestionnaireConcept";
+
+  /** dataFascia invented this coding system for Questionnaire Option */
+  public static final String QUESTIONNAIRE_OPTION =
+      "http://datafascia.com/coding/QuestionnaireOption";
+
   /** dataFascia invented this coding system for UCSF administration not given reasons */
   public static final String UCSF_REASON_NOT_GIVEN = "http://datafascia.com/coding/ReasonNotGiven";
 

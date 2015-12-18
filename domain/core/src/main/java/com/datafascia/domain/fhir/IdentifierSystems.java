@@ -7,6 +7,9 @@ package com.datafascia.domain.fhir;
  */
 public class IdentifierSystems {
 
+  /** dataFascia invented this identifier system for EpisodeOfCare */
+  public static final String EPISODE_OF_CARE = "http://datafascia.com/identifier/EpisodeOfCare";
+
   /** institution assigned patient identifier */
   public static final String INSTITUTION_PATIENT =
       "http://datafascia.com/identifier/InstitutionPatient";
@@ -42,6 +45,13 @@ public class IdentifierSystems {
   /** institution assigned procedure request identifier */
   public static final String INSTITUTION_PROCEDURE_REQUEST =
       "http://datafascia.com/identifier/InstitutionProcedureRequest";
+
+  /** dataFascia invented this identifier system for Questionnaire */
+  public static final String QUESTIONNAIRE = "http://datafascia.com/identifier/Questionnaire";
+
+  /** dataFascia invented this identifier system for Questionnaire Response */
+  public static final String QUESTIONNAIRE_RESPONSE =
+      "http://datafascia.com/identifier/QuestionnaireResponse";
 
   // Private constructor disallows creating instances of this class.
   private IdentifierSystems() {

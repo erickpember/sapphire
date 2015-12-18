@@ -127,11 +127,11 @@ public class PainAndDeliriumUpdater {
   public void updateNumericalPainLevel(HarmEvidence harmEvidence, Encounter encounter) {
     String encounterId = encounter.getId().getIdPart();
 
-    PainGoal painGoal = new PainGoal().withDataEntryTime(Date.from(Instant.now(clock)))
-        .withGoal(painGoalImpl.getPainGoal(encounterId));
+    PainGoal painGoal = new PainGoal().withGoal(painGoalImpl.getPainGoal(encounterId));
     getPain(harmEvidence).setPainGoal(painGoal);
 
     CurrentPainLevel currentLevel = numericalPainLevelImpl.getCurrentPainLevel(encounterId);
+    painGoal.setDataEntryTime(currentLevel.getEffectiveDateTime());
     CurrentScore currentScore = new CurrentScore()
         .withPainScore(currentLevel.getPainScore())
         .withTimeOfDataAquisition(currentLevel.getTimeOfDataAquisition());

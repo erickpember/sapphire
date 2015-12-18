@@ -37,6 +37,7 @@ public class NumericalPainLevel {
   public static class CurrentPainLevel {
     private int painScore;
     private Date timeOfDataAquisition;
+    private Date effectiveDateTime;
   }
 
   /**
@@ -97,6 +98,7 @@ public class NumericalPainLevel {
 
     Observation freshestNumericalPainScore = PainUtils.freshestHighestNumericalPainScore(
         observationsSinceMidnight);
+    result.setEffectiveDateTime(ObservationUtils.getEffectiveDate(freshestNumericalPainScore));
 
     if (freshestNumericalPainScore != null) {
       result.setPainScore(PainUtils.getPainScoreFromValue(freshestNumericalPainScore));

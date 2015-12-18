@@ -21,7 +21,7 @@ public class ObservationClient extends BaseClient<Observation> {
 
   private LoadingCache<String, List<Observation>> encounterIdToObservationListMap =
       CacheBuilder.newBuilder()
-      .expireAfterWrite(5, TimeUnit.SECONDS)
+      .expireAfterWrite(30, TimeUnit.SECONDS)
       .build(
           new CacheLoader<String, List<Observation>>() {
             public List<Observation> load(String encounterId) {
@@ -31,7 +31,7 @@ public class ObservationClient extends BaseClient<Observation> {
 
   private LoadingCache<String, Observations> encounterIdToObservationsMap =
       CacheBuilder.newBuilder()
-      .expireAfterWrite(5, TimeUnit.SECONDS)
+      .expireAfterWrite(30, TimeUnit.SECONDS)
       .build(
           new CacheLoader<String, Observations>() {
             public Observations load(String encounterId) {

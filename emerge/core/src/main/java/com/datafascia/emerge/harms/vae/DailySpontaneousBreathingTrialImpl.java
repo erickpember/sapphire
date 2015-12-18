@@ -141,8 +141,14 @@ public class DailySpontaneousBreathingTrialImpl {
         twentyFiveHoursAgo);
 
     if (freshestSBTContraindication.isPresent()) {
-      if (freshestSBTContraindication.get().getValue().toString().equals("Clinically Unstable")) {
+      if (freshestSBTContraindication.get().getValue().toString().contains("Clinically Unstable")) {
         return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.CLINICALLY_UNSTABLE);
+      }
+
+      if (freshestSBTContraindication.get().getValue().toString()
+          .contains("Limited Respiratory Effort")) {
+        return Optional.of(
+            DailySpontaneousBreathingTrialContraindicatedEnum.LIMITED_RESPIRATORY_EFFORT);
       }
 
       if (freshestSBTContraindication.get().getValue().toString().equals("Other (see comment)")) {

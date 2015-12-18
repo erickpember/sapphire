@@ -2,15 +2,9 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.ucsf.hl7;
 
-import ca.uhn.fhir.model.dstu2.resource.Encounter;
-import ca.uhn.fhir.model.primitive.IdDt;
 import com.datafascia.common.nifi.DependencyInjectingProcessor;
-import com.datafascia.domain.fhir.IdentifierSystems;
-import com.datafascia.domain.persist.EncounterRepository;
-import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater;
 import com.datafascia.etl.event.ReplayMessages;
 import com.datafascia.etl.hl7.HL7MessageProcessor;
-import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 import java.nio.charset.StandardCharsets;
@@ -70,9 +64,6 @@ public class ProcessHL7 extends DependencyInjectingProcessor {
   @Inject
   private volatile HL7MessageProcessor hl7MessageProcessor;
 
-  @Inject
-  private volatile HarmEvidenceUpdater harmEvidenceUpdater;
-
   @Override
   public Set<Relationship> getRelationships() {
     return RELATIONSHIPS;
@@ -94,26 +85,6 @@ public class ProcessHL7 extends DependencyInjectingProcessor {
     return new String(bytes, StandardCharsets.UTF_8);
   }
 
-  private static Encounter getEncounter(String encounterIdentifier) {
-    Encounter encounter = new Encounter();
-    encounter.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue(encounterIdentifier);
-    encounter.setId(new IdDt(EncounterRepository.generateId(encounter).toString()));
-    return encounter;
-  }
-
-  private void processTimer(String encounterIdentifier) {
-    if (Strings.isNullOrEmpty(encounterIdentifier)) {
-      throw new IllegalStateException("Missing encounterIdentifier");
-    }
-
-    log.info(
-        "Updating harm evidence for encounter ID {}", new Object[] { encounterIdentifier });
-
-    Encounter encounter = getEncounter(encounterIdentifier);
-    harmEvidenceUpdater.processTimer(encounter);
-  }
-
   @Override
   public void onTrigger(ProcessContext context, ProcessSession session) throws ProcessException {
     FlowFile flowFile = session.get();
@@ -123,13 +94,8 @@ public class ProcessHL7 extends DependencyInjectingProcessor {
 
     try {
       String message = readString(session, flowFile);
-      if (message.isEmpty()) {
-        // Empty input message indicates request for timer-based processing of an encounter.
-        String encounterIdentifier = flowFile.getAttribute("encounterIdentifier");
-        processTimer(encounterIdentifier);
-      } else {
-        hl7MessageProcessor.accept(message);
-      }
+
+      hl7MessageProcessor.accept(message);
 
       session.transfer(flowFile, SUCCESS);
     } catch (RuntimeException e) {

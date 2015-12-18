@@ -11,8 +11,14 @@ import com.datafascia.common.nifi.DependencyInjectingProcessor;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.LocationRepository;
+import com.datafascia.emerge.ucsf.HarmEvidence;
+import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater;
+import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Splitter;
+import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -20,7 +26,6 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import javax.inject.Inject;
-import org.apache.nifi.annotation.behavior.WritesAttribute;
 import org.apache.nifi.annotation.documentation.CapabilityDescription;
 import org.apache.nifi.annotation.documentation.Tags;
 import org.apache.nifi.components.PropertyDescriptor;
@@ -33,7 +38,7 @@ import org.apache.nifi.processor.exception.ProcessException;
 import org.kohsuke.MetaInfServices;
 
 /**
- * Generates event to update harm evidence values which are dependent on the current time.
+ * Updates harm evidence values which are dependent on the current time.
  * This NiFi processor should be scheduled to run frequently enough so the
  * values served to clients are not too stale.
  */
@@ -41,17 +46,19 @@ import org.kohsuke.MetaInfServices;
 @ConfigurationNode("UpdateHarmEvidence")
 @MetaInfServices(Processor.class)
 @Tags({"datafascia", "emerge", "ucsf"})
-@WritesAttribute(
-    attribute = "encounterIdentifier",
-    description = "Identifier of encounter to update")
 public class UpdateHarmEvidence extends DependencyInjectingProcessor {
 
   public static final Relationship SUCCESS = new Relationship.Builder()
       .name("success")
-      .description("Event to update harm evidence for an encounter")
+      .description("Encounter identifier of updated harm evidence record")
       .build();
 
-  private static final Set<Relationship> RELATIONSHIPS = ImmutableSet.of(SUCCESS);
+  public static final Relationship FAILURE = new Relationship.Builder()
+      .name("failure")
+      .description("Harm evidence record which failed to update")
+      .build();
+
+  private Set<Relationship> relationships = ImmutableSet.of(SUCCESS, FAILURE);
 
   private static final Splitter COMMA_SPLITTER = Splitter.on(',').trimResults();
 
@@ -67,9 +74,18 @@ public class UpdateHarmEvidence extends DependencyInjectingProcessor {
   @Inject
   private volatile LocationRepository locationRepository;
 
+  @Inject
+  private volatile HarmEvidenceRepository harmEvidenceRepository;
+
+  @Inject
+  private volatile HarmEvidenceUpdater harmEvidenceUpdater;
+
+  @Inject
+  private volatile ObjectMapper objectMapper;
+
   @Override
   public Set<Relationship> getRelationships() {
-    return RELATIONSHIPS;
+    return relationships;
   }
 
   @Override
@@ -108,14 +124,58 @@ public class UpdateHarmEvidence extends DependencyInjectingProcessor {
         .orElse(false);
   }
 
-  private void writeSuccess(ProcessSession session, String encounterIdentifier)
-      throws ProcessException {
-
+  private void writeSuccess(ProcessSession session, String content) throws ProcessException {
     FlowFile flowFile = session.create();
-    flowFile = session.putAttribute(flowFile, "encounterIdentifier", encounterIdentifier);
+    flowFile = session.write(flowFile, output -> {
+      output.write(content.getBytes(StandardCharsets.UTF_8));
+    });
 
     session.getProvenanceReporter().create(flowFile);
     session.transfer(flowFile, SUCCESS);
+  }
+
+  private void writeFailure(ProcessSession session, HarmEvidence record, RuntimeException exception)
+      throws ProcessException {
+
+    FlowFile flowFile = session.create();
+    flowFile = session.write(flowFile, output -> {
+      objectMapper.writerWithDefaultPrettyPrinter().writeValue(output, record);
+    });
+
+    flowFile = session.putAttribute(
+        flowFile, "stackTrace", Throwables.getStackTraceAsString(exception));
+
+    session.getProvenanceReporter().create(flowFile);
+    session.transfer(flowFile, FAILURE);
+  }
+
+  private void update(HarmEvidence record, Encounter encounter) {
+    log.info(
+        "Updating harm evidence for encounter ID {}, patient ID {}",
+        new Object[] {
+          record.getEncounterID(), record.getDemographicData().getMedicalRecordNumber() });
+
+    harmEvidenceUpdater.processTimer(encounter);
+  }
+
+  private void process(ProcessSession session, Encounter encounter) {
+    String encounterId = encounter.getId().getIdPart();
+
+    Optional<HarmEvidence> optionalRecord = harmEvidenceRepository.read(Id.of(encounterId));
+    if (!optionalRecord.isPresent()) {
+      log.warn(
+          "HarmEvidence record not found for encounter ID {}", new Object[] { encounterId });
+      return;
+    }
+
+    HarmEvidence record = optionalRecord.get();
+    try {
+      update(record, encounter);
+      writeSuccess(session, encounterId);
+    } catch (RuntimeException e) {
+      log.error("Cannot update for encounter ID {}", new Object[] { encounterId }, e);
+      writeFailure(session, record, e);
+    }
   }
 
   @Override
@@ -132,7 +192,7 @@ public class UpdateHarmEvidence extends DependencyInjectingProcessor {
     }
 
     for (Encounter encounter : encounters) {
-      writeSuccess(session, encounter.getIdentifierFirstRep().getValue());
+      process(session, encounter);
     }
   }
 }

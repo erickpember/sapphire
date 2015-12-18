@@ -55,7 +55,8 @@ public class MedAdminDiffTransformer {
 
   // Statuses to ignore in MedAdmin diffs.
   private final static List<String> IGNORE_STATUSES = new ArrayList<>(Arrays.asList(
-      "Due", "Rate Verify", "Canceled Entry", "Stopped"));
+      "Due", "Rate Verify", "Canceled Entry", "Stopped", "MAR Hold", "MAR Unhold",
+      "See Alternative"));
   // Track keys we expect to change.
   private final static String[] MED_DIFF_KEYS = new String[]{"OrderStatus", "OrderedDose",
     "OrderedDoseUnit", "Frequency"};

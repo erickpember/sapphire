@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.inject;
 
+import com.google.common.base.Stopwatch;
 import java.lang.reflect.Method;
 import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.intercept.MethodInterceptor;
@@ -22,10 +23,12 @@ public class TracingInterceptor implements MethodInterceptor {
     Method method = invocation.getMethod();
     String methodName = method.getDeclaringClass().getSimpleName() + '.' + method.getName();
     log.debug("{} BEFORE", methodName);
+    Stopwatch stopwatch = Stopwatch.createStarted();
     try {
       return invocation.proceed();
     } finally {
-      log.debug("{} AFTER", methodName);
+      stopwatch.stop();
+      log.debug("{} AFTER, elapsed {}", methodName, stopwatch);
     }
   }
 }

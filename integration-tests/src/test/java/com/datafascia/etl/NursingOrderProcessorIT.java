@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import javax.inject.Inject;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.nifi.util.TestRunner;
@@ -45,8 +46,10 @@ import static org.testng.Assert.assertTrue;
  */
 @Slf4j
 public class NursingOrderProcessorIT extends ApiTestSupport {
-  private NursingOrdersProcessor processor;
+
+  @Inject
   private ClientBuilder clientBuilder;
+
   private UnitedStatesPatient testPatient;
   private Encounter testEncounter;
 
@@ -105,7 +108,6 @@ public class NursingOrderProcessorIT extends ApiTestSupport {
     Thread.sleep(2000);
 
     TestRunner runner = TestRunners.newTestRunner(NursingOrdersProcessor.class);
-    clientBuilder = new ClientBuilder();
 
     // Positive tests of new data and diffs.
     runner.enqueue(addContent("GetOrdersByUnit.json"));

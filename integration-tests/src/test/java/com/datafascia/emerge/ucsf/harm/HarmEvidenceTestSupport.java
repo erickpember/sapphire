@@ -10,7 +10,6 @@ import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.util.Terser;
 import com.datafascia.api.services.ApiTestSupport;
-import com.datafascia.common.inject.Injectors;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.persist.entity.AccumuloReflectEntityStore;
 import com.datafascia.common.persist.entity.EntityId;
@@ -30,7 +29,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.util.Optional;
 import javax.inject.Inject;
-import org.testng.annotations.BeforeClass;
 
 /**
  * Common implementation for tests of exported data
@@ -65,11 +63,6 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
 
   @Inject
   protected Clock clock;
-
-  @BeforeClass
-  public void beforeHarmEvidenceTestSupport() throws Exception {
-    Injectors.getInjector().injectMembers(this);
-  }
 
   protected static UnitedStatesPatient getPatient() {
     UnitedStatesPatient patient = new UnitedStatesPatient();

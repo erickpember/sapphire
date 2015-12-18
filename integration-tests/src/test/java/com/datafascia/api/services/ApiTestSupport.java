@@ -49,11 +49,11 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import lombok.extern.slf4j.Slf4j;
 import org.hl7.fhir.instance.model.api.IIdType;
 import org.testng.annotations.AfterSuite;
+import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeSuite;
 
 /**
@@ -84,9 +84,6 @@ public abstract class ApiTestSupport {
   private static final DropwizardTestApp<APIConfiguration> app = new DropwizardTestApp<>(
       APIService.class, getConfigurationFileName());
 
-  @Inject
-  private FhirContext fhirContext;
-
   protected static IGenericClient client;
 
   @BeforeSuite
@@ -102,6 +99,7 @@ public abstract class ApiTestSupport {
     app.start();
     log.info("Started Dropwizard application listening on port {}", app.getLocalPort());
 
+    FhirContext fhirContext = injector.getInstance(FhirContext.class);
     client = fhirContext.newRestfulGenericClient(API_ENDPOINT_URL);
     client.registerInterceptor(new BasicAuthInterceptor(FHIR_USERNAME, FHIR_PASSWORD));
 
@@ -111,6 +109,11 @@ public abstract class ApiTestSupport {
   @AfterSuite
   public void afterSuite() throws Exception {
     app.stop();
+  }
+
+  @BeforeClass
+  public void beforeApiTestSupport() throws Exception {
+    Injectors.getInjector().injectMembers(this);
   }
 
   private static String getConfigurationFileName() {

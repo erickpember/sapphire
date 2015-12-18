@@ -7,48 +7,30 @@ import ca.uhn.fhir.rest.client.IGenericClient;
 import ca.uhn.fhir.rest.client.interceptor.BasicAuthInterceptor;
 import com.datafascia.common.configuration.ConfigurationNode;
 import com.datafascia.common.configuration.Configure;
-import com.datafascia.common.configuration.guice.ConfigureModule;
 import com.google.common.base.Strings;
-import com.google.inject.Guice;
-import com.google.inject.Injector;
+import javax.inject.Inject;
 
 /**
  * A builder for resource clients.
  */
 public class ClientBuilder {
-  private static final FhirContext ctx = FhirContext.forDstu2();
   private final IGenericClient client;
-  private static Injector injector;
   private ObservationClient observationClient;
   private PractitionerClient practitionerClient;
 
   /**
-   * Constructs a ClientBuilder using local config.
+   * Constructor
+   *
+   * @param fhirContext
+   *     FHIR context
+   * @param config
+   *     API client configuration
    */
-  public ClientBuilder() {
-    injector = Guice.createInjector(
-        new ConfigureModule() {
-        }
-    );
-    ClientConfiguration config = injector.getInstance(ClientConfiguration.class);
-
-    client = ctx.newRestfulGenericClient(config.endpoint);
+  @Inject
+  public ClientBuilder(FhirContext fhirContext, ClientConfiguration config) {
+    client = fhirContext.newRestfulGenericClient(config.endpoint);
     if (!Strings.isNullOrEmpty(config.username) && !Strings.isNullOrEmpty(config.password)) {
       client.registerInterceptor(new BasicAuthInterceptor(config.username, config.password));
-    }
-  }
-
-  /**
-   * Constructs a ClientBuilder.
-   *
-   * @param apiEndpoint The FHIR API endpoint to connect to.
-   * @param username The username to authenticate with.
-   * @param password The password to authenticate with.
-   */
-  public ClientBuilder(String apiEndpoint, String username, String password) {
-    client = ctx.newRestfulGenericClient(apiEndpoint);
-    if (!Strings.isNullOrEmpty(username) && !Strings.isNullOrEmpty(password)) {
-      client.registerInterceptor(new BasicAuthInterceptor(username, password));
     }
   }
 

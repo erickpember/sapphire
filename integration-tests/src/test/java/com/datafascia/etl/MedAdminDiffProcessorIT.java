@@ -56,6 +56,8 @@ import static org.testng.Assert.assertEquals;
 @Slf4j
 public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminDiffListener {
   private MedAdminDiffProcessor processor;
+
+  @Inject
   private ClientBuilder clientBuilder;
 
   @Inject
@@ -113,7 +115,6 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
     Thread.sleep(2000);
 
     TestRunner runner = TestRunners.newTestRunner(MedAdminDiffProcessor.class);
-    clientBuilder = new ClientBuilder();
 
     processor = (MedAdminDiffProcessor) runner.getProcessor();
     processor.setDiffListener(this);

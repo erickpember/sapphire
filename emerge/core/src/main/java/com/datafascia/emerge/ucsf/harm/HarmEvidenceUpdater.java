@@ -11,6 +11,7 @@ import ca.uhn.fhir.model.dstu2.resource.Procedure;
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
+import com.datafascia.emerge.ucsf.EncounterMutex;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.MedicalData;
 import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
@@ -72,6 +73,9 @@ public class HarmEvidenceUpdater {
       log.error("Exception in consequence of rule {}", match.getRule(), exception);
     }
   }
+
+  @Inject
+  private EncounterMutex encounterMutex;
 
   @Inject
   private HarmEvidenceRepository harmEvidenceRepository;
@@ -142,7 +146,7 @@ public class HarmEvidenceUpdater {
     return harmEvidence;
   }
 
-  private HarmEvidence executeWithObservations(
+  private void doExecuteWithObservations(
       EventType eventType,
       Encounter encounter,
       List<Observation> observations,
@@ -168,13 +172,27 @@ public class HarmEvidenceUpdater {
     facts.addAll(Arrays.asList(additionalFacts));
 
     session.execute(facts);
-    return harmEvidence;
+
+    harmEvidenceRepository.save(harmEvidence);
   }
 
-  private HarmEvidence execute(
-      EventType eventType, Encounter encounter, Object... additionalFacts) {
+  private void executeWithObservations(
+      EventType eventType,
+      Encounter encounter,
+      List<Observation> observations,
+      Object... additionalFacts) {
 
-    return executeWithObservations(eventType, encounter, Collections.emptyList(), additionalFacts);
+    String encounterIdentifier = encounter.getIdentifierFirstRep().getValue();
+    encounterMutex.acquire(encounterIdentifier);
+    try {
+      doExecuteWithObservations(eventType, encounter, observations, additionalFacts);
+    } finally {
+      encounterMutex.release(encounterIdentifier);
+    }
+  }
+
+  private void execute(EventType eventType, Encounter encounter, Object... additionalFacts) {
+    executeWithObservations(eventType, encounter, Collections.emptyList(), additionalFacts);
   }
 
   /**
@@ -190,8 +208,7 @@ public class HarmEvidenceUpdater {
   public void admitPatient(
       UnitedStatesPatient patient, Location location, Encounter encounter) {
 
-    HarmEvidence harmEvidence = execute(EventType.ADMIT_PATIENT, encounter, patient, location);
-    harmEvidenceRepository.save(harmEvidence);
+    execute(EventType.ADMIT_PATIENT, encounter, patient, location);
   }
 
   /**
@@ -215,8 +232,7 @@ public class HarmEvidenceUpdater {
    *     encounter
    */
   public void processTimer(Encounter encounter) {
-    HarmEvidence harmEvidence = execute(EventType.TIMER, encounter);
-    harmEvidenceRepository.save(harmEvidence);
+    execute(EventType.TIMER, encounter);
   }
 
   /**
@@ -228,9 +244,7 @@ public class HarmEvidenceUpdater {
    *     encounter
    */
   public void updateObservations(List<Observation> observations, Encounter encounter) {
-    HarmEvidence harmEvidence = executeWithObservations(
-        EventType.UPDATE_OBSERVATIONS, encounter, observations);
-    harmEvidenceRepository.save(harmEvidence);
+    executeWithObservations(EventType.UPDATE_OBSERVATIONS, encounter, observations);
   }
 
   /**
@@ -242,8 +256,7 @@ public class HarmEvidenceUpdater {
    *     encounter
    */
   public void updateFlag(Flag flag, Encounter encounter) {
-    HarmEvidence harmEvidence = execute(EventType.UPDATE_FLAG, encounter, flag);
-    harmEvidenceRepository.save(harmEvidence);
+    execute(EventType.UPDATE_FLAG, encounter, flag);
   }
 
   /**
@@ -255,8 +268,7 @@ public class HarmEvidenceUpdater {
    *    encounter
    */
   public void updateParticipant(Practitioner practitioner, Encounter encounter) {
-    HarmEvidence harmEvidence = execute(EventType.UPDATE_PARTICIPANT, encounter, practitioner);
-    harmEvidenceRepository.save(harmEvidence);
+    execute(EventType.UPDATE_PARTICIPANT, encounter, practitioner);
   }
 
   /**
@@ -269,11 +281,8 @@ public class HarmEvidenceUpdater {
    * @param encounter
    *     encounter
    */
-  public void updatePatient(
-      UnitedStatesPatient patient, Location location, Encounter encounter) {
-
-    HarmEvidence harmEvidence = execute(EventType.UPDATE_PATIENT, encounter, patient, location);
-    harmEvidenceRepository.save(harmEvidence);
+  public void updatePatient(UnitedStatesPatient patient, Location location, Encounter encounter) {
+    execute(EventType.UPDATE_PATIENT, encounter, patient, location);
   }
 
   /**
@@ -285,8 +294,7 @@ public class HarmEvidenceUpdater {
    *     encounter
    */
   public void updateProcedure(Procedure procedure, Encounter encounter) {
-    HarmEvidence harmEvidence = execute(EventType.UPDATE_PROCEDURE, encounter, procedure);
-    harmEvidenceRepository.save(harmEvidence);
+    execute(EventType.UPDATE_PROCEDURE, encounter, procedure);
   }
 
   /**
@@ -298,8 +306,6 @@ public class HarmEvidenceUpdater {
    *     encounter
    */
   public void updateProcedureRequest(ProcedureRequest procedureRequest, Encounter encounter) {
-    HarmEvidence harmEvidence = execute(
-        EventType.UPDATE_PROCEDURE_REQUEST, encounter, procedureRequest);
-    harmEvidenceRepository.save(harmEvidence);
+    execute(EventType.UPDATE_PROCEDURE_REQUEST, encounter, procedureRequest);
   }
 }

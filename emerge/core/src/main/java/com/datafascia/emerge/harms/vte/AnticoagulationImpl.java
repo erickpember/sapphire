@@ -83,7 +83,9 @@ public class AnticoagulationImpl {
                   .equals(admin.getStatusElement().getValueAsEnum())
                   || MedicationAdministrationStatusEnum.ON_HOLD
                   .equals(admin.getStatusElement().getValueAsEnum())) {
-                if (HarmsLookups.withinDrugPeriod(timeTaken.getValue(), period, clock)) {
+                if (MedicationAdministrationUtils.dosageOverZero(admin) &&
+                    admin.getReasonNotGiven().isEmpty() &&
+                    HarmsLookups.withinDrugPeriod(timeTaken.getValue(), period, clock)) {
                   return Optional.of(antiType);
                 }
               }

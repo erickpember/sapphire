@@ -4,10 +4,10 @@ package com.datafascia.emerge.harms.iaw;
 
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.api.client.Observations;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
 
@@ -39,13 +39,9 @@ public class MobilityScore {
    * @return optional observation, empty if not found
    */
   public Optional<Observation> getFreshestObservation(String encounterId) {
-    List<Observation> observations = apiClient.getObservationClient().searchObservation(
-        encounterId, ObservationCodeEnum.MOBILITY_SCORE.getCode(), null);
-    if (observations.isEmpty()) {
-      return Optional.empty();
-    }
+    Observations observations = apiClient.getObservationClient().list(encounterId);
 
-    return Optional.of(ObservationUtils.findFreshestObservation(observations));
+    return observations.findFreshest(ObservationCodeEnum.MOBILITY_SCORE.getCode());
   }
 
   /**

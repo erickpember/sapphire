@@ -15,8 +15,9 @@ import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.exceptions.UnprocessableEntityException;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.persist.ObservationRepository;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 import javax.inject.Inject;
 
 /**
@@ -56,6 +57,10 @@ public class ObservationResourceProvider implements IResourceProvider {
     return new MethodOutcome(observation.getId());
   }
 
+  private static String getCode(Observation observation) {
+    return observation.getCode().getCodingFirstRep().getCode();
+  }
+
   /**
    * Searches observations based on encounter. Returns list of Observations where
    * Observation.encounter matches a given Encounter resource ID.
@@ -70,20 +75,18 @@ public class ObservationResourceProvider implements IResourceProvider {
   public List<Observation> search(
       @RequiredParam(name = Observation.SP_ENCOUNTER) StringParam encounterId,
       @OptionalParam(name = Observation.SP_CODE) StringParam code) {
-    List<Observation> observations = new ArrayList<>();
 
     Id<Encounter> encounterInternalId = Id.of(encounterId.getValue());
-    observations.addAll(observationRepository.list(encounterInternalId));
+
+    Stream<Observation> observations = observationRepository.list(encounterInternalId)
+        .stream()
+        .filter(observation -> !"85200".equals(getCode(observation)));
 
     if (code != null) {
-      List<Observation> filteredResults = new ArrayList<>();
-      for (Observation observation : observations) {
-        if (observation.getCode().getCodingFirstRep().getCode().equalsIgnoreCase(code.getValue())) {
-          filteredResults.add(observation);
-        }
-      }
-      observations = filteredResults;
+      observations = observations
+          .filter(observation -> code.getValue().equals(getCode(observation)));
     }
-    return observations;
+
+    return observations.collect(Collectors.toList());
   }
 }

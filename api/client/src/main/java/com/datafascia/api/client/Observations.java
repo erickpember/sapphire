@@ -45,6 +45,32 @@ public class Observations {
     }
   }
 
+  /**
+   * Compares effective date of observations. Orders empty optionals first.
+   *
+   * @param left
+   *     observation in question
+   * @param right
+   *     observation we're comparing it to
+   * @return true if left is older than right
+   */
+  public static boolean isEffectiveBefore(Optional<Observation> left, Optional<Observation> right) {
+    return EFFECTIVE_COMPARATOR.compare(left.orElse(null), right.orElse(null)) < 0;
+  }
+
+  /**
+   * Compares effective date of observations. Orders empty optionals first.
+   *
+   * @param left
+   *     observation in question
+   * @param right
+   *     observation we're comparing it to
+   * @return true if left is newer than right
+   */
+  public static boolean isEffectiveAfter(Optional<Observation> left, Optional<Observation> right) {
+    return EFFECTIVE_COMPARATOR.compare(left.orElse(null), right.orElse(null)) > 0;
+  }
+
   private static String getCode(Observation observation) {
     return observation.getCode().getCodingFirstRep().getCode();
   }

@@ -4,6 +4,7 @@ package com.datafascia.emerge.harms.vae;
 
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.api.client.Observations;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import com.datafascia.emerge.ucsf.codes.ventilation.BreathTypeEnum;
@@ -14,6 +15,8 @@ import com.google.common.collect.ImmutableSet;
 import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
+
+import static com.datafascia.api.client.Observations.isEffectiveAfter;
 
 /**
  * Computes VAE Ventilation Mode
@@ -47,40 +50,45 @@ public class VentilationModeImpl {
    * @return ventilation mode
    */
   public String getVentilationMode(String encounterId) {
-    Observation freshestVentMode = ObservationUtils.findFreshestObservationForCode(
-        apiClient, encounterId, ObservationCodeEnum.VENT_MODE.getCode());
+    Observations observations = apiClient.getObservationClient().list(encounterId);
 
-    Observation freshestBreathType = ObservationUtils.findFreshestObservationForCode(
-        apiClient, encounterId, ObservationCodeEnum.BREATH_TYPE.getCode());
+    Optional<Observation> freshestVentMode = observations.findFreshest(
+        ObservationCodeEnum.VENT_MODE.getCode());
 
-    Observation freshestNonInvasiveDeviceMode = ObservationUtils.findFreshestObservationForCode(
-        apiClient, encounterId, ObservationCodeEnum.NON_INVASIVE_DEVICE_MODE.getCode());
+    Optional<Observation> freshestBreathType = observations.findFreshest(
+        ObservationCodeEnum.BREATH_TYPE.getCode());
+
+    Optional<Observation> freshestNonInvasiveDeviceMode = observations.findFreshest(
+        ObservationCodeEnum.NON_INVASIVE_DEVICE_MODE.getCode());
 
     // For when either breath type or vent mode are fresher than non-invasive device mode
-    if (freshestBreathType != null && freshestVentMode != null && (ObservationUtils.firstIsFresher(
-        freshestVentMode, freshestNonInvasiveDeviceMode) || ObservationUtils.firstIsFresher(
-            freshestBreathType, freshestNonInvasiveDeviceMode))) {
-      Optional<String> result = eitherBreathOrVentIsFreshest(freshestBreathType, freshestVentMode);
+    if (freshestBreathType.isPresent() &&
+        freshestVentMode.isPresent() &&
+        (isEffectiveAfter(freshestVentMode, freshestNonInvasiveDeviceMode) ||
+         isEffectiveAfter(freshestBreathType, freshestNonInvasiveDeviceMode))) {
+      Optional<String> result = eitherBreathOrVentIsFreshest(
+          freshestBreathType.get(), freshestVentMode.get());
       if (result.isPresent()) {
         return result.get();
       }
     }
 
     // For when breath type is fresher than non-invasive device mode
-    if (freshestBreathType != null && ObservationUtils.firstIsFresher(freshestBreathType,
-        freshestNonInvasiveDeviceMode)) {
-      Optional<String> result = breathIsFresherThanNonInvasive(freshestBreathType);
+    if (freshestBreathType.isPresent() &&
+        isEffectiveAfter(freshestBreathType, freshestNonInvasiveDeviceMode)) {
+      Optional<String> result = breathIsFresherThanNonInvasive(freshestBreathType.get());
       if (result.isPresent()) {
         return result.get();
       }
     }
 
     // For when non-invasive device mode is fresher than both the freshest vent mode and breath type
-    if (freshestBreathType != null && freshestVentMode != null && (ObservationUtils.firstIsFresher(
-        freshestVentMode, freshestNonInvasiveDeviceMode) && ObservationUtils.firstIsFresher(
-            freshestBreathType, freshestNonInvasiveDeviceMode))) {
+    if (freshestBreathType.isPresent() &&
+        freshestVentMode.isPresent() &&
+        (isEffectiveAfter(freshestVentMode, freshestNonInvasiveDeviceMode) &&
+         isEffectiveAfter(freshestBreathType, freshestNonInvasiveDeviceMode))) {
       Optional<String> result = nonInvasiveIsFresherThanVentOrBreath(
-          freshestNonInvasiveDeviceMode);
+          freshestNonInvasiveDeviceMode.get());
       if (result.isPresent()) {
         return result.get();
       }

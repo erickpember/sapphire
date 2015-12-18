@@ -6,12 +6,14 @@ import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.api.client.Observations;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import java.time.Clock;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import javax.inject.Inject;
 import lombok.Builder;
 import lombok.Data;
@@ -80,21 +82,21 @@ public class RassLevel {
         0,
         0,
         clock.getZone());
-    PeriodDt sinceMidnight = new PeriodDt();
-    sinceMidnight.setStart(new DateTimeDt(Date.from(midnight.toInstant())));
-    sinceMidnight.setEnd(new DateTimeDt(Date.from(now.toInstant())));
 
     CurrentRassLevel result = CurrentRassLevel.builder()
         .rassScore(11)
-        .timeOfDataAquisition(sinceMidnight.getEnd())
+        .timeOfDataAquisition(Date.from(now.toInstant()))
         .build();
 
-    Observation freshestRassScore = ObservationUtils.getFreshestByCodeInTimeFrame(apiClient,
-        encounterId, ObservationCodeEnum.RASS.getCode(), sinceMidnight);
+    Observations observations = apiClient.getObservationClient().list(encounterId);
 
-    if (freshestRassScore != null) {
-      result.setRassScore(RassUtils.getRassScoreFromValue(freshestRassScore));
-      result.setTimeOfDataAquisition(ObservationUtils.getEffectiveDate(freshestRassScore));
+    Optional<Observation> freshestRassScore = observations.filterToStream(
+        ObservationCodeEnum.RASS.getCode(), midnight.toInstant(), now.toInstant())
+        .max(Observations.EFFECTIVE_COMPARATOR);
+
+    if (freshestRassScore.isPresent()) {
+      result.setRassScore(RassUtils.getRassScoreFromValue(freshestRassScore.get()));
+      result.setTimeOfDataAquisition(ObservationUtils.getEffectiveDate(freshestRassScore.get()));
     }
     return result;
   }

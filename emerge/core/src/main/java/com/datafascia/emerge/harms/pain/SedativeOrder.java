@@ -72,15 +72,12 @@ public class SedativeOrder {
    * @param encounterId
    *     encounter to check.
    * @return
-   *     A list of results with drug name, route and order status, null if not found.
+   *     A list of results with drug name, route and order status, empty list if not found.
    */
   public List<OrderResult> getAllSedativeOrders(String encounterId) {
 
     List<MedicationOrder> medOrders = apiClient.getMedicationOrderClient().search(encounterId,
         null, null);
-    if (medOrders == null || medOrders.isEmpty()) {
-      return null;
-    }
 
     medOrders.sort(new MedicationOrderDateWrittenComparator().reversed());
 
@@ -92,7 +89,7 @@ public class SedativeOrder {
    * @param medOrders
    *     A list of medication orders whose meds set identifiers we will scan.
    * @return
-   *     A list of results with drug name, route and order status, null if not found.
+   *     A list of results with drug name, route and order status, empty list if not found.
    */
   public List<OrderResult> processSedativeOrders(List<MedicationOrder> medOrders) {
     List<OrderResult> results = new ArrayList<>();

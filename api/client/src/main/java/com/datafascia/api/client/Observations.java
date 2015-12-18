@@ -4,8 +4,8 @@ package com.datafascia.api.client;
 
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.domain.fhir.Dates;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multimaps;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,8 +37,12 @@ public class Observations {
    */
   public Observations(List<Observation> observations) {
     this.observations = observations;
-    codeToObservationsMap = Multimaps.index(
-        observations, observation -> getCode(observation));
+
+    int estimatedSize = observations.size() / 2 + 1;
+    codeToObservationsMap = ArrayListMultimap.create(estimatedSize, estimatedSize);
+    for (Observation observation : observations) {
+      codeToObservationsMap.put(getCode(observation), observation);
+    }
   }
 
   private static String getCode(Observation observation) {

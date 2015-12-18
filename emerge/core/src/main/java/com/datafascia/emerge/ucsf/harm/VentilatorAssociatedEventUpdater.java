@@ -161,7 +161,7 @@ public class VentilatorAssociatedEventUpdater {
         dailySedationInterruptionCandidate.getDailySedationInterruptionCandidate(encounterId);
     boolean performed = dailySedationInterruption.test(encounterId);
 
-    SATDSI dailySedationInterruption = new SATDSI()
+    SATDSI dailySedationInterruptionResult = new SATDSI()
         .withCandidate(
             candidateResult.isCandidate())
         .withNotCandidateReason(
@@ -172,7 +172,7 @@ public class VentilatorAssociatedEventUpdater {
         .withUpdateTime(
             Date.from(Instant.now(clock)));
 
-    harmEvidence.getMedicalData().setSATDSI(dailySedationInterruption);
+    harmEvidence.getMedicalData().setSATDSI(dailySedationInterruptionResult);
   }
 
   /**

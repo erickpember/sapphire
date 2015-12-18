@@ -43,11 +43,11 @@ public class MedicationAdministrationUtils {
     IDatatype effectiveTime = admin.getEffectiveTime();
 
     if (effectiveTime instanceof TimingDt) {
-      return ((TimingDt) effectiveTime).getEventFirstRep().getValue().after(startTime);
+      return ((TimingDt) effectiveTime).getEventFirstRep().getValue().compareTo(startTime) >= 0;
     } else if (effectiveTime instanceof PeriodDt) {
-      return ((PeriodDt) effectiveTime).getStart().after(startTime);
+      return ((PeriodDt) effectiveTime).getStart().compareTo(startTime) >= 0;
     } else if (effectiveTime instanceof DateTimeDt) {
-      return ((DateTimeDt) effectiveTime).getValue().after(startTime);
+      return ((DateTimeDt) effectiveTime).getValue().compareTo(startTime) >= 0;
     } else {
       throw new RuntimeException("Unexpected type: " + effectiveTime.getClass().getCanonicalName());
     }

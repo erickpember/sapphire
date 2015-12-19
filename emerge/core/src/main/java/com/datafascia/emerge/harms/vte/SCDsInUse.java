@@ -44,9 +44,9 @@ public class SCDsInUse {
    * @return true if SCDs are in use
    */
   public boolean isSCDsInUse(String encounterId) {
-    PeriodDt currentOrPriorShift = ShiftUtils.getCurrentOrPreviousShift(clock);
-    Instant effectiveLower = currentOrPriorShift.getStart().toInstant();
-    Instant effectiveUpper = currentOrPriorShift.getEnd().toInstant();
+    PeriodDt fromCurrentOrPriorShift = ShiftUtils.getCurrentOrPriorShiftToNow(clock);
+    Instant effectiveLower = fromCurrentOrPriorShift.getStart().toInstant();
+    Instant effectiveUpper = fromCurrentOrPriorShift.getEnd().toInstant();
 
     Observations observations = apiClient.getObservationClient().list(encounterId);
 

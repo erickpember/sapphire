@@ -54,10 +54,10 @@ public class CamImpl {
    * @return Cam UTA Reason and Result, or Optional.empty if not found.
    */
   public CamImplResult getCam(String encounterId) {
-    PeriodDt currentOrPriorShift = ShiftUtils.getCurrentOrPreviousShift(clock);
+    PeriodDt fromCurrentOrPriorShift = ShiftUtils.getCurrentOrPriorShiftToNow(clock);
 
     Observation freshestFromShift = ObservationUtils.getFreshestByCodeInTimeFrame(apiClient,
-        encounterId, ObservationCodeEnum.CAM_ICU.getCode(), currentOrPriorShift);
+        encounterId, ObservationCodeEnum.CAM_ICU.getCode(), fromCurrentOrPriorShift);
 
     String freshestValueFromShift = ObservationUtils.getValueAsString(freshestFromShift);
 

@@ -35,7 +35,7 @@ public class PainGoalImpl {
    * @return Numeric pain goal.
    */
   public int getPainGoal(String encounterId) {
-    PeriodDt currentOrPriorShift = ShiftUtils.getCurrentOrPreviousShift(clock);
+    PeriodDt fromCurrentOrPriorShift = ShiftUtils.getCurrentOrPriorShiftToNow(clock);
     ZonedDateTime now = ZonedDateTime.now(clock);
     ZonedDateTime midnight = ZonedDateTime.of(
         now.getYear(),
@@ -83,7 +83,7 @@ public class PainGoalImpl {
     if (freshestPainType.equals(PainUtils.PainType.NUMERICAL)
         || freshestPainType.equals(PainUtils.PainType.VERBAL)) {
       List<Observation> acceptableLevelOfPainAssessments = PainUtils
-          .getAcceptableLevelOfPainAssessments(apiClient, encounterId, currentOrPriorShift);
+          .getAcceptableLevelOfPainAssessments(apiClient, encounterId, fromCurrentOrPriorShift);
 
       if (acceptableLevelOfPainAssessments.isEmpty() || !acceptableLevelOfPainAssessments.stream()
           .anyMatch(observation -> !ObservationUtils.getValueAsString(observation).equals(

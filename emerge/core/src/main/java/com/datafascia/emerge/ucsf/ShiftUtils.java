@@ -5,6 +5,7 @@ package com.datafascia.emerge.ucsf;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import java.time.Clock;
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Date;
 import lombok.extern.slf4j.Slf4j;
@@ -30,7 +31,7 @@ public class ShiftUtils {
    * @return
    *     The start and end time of the current or previous shift.
    */
-  public static PeriodDt getCurrentOrPreviousShift(Clock clock) {
+  public static PeriodDt getCurrentOrPriorShift(Clock clock) {
     ZonedDateTime now = ZonedDateTime.now(clock);
     int nowHour = now.getHour();
     int shiftStartHour = -1;
@@ -81,6 +82,19 @@ public class ShiftUtils {
     shift.setStart(new DateTimeDt(Date.from(shiftStart.toInstant())));
     shift.setEnd(new DateTimeDt(Date.from(shiftEnd.toInstant())));
 
+    return shift;
+  }
+
+  /**
+   * Gets period from the start of the current or prior shift to now.
+   *
+   * @param clock
+   *     clock with the relevant time zone
+   * @return period from the start of the current or prior shift to now
+   */
+  public static PeriodDt getCurrentOrPriorShiftToNow(Clock clock) {
+    PeriodDt shift = getCurrentOrPriorShift(clock);
+    shift.setEnd(new DateTimeDt(Date.from(Instant.now())));
     return shift;
   }
 }

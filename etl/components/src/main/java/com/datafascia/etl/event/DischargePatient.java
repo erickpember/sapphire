@@ -31,24 +31,21 @@ public class DischargePatient {
    *
    * @param triggerEvent
    *     HL7 message trigger event
-   * @param inputEncounter
+   * @param newEncounter
    *     encounter
    */
-  public void accept(String triggerEvent, Encounter inputEncounter) {
-    Id<Encounter> encounterId = EncounterRepository.generateId(inputEncounter);
-    Optional<Encounter> optionalEncounter = encounterRepository.read(encounterId);
-    if (!optionalEncounter.isPresent()) {
+  public void accept(String triggerEvent, Encounter newEncounter) {
+    Id<Encounter> encounterId = EncounterRepository.generateId(newEncounter);
+    Optional<Encounter> currentEncounter = encounterRepository.read(encounterId);
+    if (!currentEncounter.isPresent()) {
       log.error("encounter ID [{}] not found", encounterId);
       return;
     }
 
-    Encounter encounter = optionalEncounter.get();
-    encounter.setStatus(inputEncounter.getStatusElement());
-    encounter.getPeriod().setEnd(inputEncounter.getPeriod().getEndElement());
-    encounterStatusTransition.updateEncounterStatus(triggerEvent, encounter);
+    encounterStatusTransition.updateEncounterStatus(triggerEvent, currentEncounter, newEncounter);
 
-    encounterRepository.save(encounter);
+    encounterRepository.save(newEncounter);
 
-    harmEvidenceUpdater.dischargePatient(encounter);
+    harmEvidenceUpdater.dischargePatient(newEncounter);
   }
 }

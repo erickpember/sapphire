@@ -5,6 +5,8 @@ package com.datafascia.etl.event;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Location;
+import ca.uhn.fhir.model.dstu2.valueset.EncounterLocationStatusEnum;
+import com.datafascia.common.persist.Id;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.LocationRepository;
@@ -12,6 +14,7 @@ import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater;
 import com.datafascia.etl.hl7.EncounterStatusTransition;
 import com.google.common.base.Strings;
+import java.util.Optional;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
@@ -56,35 +59,48 @@ public class AdmitPatient {
    *     patient
    * @param location
    *     location
-   * @param encounter
+   * @param newEncounter
    *     encounter
    */
   public void accept(
       String triggerEvent,
       UnitedStatesPatient patient,
       Location location,
-      Encounter encounter) {
+      Encounter newEncounter) {
 
     patientRepository.save(patient);
 
     if (Strings.isNullOrEmpty(location.getIdentifierFirstRep().getValue())) {
-      log.error("Discarded location with missing identifier for encounter ID {}, hl7:{}",
-          encounter.getIdentifierFirstRep().getValue(), triggerEvent);
+      log.error("Discarded location with missing identifier for encounter ID {}, trigger event {}",
+          newEncounter.getIdentifierFirstRep().getValue(), triggerEvent);
     } else {
       locationRepository.save(location);
     }
 
-    encounter
+    newEncounter
         .setPatient(new ResourceReferenceDt(patient))
-        .addLocation().setLocation(new ResourceReferenceDt(location));
-    encounterStatusTransition.updateEncounterStatus(triggerEvent, encounter);
+        .addLocation()
+            .setLocation(new ResourceReferenceDt(location))
+            .setStatus(EncounterLocationStatusEnum.PRESENT);
 
-    encounterRepository.save(encounter);
+    Id<Encounter> encounterId = EncounterRepository.generateId(newEncounter);
+    Optional<Encounter> currentEncounter = encounterRepository.read(encounterId);
+
+    encounterStatusTransition.updateEncounterStatus(triggerEvent, currentEncounter, newEncounter);
+
+    if (currentEncounter.isPresent()) {
+      if (!"A02".equals(triggerEvent)) {
+        // If not a transfer, then preserve current period.
+        newEncounter.setPeriod(currentEncounter.get().getPeriod());
+      }
+    }
+
+    encounterRepository.save(newEncounter);
 
     if (isAdmitOrTransfer(triggerEvent)) {
-      harmEvidenceUpdater.admitPatient(patient, location, encounter);
+      harmEvidenceUpdater.admitPatient(patient, location, newEncounter);
     } else {
-      harmEvidenceUpdater.updatePatient(patient, location, encounter);
+      harmEvidenceUpdater.updatePatient(patient, location, newEncounter);
     }
   }
 }

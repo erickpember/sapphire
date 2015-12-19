@@ -98,16 +98,22 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
     return location;
   }
 
-  private Encounter toEncounter(PV1 pv1) throws HL7Exception {
+  private Encounter toEncounter(MSH msh, PV1 pv1) throws HL7Exception {
     Encounter encounter = new Encounter();
     encounter.addIdentifier()
         .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER)
         .setValue(getEncounterIdentifier(pv1));
 
-    PeriodDt period = new PeriodDt()
-        .setStart(TimeStamps.toDateTime(pv1.getAdmitDateTime()))
-        .setEnd(TimeStamps.toDateTime(pv1.getDischargeDateTime(0)));
-    encounter.setPeriod(period);
+    PeriodDt period = encounter.getPeriod();
+    if ("A02".equals(msh.getMessageType().getTriggerEvent().getValue())) {
+      // Set period start to when patient was transferred.
+      period.setStart(TimeStamps.toDateTime(msh.getDateTimeOfMessage()));
+    } else {
+      period
+          .setStart(TimeStamps.toDateTime(pv1.getAdmitDateTime()))
+          .setEnd(TimeStamps.toDateTime(pv1.getDischargeDateTime(0)));
+    }
+
     return encounter;
   }
 
@@ -195,7 +201,7 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
 
     UnitedStatesPatient patient = toPatient(pid);
     Location location = toLocation(pv1);
-    Encounter encounter = toEncounter(pv1);
+    Encounter encounter = toEncounter(msh, pv1);
     admitPatient.accept(
         msh.getMessageType().getTriggerEvent().getValue(), patient, location, encounter);
 
@@ -268,7 +274,7 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
 
     addObservations(message, pid, pv1);
 
-    Encounter encounter = toEncounter(pv1);
+    Encounter encounter = toEncounter(msh, pv1);
     readParticipants(rolList, encounter);
     readParticipants(rol2List, encounter);
 

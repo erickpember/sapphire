@@ -49,13 +49,14 @@ public class DemographicIT extends HarmEvidenceTestSupport {
   public void transfer_should_export_demographic_data() throws Exception {
     saveMessage("ADT_A01.hl7");
     processMessage("ADT_A02.hl7");
+    processMessage("ADT_A08.hl7");
 
     HarmEvidence harmEvidence = readHarmEvidence();
     DemographicData demographicData = harmEvidence.getDemographicData();
 
     assertEquals(demographicData.getPatientName(), "ONE A NATUS-ADULT");
     assertEquals(demographicData.getMedicalRecordNumber(), PATIENT_IDENTIFIER);
-    assertEquals(demographicData.getICUadmitDate().toInstant().toString(), "2014-10-01T19:01:00Z");
+    assertEquals(demographicData.getICUadmitDate().toInstant().toString(), "2015-10-01T19:05:32Z");
     assertEquals(demographicData.getDateOfBirth(), "1999-10-01");
     assertEquals(demographicData.getGender(), DemographicData.Gender.FEMALE);
     assertEquals(demographicData.getRace(), "White");

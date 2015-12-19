@@ -4,12 +4,9 @@ package com.datafascia.etl.hl7;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
-import com.datafascia.common.persist.Id;
-import com.datafascia.domain.persist.EncounterRepository;
 import com.google.common.base.MoreObjects;
 import java.util.Arrays;
 import java.util.Optional;
-import javax.inject.Inject;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import org.kie.api.KieServices;
@@ -30,9 +27,6 @@ public class EncounterStatusTransition {
     private String triggerEvent;
   }
 
-  @Inject
-  private EncounterRepository encounterRepository;
-
   private KieContainer container;
 
   /**
@@ -43,31 +37,29 @@ public class EncounterStatusTransition {
     container = services.newKieClasspathContainer();
   }
 
-  private EncounterStateEnum readCurrentStatus(Encounter encounter) {
-    Id<Encounter> encounterId = EncounterRepository.generateId(encounter);
-    Optional<Encounter> optionalEncounter = encounterRepository.read(encounterId);
-    if (optionalEncounter.isPresent()) {
-      return optionalEncounter.get().getStatusElement().getValueAsEnum();
-    }
-    return null;
-  }
-
   /**
    * Computes next encounter status.
    *
    * @param triggerEvent
    *     HL7 message trigger event
-   * @param encounter
-   *     to update
+   * @param currentEncounter
+   *     current encounter
+   * @param newEncounter
+   *     new encounter
    */
-  public void updateEncounterStatus(String triggerEvent, Encounter encounter) {
-    encounter.setStatus(readCurrentStatus(encounter));
+  public void updateEncounterStatus(
+      String triggerEvent, Optional<Encounter> currentEncounter, Encounter newEncounter) {
+
+    EncounterStateEnum currentStatus = currentEncounter
+        .map(encounter -> encounter.getStatusElement().getValueAsEnum())
+        .orElse(null);
+    newEncounter.setStatus(currentStatus);
 
     StatelessKieSession session = container.newStatelessKieSession("encounterStatus");
-    session.execute(Arrays.asList(new MessageType(triggerEvent), encounter));
+    session.execute(Arrays.asList(new MessageType(triggerEvent), newEncounter));
 
-    encounter.setStatus(MoreObjects.firstNonNull(
-        encounter.getStatusElement().getValueAsEnum(),
+    newEncounter.setStatus(MoreObjects.firstNonNull(
+        newEncounter.getStatusElement().getValueAsEnum(),
         EncounterStateEnum.IN_PROGRESS));
   }
 }

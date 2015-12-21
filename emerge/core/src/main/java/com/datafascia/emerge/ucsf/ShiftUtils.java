@@ -94,7 +94,8 @@ public class ShiftUtils {
    */
   public static PeriodDt getCurrentOrPriorShiftToNow(Clock clock) {
     PeriodDt shift = getCurrentOrPriorShift(clock);
-    shift.setEnd(new DateTimeDt(Date.from(Instant.now())));
+    shift.setEnd(new DateTimeDt(Date.from(Instant.now(clock))));
+
     return shift;
   }
 }

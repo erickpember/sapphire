@@ -6,7 +6,6 @@ import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.domain.fhir.Dates;
-import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -156,53 +155,5 @@ public class ProcedureRequestUtils {
       }
     }
     return returnList;
-  }
-
-  private static ProcedureRequest filterCodeFreshest(
-      List<ProcedureRequest> procedureRequests, String code) {
-
-    return procedureRequests.stream()
-        .filter(request -> request.getCode().getCodingFirstRep().getCode().equals(code))
-        .max(ProcedureRequestUtils.getScheduledComparator())
-        .orElse(null);
-  }
-
-  /**
-   * Finds freshest place SCDs.
-   *
-   * @param procedureRequests
-   *     items to search
-   * @return freshest place SCDs, or {@code null} if not found
-   */
-  public static ProcedureRequest findFreshestPlaceSCDs(
-      List<ProcedureRequest> procedureRequests) {
-    return filterCodeFreshest(procedureRequests,
-        ProcedureRequestCodeEnum.PLACE_SCDS.getCode());
-  }
-
-  /**
-   * Finds freshest maintain SCDs.
-   *
-   * @param procedureRequests
-   *     items to search
-   * @return freshest maintain SCDs, or {@code null} if not found
-   */
-  public static ProcedureRequest findFreshestMaintainSCDs(
-      List<ProcedureRequest> procedureRequests) {
-
-    return filterCodeFreshest(procedureRequests,
-        ProcedureRequestCodeEnum.MAINTAIN_SCDS.getCode());
-  }
-
-  /**
-   * Finds freshest remove SCDs.
-   *
-   * @param procedureRequests
-   *     items to search
-   * @return freshest remove SCDs, or {@code null} if not found
-   */
-  public static ProcedureRequest findFreshestRemoveSCDs(List<ProcedureRequest> procedureRequests) {
-    return filterCodeFreshest(procedureRequests,
-        ProcedureRequestCodeEnum.REMOVE_SCDS.getCode());
   }
 }

@@ -31,14 +31,15 @@ public class SCDsOrderedTest extends SCDsOrdered {
   public void testIsSCDsOrdered_List() {
     Instant now = Instant.now();
     Instant twoHoursAgo = now.minus(2, ChronoUnit.HOURS);
+    Instant threeHoursAgo = now.minus(3, ChronoUnit.HOURS);
 
-    DateTimeDt oldTime = new DateTimeDt(Date.from(twoHoursAgo));
-    DateTimeDt newTime = new DateTimeDt(Date.from(now));
+    DateTimeDt oldTime = new DateTimeDt(Date.from(threeHoursAgo));
+    DateTimeDt newTime = new DateTimeDt(Date.from(twoHoursAgo));
 
     PeriodDt oldPeriod = new PeriodDt();
-    oldPeriod.setStartWithSecondsPrecision(Date.from(twoHoursAgo));
+    oldPeriod.setStartWithSecondsPrecision(Date.from(threeHoursAgo));
     PeriodDt newPeriod = new PeriodDt();
-    newPeriod.setStartWithSecondsPrecision(Date.from(now));
+    newPeriod.setStartWithSecondsPrecision(Date.from(twoHoursAgo));
 
     ProcedureRequest oldMaintainTime
         = createProcedureRequest(ProcedureRequestCodeEnum.MAINTAIN_SCDS.getCode(), oldTime);
@@ -46,8 +47,11 @@ public class SCDsOrderedTest extends SCDsOrdered {
     ProcedureRequest newRemoveTime
         = createProcedureRequest(ProcedureRequestCodeEnum.REMOVE_SCDS.getCode(), newTime);
 
-    assertTrue(isSCDsOrdered(Arrays.asList(oldMaintainTime)));
-    assertFalse(isSCDsOrdered(Arrays.asList(oldMaintainTime, newRemoveTime)));
+    assertTrue(isSCDsOrdered(Arrays.asList(oldMaintainTime), threeHoursAgo, now));
+    assertFalse(isSCDsOrdered(Arrays.asList(oldMaintainTime, newRemoveTime), threeHoursAgo, now));
+
+    // tests the lower bound
+    assertFalse(isSCDsOrdered(Arrays.asList(oldMaintainTime), now, now));
 
     ProcedureRequest oldPlacePeriod
         = createProcedureRequest(ProcedureRequestCodeEnum.PLACE_SCDS.getCode(), oldPeriod);
@@ -55,8 +59,8 @@ public class SCDsOrderedTest extends SCDsOrdered {
     ProcedureRequest newRemovePeriod
         = createProcedureRequest(ProcedureRequestCodeEnum.REMOVE_SCDS.getCode(), newPeriod);
 
-    assertTrue(isSCDsOrdered(Arrays.asList(oldPlacePeriod)));
-    assertFalse(isSCDsOrdered(Arrays.asList(oldPlacePeriod, newRemovePeriod)));
+    assertTrue(isSCDsOrdered(Arrays.asList(oldPlacePeriod), threeHoursAgo, now));
+    assertFalse(isSCDsOrdered(Arrays.asList(oldPlacePeriod, newRemovePeriod), threeHoursAgo, now));
   }
 
   private ProcedureRequest createProcedureRequest(String typeCode, IDatatype scheduled) {

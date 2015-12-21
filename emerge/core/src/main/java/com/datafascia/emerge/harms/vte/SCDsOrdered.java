@@ -2,14 +2,14 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.harms.vte;
 
-import ca.uhn.fhir.model.api.IDatatype;
-import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
-import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
-import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
+import com.datafascia.api.client.ProcedureRequests;
 import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
+import java.time.Clock;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -18,6 +18,9 @@ import javax.inject.Inject;
  * VTE SCDs Ordered Implementation
  */
 public class SCDsOrdered {
+
+  @Inject
+  private Clock clock;
 
   @Inject
   private ClientBuilder apiClient;
@@ -35,18 +38,6 @@ public class SCDsOrdered {
             ProcedureRequestCodeEnum.REMOVE_SCDS.isCodeEquals(request.getCode()));
   }
 
-  private static Optional<DateTimeDt> getStartTime(ProcedureRequest request) {
-    if (request != null) {
-      IDatatype scheduled = request.getScheduled();
-      if (scheduled instanceof DateTimeDt) {
-        return Optional.of((DateTimeDt) scheduled);
-      } else if (scheduled instanceof PeriodDt) {
-        return Optional.of(((PeriodDt) scheduled).getStartElement());
-      }
-    }
-    return Optional.empty();
-  }
-
   /**
    * SCDs Ordered Implementation
    *
@@ -55,31 +46,44 @@ public class SCDsOrdered {
    * @return true if SCDs have been ordered
    */
   public boolean isSCDsOrdered(String encounterId) {
+    Instant now = Instant.now(clock);
     List<ProcedureRequest> requests = apiClient.getProcedureRequestClient()
         .search(
             encounterId, null, ProcedureRequestStatusEnum.IN_PROGRESS.getCode());
 
-    return isSCDsOrdered(requests);
+    Encounter encounter = apiClient.getEncounterClient().getEncounter(encounterId);
 
+    Instant encounterStartTime = encounter.getPeriod().getStart().toInstant();
+
+    return isSCDsOrdered(requests, encounterStartTime, now);
   }
 
   /**
    * SCDs Ordered Implementation
    *
-   * @param requests
+   * @param procedureRequests
    *     procedure requests for the encounter
+   * @param effectiveLowerBound
+   *     start time of the encounter
+   * @param effectiveUpperBound
+   *     current time
    * @return true if SCDs have been ordered
    */
-  public boolean isSCDsOrdered(List<ProcedureRequest> requests) {
+  public boolean isSCDsOrdered(List<ProcedureRequest> procedureRequests,
+      Instant effectiveLowerBound, Instant effectiveUpperBound) {
+    ProcedureRequests requests = new ProcedureRequests(procedureRequests);
 
     boolean ordered = false;
 
-    Optional<DateTimeDt> placeStart =
-        getStartTime(ProcedureRequestUtils.findFreshestPlaceSCDs(requests));
-    Optional<DateTimeDt> maintainStart =
-        getStartTime(ProcedureRequestUtils.findFreshestMaintainSCDs(requests));
-    Optional<DateTimeDt> removeStart =
-        getStartTime(ProcedureRequestUtils.findFreshestRemoveSCDs(requests));
+    Optional<ProcedureRequest> placeStart = requests.findFreshest(
+        ProcedureRequestCodeEnum.PLACE_SCDS.getCode(),
+        effectiveLowerBound, effectiveUpperBound);
+    Optional<ProcedureRequest> maintainStart = requests.findFreshest(
+        ProcedureRequestCodeEnum.MAINTAIN_SCDS.getCode(),
+        effectiveLowerBound, effectiveUpperBound);
+    Optional<ProcedureRequest> removeStart = requests.findFreshest(
+        ProcedureRequestCodeEnum.REMOVE_SCDS.getCode(),
+        effectiveLowerBound, effectiveUpperBound);
 
     if (!removeStart.isPresent()) {
       if (placeStart.isPresent() || maintainStart.isPresent()) {
@@ -87,10 +91,8 @@ public class SCDsOrdered {
       }
     } else {
       // there is at least one RemoveSCD
-      if ((placeStart.isPresent() &&
-            (removeStart.get().getValue()).before(placeStart.get().getValue())) ||
-          (maintainStart.isPresent() &&
-            (removeStart.get().getValue()).before(maintainStart.get().getValue()))) {
+      if (ProcedureRequests.isScheduledBefore(removeStart, placeStart) ||
+          ProcedureRequests.isScheduledBefore(removeStart, maintainStart)) {
         ordered = true;
       }
     }

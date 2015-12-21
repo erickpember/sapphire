@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.ucsf.web;
 
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Medication;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
@@ -137,6 +138,14 @@ public class MedAdminDiffTransformer {
     for (Object obj : patients) {
       if (obj instanceof JSONObject) {
         String encounterId = ((JSONObject) obj).get("CSN").toString();
+        Encounter encounter = clientBuilder.getEncounterClient().getEncounter(encounterId);
+
+        if (encounter == null) {
+          log.warn("Encounter " + encounterId + " is not known in FHIR. Associated medication "
+              + "orders and admins will be dropped for now.");
+          continue;
+        }
+
         JSONArray medications = (JSONArray) ((JSONObject) obj).get("Medications");
 
         Collections.sort(medications, new JSONObjectDateTimeOrderedComparator());
@@ -145,7 +154,7 @@ public class MedAdminDiffTransformer {
           JSONObject jsonMed = (JSONObject) obj2;
           String scd = UcsfMedicationUtils.extractSCD(jsonMed);
           try {
-            findPrescriptionDiffs(jsonMed, encounterId, scd);
+            findPrescriptionDiffs(jsonMed, scd, encounter);
           } catch (SQLException ex) {
             log.error("Error fetching RxNorm name with SCD " + scd + ": " + ex.getMessage(),
                 ex);
@@ -163,15 +172,16 @@ public class MedAdminDiffTransformer {
    * Detects diffs in medication JSON object.
    *
    * @param orderJson A JSONObject of a medication order.
-   * @param encounterId The ID of the encounter.
+   * @param encounter The encounter to which the check is relevant.
    * @param scd The SCD of the drug this refers to.
    * @throws MutationsRejectedException If the mutation fails.
    * @throws ParseException If the persisted data in accumulo is corrupt.
    * @throws TableNotFoundException If the table doesn't exist.
    * @throws SQLException If there is a problem interacting with SQL.
    */
-  private void findPrescriptionDiffs(JSONObject orderJson, String encounterId, String scd)
-      throws ParseException, MutationsRejectedException, TableNotFoundException, SQLException {
+  private void findPrescriptionDiffs(JSONObject orderJson, String scd, Encounter encounter)
+      throws ParseException, MutationsRejectedException,
+      TableNotFoundException, SQLException {
     String prescriptionId = orderJson.get("OrderID").toString();
     String drugName = orderJson.get("DrugName").toString();
     String[] routeParts = orderJson.get("Route").toString().split("\\^");
@@ -248,10 +258,12 @@ public class MedAdminDiffTransformer {
     JsonPersistUtils.persistJson(MedAdminDiffListener.ElementType.ORDER, prescriptionId, medDataNew,
         connector, tableName);
 
+    MedicationOrder medOrder = null;
     // If medDataOld isn't null, then it's a change. Otherwise, it's a new order.
     if (medDataOld != null) {
       JSONObject oldDataJson = (JSONObject) new JSONParser().parse(medDataOld);
 
+      boolean foundDiff = false;
       for (String key : MED_DIFF_KEYS) {
         Object medelem = oldDataJson.get(key);
         if (medelem != null) {
@@ -259,6 +271,7 @@ public class MedAdminDiffTransformer {
           String newData = orderJson.get(key).toString();
 
           if (!oldData.equals(newData)) {
+            foundDiff = true;
             if (diffListener != null) {
               diffListener.diff(MedAdminDiffListener.ElementType.ORDER, key, prescriptionId,
                   oldData, newData);
@@ -267,50 +280,55 @@ public class MedAdminDiffTransformer {
         }
       }
 
-      // Recreate the prescription based on the new data.
-      MedicationOrder newOrder = UcsfMedicationUtils.populateMedicationOrder(
-          orderJson,
-          medication,
-          encounterId,
-          prescriptionId,
-          droolNorm.getMedsSets(),
-          clientBuilder);
-      MedicationOrder existingOrder = clientBuilder.getMedicationOrderClient()
-          .read(prescriptionId, encounterId);
-      if (existingOrder != null) {
-        newOrder.setId(existingOrder.getId());
-        clientBuilder.getMedicationOrderClient().update(newOrder);
-      } else {
-        log.warn(
-            "Could not find prescription [{}] for encounterId [{}]."
-            + " Older data for this exists in the accumulo table [{}] but"
-            + " is not stored in the API. Attempting to create it now.",
+      if (!foundDiff) {
+        // Recreate the prescription based on the new data.
+        medOrder = UcsfMedicationUtils.populateMedicationOrder(
+            orderJson,
+            medication,
             prescriptionId,
-            encounterId,
-            tableName);
-        clientBuilder.getMedicationOrderClient().create(newOrder);
+            droolNorm.getMedsSets(),
+            encounter);
+        MedicationOrder existingOrder = clientBuilder.getMedicationOrderClient()
+            .read(prescriptionId, encounter.getIdentifierFirstRep().getValue());
+        if (existingOrder != null) {
+          medOrder.setId(existingOrder.getId());
+          clientBuilder.getMedicationOrderClient().update(medOrder);
+        } else {
+          log.warn(
+              "Could not find prescription [{}] for encounterId [{}]."
+              + " Older data for this exists in the accumulo table [{}] but"
+              + " is not stored in the API. Attempting to create it now.",
+              prescriptionId,
+              encounter.getIdentifierFirstRep().getValue(),
+              tableName);
+          clientBuilder.getMedicationOrderClient().create(medOrder);
+        }
       }
     } else {
-      MedicationOrder newOrder = UcsfMedicationUtils.populateMedicationOrder(
+      medOrder = UcsfMedicationUtils.populateMedicationOrder(
           orderJson,
           medication,
-          encounterId,
           prescriptionId,
           droolNorm.getMedsSets(),
-          clientBuilder);
-      newOrder = clientBuilder.getMedicationOrderClient().create(newOrder);
+          encounter);
+      medOrder = clientBuilder.getMedicationOrderClient().create(medOrder);
       if (diffListener != null) {
-        diffListener.newOrder(newOrder);
+        diffListener.newOrder(medOrder);
       }
     }
 
-    JSONArray meds = (JSONArray) orderJson.get("MedAdmin");
-    if (meds != null) {
-      for (Object obj : meds) {
+    JSONArray admins = (JSONArray) orderJson.get("MedAdmin");
+
+    if (admins != null && admins.size() > 0) {
+      if (medOrder == null) {
+        medOrder = clientBuilder.getMedicationOrderClient().read(prescriptionId,
+            encounter.getIdentifierFirstRep().getValue());
+      }
+      for (Object obj : admins) {
         if (obj instanceof JSONObject) {
           JSONObject admin = (JSONObject) obj;
-          findAdministrationDiffs(admin, encounterId, prescriptionId, droolNorm, customMedId,
-              drugName);
+          findAdministrationDiffs(admin, prescriptionId, droolNorm, customMedId,
+              drugName, encounter, medOrder);
         }
       }
     }
@@ -320,7 +338,7 @@ public class MedAdminDiffTransformer {
    * Detects diffs in medication administration JSON object.
    *
    * @param admin The admin to inspect for diffs.
-   * @param encounterId the Id of the encounter.
+   * @param encounter the encounter to which the check is relevant.
    * @param prescriptionId The Id of the order.
    * @param droolNorm The populated RxNorm pojo.
    * @throws MutationsRejectedException If the mutation fails.
@@ -328,13 +346,14 @@ public class MedAdminDiffTransformer {
    * @throws TableNotFoundException If the table doesn't exist.
    * @throws SQLException If there is a problem interacting with SQL.
    */
-  private void findAdministrationDiffs(JSONObject admin, String encounterId, String prescriptionId,
-      RxNorm droolNorm, String customMedId, String drugName) throws ParseException,
-      MutationsRejectedException, TableNotFoundException, SQLException {
+  private void findAdministrationDiffs(JSONObject admin, String prescriptionId, RxNorm droolNorm,
+      String customMedId, String drugName, Encounter encounter, MedicationOrder order)
+      throws ParseException, MutationsRejectedException, TableNotFoundException, SQLException {
     /*
      * Only recording actual administrations, not scheduled ones or verifications. Might need to
      * invert this to a whitelist instead containing "Given" and "New Bag".
      */
+    String encounterId = encounter.getIdentifierFirstRep().getValue();
     String adminAction = admin.get("AdminAction").toString();
     String adminId = admin.get("AdminID").toString();
     String[] adminActionParts = adminAction.split("\\^");
@@ -358,52 +377,60 @@ public class MedAdminDiffTransformer {
 
     // If adminDataOld isn't null, then it's a change. Otherwise, it's a new admin.
     if (adminDataOld != null) {
-      JSONObject oldDataJson = (JSONObject) new JSONParser().parse(adminDataOld);
+      if (!adminDataNew.equals(adminDataOld)) {
+        JSONObject oldDataJson = (JSONObject) new JSONParser().parse(adminDataOld);
 
-      for (String key : ADMIN_DIFF_KEYS) {
-        Object oldAdmin = oldDataJson.get(key);
-        if (oldAdmin != null) {
-          String oldData = oldAdmin.toString();
-          String newData = admin.get(key).toString();
+        boolean foundDiffKey = false;
+        for (String key : ADMIN_DIFF_KEYS) {
+          Object oldAdmin = oldDataJson.get(key);
+          if (oldAdmin != null) {
+            String oldData = oldAdmin.toString();
+            String newData = admin.get(key).toString();
 
-          if (!oldData.equals(newData)) {
-            if (diffListener != null) {
-              diffListener.diff(MedAdminDiffListener.ElementType.ADMIN, key, adminId, oldData,
-                  newData);
+            if (!oldData.equals(newData)) {
+              foundDiffKey = true;
+              if (diffListener != null) {
+                diffListener.diff(MedAdminDiffListener.ElementType.ADMIN, key, adminId, oldData,
+                    newData);
+              }
             }
           }
         }
-      }
 
-      // Recreate the administration based on the new data.
-      MedicationAdministration medAdmin = UcsfMedicationUtils.populateAdministration(admin, adminId,
-          prescriptionId, encounterId, UcsfMedicationUtils.populateMedication(droolNorm,
-              customMedId, drugName, rxNormDb, clientBuilder),
-          droolNorm.getMedsSets(), clientBuilder);
-      MedicationAdministration existingAdministration = clientBuilder
-          .getMedicationAdministrationClient().get(adminId, encounterId,
-              prescriptionId);
-      if (existingAdministration != null) {
-        medAdmin.setId(existingAdministration.getId());
-        clientBuilder.getMedicationAdministrationClient()
-            .update(medAdmin);
-      } else {
-        log.warn(
-            "Could not find administration [{}] for prescriptionId [{}] and encounterId [{}]."
-            + " Older data for this admin exists in the accumulo table " + tableName + " but"
-            + " is not stored in the API. Attempting to create it now.",
-            adminId,
-            prescriptionId,
-            encounterId);
-        clientBuilder.getMedicationAdministrationClient().save(medAdmin);
+        if (!foundDiffKey) {
+          return;
+        }
+
+        // Recreate the administration based on the new data.
+        MedicationAdministration medAdmin = UcsfMedicationUtils.populateAdministration(admin,
+            adminId, prescriptionId, UcsfMedicationUtils.populateMedication(droolNorm, customMedId,
+                drugName, rxNormDb, clientBuilder),
+            droolNorm.getMedsSets(), encounter, order);
+        MedicationAdministration existingAdministration = clientBuilder
+            .getMedicationAdministrationClient().get(adminId, encounterId,
+                prescriptionId);
+        if (existingAdministration != null) {
+          medAdmin.setId(existingAdministration.getId());
+          clientBuilder.getMedicationAdministrationClient()
+              .update(medAdmin);
+        } else {
+          log.warn(
+              "Could not find administration [{}] for prescriptionId [{}] and encounterId [{}]."
+              + " Older data for this admin exists in the accumulo table " + tableName + " but"
+              + " is not stored in the API. Attempting to create it now.",
+              adminId,
+              prescriptionId,
+              encounterId);
+          clientBuilder.getMedicationAdministrationClient().save(medAdmin);
+        }
       }
     } else {
       // We have a new administration. Populate a MedicationAdministration and save it.
       MedicationAdministration medAdmin = UcsfMedicationUtils
-          .populateAdministration(admin, adminId, prescriptionId, encounterId,
+          .populateAdministration(admin, adminId, prescriptionId,
               UcsfMedicationUtils.populateMedication(droolNorm, customMedId, drugName, rxNormDb,
                   clientBuilder),
-              droolNorm.getMedsSets(), clientBuilder);
+              droolNorm.getMedsSets(), encounter, order);
       medAdmin = clientBuilder.getMedicationAdministrationClient().save(medAdmin);
       if (diffListener != null) {
         diffListener.newAdmin(medAdmin);

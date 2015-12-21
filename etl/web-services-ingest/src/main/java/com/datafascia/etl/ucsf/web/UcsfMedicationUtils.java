@@ -66,16 +66,16 @@ public class UcsfMedicationUtils {
    * @param adminJson The base JSON.
    * @param adminId The ID of the administration.
    * @param orderId The ID of the prescription.
-   * @param encounterId The encounter.
    * @param med The medication.
    * @param medsSet A search of medication group sets.
-   * @param clientBuilder The resource client builder.
+   * @param encounter The encounter to which this admin is relevant.
+   * @param order The order to which this admin is relevant.
    * @return The populated administration.
    * @throws java.sql.SQLException When there is a problem communicating with SQL.
    */
   public static MedicationAdministration populateAdministration(JSONObject adminJson,
-      String adminId, String orderId, String encounterId, Medication med, List<MedsSet> medsSet,
-      ClientBuilder clientBuilder)
+      String adminId, String orderId, Medication med, List<MedsSet> medsSet,
+      Encounter encounter, MedicationOrder order)
       throws SQLException {
     MedicationAdministration admin = new MedicationAdministration();
 
@@ -85,28 +85,10 @@ public class UcsfMedicationUtils {
     }
 
     ResourceReferenceDt prescriptionRef = new ResourceReferenceDt();
-    prescriptionRef.setResource(clientBuilder.getMedicationOrderClient()
-        .read(orderId, encounterId));
+    prescriptionRef.setResource(order);
     admin.setPrescription(prescriptionRef);
+    admin.setEncounter(new ResourceReferenceDt(encounter.getId()));
 
-    if (encounterId != null) {
-      Encounter encounter = null;
-
-      try {
-        encounter = clientBuilder.getEncounterClient().getEncounter(encounterId);
-      } catch (ResourceNotFoundException e) {
-        // The encounter will remain empty, and the warning below will trigger.
-      }
-      if (encounter != null) {
-        admin.setEncounter(new ResourceReferenceDt(encounter.getId()));
-      } else {
-        log.warn("Could not find encounter with CSN " + encounterId + ". HAPI FHIR doesn't allow "
-            + "dangling references, so the linkage between the encounter and admin " + orderId
-            + "-" + adminId + " is lost.");
-      }
-    } else {
-      log.info("No encounter given for admin " + adminId + " on order " + orderId + "!!!!!");
-    }
     admin.addIdentifier()
         .setSystem(IdentifierSystems.INSTITUTION_MEDICATION_ADMINISTRATION)
         .setValue(orderId + "-" + adminId);
@@ -230,20 +212,18 @@ public class UcsfMedicationUtils {
    *
    * @param orderJson The base JSON.
    * @param medication The medication.
-   * @param encounterId The ID of the associated encounter.
    * @param orderId The id of the order.
    * @param medsSet The medsset codes and names.
-   * @param clientBuilder The resource client builder.
+   * @param encounter The encounter to which this is relevant.
    * @return The populated medication order.
    * @throws java.sql.SQLException When there is a problem communicating with SQL.
    */
   public static MedicationOrder populateMedicationOrder(
       JSONObject orderJson,
       Medication medication,
-      String encounterId,
       String orderId,
       List<MedsSet> medsSet,
-      ClientBuilder clientBuilder) throws SQLException {
+      Encounter encounter) throws SQLException {
 
     MedicationOrder medicationOrder = new MedicationOrder();
     medicationOrder.addIdentifier()
@@ -269,21 +249,7 @@ public class UcsfMedicationUtils {
     Instant instant = UcsfWebGetProcessor.epicDateToInstant(dateTimeOrdered);
     DateTimeDt orderedDateDt = new DateTimeDt(Date.from(instant));
 
-    if (encounterId != null) {
-      Encounter encounter = new Encounter();
-      try {
-        encounter = clientBuilder.getEncounterClient().getEncounter(encounterId);
-      } catch (ResourceNotFoundException e) {
-        // The encounter will remain empty, and the warning below will trigger.
-      }
-      if (!encounter.isEmpty()) {
-        medicationOrder.setEncounter(new ResourceReferenceDt(encounter));
-      } else {
-        log.warn("Could not find encounter with CSN " + encounterId + ". HAPI FHIR doesn't allow "
-            + "dangling references, so the linkage between the encounter and order " + orderId
-            + " is lost.");
-      }
-    }
+    medicationOrder.setEncounter(new ResourceReferenceDt(encounter));
 
     if (medication != null) {
       ResourceReferenceDt medicationRef = new ResourceReferenceDt();

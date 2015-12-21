@@ -47,11 +47,11 @@ public class SCDsOrderedTest extends SCDsOrdered {
     ProcedureRequest newRemoveTime
         = createProcedureRequest(ProcedureRequestCodeEnum.REMOVE_SCDS.getCode(), newTime);
 
-    assertTrue(isSCDsOrdered(Arrays.asList(oldMaintainTime), threeHoursAgo, now));
-    assertFalse(isSCDsOrdered(Arrays.asList(oldMaintainTime, newRemoveTime), threeHoursAgo, now));
+    assertTrue(isSCDsOrdered(Arrays.asList(oldMaintainTime), threeHoursAgo, null));
+    assertFalse(isSCDsOrdered(Arrays.asList(oldMaintainTime, newRemoveTime), threeHoursAgo, null));
 
     // tests the lower bound
-    assertFalse(isSCDsOrdered(Arrays.asList(oldMaintainTime), now, now));
+    assertFalse(isSCDsOrdered(Arrays.asList(oldMaintainTime), now, null));
 
     ProcedureRequest oldPlacePeriod
         = createProcedureRequest(ProcedureRequestCodeEnum.PLACE_SCDS.getCode(), oldPeriod);
@@ -59,8 +59,8 @@ public class SCDsOrderedTest extends SCDsOrdered {
     ProcedureRequest newRemovePeriod
         = createProcedureRequest(ProcedureRequestCodeEnum.REMOVE_SCDS.getCode(), newPeriod);
 
-    assertTrue(isSCDsOrdered(Arrays.asList(oldPlacePeriod), threeHoursAgo, now));
-    assertFalse(isSCDsOrdered(Arrays.asList(oldPlacePeriod, newRemovePeriod), threeHoursAgo, now));
+    assertTrue(isSCDsOrdered(Arrays.asList(oldPlacePeriod), threeHoursAgo, null));
+    assertFalse(isSCDsOrdered(Arrays.asList(oldPlacePeriod, newRemovePeriod), threeHoursAgo, null));
   }
 
   private ProcedureRequest createProcedureRequest(String typeCode, IDatatype scheduled) {

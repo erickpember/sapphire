@@ -192,9 +192,8 @@ public class VenousThromboembolismUpdater {
   public void updateScdsOrdered(HarmEvidence harmEvidence, Encounter encounter) {
     SCDs scds = getSCDs(harmEvidence);
 
-    String encounterId = encounter.getId().getIdPart();
     TimestampedBoolean scdsOrdered = new TimestampedBoolean()
-        .withValue(scdsOrderedImpl.isSCDsOrdered(encounterId))
+        .withValue(scdsOrderedImpl.isSCDsOrdered(encounter))
         .withUpdateTime(Date.from(Instant.now(clock)));
     scds.setOrdered(scdsOrdered);
   }

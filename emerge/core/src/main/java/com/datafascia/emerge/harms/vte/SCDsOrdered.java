@@ -8,6 +8,7 @@ import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.client.ProcedureRequests;
 import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
+import com.google.common.annotations.VisibleForTesting;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
@@ -41,21 +42,18 @@ public class SCDsOrdered {
   /**
    * SCDs Ordered Implementation
    *
-   * @param encounterId
+   * @param encounter
    *     encounter to search
    * @return true if SCDs have been ordered
    */
-  public boolean isSCDsOrdered(String encounterId) {
-    Instant now = Instant.now(clock);
-    List<ProcedureRequest> requests = apiClient.getProcedureRequestClient()
-        .search(
-            encounterId, null, ProcedureRequestStatusEnum.IN_PROGRESS.getCode());
+  public boolean isSCDsOrdered(Encounter encounter) {
+    String encounterId = encounter.getId().getIdPart();
+    List<ProcedureRequest> requests = apiClient.getProcedureRequestClient().search(
+        encounterId, null, ProcedureRequestStatusEnum.IN_PROGRESS.getCode());
 
-    Encounter encounter = apiClient.getEncounterClient().getEncounter(encounterId);
+    Instant icuAdmitTime = encounter.getPeriod().getStart().toInstant();
 
-    Instant encounterStartTime = encounter.getPeriod().getStart().toInstant();
-
-    return isSCDsOrdered(requests, encounterStartTime, now);
+    return isSCDsOrdered(requests, icuAdmitTime, null);
   }
 
   /**
@@ -63,27 +61,26 @@ public class SCDsOrdered {
    *
    * @param procedureRequests
    *     procedure requests for the encounter
-   * @param effectiveLowerBound
-   *     start time of the encounter
-   * @param effectiveUpperBound
+   * @param scheduledLower
+   *     ICU admit time
+   * @param scheduledUpper
    *     current time
    * @return true if SCDs have been ordered
    */
-  public boolean isSCDsOrdered(List<ProcedureRequest> procedureRequests,
-      Instant effectiveLowerBound, Instant effectiveUpperBound) {
+  @VisibleForTesting
+  boolean isSCDsOrdered(
+      List<ProcedureRequest> procedureRequests, Instant scheduledLower, Instant scheduledUpper) {
+
     ProcedureRequests requests = new ProcedureRequests(procedureRequests);
 
     boolean ordered = false;
 
     Optional<ProcedureRequest> placeStart = requests.findFreshest(
-        ProcedureRequestCodeEnum.PLACE_SCDS.getCode(),
-        effectiveLowerBound, effectiveUpperBound);
+        ProcedureRequestCodeEnum.PLACE_SCDS.getCode(), scheduledLower, scheduledUpper);
     Optional<ProcedureRequest> maintainStart = requests.findFreshest(
-        ProcedureRequestCodeEnum.MAINTAIN_SCDS.getCode(),
-        effectiveLowerBound, effectiveUpperBound);
+        ProcedureRequestCodeEnum.MAINTAIN_SCDS.getCode(), scheduledLower, scheduledUpper);
     Optional<ProcedureRequest> removeStart = requests.findFreshest(
-        ProcedureRequestCodeEnum.REMOVE_SCDS.getCode(),
-        effectiveLowerBound, effectiveUpperBound);
+        ProcedureRequestCodeEnum.REMOVE_SCDS.getCode(), scheduledLower, scheduledUpper);
 
     if (!removeStart.isPresent()) {
       if (placeStart.isPresent() || maintainStart.isPresent()) {

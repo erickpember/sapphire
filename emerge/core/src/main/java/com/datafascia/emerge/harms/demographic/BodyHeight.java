@@ -5,11 +5,10 @@ package com.datafascia.emerge.harms.demographic;
 import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
-import com.datafascia.emerge.ucsf.ObservationEffectiveDescendingComparator;
+import com.datafascia.api.client.Observations;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import com.google.common.collect.ImmutableSet;
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
@@ -44,13 +43,6 @@ public class BodyHeight {
    */
   public static boolean isRelevant(Observation observation) {
     return RELEVANT_OBSERVATION_CODES.contains(observation.getCode().getCodingFirstRep().getCode());
-  }
-
-  private List<Observation> getObservations(String encounterId) {
-    List<Observation> observations =
-        apiClient.getObservationClient().searchObservation(encounterId, null, null);
-    observations.sort(new ObservationEffectiveDescendingComparator());
-    return observations;
   }
 
   private static Quantity<Length> getQuantityLength(Observation observation) {
@@ -88,21 +80,15 @@ public class BodyHeight {
    * @return height in cm, or {@code null} if not found
    */
   public BigDecimal apply(String encounterId) {
-    List<Observation> observations = getObservations(encounterId);
+    Observations observations = apiClient.getObservationClient().list(encounterId);
 
-    Optional<BigDecimal> observedHeight = observations.stream()
-        .filter(observation ->
-            ObservationCodeEnum.CLINICAL_HEIGHT.isCodeEquals(observation.getCode()))
-        .findFirst()
-        .map(observation -> getValue(observation));
-    if (observedHeight.isPresent()) {
-      return observedHeight.get();
+    Optional<Observation> clinicalHeight = observations.findFreshest(
+        ObservationCodeEnum.CLINICAL_HEIGHT.getCode());
+    if (clinicalHeight.isPresent()) {
+      return getValue(clinicalHeight.get());
     }
 
-    return observations.stream()
-        .filter(observation ->
-            ObservationCodeEnum.ADMISSION_HEIGHT.isCodeEquals(observation.getCode()))
-        .findFirst()
+    return observations.findFreshest(ObservationCodeEnum.ADMISSION_HEIGHT.getCode())
         .map(observation -> getValue(observation))
         .orElse(null);
   }

@@ -111,13 +111,14 @@ public class Ventilated {
          valueEquals(freshestInvasiveVentStatus, "Patient Taken Off")) &&
         (freshestIntubation.isPresent() &&
          isEffectiveAfter(freshestIntubation, freshestInvasiveVentStatus)) ||
-        (freshestETTInvasiveVentInitiation.isPresent() &&
+        (freshestETTInvasiveVentInitiation.isPresent() && freshestInvasiveVentStatus.isPresent() &&
          isEffectiveAfter(freshestETTInvasiveVentInitiation, freshestInvasiveVentStatus)) ||
-        (freshestETTOngoingInvasiveVent.isPresent() &&
+        (freshestETTOngoingInvasiveVent.isPresent() && freshestInvasiveVentStatus.isPresent() &&
          isEffectiveAfter(freshestETTOngoingInvasiveVent, freshestInvasiveVentStatus)) ||
         (freshestTrachInvasiveVentInitiation.isPresent() &&
+         freshestInvasiveVentStatus.isPresent() &&
          isEffectiveAfter(freshestTrachInvasiveVentInitiation, freshestInvasiveVentStatus)) ||
-        (freshestTrachOngoingInvasiveVent.isPresent() &&
+        (freshestTrachOngoingInvasiveVent.isPresent() && freshestInvasiveVentStatus.isPresent() &&
          isEffectiveAfter(freshestTrachOngoingInvasiveVent, freshestInvasiveVentStatus))) {
       return true;
     }

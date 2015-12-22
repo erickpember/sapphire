@@ -3,6 +3,7 @@
 package com.datafascia.emerge.harms.vae;
 
 import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
@@ -37,15 +38,16 @@ public class CurrentTidalVolume {
   /**
    * Computes current tidal volume.
    *
-   * @param encounterId
-   *     relevant encounter ID
+   * @param encounter
+   *     relevant encounter
    * @return current tidal volume, or 0 if not found
    */
-  public int apply(String encounterId) {
+  public int apply(Encounter encounter) {
+    String encounterId = encounter.getId().getIdPart();
     Instant now = Instant.now(clock);
     Date thirteenHoursAgo = Date.from(now.minus(13, ChronoUnit.HOURS));
 
-    String ventilationMode = ventilationModeImpl.getVentilationMode(encounterId);
+    String ventilationMode = ventilationModeImpl.getVentilationMode(encounter);
 
     Optional<Observation> freshestVentSetTidalVolume = ObservationUtils
         .getFreshestByCodeAfterTime(apiClient, encounterId,

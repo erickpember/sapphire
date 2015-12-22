@@ -2,9 +2,11 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.harms.vae;
 
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.client.Observations;
+import com.datafascia.emerge.ucsf.EncounterUtils;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import com.datafascia.emerge.ucsf.codes.ventilation.BreathTypeEnum;
@@ -12,6 +14,7 @@ import com.datafascia.emerge.ucsf.codes.ventilation.NonInvasiveDeviceModeEnum;
 import com.datafascia.emerge.ucsf.codes.ventilation.VentModeEmergeEnum;
 import com.datafascia.emerge.ucsf.codes.ventilation.VentModeObservationEnum;
 import com.google.common.collect.ImmutableSet;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
@@ -45,21 +48,23 @@ public class VentilationModeImpl {
   /**
    * Computes VAE ventilation mode
    *
-   * @param encounterId
+   * @param encounter
    *     encounter to search
    * @return ventilation mode
    */
-  public String getVentilationMode(String encounterId) {
-    Observations observations = apiClient.getObservationClient().list(encounterId);
+  public String getVentilationMode(Encounter encounter) {
+    Instant icuAdmitTime = EncounterUtils.getIcuPeriodStart(encounter);
+    Observations observations = apiClient.getObservationClient()
+        .list(encounter.getId().getIdPart());
 
     Optional<Observation> freshestVentMode = observations.findFreshest(
-        ObservationCodeEnum.VENT_MODE.getCode());
+        ObservationCodeEnum.VENT_MODE.getCode(), icuAdmitTime, null);
 
     Optional<Observation> freshestBreathType = observations.findFreshest(
-        ObservationCodeEnum.BREATH_TYPE.getCode());
+        ObservationCodeEnum.BREATH_TYPE.getCode(), icuAdmitTime, null);
 
     Optional<Observation> freshestNonInvasiveDeviceMode = observations.findFreshest(
-        ObservationCodeEnum.NON_INVASIVE_DEVICE_MODE.getCode());
+        ObservationCodeEnum.NON_INVASIVE_DEVICE_MODE.getCode(), icuAdmitTime, null);
 
     // For when either breath type or vent mode are fresher than non-invasive device mode
     if (freshestBreathType.isPresent() &&

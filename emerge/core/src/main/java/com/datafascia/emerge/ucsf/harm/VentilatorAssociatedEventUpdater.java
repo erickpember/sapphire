@@ -202,8 +202,7 @@ public class VentilatorAssociatedEventUpdater {
    *     encounter
    */
   public void updateVentilationMode(HarmEvidence harmEvidence, Encounter encounter) {
-    String encounterId = encounter.getId().getIdPart();
-    String value = ventilationModeImpl.getVentilationMode(encounterId);
+    String value = ventilationModeImpl.getVentilationMode(encounter);
 
     Mode mode = new Mode()
         .withValue(Mode.Value.fromValue(value))
@@ -301,10 +300,9 @@ public class VentilatorAssociatedEventUpdater {
    *     encounter
    */
   public void updateCurrentTidalVolume(HarmEvidence harmEvidence, Encounter encounter) {
-    String encounterId = encounter.getId().getIdPart();
 
     TimestampedInteger tidalVolume = new TimestampedInteger()
-        .withValue(currentTidalVolume.apply(encounterId))
+        .withValue(currentTidalVolume.apply(encounter))
         .withUpdateTime(Date.from(Instant.now(clock)));
 
     getVAE(harmEvidence).setCurrentTidalVolume(tidalVolume);

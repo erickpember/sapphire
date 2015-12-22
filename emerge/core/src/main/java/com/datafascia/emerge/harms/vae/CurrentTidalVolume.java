@@ -6,12 +6,13 @@ import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.api.client.Observations;
+import com.datafascia.emerge.ucsf.EncounterUtils;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.Optional;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -43,18 +44,19 @@ public class CurrentTidalVolume {
    * @return current tidal volume, or 0 if not found
    */
   public int apply(Encounter encounter) {
-    String encounterId = encounter.getId().getIdPart();
+    Instant icuAdmitTime = EncounterUtils.getIcuPeriodStart(encounter);
     Instant now = Instant.now(clock);
-    Date thirteenHoursAgo = Date.from(now.minus(13, ChronoUnit.HOURS));
+    Instant thirteenHoursAgo = now.minus(13, ChronoUnit.HOURS);
 
     String ventilationMode = ventilationModeImpl.getVentilationMode(encounter);
 
-    Optional<Observation> freshestVentSetTidalVolume = ObservationUtils
-        .getFreshestByCodeAfterTime(apiClient, encounterId,
-            ObservationCodeEnum.TIDAL_VOLUME.getCode(), thirteenHoursAgo);
+    Observations observations = apiClient.getObservationClient()
+        .list(encounter.getId().getIdPart());
+    Optional<Observation> freshestVentSetTidalVolume = observations.findFreshest(
+        ObservationCodeEnum.TIDAL_VOLUME.getCode(), thirteenHoursAgo, null);
 
-    Observation freshestBreathType = ObservationUtils.findFreshestObservationForCode(
-        apiClient, encounterId, ObservationCodeEnum.BREATH_TYPE.getCode());
+    Optional<Observation> freshestBreathType = observations.findFreshest(
+        ObservationCodeEnum.BREATH_TYPE.getCode(), icuAdmitTime, null);
 
     switch (ventilationMode) {
       case "Assist Control Volume Control (ACVC)":
@@ -66,8 +68,8 @@ public class CurrentTidalVolume {
           return getAbsValue(freshestVentSetTidalVolume.get());
         }
       case "Synchronous Intermittent Mandatory Ventilation (SIMV)":
-        if (freshestBreathType != null && freshestBreathType.getValue().toString().equals(
-            "Volume Control")) {
+        if (freshestBreathType.isPresent() && "Volume Control".equals(ObservationUtils
+            .getValueAsString(freshestBreathType.get()))) {
           if (!freshestVentSetTidalVolume.isPresent()) {
             return -1;
           } else {

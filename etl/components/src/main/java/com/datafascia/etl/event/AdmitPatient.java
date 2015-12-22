@@ -2,27 +2,44 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.event;
 
+import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Location;
 import ca.uhn.fhir.model.dstu2.valueset.EncounterLocationStatusEnum;
+import ca.uhn.fhir.model.primitive.DateTimeDt;
+import com.datafascia.common.configuration.ConfigurationNode;
+import com.datafascia.common.configuration.Configure;
 import com.datafascia.common.persist.Id;
+import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.LocationRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater;
 import com.datafascia.etl.hl7.EncounterStatusTransition;
+import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
 /**
  * Admits, transfers, updates patient.
  */
+@ConfigurationNode("UpdateHarmEvidence")
 @Slf4j
 public class AdmitPatient {
+
+  private static final Splitter COMMA_SPLITTER = Splitter.on(',').trimResults();
+
+  @Configure
+  @Inject
+  private String pointOfCare;
+
+  private Set<String> icuPointsOfCare;
 
   @Inject
   private EncounterStatusTransition encounterStatusTransition;
@@ -50,11 +67,52 @@ public class AdmitPatient {
     return "A01".equals(triggerEvent) || "A02".equals(triggerEvent);
   }
 
+  private Optional<String> getPointOfCare(Location location) {
+    String[] locationParts = location.getIdentifierFirstRep().getValue().split("\\^");
+    if (locationParts.length > 0) {
+      String pointOfCare = locationParts[0];
+      return Optional.of(pointOfCare);
+    } else {
+      return Optional.empty();
+    }
+  }
+
+  private synchronized Set<String> getIcuPointsOfCare() {
+    if (icuPointsOfCare == null) {
+      icuPointsOfCare = new HashSet<>();
+      COMMA_SPLITTER.split(pointOfCare)
+          .forEach(p -> icuPointsOfCare.add(p));
+    }
+
+    return icuPointsOfCare;
+  }
+
+  private boolean isIcu(Location location) {
+    Optional<String> pointOfCare = getPointOfCare(location);
+    if (!pointOfCare.isPresent()) {
+      return false;
+    }
+
+    return getIcuPointsOfCare().contains(pointOfCare.get());
+  }
+
+  private Location getIcuLocation() {
+    final String identifier = "ANY-ICU";
+    Location location = new Location();
+    location.setId(identifier);
+    location.addIdentifier()
+        .setSystem(IdentifierSystems.INSTITUTION_LOCATION)
+        .setValue(identifier);
+    return location;
+  }
+
   /**
    * Admits patient.
    *
    * @param triggerEvent
    *     HL7 message trigger event
+   * @param messageDateTime
+   *     HL7 message date time
    * @param patient
    *     patient
    * @param location
@@ -64,6 +122,7 @@ public class AdmitPatient {
    */
   public void accept(
       String triggerEvent,
+      DateTimeDt messageDateTime,
       UnitedStatesPatient patient,
       Location location,
       Encounter newEncounter) {
@@ -88,11 +147,17 @@ public class AdmitPatient {
 
     encounterStatusTransition.updateEncounterStatus(triggerEvent, currentEncounter, newEncounter);
 
-    if (currentEncounter.isPresent()) {
-      if (!"A02".equals(triggerEvent)) {
-        // If not a transfer, then preserve current period.
-        newEncounter.setPeriod(currentEncounter.get().getPeriod());
-      }
+    if (currentEncounter.isPresent() && currentEncounter.get().getLocation().size() > 1) {
+      // Preserve ICU admit time from current encounter.
+      newEncounter.addLocation(currentEncounter.get().getLocation().get(1));
+    } else if (isIcu(location)) {
+      // The first time the patient is admitted or transferred into an ICU, add a dummy location to
+      // the encounter. Store the ICU admit time in the location period start.
+      PeriodDt period = new PeriodDt()
+          .setStart(messageDateTime);
+      newEncounter.addLocation()
+          .setLocation(new ResourceReferenceDt(getIcuLocation()))
+          .setPeriod(period);
     }
 
     encounterRepository.save(newEncounter);

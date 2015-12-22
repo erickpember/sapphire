@@ -11,6 +11,7 @@ import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.emerge.harms.demographic.BodyHeight;
 import com.datafascia.emerge.harms.demographic.BodyWeight;
 import com.datafascia.emerge.ucsf.DemographicData;
+import com.datafascia.emerge.ucsf.EncounterUtils;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -137,13 +138,10 @@ public class DemographicDataUpdater {
             formatRace(patient))
         .withRoomNumber(
             formatRoomNumber(location))
+        .withICUadmitDate(
+            Date.from(EncounterUtils.getIcuPeriodStart(encounter)))
         .withUpdateTime(
             formatNow());
-
-    if (!encounter.getPeriod().getStartElement().isEmpty()) {
-      demographicData.setICUadmitDate(
-          encounter.getPeriod().getStartElement().getValue());
-    }
 
     if (!patient.getBirthDateElement().isEmpty()) {
       demographicData.setDateOfBirth(

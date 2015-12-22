@@ -49,6 +49,7 @@ public class DemographicIT extends HarmEvidenceTestSupport {
   public void transfer_should_export_demographic_data() throws Exception {
     saveMessage("ADT_A01.hl7");
     processMessage("ADT_A02.hl7");
+    processMessage("transfer-within-icu.hl7");
     processMessage("ADT_A08.hl7");
 
     HarmEvidence harmEvidence = readHarmEvidence();

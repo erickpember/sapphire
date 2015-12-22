@@ -184,10 +184,8 @@ public class VentilatorAssociatedEventUpdater {
    *     encounter
    */
   public void updateVentilated(HarmEvidence harmEvidence, Encounter encounter) {
-    String encounterId = encounter.getId().getIdPart();
-
     TimestampedBoolean ventilated = new TimestampedBoolean()
-        .withValue(ventilatedImpl.isVentilated(encounterId))
+        .withValue(ventilatedImpl.isVentilated(encounter))
         .withUpdateTime(Date.from(Instant.now(clock)));
 
     getVentilation(harmEvidence).setVentilated(ventilated);
@@ -260,12 +258,10 @@ public class VentilatorAssociatedEventUpdater {
   public void updateMechanicalVentilationGreaterThan48Hours(
       HarmEvidence harmEvidence, Encounter encounter) {
 
-    String encounterId = encounter.getId().getIdPart();
-
     TimestampedBoolean mechanicalVentilation = new TimestampedBoolean()
         .withValue(
             mechanicalVentilationGreaterThan48HoursImpl.isMechanicalVentilationGreaterThan48Hours(
-                encounterId))
+                encounter))
         .withUpdateTime(Date.from(Instant.now(clock)));
 
     getVAE(harmEvidence).setMechanicalVentilationGreaterThan48Hours(mechanicalVentilation);
@@ -309,7 +305,7 @@ public class VentilatorAssociatedEventUpdater {
   }
 
   /**
-   * Updates subglottic suction non-surgical airway.
+   * Updates sub-glottic suction non-surgical airway.
    *
    * @param harmEvidence
    *     to modify

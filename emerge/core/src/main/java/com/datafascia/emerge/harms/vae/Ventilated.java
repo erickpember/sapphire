@@ -2,11 +2,14 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.harms.vae;
 
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.client.Observations;
+import com.datafascia.emerge.ucsf.EncounterUtils;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import com.google.common.collect.ImmutableSet;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -49,18 +52,21 @@ public class Ventilated {
   }
 
   /**
-   * Checks if ventilated.
+   * Checks if the patient is ventilated.
    *
-   * @param encounterId
+   * @param encounter
    *     encounter to search
    * @return true if the conditions that indicate ventilation are met
    */
-  public boolean isVentilated(String encounterId) {
-    Observations observations = apiClient.getObservationClient().list(encounterId);
+  public boolean isVentilated(Encounter encounter) {
+    Instant icuAdmitTime = EncounterUtils.getIcuPeriodStart(encounter);
+    Observations observations = apiClient.getObservationClient()
+        .list(encounter.getId().getIdPart());
 
     List<Observation> invasiveVentStatus = new ArrayList<>();
 
-    observations.findFreshest(ObservationCodeEnum.ETT_INVASIVE_VENT_STATUS.getCode())
+    observations.findFreshest(ObservationCodeEnum.ETT_INVASIVE_VENT_STATUS.getCode(), icuAdmitTime,
+        null)
         .ifPresent(observation -> invasiveVentStatus.add(observation));
 
     observations.findFreshest(ObservationCodeEnum.TRACH_INVASIVE_VENT_STATUS.getCode())
@@ -70,7 +76,7 @@ public class Ventilated {
         .max(Observations.EFFECTIVE_COMPARATOR);
 
     Optional<Observation> freshestIntubation = observations.findFreshest(
-        ObservationCodeEnum.INTUBATION.getCode(), "Yes");
+        ObservationCodeEnum.INTUBATION.getCode(), "Yes", icuAdmitTime, null);
 
     Optional<Observation> freshestExtubation = observations.findFreshest(
         ObservationCodeEnum.EXTUBATION.getCode(), "Yes");

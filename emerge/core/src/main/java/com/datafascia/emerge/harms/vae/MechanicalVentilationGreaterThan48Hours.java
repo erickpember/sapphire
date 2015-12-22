@@ -2,6 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.harms.vae;
 
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
@@ -32,16 +33,17 @@ public class MechanicalVentilationGreaterThan48Hours {
   /**
    * Checks if there is mechanical ventilation greater than 48 hours.
    *
-   * @param encounterId
+   * @param encounter
    *     encounter to check
    * @return true if there is an observation in this encounter that meets the conditions
    */
-  public boolean isMechanicalVentilationGreaterThan48Hours(String encounterId) {
+  public boolean isMechanicalVentilationGreaterThan48Hours(Encounter encounter) {
+    String encounterId = encounter.getId().getIdPart();
     Instant now = Instant.now(clock);
     Date fortyEightHoursAgo = Date.from(now.minus(48, ChronoUnit.HOURS));
 
     // grouping of negative short-circuit logic
-    if (!ventilatedImpl.isVentilated(encounterId)) {
+    if (!ventilatedImpl.isVentilated(encounter)) {
       return false;
     }
 

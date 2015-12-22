@@ -228,6 +228,26 @@ public class Observations {
   }
 
   /**
+   * Finds freshest observation for given observation code and value, within a time window.
+   *
+   * @param code
+   *     observation code to match
+   * @param value
+   *     observation value to match
+   * @param effectiveLower
+   *     effective date time lower bound (inclusive), null for no lower bound
+   * @param effectiveUpper
+   *     effective date time upper bound (exclusive), null for no upper bound
+   * @return found observation, or empty if no match is found
+   */
+  public Optional<Observation> findFreshest(String code, String value, Instant effectiveLower,
+      Instant effectiveUpper) {
+    return filter(Collections.singleton(code), effectiveLower, effectiveUpper)
+        .filter(observation -> value.equals(observation.getValue().toString()))
+        .max(EFFECTIVE_COMPARATOR);
+  }
+
+  /**
    * Finds any observation for given observation code.
    *
    * @param code

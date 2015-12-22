@@ -105,13 +105,13 @@ public class ComponentsModule extends AbstractModule {
     IRestfulClientFactory clientFactory = fhirContext.getRestfulClientFactory();
 
     PoolingHttpClientConnectionManager connectionManager =
-        new PoolingHttpClientConnectionManager(5000, TimeUnit.MILLISECONDS);
+        new PoolingHttpClientConnectionManager(30000, TimeUnit.MILLISECONDS);
     connectionManager.setDefaultMaxPerRoute(20);
     connectionManager.setMaxTotal(200);
     connectionManager.setValidateAfterInactivity(5000);
 
     RequestConfig defaultRequestConfig = RequestConfig.custom()
-        .setSocketTimeout(clientFactory.getSocketTimeout())
+        .setSocketTimeout(30000)
         .setConnectTimeout(clientFactory.getConnectTimeout())
         .setConnectionRequestTimeout(clientFactory.getConnectionRequestTimeout())
         .build();

@@ -6,6 +6,7 @@ import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.api.client.Observations;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.codes.MedsSetEnum;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
@@ -16,6 +17,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import lombok.extern.slf4j.Slf4j;
 
@@ -76,21 +78,22 @@ public class HarmsLookups {
   /**
    * Platelet count <50,000 Implementation
    *
-   * @param client
-   *     API client.
-   * @param encounterId
-   *     Relevant encounter ID.
+   * @param observations
+   *     Wrapper containing observations for the encounter.
+   * @param icuAdmitTime
+   *     Lower time bound for the observation query.
    * @return true if conditions are met
    */
-  public static boolean plateletCountLessThan50000(ClientBuilder client, String encounterId) {
-    List<Observation> pltObservations = client.getObservationClient().searchObservation(encounterId,
-        ObservationCodeEnum.PLT.getCode(), null);
-    Observation freshestPltObservation = ObservationUtils.findFreshestObservation(pltObservations);
-    if (freshestPltObservation == null || freshestPltObservation.getValue() == null) {
+  public static boolean plateletCountLessThan50000(Observations observations,
+      Instant icuAdmitTime) {
+    Optional<Observation> freshestPltObservation = observations.findFreshest(
+        ObservationCodeEnum.PLT.getCode(), icuAdmitTime, null);
+
+    if (!freshestPltObservation.isPresent() || freshestPltObservation.get().getValue().isEmpty()) {
       return false;
     }
 
-    IDatatype quantity = freshestPltObservation.getValue();
+    IDatatype quantity = freshestPltObservation.get().getValue();
     if (quantity instanceof QuantityDt) {
       return ((QuantityDt) quantity).getValue().compareTo(FIFTY) < 0;
     } else {
@@ -101,22 +104,21 @@ public class HarmsLookups {
   /**
    * INR >1.5 Implementation
    *
-   * @param client
-   *     API client.
-   * @param encounterId
-   *     Relevant encounter ID.
+   * @param observations
+   *     Wrapper containing observations for the encounter.
+   * @param icuAdmitTime
+   *     Lower time bound for the observation query.
    * @return true if conditions are met
    */
-  public static boolean inrOver1point5(ClientBuilder client, String encounterId) {
-    List<Observation> pltObservations = client.getObservationClient().searchObservation(encounterId,
-        ObservationCodeEnum.INR.getCode(), null);
-    Observation freshestInrObservation = ObservationUtils.findFreshestObservation(pltObservations);
+  public static boolean inrOver1point5(Observations observations, Instant icuAdmitTime) {
+    Optional<Observation> freshestInrObservation = observations.findFreshest(
+        ObservationCodeEnum.INR.getCode(), icuAdmitTime, null);
 
-    if (freshestInrObservation == null || freshestInrObservation.getValue() == null) {
+    if (!freshestInrObservation.isPresent() || freshestInrObservation.get().getValue().isEmpty()) {
       return false;
     }
 
-    IDatatype quantity = freshestInrObservation.getValue();
+    IDatatype quantity = freshestInrObservation.get().getValue();
     if (quantity instanceof QuantityDt) {
       return ((QuantityDt) quantity).getValue().compareTo(ONE_POINT_FIVE) > 0;
     } else {
@@ -127,25 +129,24 @@ public class HarmsLookups {
   /**
    * aPTT Ratio >1.5 Implementation
    *
-   * @param client
-   *     API client.
-   * @param encounterId
-   *     Relevant encounter ID.
+   * @param observations
+   *     Wrapper containing observations for the encounter.
+   * @param icuAdmitTime
+   *     Lower time bound for the observation query.
    * @return true if conditions are met
    */
-  public static boolean aPttRatioOver1point5(ClientBuilder client, String encounterId) {
-    List<Observation> pttObservations = client.getObservationClient().searchObservation(encounterId,
-        ObservationCodeEnum.PTT.getCode(), null);
-    Observation freshestPttObservation = ObservationUtils.findFreshestObservation(pttObservations);
+  public static boolean aPttRatioOver1point5(Observations observations, Instant icuAdmitTime) {
+    Optional<Observation> freshestPttObservation = observations.findFreshest(
+        ObservationCodeEnum.PTT.getCode(), icuAdmitTime, null);
 
-    if (freshestPttObservation == null || freshestPttObservation.getValue() == null) {
+    if (!freshestPttObservation.isPresent() || freshestPttObservation.get().getValue().isEmpty()) {
       return false;
     }
 
-    IDatatype quantity = freshestPttObservation.getValue();
+    IDatatype quantity = freshestPttObservation.get().getValue();
     if (quantity instanceof QuantityDt) {
-      if (freshestPttObservation.getReferenceRangeFirstRep().getText() != null) {
-        String[] rangeParts = freshestPttObservation
+      if (!freshestPttObservation.get().getReferenceRangeFirstRep().getText().isEmpty()) {
+        String[] rangeParts = freshestPttObservation.get()
             .getReferenceRangeFirstRep().getText().split("-");
         if (rangeParts.length > 1) {
           BigDecimal value = ((QuantityDt) quantity).getValue();
@@ -154,7 +155,7 @@ public class HarmsLookups {
           return value.compareTo((highEnd.multiply(ONE_POINT_FIVE))) > 0;
         } else {
           log.warn("Reference range format is invalid: {}",
-              freshestPttObservation.getReferenceRangeFirstRep().getText());
+              freshestPttObservation.get().getReferenceRangeFirstRep().getText());
         }
       } else {
         log.warn("Reference range is null");

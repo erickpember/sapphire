@@ -3,10 +3,13 @@
 package com.datafascia.emerge.harms.vte;
 
 import ca.uhn.fhir.model.dstu2.composite.AnnotationDt;
+import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.api.client.Observations;
 import com.datafascia.emerge.harms.HarmsLookups;
+import com.datafascia.emerge.ucsf.EncounterUtils;
 import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
 import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
 import java.time.Clock;
@@ -29,20 +32,24 @@ public class ProphylaxisContraindicated {
   /**
    * Gets pharmacologic VTE prophylaxis contraindicated reason
    *
-   * @param encounterId
+   * @param encounter
    *     encounter to search
    * @return pharmacologic VTE prophylaxis contraindicated reason, or {@code null} if not found
    */
-  public String getProphylaxisContraindicatedReason(String encounterId) {
-    if (HarmsLookups.plateletCountLessThan50000(apiClient, encounterId)) {
+  public String getProphylaxisContraindicatedReason(Encounter encounter) {
+    String encounterId = encounter.getId().getIdPart();
+    Observations observations = apiClient.getObservationClient().list(encounterId);
+    Instant icuAdmitTime = EncounterUtils.getIcuPeriodStart(encounter);
+
+    if (HarmsLookups.plateletCountLessThan50000(observations, icuAdmitTime)) {
       return "Platelet Count <50,000";
     }
 
-    if (HarmsLookups.inrOver1point5(apiClient, encounterId)) {
+    if (HarmsLookups.inrOver1point5(observations, icuAdmitTime)) {
       return "INR >1.5";
     }
 
-    if (HarmsLookups.aPttRatioOver1point5(apiClient, encounterId)) {
+    if (HarmsLookups.aPttRatioOver1point5(observations, icuAdmitTime)) {
       return "aPTT Ratio >1.5";
     }
 

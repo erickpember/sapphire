@@ -211,8 +211,7 @@ public class VenousThromboembolismUpdater {
 
     PharmacologicVTEProphylaxis prophylaxis = getPharmacologicVTEProphylaxis(harmEvidence);
 
-    String encounterId = encounter.getId().getIdPart();
-    String reason = prophylaxisContraindicated.getProphylaxisContraindicatedReason(encounterId);
+    String reason = prophylaxisContraindicated.getProphylaxisContraindicatedReason(encounter);
 
     Contraindicated contraindicated = new Contraindicated()
         .withValue(reason != null)

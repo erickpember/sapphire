@@ -5,15 +5,15 @@ package com.datafascia.emerge.harms.vae;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.client.Observations;
-import com.datafascia.domain.fhir.Dates;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import com.google.common.collect.ImmutableSet;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
+
+import static com.datafascia.api.client.Observations.isEffectiveAfter;
 
 /**
  * Implements VAE Ventilated
@@ -42,12 +42,6 @@ public class Ventilated {
    */
   public static boolean isRelevant(Observation observation) {
     return RELEVANT_OBSERVATION_CODES.contains(observation.getCode().getCodingFirstRep().getCode());
-  }
-
-  private static boolean after(Optional<Observation> left, Optional<Observation> right) {
-    Date leftEffectiveDate = Dates.toDate(left.get().getEffective());
-    Date rightEffectiveDate = Dates.toDate(right.get().getEffective());
-    return leftEffectiveDate.after(rightEffectiveDate);
   }
 
   private static boolean valueEquals(Optional<Observation> observation, String value) {
@@ -97,17 +91,18 @@ public class Ventilated {
       String value = freshestInvasiveVentStatus.get().getValue().toString();
       if ((value.equals("Continue") || value.equals("Patient back on Invasive")) &&
           (!freshestExtubation.isPresent() ||
-           after(freshestInvasiveVentStatus, freshestExtubation))) {
+           isEffectiveAfter(freshestInvasiveVentStatus, freshestExtubation))) {
         return true;
       }
     }
 
     if (freshestIntubation.isPresent() &&
-        (!freshestExtubation.isPresent() || !after(freshestExtubation, freshestIntubation)) &&
+        (!freshestExtubation.isPresent() ||
+         !isEffectiveAfter(freshestExtubation, freshestIntubation)) &&
         (!freshestInvasiveVentStatus.isPresent() ||
          !valueEquals(freshestInvasiveVentStatus, "Discontinue") ||
          !valueEquals(freshestInvasiveVentStatus, "Patient Taken Off") ||
-         !after(freshestInvasiveVentStatus, freshestIntubation))) {
+         !isEffectiveAfter(freshestInvasiveVentStatus, freshestIntubation))) {
       return true;
     }
 
@@ -115,15 +110,15 @@ public class Ventilated {
         (valueEquals(freshestInvasiveVentStatus, "Discontinue") ||
          valueEquals(freshestInvasiveVentStatus, "Patient Taken Off")) &&
         (freshestIntubation.isPresent() &&
-         after(freshestIntubation, freshestInvasiveVentStatus)) ||
+         isEffectiveAfter(freshestIntubation, freshestInvasiveVentStatus)) ||
         (freshestETTInvasiveVentInitiation.isPresent() &&
-         after(freshestETTInvasiveVentInitiation, freshestInvasiveVentStatus)) ||
+         isEffectiveAfter(freshestETTInvasiveVentInitiation, freshestInvasiveVentStatus)) ||
         (freshestETTOngoingInvasiveVent.isPresent() &&
-         after(freshestETTOngoingInvasiveVent, freshestInvasiveVentStatus)) ||
+         isEffectiveAfter(freshestETTOngoingInvasiveVent, freshestInvasiveVentStatus)) ||
         (freshestTrachInvasiveVentInitiation.isPresent() &&
-         after(freshestTrachInvasiveVentInitiation, freshestInvasiveVentStatus)) ||
+         isEffectiveAfter(freshestTrachInvasiveVentInitiation, freshestInvasiveVentStatus)) ||
         (freshestTrachOngoingInvasiveVent.isPresent() &&
-         after(freshestTrachOngoingInvasiveVent, freshestInvasiveVentStatus))) {
+         isEffectiveAfter(freshestTrachOngoingInvasiveVent, freshestInvasiveVentStatus))) {
       return true;
     }
     return false;

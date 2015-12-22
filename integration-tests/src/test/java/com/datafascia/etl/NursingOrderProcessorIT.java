@@ -12,6 +12,7 @@ import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import ca.uhn.fhir.model.dstu2.valueset.MaritalStatusCodesEnum;
 import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
 import ca.uhn.fhir.model.primitive.DateDt;
+import ca.uhn.fhir.model.primitive.DateTimeDt;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.services.ApiTestSupport;
@@ -93,7 +94,8 @@ public class NursingOrderProcessorIT extends ApiTestSupport {
         .setStatus(EncounterStateEnum.IN_PROGRESS);
     encounter.addIdentifier()
         .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER)
-        .setValue("2085202");
+        .setValue("2085202")
+        .setPeriod(new PeriodDt().setStart(DateTimeDt.withCurrentTime()));
 
     MethodOutcome outcome = client.create().resource(encounter)
         .encodedJson().execute();

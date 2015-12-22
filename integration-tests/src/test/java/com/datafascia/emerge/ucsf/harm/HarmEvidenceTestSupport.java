@@ -2,8 +2,10 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.ucsf.harm;
 
+import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import ca.uhn.fhir.model.primitive.DateTimeDt;
 import ca.uhn.fhir.model.primitive.IdDt;
 import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
@@ -79,7 +81,7 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
         .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER)
         .setValue(ENCOUNTER_IDENTIFIER);
     encounter.setId(new IdDt(EncounterRepository.generateId(encounter).toString()));
-
+    encounter.setPeriod(new PeriodDt().setStart(DateTimeDt.withCurrentTime()));
     encounter.setPatient(new ResourceReferenceDt(getPatient()));
     return encounter;
   }

@@ -7,11 +7,12 @@ import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import ca.uhn.fhir.model.primitive.IdDt;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.persist.entity.EntityId;
+import com.datafascia.common.persist.entity.FhirEntityIndex;
 import com.datafascia.common.persist.entity.FhirEntityStore;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
@@ -21,6 +22,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class EncounterRepository extends FhirEntityStoreRepository {
 
+  private FhirEntityIndex<Encounter> statusIndex;
+
   /**
    * Constructor
    *
@@ -29,6 +32,18 @@ public class EncounterRepository extends FhirEntityStoreRepository {
   @Inject
   public EncounterRepository(FhirEntityStore entityStore) {
     super(entityStore);
+
+    statusIndex = entityStore.getIndex("EncounterStatus", Encounter::getStatus);
+  }
+
+  private void populateStatusIndex() {
+    if (statusIndex.isEmpty()) {
+      entityStore.stream(Encounter.class)
+          .forEach(encounter -> {
+            EntityId entityId = toEntityId(encounter);
+            statusIndex.save(entityId, null, encounter);
+          });
+    }
   }
 
   /**
@@ -39,6 +54,11 @@ public class EncounterRepository extends FhirEntityStoreRepository {
    */
   public static EntityId toEntityId(Id<Encounter> encounterId) {
     return new EntityId(Encounter.class, encounterId);
+  }
+
+  private static EntityId toEntityId(Encounter encounter) {
+    Id<Encounter> encounterId = Id.of(encounter.getId().getIdPart());
+    return toEntityId(encounterId);
   }
 
   /**
@@ -61,7 +81,12 @@ public class EncounterRepository extends FhirEntityStoreRepository {
     Id<Encounter> encounterId = generateId(encounter);
     encounter.setId(new IdDt(Encounter.class.getSimpleName(), encounterId.toString()));
 
-    entityStore.save(toEntityId(encounterId), encounter);
+    EntityId entityId = toEntityId(encounterId);
+    Optional<Encounter> oldEncounter = entityStore.read(entityId);
+    entityStore.save(entityId, encounter);
+
+    populateStatusIndex();
+    statusIndex.save(entityId, oldEncounter.orElse(null), encounter);
   }
 
   /**
@@ -81,21 +106,32 @@ public class EncounterRepository extends FhirEntityStoreRepository {
    * @return encounters
    */
   public List<Encounter> list(Optional<EncounterStateEnum> optStatus) {
-    Stream<Encounter> stream = entityStore.stream(Encounter.class);
     if (optStatus.isPresent()) {
-      stream = stream.filter(encounter -> encounter.getStatusElement().getValueAsEnum()
-          .equals(optStatus.get()));
+      List<Encounter> encounters = new ArrayList<>();
+      populateStatusIndex();
+      statusIndex.search(optStatus.get().getCode())
+          .forEach(entityRowId ->
+              entityStore.read(entityRowId, Encounter.class)
+                  .ifPresent(encounter -> encounters.add(encounter))
+        );
+      return encounters;
     }
 
-    return stream.collect(Collectors.toList());
+    return entityStore.stream(Encounter.class)
+        .collect(Collectors.toList());
   }
 
   /**
    * Deletes encounter and all of its children.
    *
-   * @param encounterId encounter ID
+   * @param encounter
+   *     to delete
    */
-  public void delete(Id<Encounter> encounterId) {
-    entityStore.delete(toEntityId(encounterId));
+  public void delete(Encounter encounter) {
+    EntityId entityId = toEntityId(encounter);
+    entityStore.delete(entityId);
+
+    populateStatusIndex();
+    statusIndex.delete(entityId, encounter);
   }
 }

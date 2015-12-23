@@ -3,6 +3,7 @@
 package com.datafascia.common.persist.entity;
 
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import org.hl7.fhir.instance.model.api.IBaseResource;
 
@@ -20,6 +21,19 @@ public interface FhirEntityStore {
    *     to save
    */
   void save(EntityId entityId, IBaseResource object);
+
+  /**
+   * Reads entity.
+   *
+   * @param rowId
+   *     row ID
+   * @param entityType
+   *     entity type
+   * @param <E>
+   *     entity type
+   * @return optional entity, empty if not found
+   */
+  <E extends IBaseResource> Optional<E> read(String rowId, Class<E> entityType);
 
   /**
    * Reads entity.
@@ -86,4 +100,18 @@ public interface FhirEntityStore {
    *     entity type
    */
   <E extends IBaseResource> void delete(EntityId parentId, Class<E> entityType);
+
+  /**
+   * Gets index.
+   *
+   * @param indexName
+   *     index name
+   * @param termSupplier
+   *     function to compute search term from entity
+   * @param <E>
+   *     entity type
+   * @return index
+   */
+  <E extends IBaseResource> FhirEntityIndex<E> getIndex(
+      String indexName, Function<E, String> termSupplier);
 }

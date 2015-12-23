@@ -100,7 +100,10 @@ public class EncounterResourceProvider implements IResourceProvider {
   @Delete()
   public void deleteEncounter(@IdParam IdDt resourceId) {
     Id<Encounter> encounterId = Id.of(resourceId.getIdPart());
-    encounterRepository.delete(encounterId);
+    Optional<Encounter> encounter = encounterRepository.read(encounterId);
+    if (encounter.isPresent()) {
+      encounterRepository.delete(encounter.get());
+    }
   }
 
   /**

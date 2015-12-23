@@ -10,9 +10,11 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Stream;
 import javax.inject.Inject;
 import javax.inject.Named;
+import org.apache.accumulo.core.client.Connector;
 import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.data.Range;
 import org.apache.avro.Schema;
@@ -32,6 +34,7 @@ public class AccumuloFhirEntityStore implements FhirEntityStore {
   private FhirContext fhirContext;
   private AvroSchemaRegistry schemaRegistry;
   private String dataTableName;
+  private Connector connector;
   private AccumuloTemplate accumuloTemplate;
 
   /**
@@ -43,6 +46,8 @@ public class AccumuloFhirEntityStore implements FhirEntityStore {
    *     Avro schema registry
    * @param tableNamePrefix
    *     prefix for generating table names
+   * @param connector
+   *     Accumulo connector
    * @param accumuloTemplate
    *     data access operations template
    */
@@ -51,10 +56,12 @@ public class AccumuloFhirEntityStore implements FhirEntityStore {
       FhirContext fhirContext,
       AvroSchemaRegistry schemaRegistry,
       @Named("entityTableNamePrefix") String tableNamePrefix,
+      Connector connector,
       AccumuloTemplate accumuloTemplate) {
 
     this.fhirContext = fhirContext;
     this.schemaRegistry = schemaRegistry;
+    this.connector = connector;
     this.accumuloTemplate = accumuloTemplate;
 
     dataTableName = tableNamePrefix + DATA;
@@ -83,7 +90,14 @@ public class AccumuloFhirEntityStore implements FhirEntityStore {
         escape(entityIdElement.getId().toString()) + KEY_SEPARATOR;
   }
 
-  private static String toRowId(EntityId entityId) {
+  /**
+   * Converts entity ID to Accumulo row ID.
+   *
+   * @param entityId
+   *     entity ID
+   * @return row ID
+   */
+  public static String toRowId(EntityId entityId) {
     StringBuilder rowId = new StringBuilder();
     for (TypeAndId entityIdElement : entityId.getElements()) {
       rowId.append(toRowId(entityIdElement));
@@ -104,14 +118,17 @@ public class AccumuloFhirEntityStore implements FhirEntityStore {
   }
 
   @Override
-  public <E extends IBaseResource> Optional<E> read(EntityId entityId) {
-    Class<E> entityType = (Class<E>) entityId.getType();
-
+  public <E extends IBaseResource> Optional<E> read(String rowId, Class<E> entityType) {
     Scanner scanner = accumuloTemplate.createScanner(getDataTableName());
-    scanner.setRange(Range.exact(toRowId(entityId)));
+    scanner.setRange(Range.exact(rowId));
     scanner.fetchColumnFamily(new Text(entityType.getSimpleName()));
 
     return accumuloTemplate.queryForObject(scanner, new FhirRowMapper<>(fhirContext, entityType));
+  }
+
+  @Override
+  public <E extends IBaseResource> Optional<E> read(EntityId entityId) {
+    return read(toRowId(entityId), (Class<E>) entityId.getType());
   }
 
   private static <E> String toRowIdPrefix(EntityId parentId, Class<E> entityType) {
@@ -154,5 +171,12 @@ public class AccumuloFhirEntityStore implements FhirEntityStore {
   @Override
   public <E extends IBaseResource> void delete(EntityId parentId, Class<E> entityType) {
     accumuloTemplate.deleteRowIdPrefix(getDataTableName(), toRowIdPrefix(parentId, entityType));
+  }
+
+  @Override
+  public <E extends IBaseResource> FhirEntityIndex<E> getIndex(
+      String indexName, Function<E, String> termSupplier) {
+
+    return new AccumuloFhirEntityIndex<>(indexName, termSupplier, connector, accumuloTemplate);
   }
 }

@@ -91,12 +91,49 @@ public class EncounterRepositoryTest extends RepositoryTestSupport {
     assertTrue(result.isPresent());
     assertEquals(result.get().getId().getValue(), encounter.getId().getValue());
 
-    Optional<UnitedStatesPatient> patientResult = patientRepository.read(Id.of(encounter.
-        getPatient().getReference().getIdPart()));
+    Optional<UnitedStatesPatient> patientResult = patientRepository.read(
+        Id.of(encounter.getPatient().getReference().getIdPart()));
     assertEquals(patientResult.get().getId().getIdPart(), patient.getId().getIdPart());
 
-    encounterRepository.delete(encounterId);
+    encounterRepository.delete(encounter);
     encounters = encounterRepository.list(Optional.empty());
+    assertEquals(encounters.size(), 0);
+  }
+
+  @Test
+  public void status_change_should_update_status_index() {
+    UnitedStatesPatient patient = createPatient();
+    patientRepository.save(patient);
+
+    Encounter encounter = createEncounter(patient);
+    encounterRepository.save(encounter);
+
+    List<Encounter> encounters =
+        encounterRepository.list(Optional.of(EncounterStateEnum.IN_PROGRESS));
+    assertEquals(encounters.size(), 1);
+
+    encounter.setStatus(EncounterStateEnum.FINISHED);
+    encounterRepository.save(encounter);
+
+    encounters = encounterRepository.list(Optional.of(EncounterStateEnum.IN_PROGRESS));
+    assertEquals(encounters.size(), 0);
+  }
+
+  @Test
+  public void delete_encounter_should_update_status_index() {
+    UnitedStatesPatient patient = createPatient();
+    patientRepository.save(patient);
+
+    Encounter encounter = createEncounter(patient);
+    encounterRepository.save(encounter);
+
+    List<Encounter> encounters =
+        encounterRepository.list(Optional.of(EncounterStateEnum.IN_PROGRESS));
+    assertEquals(encounters.size(), 1);
+
+    encounterRepository.delete(encounter);
+
+    encounters = encounterRepository.list(Optional.of(EncounterStateEnum.IN_PROGRESS));
     assertEquals(encounters.size(), 0);
   }
 }

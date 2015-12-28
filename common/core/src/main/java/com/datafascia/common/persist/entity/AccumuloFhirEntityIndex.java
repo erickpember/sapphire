@@ -4,16 +4,13 @@ package com.datafascia.common.persist.entity;
 
 import com.datafascia.common.accumulo.AccumuloTemplate;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
-import org.apache.accumulo.core.client.BatchScanner;
 import org.apache.accumulo.core.client.BatchWriter;
 import org.apache.accumulo.core.client.BatchWriterConfig;
 import org.apache.accumulo.core.client.Connector;
-import org.apache.accumulo.core.client.IteratorSetting;
 import org.apache.accumulo.core.client.MutationsRejectedException;
 import org.apache.accumulo.core.client.Scanner;
 import org.apache.accumulo.core.client.TableNotFoundException;
@@ -21,8 +18,6 @@ import org.apache.accumulo.core.data.Key;
 import org.apache.accumulo.core.data.Mutation;
 import org.apache.accumulo.core.data.Range;
 import org.apache.accumulo.core.data.Value;
-import org.apache.accumulo.core.iterators.user.IntersectingIterator;
-import org.apache.hadoop.io.Text;
 
 /**
  * Maps search term to entity IDs.
@@ -122,23 +117,15 @@ public class AccumuloFhirEntityIndex<E> implements FhirEntityIndex<E> {
 
   @Override
   public List<String> search(String term) {
-    Text[] columns = new Text[1];
-    columns[0] = new Text(term);
-
-    IteratorSetting iteratorSetting = new IteratorSetting(
-        20, IntersectingIterator.class.getSimpleName(), IntersectingIterator.class);
-    IntersectingIterator.setColumnFamilies(iteratorSetting, columns);
-
-    BatchScanner scanner = accumuloTemplate.createBatchScanner(indexTableName);
-    scanner.addScanIterator(iteratorSetting);
-    scanner.setRanges(Arrays.asList(new Range()));
-
     List<String> entityIds = new ArrayList<>();
+
+    Scanner scanner = accumuloTemplate.createScanner(indexTableName);
+    scanner.setRange(Range.exact(BIN_ROW_ID, term));
     for (Map.Entry<Key, Value> entry : scanner) {
       entityIds.add(entry.getKey().getColumnQualifier().toString());
     }
-
     scanner.close();
+
     return entityIds;
   }
 

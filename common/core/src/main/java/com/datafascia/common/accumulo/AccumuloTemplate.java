@@ -21,7 +21,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.accumulo.core.client.AccumuloException;
 import org.apache.accumulo.core.client.AccumuloSecurityException;
 import org.apache.accumulo.core.client.BatchDeleter;
-import org.apache.accumulo.core.client.BatchScanner;
 import org.apache.accumulo.core.client.BatchWriter;
 import org.apache.accumulo.core.client.BatchWriterConfig;
 import org.apache.accumulo.core.client.Connector;
@@ -136,23 +135,6 @@ public class AccumuloTemplate {
   public Scanner createScanner(String tableName) {
     try {
       return connector.createScanner(tableName, authorizationsSupplier.get());
-    } catch (TableNotFoundException e) {
-      throw new IllegalStateException("Table " + tableName + " not found", e);
-    }
-  }
-
-  /**
-   * Creates a batch scanner of the table.
-   *
-   * @param tableName
-   *     table to scan
-   * @return scanner
-   * @throws RuntimeException
-   *     if table not found
-   */
-  public BatchScanner createBatchScanner(String tableName) {
-    try {
-      return connector.createBatchScanner(tableName, authorizationsSupplier.get(), 1);
     } catch (TableNotFoundException e) {
       throw new IllegalStateException("Table " + tableName + " not found", e);
     }

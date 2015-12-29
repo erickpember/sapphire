@@ -64,7 +64,7 @@
           --publish=3888:3888
           --volume={{ company_data_prefix }}:{{ company_data_prefix }}
           datafascia/zookeeper
-  when: "'datafascia/zookeeper:latest' not in list_containers.stdout_lines"
+  when: "'datafascia/zookeeper' not in list_containers.stdout_lines"
 
 - name: Run Accumulo master primary container
   command: >
@@ -83,7 +83,7 @@
           --publish=50095:50095
           --volume={{ company_data_prefix }}:{{ company_data_prefix }}
           datafascia/accumulo-master-primary
-  when: "'datafascia/accumulo-master-primary:latest' not in list_containers.stdout_lines"
+  when: "'datafascia/accumulo-master-primary' not in list_containers.stdout_lines"
 
 - name: Run Accumulo master standby container
   command: >
@@ -100,7 +100,7 @@
           --publish=50091:50091
           --volume={{ company_data_prefix }}:{{ company_data_prefix }}
           datafascia/accumulo-master-standby
-  when: "'datafascia/accumulo-master-standby:latest' not in list_containers.stdout_lines"
+  when: "'datafascia/accumulo-master-standby' not in list_containers.stdout_lines"
 
 - name: Run Accumulo slave container
   command: >
@@ -118,7 +118,7 @@
           --publish=50075:50075
           --volume={{ company_data_prefix }}:{{ company_data_prefix }}
           datafascia/accumulo-slave
-  when: "'datafascia/accumulo-slave:latest' not in list_containers.stdout_lines"
+  when: "'datafascia/accumulo-slave' not in list_containers.stdout_lines"
 
 - name: Wait for HDFS namenode to start
   command: >
@@ -127,13 +127,13 @@
       --connection=local
       --module-name=wait_for
       --args="host={{ groups['accumulo-master-primary'][0] }} port=8020 timeout=30"
-  when: "'datafascia/accumulo-master-primary:latest' not in list_containers.stdout_lines"
+  when: "'datafascia/accumulo-master-primary' not in list_containers.stdout_lines"
 
 - name: Wait for HDFS to become available
   command: >
       docker exec {{ groups['accumulo-master-primary'][0] }}
       su hdfs -c "hdfs dfsadmin -safemode wait"
-  when: "'datafascia/accumulo-master-primary:latest' not in list_containers.stdout_lines"
+  when: "'datafascia/accumulo-master-primary' not in list_containers.stdout_lines"
 
 - name: Initialize Accumulo instance
   shell: >
@@ -181,7 +181,7 @@
           --publish=9520:9520
           --volume={{ company_data_prefix }}:{{ company_data_prefix }}
           datafascia/df-etl
-  when: "'datafascia/df-etl:latest' not in list_containers.stdout_lines"
+  when: "'datafascia/df-etl' not in list_containers.stdout_lines"
 
 - name: Run df-api-server
   command: >
@@ -193,4 +193,4 @@
           --publish=9090:9090
           --volume={{ company_data_prefix }}:{{ company_data_prefix }}
           datafascia/df-api-server
-  when: "'datafascia/df-api-server:latest' not in list_containers.stdout_lines"
+  when: "'datafascia/df-api-server' not in list_containers.stdout_lines"

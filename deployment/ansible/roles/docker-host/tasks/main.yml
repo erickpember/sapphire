@@ -18,8 +18,8 @@
     enabled: no
   when: ansible_distribution == 'CentOS'
 
-- name: Install device-mapper
-  yum: name=device-mapper-{{ device_mapper_version }}
+- name: Install LVM2
+  yum: name=lvm2-{{ lvm2_version }}
   when: ansible_distribution == 'CentOS'
 
 - name: Install Docker

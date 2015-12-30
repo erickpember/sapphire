@@ -82,6 +82,7 @@ public class ProcedureBuilder {
   private static final String MEDIAL = "Medial";
   private static final String RIGHT = "Right";
   private static final String OTHER_COMMENT = "Other (Comment)";
+  private static final String N_A = "N/A";
   private static final String OTHER = "Other";
   private static final String UNKNOWN = "Unknown";
 
@@ -200,7 +201,7 @@ public class ProcedureBuilder {
         } else if (orientation3.contains(RIGHT)) {
           return RIGHT;
         } else if (orientation3.contains(MEDIAL) || orientation3.contains(OTHER_COMMENT)) {
-          return OTHER;
+          return N_A;
         }
         break;
 
@@ -214,9 +215,9 @@ public class ProcedureBuilder {
             || basicLineType == LineType.PICC_DOUBLE_LUMEN
             || basicLineType == LineType.PICC_TRIPLE_LUMEN)
             && orientation1.contains(LOWER)) {
-          return OTHER;
+          return N_A;
         } else if (orientation1.contains(OTHER_COMMENT)) {
-          return OTHER;
+          return N_A;
         }
     }
 
@@ -298,7 +299,7 @@ public class ProcedureBuilder {
           return INTERNAL_JUGULAR;
         } else if (location2.contains(SUBCLAVIAN)) {
           return SUBCLAVIAN;
-        } else if (location0.contains(OTHER_COMMENT)) {
+        } else if (location2.contains(OTHER_COMMENT)) {
           return OTHER;
         }
     }

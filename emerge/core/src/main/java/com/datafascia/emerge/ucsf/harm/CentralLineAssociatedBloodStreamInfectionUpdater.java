@@ -88,6 +88,7 @@ public class CentralLineAssociatedBloodStreamInfectionUpdater {
 
   private static CentralLine.Side formatSide(String bodySiteSide) {
     switch (bodySiteSide) {
+      case "Other":
       case "Unknown":
         return CentralLine.Side.N_A;
       default:

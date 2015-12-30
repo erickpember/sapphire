@@ -13,8 +13,8 @@ import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import static org.junit.Assert.assertNull;
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertNull;
 
 /**
  * Tests central line associated blood stream infection data is exported.
@@ -55,7 +55,35 @@ public class CentralLineAssociateBloodStreamInfectionIT extends HarmEvidenceTest
     assertEquals(centralLine.getType(), CentralLine.Type.INTRODUCER);
     assertEquals(centralLine.getSite(), CentralLine.Site.FEMORAL);
     assertEquals(centralLine.getSide(), CentralLine.Side.RIGHT);
+    assertEquals(centralLine.getInsertionDate().toInstant().toString(), "2015-12-27T08:00:00Z");
+    assertEquals(centralLine.getUpdateTime(), Date.from(Instant.now(clock)));
+  }
+
+  @Test
+  public void should_export_psi_introducer_other() throws Exception {
+    processMessage("psi-introducer-other.hl7");
+
+    HarmEvidence harmEvidence = readHarmEvidence();
+    CLABSI clabsi = harmEvidence.getMedicalData().getCLABSI();
+    CentralLine centralLine = clabsi.getCentralLine().get(0);
+    assertEquals(centralLine.getType(), CentralLine.Type.PSI_INTRODUCER);
+    assertEquals(centralLine.getSite(), CentralLine.Site.OTHER);
+    assertEquals(centralLine.getSide(), CentralLine.Side.N_A);
     assertNull(centralLine.getInsertionDate());
+    assertEquals(centralLine.getUpdateTime(), Date.from(Instant.now(clock)));
+  }
+
+  @Test
+  public void should_export_implanted_port_double_lumen() throws Exception {
+    processMessage("implanted-port-double-lumen.hl7");
+
+    HarmEvidence harmEvidence = readHarmEvidence();
+    CLABSI clabsi = harmEvidence.getMedicalData().getCLABSI();
+    CentralLine centralLine = clabsi.getCentralLine().get(0);
+    assertEquals(centralLine.getType(), CentralLine.Type.IMPLANTED_PORT_DOUBLE_LUMEN);
+    assertEquals(centralLine.getSite(), CentralLine.Site.OTHER);
+    assertEquals(centralLine.getSide(), CentralLine.Side.N_A);
+    assertEquals(centralLine.getInsertionDate().toInstant().toString(),"2015-12-29T21:48:00Z");
     assertEquals(centralLine.getUpdateTime(), Date.from(Instant.now(clock)));
   }
 

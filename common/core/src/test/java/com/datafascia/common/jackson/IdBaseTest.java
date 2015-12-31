@@ -12,7 +12,7 @@ import lombok.Data;
 /**
  * Base test for the serializer/deserializer
  */
-public class IdBaseTest extends JacksonBaseTest {
+public class IdBaseTest {
   @Data @IdNamespace("test-IdBaseTest")
   protected static class Observation {
     @JsonDeserialize(using = IdDeserializer.class) @JsonSerialize(using = IdSerializer.class)

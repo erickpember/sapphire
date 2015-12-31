@@ -3,14 +3,11 @@
 package com.datafascia.domain.model;
 
 import com.datafascia.common.jackson.DFObjectMapper;
-import com.datafascia.common.urn.URNMap;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.List;
-import org.testng.annotations.BeforeSuite;
 
 import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertNotNull;
@@ -20,12 +17,6 @@ import static org.testng.Assert.assertNotNull;
  */
 public class ModelTestBase {
   public static ObjectMapper mapper = DFObjectMapper.objectMapper();
-
-  @BeforeSuite
-  public void setup() {
-    // Load the mappings by scanning the package
-    URNMap.idNSMapping(Version.class.getPackage().getName());
-  }
 
   public Object geneticEncodeDecodeTest(Object test) throws IOException, URISyntaxException {
     String jsonString = mapper.writeValueAsString(test);
@@ -40,11 +31,10 @@ public class ModelTestBase {
    *
    * @param test tested object
    * @param jsonProperties Json property names we are looking for
-   * @throws JsonProcessingException
    * @throws IOException
    */
   public void geneticJsonContainsFieldsTest(Object test, List<String> jsonProperties)
-      throws JsonProcessingException, IOException {
+      throws IOException {
     String jsonString = mapper.writeValueAsString(test);
 
     // Deserialize to JsonNode instead of back to the tested class, so Json field names are seen

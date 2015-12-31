@@ -9,8 +9,6 @@ import com.datafascia.api.health.AccumuloHealthCheck;
 import com.datafascia.api.inject.ApplicationModule;
 import com.datafascia.common.configuration.guice.ConfigureModule;
 import com.datafascia.common.shiro.RealmInjectingEnvironmentLoaderListener;
-import com.datafascia.common.urn.URNMap;
-import com.datafascia.domain.model.Version;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.inject.Stage;
 import com.hubspot.dropwizard.guice.GuiceBundle;
@@ -32,8 +30,6 @@ import org.apache.shiro.web.servlet.ShiroFilter;
 public class APIService extends Application<APIConfiguration> {
   /** Package name for resources */
   public static final String RESOURCES_PKG = "com.datafascia.api.resources";
-  /** Package name for models */
-  private static final String MODELS_PKG = Version.class.getPackage().getName();
 
   private GuiceBundle<APIConfiguration> guiceBundle;
 
@@ -69,8 +65,6 @@ public class APIService extends Application<APIConfiguration> {
 
   @Override
   public void run(APIConfiguration configuration, Environment environment) {
-    URNMap.idNSMapping(MODELS_PKG);
-
     // Setup Jackson
     setupJackson(environment.getObjectMapper());
 

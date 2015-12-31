@@ -12,7 +12,7 @@ import lombok.Data;
 /**
  * Base test for the serializer/deserializer
  */
-public class LocalDateBaseTest extends JacksonBaseTest {
+public class LocalDateBaseTest {
   @Data @IdNamespace("test-LocalDateBaseTest")
   protected static class Person {
     @JsonProperty("birthDate") @JsonSerialize(using = LocalDateSerializer.class)

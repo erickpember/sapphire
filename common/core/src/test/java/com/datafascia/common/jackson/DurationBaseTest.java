@@ -12,7 +12,7 @@ import lombok.Data;
 /**
  * Base test for the serializer/deserializer
  */
-public class DurationBaseTest extends JacksonBaseTest {
+public class DurationBaseTest {
   @Data @IdNamespace("test-DurationBaseTest")
   protected static class HealthcareServiceAvailableTime {
     @JsonProperty("availableStartTime") @JsonSerialize(using = DurationSerializer.class)

@@ -7,6 +7,7 @@ import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.primitive.IdDt;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.common.persist.Id;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
 import com.datafascia.domain.persist.EncounterRepository;
@@ -26,6 +27,9 @@ public class AddObservations {
 
   @Inject
   private Clock clock;
+
+  @Inject
+  private EncounterRepository encounterRepository;
 
   @Inject
   private ObservationRepository observationRepository;
@@ -50,16 +54,6 @@ public class AddObservations {
     return patient;
   }
 
-  private static Encounter getEncounter(String encounterIdentifier, UnitedStatesPatient patient) {
-    Encounter encounter = new Encounter();
-    encounter.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_ENCOUNTER).setValue(encounterIdentifier);
-    encounter.setId(new IdDt(EncounterRepository.generateId(encounter).toString()));
-
-    encounter.setPatient(new ResourceReferenceDt(patient));
-    return encounter;
-  }
-
   /**
    * Adds observations.
    *
@@ -74,7 +68,7 @@ public class AddObservations {
       List<Observation> observations, String patientIdentifier, String encounterIdentifier) {
 
     UnitedStatesPatient patient = getPatient(patientIdentifier);
-    Encounter encounter = getEncounter(encounterIdentifier, patient);
+    Encounter encounter = encounterRepository.read(Id.of(encounterIdentifier)).get();
 
     FlagBuilder flagBuilder = new FlagBuilder(patient);
     ProcedureBuilder procedureBuilder = new ProcedureBuilder(encounter, clock);

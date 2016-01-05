@@ -17,6 +17,7 @@ public class ClientBuilder {
   private final IGenericClient client;
   private ObservationClient observationClient;
   private PractitionerClient practitionerClient;
+  private EncounterClient encounterClient;
 
   /**
    * Constructor
@@ -34,8 +35,14 @@ public class ClientBuilder {
     }
   }
 
-  public EncounterClient getEncounterClient() {
-    return new EncounterClient(client);
+  /**
+   * @return encounter client
+   */
+  public synchronized EncounterClient getEncounterClient() {
+    if (encounterClient == null) {
+      encounterClient = new EncounterClient(client);
+    }
+    return encounterClient;
   }
 
   public FlagClient getFlagClient() {
@@ -87,13 +94,23 @@ public class ClientBuilder {
   }
 
   /**
-   * Invalidates cache entry for encounter.
+   * Invalidates observation cache entry for an encounter.
+   *
+   * @param encounterId
+   *     encounter ID
+   */
+  public void invalidateObservations(String encounterId) {
+    getObservationClient().invalidate(encounterId);
+  }
+
+  /**
+   * Invalidates cache entry for an encounter.
    *
    * @param encounterId
    *     encounter ID
    */
   public void invalidateEncounter(String encounterId) {
-    getObservationClient().invalidate(encounterId);
+    getEncounterClient().invalidate(encounterId);
   }
 
   /**

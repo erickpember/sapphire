@@ -78,6 +78,8 @@ public class AddParticipant {
     encounter.setParticipant(participants);
     encounterRepository.save(encounter);
 
+    apiClient.invalidateEncounter(encounter.getId().getIdPart());
+
     harmEvidenceUpdater.updateParticipant(practitioner, encounter);
   }
 }

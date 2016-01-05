@@ -3,6 +3,7 @@
 package com.datafascia.etl.event;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
+import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater;
@@ -26,6 +27,9 @@ public class DischargePatient {
   @Inject
   private HarmEvidenceUpdater harmEvidenceUpdater;
 
+  @Inject
+  private ClientBuilder apiClient;
+
   /**
    * Discharges patient.
    *
@@ -45,6 +49,8 @@ public class DischargePatient {
     encounterStatusTransition.updateEncounterStatus(triggerEvent, currentEncounter, newEncounter);
 
     encounterRepository.save(newEncounter);
+
+    apiClient.invalidateEncounter(newEncounter.getId().getIdPart());
 
     harmEvidenceUpdater.dischargePatient(newEncounter);
   }

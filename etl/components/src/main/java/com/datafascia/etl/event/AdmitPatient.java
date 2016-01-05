@@ -8,6 +8,7 @@ import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Location;
 import ca.uhn.fhir.model.dstu2.valueset.EncounterLocationStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
+import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.common.configuration.ConfigurationNode;
 import com.datafascia.common.configuration.Configure;
 import com.datafascia.common.persist.Id;
@@ -55,6 +56,9 @@ public class AdmitPatient {
 
   @Inject
   private HarmEvidenceUpdater harmEvidenceUpdater;
+
+  @Inject
+  private ClientBuilder apiClient;
 
   /**
    * Checks if trigger event is admit or transfer.
@@ -161,6 +165,7 @@ public class AdmitPatient {
     }
 
     encounterRepository.save(newEncounter);
+    apiClient.invalidateEncounter(newEncounter.getId().getIdPart());
 
     if (isAdmitOrTransfer(triggerEvent)) {
       harmEvidenceUpdater.admitPatient(patient, location, newEncounter);

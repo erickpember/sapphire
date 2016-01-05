@@ -9,14 +9,30 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.IGenericClient;
 import ca.uhn.fhir.rest.gclient.StringClientParam;
 import com.google.common.base.Strings;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 /**
  * Client utilities for medication orders.
  */
 public class MedicationOrderClient extends BaseClient<MedicationOrder> {
+
+  private final LoadingCache<String, List<MedicationOrder>> encounterIdToMedicationOrdersMap
+      = CacheBuilder.newBuilder()
+      .expireAfterWrite(30, TimeUnit.SECONDS)
+      .build(
+          new CacheLoader<String, List<MedicationOrder>>() {
+            @Override
+            public List<MedicationOrder> load(String encounterId) {
+              return list(encounterId);
+            }
+          });
+
   /**
    * Constructs an API client
    *
@@ -71,8 +87,18 @@ public class MedicationOrderClient extends BaseClient<MedicationOrder> {
     client.update().resource(order).execute();
   }
 
+  private List<MedicationOrder> list(String encounterId) {
+    Bundle results = client.search()
+        .forResource(MedicationOrder.class)
+        .where(new StringClientParam(MedicationOrder.SP_ENCOUNTER)
+            .matches()
+            .value(encounterId))
+        .execute();
+    return extractBundle(results, MedicationOrder.class);
+  }
+
   /**
-   * Searches MedicationOrders
+   * Lists MedicationOrders for a given Encounter.
    *
    * @param encounterId
    *     The ID of the encounter to which the medication orders belong.
@@ -84,7 +110,7 @@ public class MedicationOrderClient extends BaseClient<MedicationOrder> {
   }
 
   /**
-   * Searches MedicationOrders
+   * Lists MedicationOrders for a given Encounter, optionally filtering by order status.
    *
    * @param encounterId
    *     The ID of the encounter to which the medicationOrders belong.
@@ -94,13 +120,8 @@ public class MedicationOrderClient extends BaseClient<MedicationOrder> {
    *     Medication orders for this encounter and status
    */
   public List<MedicationOrder> search(String encounterId, String status) {
-    Bundle results = client.search().forResource(MedicationOrder.class)
-        .where(new StringClientParam(MedicationOrder.SP_ENCOUNTER)
-            .matches()
-            .value(encounterId))
-        .execute();
-
-    List<MedicationOrder> medicationOrders = extractBundle(results, MedicationOrder.class);
+    List<MedicationOrder> medicationOrders = encounterIdToMedicationOrdersMap.getUnchecked(
+        encounterId);
 
     if (!Strings.isNullOrEmpty(status)) {
       List<MedicationOrder> filteredResults = new ArrayList<>();
@@ -138,5 +159,15 @@ public class MedicationOrderClient extends BaseClient<MedicationOrder> {
               .anyMatch(ident -> ident.getValue().equals(identifier)))
           .collect(Collectors.toList());
     }
+  }
+
+  /**
+   * Invalidates cache entry for encounter-based search.
+   *
+   * @param encounterId
+   *     encounter ID
+   */
+  public void invalidate(String encounterId) {
+    encounterIdToMedicationOrdersMap.invalidate(encounterId);
   }
 }

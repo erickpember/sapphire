@@ -55,35 +55,6 @@ public class MedicationOrderRepository extends FhirEntityStoreRepository {
   /**
    * Saves entity.
    *
-   * @param encounter parent entity
-   * @param medicationOrder to save
-   */
-  public void save(Encounter encounter, MedicationOrder medicationOrder) {
-    Id<MedicationOrder> orderId = generateId(medicationOrder);
-    medicationOrder.setId(new IdDt(
-        MedicationOrder.class.getSimpleName(), orderId.toString()));
-
-    Id<Encounter> encounterId = Ids.toPrimaryKey(encounter.getId());
-    entityStore.save(toEntityId(encounterId, orderId), medicationOrder);
-  }
-
-  /**
-   * Saves entity.
-   *
-   * @param encounterId  parent entity ID
-   * @param medicationOrder to save
-   */
-  public void save(Id<Encounter> encounterId, MedicationOrder medicationOrder) {
-    Id<MedicationOrder> orderId = generateId(medicationOrder);
-    medicationOrder.setId(new IdDt(
-        MedicationOrder.class.getSimpleName(), orderId.toString()));
-
-    entityStore.save(toEntityId(encounterId, orderId), medicationOrder);
-  }
-
-  /**
-   * Saves entity.
-   *
    * @param medicationOrder to save
    */
   public void save(MedicationOrder medicationOrder) {

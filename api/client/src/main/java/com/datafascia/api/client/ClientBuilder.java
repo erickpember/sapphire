@@ -17,6 +17,7 @@ public class ClientBuilder {
   private final IGenericClient client;
   private EncounterClient encounterClient;
   private MedicationClient medicationClient;
+  private MedicationOrderClient medicationOrderClient;
   private ObservationClient observationClient;
   private PractitionerClient practitionerClient;
 
@@ -54,8 +55,14 @@ public class ClientBuilder {
     return new MedicationAdministrationClient(client);
   }
 
-  public MedicationOrderClient getMedicationOrderClient() {
-    return new MedicationOrderClient(client);
+  /**
+   * @return medicationOrder client
+   */
+  public synchronized MedicationOrderClient getMedicationOrderClient() {
+    if (medicationOrderClient == null) {
+      medicationOrderClient = new MedicationOrderClient(client);
+    }
+    return medicationOrderClient;
   }
 
   /**
@@ -118,6 +125,16 @@ public class ClientBuilder {
    */
   public void invalidateMedication(String medicationId) {
     getMedicationClient().invalidate(medicationId);
+  }
+
+  /**
+   * Invalidates medication order cache entry for a specific encounter-based lookup.
+   *
+   * @param encounterId
+   *     encounter ID
+   */
+  public void invalidateMedicationOrders(String encounterId) {
+    getMedicationOrderClient().invalidate(encounterId);
   }
 
   /**

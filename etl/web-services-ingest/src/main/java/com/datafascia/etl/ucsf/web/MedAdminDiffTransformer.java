@@ -67,7 +67,7 @@ public class MedAdminDiffTransformer {
   @Inject
   private volatile Connector connector;
   @Inject
-  private ClientBuilder clientBuilder;
+  private ClientBuilder apiClient;
 
   @Configure
   public String accumuloTable;
@@ -138,7 +138,7 @@ public class MedAdminDiffTransformer {
     for (Object obj : patients) {
       if (obj instanceof JSONObject) {
         String encounterId = ((JSONObject) obj).get("CSN").toString();
-        Encounter encounter = clientBuilder.getEncounterClient().getEncounter(encounterId);
+        Encounter encounter = apiClient.getEncounterClient().getEncounter(encounterId);
 
         if (encounter == null) {
           log.warn("Encounter " + encounterId + " is not known in FHIR. Associated medication "
@@ -234,14 +234,14 @@ public class MedAdminDiffTransformer {
     String customMedId = null;
     if (!Strings.isNullOrEmpty(scd)) {
       medication = UcsfMedicationUtils.populateMedication(droolNorm, null, null, rxNormDb,
-          clientBuilder);
+          apiClient);
     } else if (orderJson.get("Mixture") != null) {
       HashCode hc = hashFunction.newHasher()
           .putString(((JSONArray) orderJson.get("Mixture")).toJSONString(), Charsets.UTF_8)
           .hash();
       customMedId = hc.toString();
       medication = UcsfMedicationUtils.populateMedication(droolNorm, customMedId, drugName,
-          rxNormDb, clientBuilder);
+          rxNormDb, apiClient);
     } else if (orderJson.get("RxNorm") != null) {
       // This will trigger if there is no SCD, but the RxNorm still isn't null.
       HashCode hc = hashFunction.newHasher()
@@ -249,7 +249,7 @@ public class MedAdminDiffTransformer {
           .hash();
       customMedId = hc.toString();
       medication = UcsfMedicationUtils.populateMedication(droolNorm, customMedId, drugName,
-          rxNormDb, clientBuilder);
+          rxNormDb, apiClient);
     }
 
     String medDataNew = orderJson.toJSONString();
@@ -288,11 +288,12 @@ public class MedAdminDiffTransformer {
             prescriptionId,
             droolNorm.getMedsSets(),
             encounter);
-        MedicationOrder existingOrder = clientBuilder.getMedicationOrderClient()
+        MedicationOrder existingOrder = apiClient.getMedicationOrderClient()
             .read(prescriptionId, encounter.getIdentifierFirstRep().getValue());
         if (existingOrder != null) {
           medOrder.setId(existingOrder.getId());
-          clientBuilder.getMedicationOrderClient().update(medOrder);
+          apiClient.getMedicationOrderClient().update(medOrder);
+          apiClient.invalidateMedicationOrders(encounter.getIdentifierFirstRep().getValue());
         } else {
           log.warn(
               "Could not find prescription [{}] for encounterId [{}]."
@@ -301,7 +302,8 @@ public class MedAdminDiffTransformer {
               prescriptionId,
               encounter.getIdentifierFirstRep().getValue(),
               tableName);
-          clientBuilder.getMedicationOrderClient().create(medOrder);
+          apiClient.getMedicationOrderClient().create(medOrder);
+          apiClient.invalidateMedicationOrders(encounter.getIdentifierFirstRep().getValue());
         }
       }
     } else {
@@ -311,7 +313,8 @@ public class MedAdminDiffTransformer {
           prescriptionId,
           droolNorm.getMedsSets(),
           encounter);
-      medOrder = clientBuilder.getMedicationOrderClient().create(medOrder);
+      medOrder = apiClient.getMedicationOrderClient().create(medOrder);
+      apiClient.invalidateMedicationOrders(encounter.getIdentifierFirstRep().getValue());
       if (diffListener != null) {
         diffListener.newOrder(medOrder);
       }
@@ -321,7 +324,7 @@ public class MedAdminDiffTransformer {
 
     if (admins != null && admins.size() > 0) {
       if (medOrder == null) {
-        medOrder = clientBuilder.getMedicationOrderClient().read(prescriptionId,
+        medOrder = apiClient.getMedicationOrderClient().read(prescriptionId,
             encounter.getIdentifierFirstRep().getValue());
       }
       for (Object obj : admins) {
@@ -404,14 +407,14 @@ public class MedAdminDiffTransformer {
         // Recreate the administration based on the new data.
         MedicationAdministration medAdmin = UcsfMedicationUtils.populateAdministration(admin,
             adminId, prescriptionId, UcsfMedicationUtils.populateMedication(droolNorm, customMedId,
-                drugName, rxNormDb, clientBuilder),
+                drugName, rxNormDb, apiClient),
             droolNorm.getMedsSets(), encounter, order);
-        MedicationAdministration existingAdministration = clientBuilder
+        MedicationAdministration existingAdministration = apiClient
             .getMedicationAdministrationClient().get(adminId, encounterId,
                 prescriptionId);
         if (existingAdministration != null) {
           medAdmin.setId(existingAdministration.getId());
-          clientBuilder.getMedicationAdministrationClient()
+          apiClient.getMedicationAdministrationClient()
               .update(medAdmin);
         } else {
           log.warn(
@@ -421,7 +424,7 @@ public class MedAdminDiffTransformer {
               adminId,
               prescriptionId,
               encounterId);
-          clientBuilder.getMedicationAdministrationClient().save(medAdmin);
+          apiClient.getMedicationAdministrationClient().save(medAdmin);
         }
       }
     } else {
@@ -429,9 +432,9 @@ public class MedAdminDiffTransformer {
       MedicationAdministration medAdmin = UcsfMedicationUtils
           .populateAdministration(admin, adminId, prescriptionId,
               UcsfMedicationUtils.populateMedication(droolNorm, customMedId, drugName, rxNormDb,
-                  clientBuilder),
+                  apiClient),
               droolNorm.getMedsSets(), encounter, order);
-      medAdmin = clientBuilder.getMedicationAdministrationClient().save(medAdmin);
+      medAdmin = apiClient.getMedicationAdministrationClient().save(medAdmin);
       if (diffListener != null) {
         diffListener.newAdmin(medAdmin);
       }

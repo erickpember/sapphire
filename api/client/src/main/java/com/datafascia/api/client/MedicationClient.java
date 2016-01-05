@@ -5,12 +5,24 @@ package com.datafascia.api.client;
 import ca.uhn.fhir.model.dstu2.resource.Medication;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.IGenericClient;
-import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Client utilities for medications.
  */
 public class MedicationClient extends BaseClient<Medication> {
+  private final LoadingCache<String, Medication> medicationsMap = CacheBuilder.newBuilder()
+      .expireAfterWrite(10, TimeUnit.MINUTES)
+      .build(
+          new CacheLoader<String, Medication>() {
+            public Medication load(String medicationId) {
+              return read(medicationId);
+            }
+          });
+
   /**
    * Builds a MedicationClient
    *
@@ -20,6 +32,13 @@ public class MedicationClient extends BaseClient<Medication> {
     super(client);
   }
 
+  private Medication read(String medicationId) {
+    return client.read()
+        .resource(Medication.class)
+        .withId(medicationId)
+        .execute();
+  }
+
   /**
    * Retrieve a medication for a given FHIR-native ID.
    *
@@ -27,14 +46,13 @@ public class MedicationClient extends BaseClient<Medication> {
    * @return A medication.
    */
   public Medication getMedication(String nativeId) {
+    Medication result = null;
+
     try {
-      return client.read()
-          .resource(Medication.class)
-          .withId(nativeId)
-          .execute();
-    } catch (ResourceNotFoundException e) {
-      return null;
+      result = medicationsMap.getUnchecked(nativeId);
+    } catch (Exception e) {
     }
+    return result;
   }
 
   /**
@@ -46,5 +64,15 @@ public class MedicationClient extends BaseClient<Medication> {
     MethodOutcome outcome = client.create().resource(medication).execute();
     medication.setId(outcome.getId());
     return medication;
+  }
+
+  /**
+   * Invalidates cache entry for a medication.
+   *
+   * @param medicationId
+   *     medication ID
+   */
+  public void invalidate(String medicationId) {
+    medicationsMap.invalidate(medicationId);
   }
 }

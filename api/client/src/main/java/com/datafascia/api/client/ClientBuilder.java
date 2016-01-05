@@ -15,9 +15,10 @@ import javax.inject.Inject;
  */
 public class ClientBuilder {
   private final IGenericClient client;
+  private EncounterClient encounterClient;
+  private MedicationClient medicationClient;
   private ObservationClient observationClient;
   private PractitionerClient practitionerClient;
-  private EncounterClient encounterClient;
 
   /**
    * Constructor
@@ -75,8 +76,14 @@ public class ClientBuilder {
     return new ProcedureClient(client);
   }
 
-  public MedicationClient getMedicationClient() {
-    return new MedicationClient(client);
+  /**
+   * @return medication client
+   */
+  public synchronized MedicationClient getMedicationClient() {
+    if (medicationClient == null) {
+      medicationClient = new MedicationClient(client);
+    }
+    return medicationClient;
   }
 
   /**
@@ -94,16 +101,6 @@ public class ClientBuilder {
   }
 
   /**
-   * Invalidates observation cache entry for an encounter.
-   *
-   * @param encounterId
-   *     encounter ID
-   */
-  public void invalidateObservations(String encounterId) {
-    getObservationClient().invalidate(encounterId);
-  }
-
-  /**
    * Invalidates cache entry for an encounter.
    *
    * @param encounterId
@@ -111,6 +108,26 @@ public class ClientBuilder {
    */
   public void invalidateEncounter(String encounterId) {
     getEncounterClient().invalidate(encounterId);
+  }
+
+  /**
+   * Invalidates cache entry for a medication
+   *
+   * @param medicationId
+   *     medication ID
+   */
+  public void invalidateMedication(String medicationId) {
+    getMedicationClient().invalidate(medicationId);
+  }
+
+  /**
+   * Invalidates observation cache entry for an encounter.
+   *
+   * @param encounterId
+   *     encounter ID
+   */
+  public void invalidateObservations(String encounterId) {
+    getObservationClient().invalidate(encounterId);
   }
 
   /**

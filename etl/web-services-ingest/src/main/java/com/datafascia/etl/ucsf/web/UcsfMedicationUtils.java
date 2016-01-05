@@ -426,6 +426,7 @@ public class UcsfMedicationUtils {
         medication.setProduct(product);
 
         medication = clientBuilder.getMedicationClient().saveMedication(medication);
+        clientBuilder.invalidateMedication(id);
       }
 
       if (!orderMedicationCache.keySet().contains(id)) {

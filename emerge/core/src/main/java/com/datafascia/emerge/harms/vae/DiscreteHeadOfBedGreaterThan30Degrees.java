@@ -64,7 +64,7 @@ public class DiscreteHeadOfBedGreaterThan30Degrees {
     Instant now = Instant.now(clock);
 
     boolean contraindicated = apiClient.getProcedureRequestClient()
-        .list(encounterId)
+        .search(encounterId)
         .stream()
         .filter(request ->
             CONTRAINDICATED_BED_ORDER_CODES.contains(

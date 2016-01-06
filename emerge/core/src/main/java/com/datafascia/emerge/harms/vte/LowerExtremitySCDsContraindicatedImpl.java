@@ -38,7 +38,7 @@ public class LowerExtremitySCDsContraindicatedImpl {
    */
   public String getLowerExtremitySCDsContraindicated(String encounterId) {
     List<ProcedureRequest> requests = apiClient.getProcedureRequestClient()
-        .list(encounterId);
+        .search(encounterId);
 
     for (ProcedureRequest request : requests) {
       if (ProcedureRequestCodeEnum.VTE_PPX_CONTRAINDICATIONS.isCodeEquals(request.getCode()) &&

@@ -142,8 +142,10 @@ public class NursingOrdersTransformer {
     if (existingRequest.isPresent()) {
       request.setId(existingRequest.get().getId());
       apiClient.getProcedureRequestClient().update(request);
+      apiClient.invalidateProcedureRequests(encounterId);
     } else {
       apiClient.getProcedureRequestClient().create(request);
+      apiClient.invalidateProcedureRequests(encounterId);
     }
   }
 

@@ -8,14 +8,29 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.IGenericClient;
 import ca.uhn.fhir.rest.gclient.StringClientParam;
 import com.google.common.base.Strings;
-import java.util.ArrayList;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Client utilities for procedure requests.
  */
 public class ProcedureRequestClient extends BaseClient<ProcedureRequest> {
+  private final LoadingCache<String, List<ProcedureRequest>> encounterIdToProcedureRequestsMap
+      = CacheBuilder.newBuilder()
+      .expireAfterWrite(30, TimeUnit.SECONDS)
+      .build(
+          new CacheLoader<String, List<ProcedureRequest>>() {
+            @Override
+            public List<ProcedureRequest> load(String encounterId) {
+              return list(encounterId);
+            }
+          });
+
   /**
    * Builds a ProcedureRequestClient
    *
@@ -23,6 +38,17 @@ public class ProcedureRequestClient extends BaseClient<ProcedureRequest> {
    */
   public ProcedureRequestClient(IGenericClient client) {
     super(client);
+  }
+
+  private List<ProcedureRequest> list(String encounterId) {
+    Bundle results = client.search()
+        .forResource(ProcedureRequest.class)
+        .where(new StringClientParam(ProcedureRequest.SP_ENCOUNTER)
+            .matches()
+            .value(encounterId))
+        .execute();
+
+    return extractBundle(results, ProcedureRequest.class);
   }
 
   /**
@@ -69,59 +95,49 @@ public class ProcedureRequestClient extends BaseClient<ProcedureRequest> {
   }
 
   /**
-   * Lists all procedure requests for an encounter.
+   * Lists all procedure requests for a given encounter.
    *
-   * @param encounterId The ID of the encounter they belong to.
+   * @param encounterId
+   *     The ID of the encounter to which the procedure requests belong.
    * @return A list ProcedureRequests.
    */
-  public List<ProcedureRequest> list(String encounterId) {
-    Bundle results = client.search().forResource(ProcedureRequest.class)
-        .where(new StringClientParam(ProcedureRequest.SP_ENCOUNTER)
-            .matches()
-            .value(encounterId))
-        .execute();
-    return extractBundle(results, ProcedureRequest.class);
+  public List<ProcedureRequest> search(String encounterId) {
+    return search(encounterId, null, null);
   }
 
   /**
    * Searches ProcedureRequests
    *
-   * @param encounterId The ID of the encounter to which the procedure requests belong.
-   * @param code procedure request code, optional.
-   * @param status Status of procedure request, optional.
+   * @param encounterId
+   *     The ID of the encounter to which the procedure requests belong. Not optional.
+   * @param code
+   *     procedure request code, optional.
+   * @param status
+   *     Status of procedure request, optional.
    * @return A list ProcedureRequests.
    */
   public List<ProcedureRequest> search(String encounterId, String code, String status) {
-    Bundle results = client.search().forResource(ProcedureRequest.class)
-        .where(new StringClientParam(ProcedureRequest.SP_ENCOUNTER)
-            .matches()
-            .value(encounterId))
-        .execute();
-
-    List<ProcedureRequest> procedureRequests = extractBundle(results, ProcedureRequest.class);
-
-    if (!Strings.isNullOrEmpty(code)) {
-      List<ProcedureRequest> filteredResults = new ArrayList<>();
-      for (ProcedureRequest procedureRequest : procedureRequests) {
-        if (procedureRequest.getCode().getCodingFirstRep().getCode().equalsIgnoreCase(code)) {
-          filteredResults.add(procedureRequest);
-        }
-      }
-      procedureRequests = filteredResults;
+    List<ProcedureRequest> procedurerequests = encounterIdToProcedureRequestsMap.getUnchecked(
+        encounterId);
+    if (Strings.isNullOrEmpty(code) && Strings.isNullOrEmpty(status)) {
+      return procedurerequests;
     }
 
-    if (!Strings.isNullOrEmpty(status)) {
-      List<ProcedureRequest> filteredResults = new ArrayList<>();
-      for (ProcedureRequest procedureRequest : procedureRequests) {
-        if (procedureRequest.getStatus() != null) {
-          if (procedureRequest.getStatus().equalsIgnoreCase(status)) {
-            filteredResults.add(procedureRequest);
-          }
-        }
-      }
-      procedureRequests = filteredResults;
-    }
+    return procedurerequests.stream()
+        .filter(procedurerequest -> Strings.isNullOrEmpty(code) ||
+            code.equalsIgnoreCase(procedurerequest.getCode().getCodingFirstRep().getCode()))
+        .filter(procedurerequest -> Strings.isNullOrEmpty(status) ||
+            status.equalsIgnoreCase(procedurerequest.getStatus()))
+        .collect(Collectors.toList());
+  }
 
-    return procedureRequests;
+  /**
+   * Invalidates cache entry for encounter-based search results.
+   *
+   * @param encounterId
+   *     encounter ID
+   */
+  public void invalidate(String encounterId) {
+    encounterIdToProcedureRequestsMap.invalidate(encounterId);
   }
 }

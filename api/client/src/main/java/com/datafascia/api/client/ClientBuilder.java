@@ -21,6 +21,7 @@ public class ClientBuilder {
   private ObservationClient observationClient;
   private PractitionerClient practitionerClient;
   private ProcedureClient procedureClient;
+  private ProcedureRequestClient procedureRequestClient;
 
   /**
    * Constructor
@@ -76,10 +77,6 @@ public class ClientBuilder {
     return observationClient;
   }
 
-  public ProcedureRequestClient getProcedureRequestClient() {
-    return new ProcedureRequestClient(client);
-  }
-
   /**
    * @return medication client
    */
@@ -108,6 +105,16 @@ public class ClientBuilder {
       procedureClient = new ProcedureClient(client);
     }
     return procedureClient;
+  }
+
+  /**
+   * @return procedure request client
+   */
+  public synchronized ProcedureRequestClient getProcedureRequestClient() {
+    if (procedureRequestClient == null) {
+      procedureRequestClient = new ProcedureRequestClient(client);
+    }
+    return procedureRequestClient;
   }
 
   public SubstanceClient getSubstanceClient() {
@@ -172,6 +179,16 @@ public class ClientBuilder {
    */
   public void invalidateProcedures(String procedureId) {
     getProcedureClient().invalidate(procedureId);
+  }
+
+  /**
+   * Invalidates procedure request cache entry for encounter-based lookups.
+   *
+   * @param encounterId
+   *     encounter ID
+   */
+  public void invalidateProcedureRequests(String encounterId) {
+    getProcedureRequestClient().invalidate(encounterId);
   }
 
   /**

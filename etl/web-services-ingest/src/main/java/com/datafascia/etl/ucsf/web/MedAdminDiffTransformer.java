@@ -425,6 +425,7 @@ public class MedAdminDiffTransformer {
               prescriptionId,
               encounterId);
           apiClient.getMedicationAdministrationClient().save(medAdmin);
+          apiClient.invalidateMedicationAdministrations(encounterId);
         }
       }
     } else {
@@ -435,6 +436,7 @@ public class MedAdminDiffTransformer {
                   apiClient),
               droolNorm.getMedsSets(), encounter, order);
       medAdmin = apiClient.getMedicationAdministrationClient().save(medAdmin);
+      apiClient.invalidateMedicationAdministrations(encounterId);
       if (diffListener != null) {
         diffListener.newAdmin(medAdmin);
       }

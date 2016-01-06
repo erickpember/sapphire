@@ -17,6 +17,7 @@ public class ClientBuilder {
   private final IGenericClient client;
   private EncounterClient encounterClient;
   private MedicationClient medicationClient;
+  private MedicationAdministrationClient medicationAdministrationClient;
   private MedicationOrderClient medicationOrderClient;
   private ObservationClient observationClient;
   private PractitionerClient practitionerClient;
@@ -53,20 +54,6 @@ public class ClientBuilder {
     return new FlagClient(client);
   }
 
-  public MedicationAdministrationClient getMedicationAdministrationClient() {
-    return new MedicationAdministrationClient(client);
-  }
-
-  /**
-   * @return medicationOrder client
-   */
-  public synchronized MedicationOrderClient getMedicationOrderClient() {
-    if (medicationOrderClient == null) {
-      medicationOrderClient = new MedicationOrderClient(client);
-    }
-    return medicationOrderClient;
-  }
-
   /**
    * @return observation client
    */
@@ -85,6 +72,26 @@ public class ClientBuilder {
       medicationClient = new MedicationClient(client);
     }
     return medicationClient;
+  }
+
+  /**
+   * @return medicationAdministration client
+   */
+  public synchronized MedicationAdministrationClient getMedicationAdministrationClient() {
+    if (medicationAdministrationClient == null) {
+      medicationAdministrationClient = new MedicationAdministrationClient(client);
+    }
+    return medicationAdministrationClient;
+  }
+
+  /**
+   * @return medicationOrder client
+   */
+  public synchronized MedicationOrderClient getMedicationOrderClient() {
+    if (medicationOrderClient == null) {
+      medicationOrderClient = new MedicationOrderClient(client);
+    }
+    return medicationOrderClient;
   }
 
   /**
@@ -149,6 +156,16 @@ public class ClientBuilder {
    */
   public void invalidateMedicationOrders(String encounterId) {
     getMedicationOrderClient().invalidate(encounterId);
+  }
+
+  /**
+   * Invalidates medication administration cache entry for encounter-based lookups.
+   *
+   * @param encounterId
+   *     encounter ID
+   */
+  public void invalidateMedicationAdministrations(String encounterId) {
+    getMedicationAdministrationClient().invalidate(encounterId);
   }
 
   /**

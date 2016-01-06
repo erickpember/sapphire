@@ -9,13 +9,29 @@ import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.IGenericClient;
 import ca.uhn.fhir.rest.gclient.StringClientParam;
 import com.google.common.base.Strings;
-import java.util.ArrayList;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Client utilities for medication administrations.
  */
 public class MedicationAdministrationClient extends BaseClient<MedicationAdministration> {
+
+  private final LoadingCache<String, List<MedicationAdministration>>
+      encounterIdToMedicationAdministrationsMap = CacheBuilder.newBuilder()
+      .expireAfterWrite(30, TimeUnit.SECONDS)
+      .build(
+          new CacheLoader<String, List<MedicationAdministration>>() {
+            @Override
+            public List<MedicationAdministration> load(String encounterId) {
+              return list(encounterId);
+            }
+          });
+
   /**
    * Builds a MedicationAdministrationClient
    *
@@ -23,6 +39,17 @@ public class MedicationAdministrationClient extends BaseClient<MedicationAdminis
    */
   public MedicationAdministrationClient(IGenericClient client) {
     super(client);
+  }
+
+  private List<MedicationAdministration> list(String encounterId) {
+    Bundle results = client.search()
+        .forResource(MedicationAdministration.class)
+        .where(new StringClientParam(MedicationAdministration.SP_ENCOUNTER)
+            .matches()
+            .value(encounterId))
+        .execute();
+
+    return extractBundle(results, MedicationAdministration.class);
   }
 
   /**
@@ -48,26 +75,15 @@ public class MedicationAdministrationClient extends BaseClient<MedicationAdminis
    *    A list of MedicationAdministrations for the encounter and status.
    */
   public List<MedicationAdministration> search(String encounterId, String status) {
-    Bundle results = client.search().forResource(MedicationAdministration.class)
-        .where(new StringClientParam(MedicationAdministration.SP_ENCOUNTER)
-            .matches()
-            .value(encounterId))
-        .execute();
-
-    List<MedicationAdministration> medicationAdministrations = extractBundle(results,
-        MedicationAdministration.class);
-
-    if (!Strings.isNullOrEmpty(status)) {
-      List<MedicationAdministration> filteredResults = new ArrayList<>();
-      for (MedicationAdministration medicationAdministration : medicationAdministrations) {
-        if (medicationAdministration.getStatus().equalsIgnoreCase(status)) {
-          filteredResults.add(medicationAdministration);
-        }
-      }
-      medicationAdministrations = filteredResults;
+    List<MedicationAdministration> medicationAdministrations
+        = encounterIdToMedicationAdministrationsMap.getUnchecked(encounterId);
+    if (Strings.isNullOrEmpty(status)) {
+      return medicationAdministrations;
     }
 
-    return medicationAdministrations;
+    return medicationAdministrations.stream()
+        .filter(administration -> status.equals(administration.getStatus()))
+        .collect(Collectors.toList());
   }
 
   /**
@@ -151,5 +167,15 @@ public class MedicationAdministrationClient extends BaseClient<MedicationAdminis
    */
   public void update(MedicationAdministration admin) {
     client.update().resource(admin).execute();
+  }
+
+  /**
+   * Invalidates cache entry for encounter-based search results.
+   *
+   * @param encounterId
+   *     encounter ID
+   */
+  public void invalidate(String encounterId) {
+    encounterIdToMedicationAdministrationsMap.invalidate(encounterId);
   }
 }

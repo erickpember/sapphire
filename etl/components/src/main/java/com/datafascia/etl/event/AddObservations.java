@@ -94,6 +94,7 @@ public class AddObservations {
     procedureBuilder.build()
         .ifPresent(procedure -> {
           procedureRepository.save(procedure);
+          apiClient.invalidateProcedures(encounterIdentifier);
           harmEvidenceUpdater.updateProcedure(procedure, encounter);
         });
 

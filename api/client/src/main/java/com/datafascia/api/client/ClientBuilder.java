@@ -20,6 +20,7 @@ public class ClientBuilder {
   private MedicationOrderClient medicationOrderClient;
   private ObservationClient observationClient;
   private PractitionerClient practitionerClient;
+  private ProcedureClient procedureClient;
 
   /**
    * Constructor
@@ -79,10 +80,6 @@ public class ClientBuilder {
     return new ProcedureRequestClient(client);
   }
 
-  public ProcedureClient getProcedureClient() {
-    return new ProcedureClient(client);
-  }
-
   /**
    * @return medication client
    */
@@ -101,6 +98,16 @@ public class ClientBuilder {
       practitionerClient = new PractitionerClient(client);
     }
     return practitionerClient;
+  }
+
+  /**
+   * @return procedure client
+   */
+  public synchronized ProcedureClient getProcedureClient() {
+    if (procedureClient == null) {
+      procedureClient = new ProcedureClient(client);
+    }
+    return procedureClient;
   }
 
   public SubstanceClient getSubstanceClient() {
@@ -128,7 +135,7 @@ public class ClientBuilder {
   }
 
   /**
-   * Invalidates medication order cache entry for a specific encounter-based lookup.
+   * Invalidates medication order cache entry for encounter-based lookups.
    *
    * @param encounterId
    *     encounter ID
@@ -138,7 +145,7 @@ public class ClientBuilder {
   }
 
   /**
-   * Invalidates observation cache entry for an encounter.
+   * Invalidates observation cache entry for encounter-based lookups.
    *
    * @param encounterId
    *     encounter ID
@@ -155,6 +162,16 @@ public class ClientBuilder {
    */
   public void invalidatePractitioner(String practitionerId) {
     getPractitionerClient().invalidate(practitionerId);
+  }
+
+  /**
+   * Invalidates procedure cache entry for encounter-based lookups.
+   *
+   * @param procedureId
+   *     procedure ID
+   */
+  public void invalidateProcedures(String procedureId) {
+    getProcedureClient().invalidate(procedureId);
   }
 
   /**

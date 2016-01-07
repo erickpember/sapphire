@@ -7,7 +7,6 @@ import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.client.ProcedureRequests;
-import com.datafascia.emerge.ucsf.EncounterUtils;
 import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
 import com.google.common.annotations.VisibleForTesting;
 import java.time.Clock;
@@ -52,9 +51,7 @@ public class SCDsOrdered {
     List<ProcedureRequest> requests = apiClient.getProcedureRequestClient().search(
         encounterId, null, ProcedureRequestStatusEnum.IN_PROGRESS.getCode());
 
-    Instant icuAdmitTime = EncounterUtils.getIcuPeriodStart(encounter);
-
-    return isSCDsOrdered(requests, icuAdmitTime, null);
+    return isSCDsOrdered(requests, null, null);
   }
 
   /**

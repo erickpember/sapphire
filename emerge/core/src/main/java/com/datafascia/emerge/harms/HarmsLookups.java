@@ -80,14 +80,15 @@ public class HarmsLookups {
    *
    * @param observations
    *     Wrapper containing observations for the encounter.
-   * @param icuAdmitTime
+   * @param effectiveLower
    *     Lower time bound for the observation query.
    * @return true if conditions are met
    */
-  public static boolean plateletCountLessThan50000(Observations observations,
-      Instant icuAdmitTime) {
+  public static boolean plateletCountLessThan50000(
+      Observations observations, Instant effectiveLower) {
+
     Optional<Observation> freshestPltObservation = observations.findFreshest(
-        ObservationCodeEnum.PLT.getCode(), icuAdmitTime, null);
+        ObservationCodeEnum.PLT.getCode(), effectiveLower, null);
 
     if (!freshestPltObservation.isPresent() || freshestPltObservation.get().getValue().isEmpty()) {
       return false;
@@ -106,13 +107,13 @@ public class HarmsLookups {
    *
    * @param observations
    *     Wrapper containing observations for the encounter.
-   * @param icuAdmitTime
+   * @param effectiveLower
    *     Lower time bound for the observation query.
    * @return true if conditions are met
    */
-  public static boolean inrOver1point5(Observations observations, Instant icuAdmitTime) {
+  public static boolean inrOver1point5(Observations observations, Instant effectiveLower) {
     Optional<Observation> freshestInrObservation = observations.findFreshest(
-        ObservationCodeEnum.INR.getCode(), icuAdmitTime, null);
+        ObservationCodeEnum.INR.getCode(), effectiveLower, null);
 
     if (!freshestInrObservation.isPresent() || freshestInrObservation.get().getValue().isEmpty()) {
       return false;
@@ -131,13 +132,13 @@ public class HarmsLookups {
    *
    * @param observations
    *     Wrapper containing observations for the encounter.
-   * @param icuAdmitTime
+   * @param effectiveLower
    *     Lower time bound for the observation query.
    * @return true if conditions are met
    */
-  public static boolean aPttRatioOver1point5(Observations observations, Instant icuAdmitTime) {
+  public static boolean aPttRatioOver1point5(Observations observations, Instant effectiveLower) {
     Optional<Observation> freshestPttObservation = observations.findFreshest(
-        ObservationCodeEnum.PTT.getCode(), icuAdmitTime, null);
+        ObservationCodeEnum.PTT.getCode(), effectiveLower, null);
 
     if (!freshestPttObservation.isPresent() || freshestPttObservation.get().getValue().isEmpty()) {
       return false;

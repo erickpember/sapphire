@@ -9,7 +9,6 @@ import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.client.Observations;
 import com.datafascia.emerge.harms.HarmsLookups;
-import com.datafascia.emerge.ucsf.EncounterUtils;
 import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
 import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
 import java.time.Clock;
@@ -39,17 +38,16 @@ public class ProphylaxisContraindicated {
   public String getProphylaxisContraindicatedReason(Encounter encounter) {
     String encounterId = encounter.getId().getIdPart();
     Observations observations = apiClient.getObservationClient().list(encounterId);
-    Instant icuAdmitTime = EncounterUtils.getIcuPeriodStart(encounter);
 
-    if (HarmsLookups.plateletCountLessThan50000(observations, icuAdmitTime)) {
+    if (HarmsLookups.plateletCountLessThan50000(observations, null)) {
       return "Platelet Count <50,000";
     }
 
-    if (HarmsLookups.inrOver1point5(observations, icuAdmitTime)) {
+    if (HarmsLookups.inrOver1point5(observations, null)) {
       return "INR >1.5";
     }
 
-    if (HarmsLookups.aPttRatioOver1point5(observations, icuAdmitTime)) {
+    if (HarmsLookups.aPttRatioOver1point5(observations, null)) {
       return "aPTT Ratio >1.5";
     }
 

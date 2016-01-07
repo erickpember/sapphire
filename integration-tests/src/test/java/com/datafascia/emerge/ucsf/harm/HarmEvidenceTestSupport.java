@@ -11,6 +11,7 @@ import ca.uhn.hl7v2.HL7Exception;
 import ca.uhn.hl7v2.model.Message;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.util.Terser;
+import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.services.ApiTestSupport;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.persist.entity.AccumuloReflectEntityStore;
@@ -65,6 +66,9 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
 
   @Inject
   protected Clock clock;
+
+  @Inject
+  private ClientBuilder apiClient;
 
   protected static UnitedStatesPatient getPatient() {
     UnitedStatesPatient patient = new UnitedStatesPatient();
@@ -132,5 +136,7 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
     entityStore.delete(new EntityId(Encounter.class, ENCOUNTER_ID));
     entityStore.delete(new EntityId(UnitedStatesPatient.class, PATIENT_ID));
     ingestMessageRepository.delete(ENCOUNTER_ID);
+
+    apiClient.invalidateEncounter(ENCOUNTER_IDENTIFIER);
   }
 }

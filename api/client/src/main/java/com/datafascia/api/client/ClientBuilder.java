@@ -129,13 +129,17 @@ public class ClientBuilder {
   }
 
   /**
-   * Invalidates cache entry for an encounter.
+   * Invalidates cache entry for an encounter and encounter-linked resource search result caches.
    *
    * @param encounterId
    *     encounter ID
    */
   public void invalidateEncounter(String encounterId) {
     getEncounterClient().invalidate(encounterId);
+    invalidateMedicationOrders(encounterId);
+    invalidateMedicationAdministrations(encounterId);
+    invalidateObservations(encounterId);
+    invalidateProcedureRequests(encounterId);
   }
 
   /**

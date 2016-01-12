@@ -90,9 +90,13 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
     return encounter;
   }
 
-  private String readResource(String hl7File) throws IOException {
-    URL url = Resources.getResource(getClass(), hl7File);
-    return Resources.toString(url, StandardCharsets.UTF_8).replace('\n', '\r');
+  private String readResource(String resourceName) throws IOException {
+    URL url = Resources.getResource(getClass(), resourceName);
+    return Resources.toString(url, StandardCharsets.UTF_8);
+  }
+
+  private String readHL7Resource(String hl7File) throws IOException {
+    return readResource(hl7File).replace('\n', '\r');
   }
 
   private void saveMessageByEncounter(String hl7) throws HL7Exception {
@@ -104,19 +108,18 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
   }
 
   protected void saveMessage(String hl7File) throws HL7Exception, IOException {
-    String hl7 = readResource(hl7File);
+    String hl7 = readHL7Resource(hl7File);
     saveMessageByEncounter(hl7);
   }
 
   protected void processMessage(String hl7File) throws HL7Exception, IOException {
-    String hl7 = readResource(hl7File);
+    String hl7 = readHL7Resource(hl7File);
     saveMessageByEncounter(hl7);
     hl7MessageProcessor.accept(hl7);
   }
 
   protected void processNursingOrder(String jsonFile) throws IOException {
-    URL url = Resources.getResource(getClass(), jsonFile);
-    String json = Resources.toString(url, StandardCharsets.UTF_8);
+    String json = readResource(jsonFile);
     nursingOrdersTransformer.accept(json);
   }
 

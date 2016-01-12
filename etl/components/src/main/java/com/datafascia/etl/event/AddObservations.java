@@ -18,11 +18,14 @@ import com.datafascia.domain.persist.ProcedureRepository;
 import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater;
 import java.time.Clock;
 import java.util.List;
+import java.util.Optional;
 import javax.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Adds observations.
  */
+@Slf4j
 public class AddObservations {
 
   @Inject
@@ -67,8 +70,14 @@ public class AddObservations {
   public void accept(
       List<Observation> observations, String patientIdentifier, String encounterIdentifier) {
 
+    Optional<Encounter> optionalEncounter = encounterRepository.read(Id.of(encounterIdentifier));
+    if (!optionalEncounter.isPresent()) {
+      log.warn("Encounter identifier [{}] not found. Ignoring observations", encounterIdentifier);
+      return;
+    }
+
+    Encounter encounter = optionalEncounter.get();
     UnitedStatesPatient patient = getPatient(patientIdentifier);
-    Encounter encounter = encounterRepository.read(Id.of(encounterIdentifier)).get();
 
     FlagBuilder flagBuilder = new FlagBuilder(patient);
     ProcedureBuilder procedureBuilder = new ProcedureBuilder(encounter, clock);

@@ -38,10 +38,11 @@ public class ObservationsBuilder {
 
   private static final BaseEncoding ENCODING = BaseEncoding.base64Url().omitPadding();
 
-  private Message message;
-  private String obxPathPattern;
-  private String ntePathPattern;
-  private Terser terser;
+  private final static String ORDER_OBSERVATION = "ORDER_OBSERVATION";
+  private final Message message;
+  private final String obxPathPattern;
+  private final String ntePathPattern;
+  private final Terser terser;
   private String messageHash;
 
   /**
@@ -51,12 +52,12 @@ public class ObservationsBuilder {
    *     HL7 message
    * @param obxPathPattern
    *     {@link String#format pattern} to generate path to each OBX segment. The pattern must
-   *     contain exactly one {@code %d} format specifier which will be replaced with an OBX
-   *     repetition index.
+   *     contain exactly two {@code %d} format specifiers which will be replaced with an OBR
+   *     repetition index and OBX repetition index respectively.
    * @param ntePathPattern
    *     {@link String#format pattern} to generate path to each NTE segment. The pattern must
-   *     contain exactly two {@code %d} format specifiers which will be replaced with an OBX
-   *     repetition index and NTE repetition index respectively.
+   *     contain exactly three {@code %d} format specifiers which will be replaced with an OBR
+   *     repetition index, OBX repetition index and NTE repetition index respectively.
    */
   public ObservationsBuilder(Message message, String obxPathPattern, String ntePathPattern) {
     this.message = message;
@@ -69,12 +70,12 @@ public class ObservationsBuilder {
     return ENCODING.encode(Hashing.sha1().hashString(input, StandardCharsets.UTF_8).asBytes());
   }
 
-  private String formatObxPath(int obxIndex) {
-    return String.format(obxPathPattern, obxIndex);
+  private String formatObxPath(int obrIndex, int obxIndex) {
+    return String.format(obxPathPattern, obrIndex, obxIndex);
   }
 
-  private String formatNtePath(int obxIndex, int nteIndex) {
-    return String.format(ntePathPattern, obxIndex, nteIndex);
+  private String formatNtePath(int obrIndex, int obxIndex, int nteIndex) {
+    return String.format(ntePathPattern, obrIndex, obxIndex, nteIndex);
   }
 
   /**
@@ -82,15 +83,15 @@ public class ObservationsBuilder {
    * @throws HL7Exception if HL7 message is malformed
    */
   public boolean hasObservations() throws HL7Exception {
-    String obxPath = formatObxPath(0);
+    String obxPath = formatObxPath(0, 0);
     return !Strings.isNullOrEmpty(terser.get(obxPath + "-1"));
   }
 
-  private List<Segment> getNteSegments(int obxIndex) throws HL7Exception {
+  private List<Segment> getNteSegments(int obrIndex, int obxIndex) throws HL7Exception {
     List<Segment> notes = new ArrayList<>();
     if (!Strings.isNullOrEmpty(ntePathPattern)) {
       for (int nteIndex = 0; true; ++nteIndex) {
-        String ntePath = formatNtePath(obxIndex, nteIndex);
+        String ntePath = formatNtePath(obrIndex, obxIndex, nteIndex);
         if (Strings.isNullOrEmpty(terser.get(ntePath + "-1"))) {
           break;
         }
@@ -238,15 +239,34 @@ public class ObservationsBuilder {
     messageHash = hash(message.encode());
 
     List<Observation> observations = new ArrayList<>();
-    for (int obxIndex = 0; true; ++obxIndex) {
-      String obxPath = formatObxPath(obxIndex);
-      if (Strings.isNullOrEmpty(terser.get(obxPath + "-1"))) {
-        break;
-      }
 
-      Segment obx = terser.getSegment(obxPath);
-      List<Segment> notes = getNteSegments(obxIndex);
-      observations.add(toObservation(obx, notes));
+    if (obxPathPattern.contains(ORDER_OBSERVATION)) {
+      boolean foundObr = true;
+      for (int obrIndex = 0; foundObr; ++obrIndex) {
+        for (int obxIndex = 0; true; ++obxIndex) {
+          String obxPath = formatObxPath(obrIndex, obxIndex);
+          if (Strings.isNullOrEmpty(terser.get(obxPath + "-1"))) {
+            foundObr = obxIndex > 0;
+            break;
+          }
+
+          Segment obx = terser.getSegment(obxPath);
+          List<Segment> notes = getNteSegments(obrIndex, obxIndex);
+          observations.add(toObservation(obx, notes));
+        }
+      }
+    } else {
+      int obrIndex = 0;
+      for (int obxIndex = 0; true; ++obxIndex) {
+        String obxPath = formatObxPath(obrIndex, obxIndex);
+        if (Strings.isNullOrEmpty(terser.get(obxPath + "-1"))) {
+          break;
+        }
+
+        Segment obx = terser.getSegment(obxPath);
+        List<Segment> notes = getNteSegments(obrIndex, obxIndex);
+        observations.add(toObservation(obx, notes));
+      }
     }
 
     return observations;

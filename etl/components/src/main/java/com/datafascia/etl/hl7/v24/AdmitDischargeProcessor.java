@@ -38,10 +38,10 @@ import javax.inject.Inject;
  */
 public abstract class AdmitDischargeProcessor extends BaseProcessor {
 
-  private static final String OBX_PATH_PATTERN = "/OBX(%d)";
+  private static final String OBX_PATH_PATTERN = "/OBX(%2$d)";
   private static final String NTE_PATH_PATTERN = null;
 
-  private static ConcurrentHashMap<String, Boolean> encounterIdentifierToReplayFlagMap =
+  private static final ConcurrentHashMap<String, Boolean> encounterIdentifierToReplayFlagMap =
       new ConcurrentHashMap<>();
 
   @Inject
@@ -211,7 +211,7 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
   }
 
   /**
-   * Admits, tranfers, updates patient.
+   * Admits, transfers, updates patient.
    *
    * @param message
    *     HL7 message
@@ -258,6 +258,8 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
    *     HL7 message
    * @param msh
    *     MSH segment
+   * @param pid
+   *     PID segment
    * @param pv1
    *     PV1 segment
    * @param rolList

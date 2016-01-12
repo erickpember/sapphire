@@ -22,10 +22,10 @@ import org.kohsuke.MetaInfServices;
 public class ORU_R01_Processor extends BaseProcessor {
 
   // HAPI paths to retrieve the segments. Differs between some message types.
-  private static final String OBX_PATH_PATTERN =
-      "/PATIENT_RESULT/ORDER_OBSERVATION/OBSERVATION(%d)/OBX";
-  private static final String NTE_PATH_PATTERN =
-      "/PATIENT_RESULT/ORDER_OBSERVATION/OBSERVATION(%d)/NTE(%d)";
+  private static final String OBX_PATH_PATTERN
+      = "/PATIENT_RESULT/ORDER_OBSERVATION(%1$d)/OBSERVATION(%2$d)/OBX";
+  private static final String NTE_PATH_PATTERN
+      = "/PATIENT_RESULT/ORDER_OBSERVATION(%1$d)/OBSERVATION(%2$d)/NTE(%3$d)";
 
   @Inject
   private AddObservations addObservations;

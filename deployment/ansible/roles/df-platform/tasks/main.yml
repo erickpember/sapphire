@@ -5,7 +5,9 @@
       dest={{ company_package_dir }}/{{ df_platform_package }}
 
 - name: Remove previous application install
-  command: rm -rf {{ df_platform_install_dir }}.previous
+  file:
+    path: "{{ df_platform_install_dir }}.previous"
+    state: absent
   ignore_errors: True
 
 - name: Move current application install out of the way

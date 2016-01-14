@@ -13,7 +13,7 @@
 - name: Package Ansible scripts
   local_action: command tar czf /tmp/ansible.tar.gz ansible
       chdir={{ playbook_dir }}/..
-  sudo: no
+  become: no
 
 - name: Copy Ansible scripts
   copy:

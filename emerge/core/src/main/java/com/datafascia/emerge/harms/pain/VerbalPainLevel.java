@@ -4,13 +4,12 @@ package com.datafascia.emerge.harms.pain;
 
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
-import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
+import com.datafascia.emerge.ucsf.Periods;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import com.google.common.base.Strings;
 import java.time.Clock;
-import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
@@ -76,19 +75,7 @@ public class VerbalPainLevel {
    * @return Numeric pain level and time of acquisition, or {@code null} if not found
    */
   public CurrentPainLevel getCurrentPainLevel(String encounterId) {
-    ZonedDateTime now = ZonedDateTime.now(clock);
-    ZonedDateTime midnight = ZonedDateTime.of(
-        now.getYear(),
-        now.getMonthValue(),
-        now.getDayOfMonth(),
-        0,
-        0,
-        0,
-        0,
-        clock.getZone());
-    PeriodDt sinceMidnight = new PeriodDt();
-    sinceMidnight.setStart(new DateTimeDt(Date.from(midnight.toInstant())));
-    sinceMidnight.setEnd(new DateTimeDt(Date.from(now.toInstant())));
+    PeriodDt sinceMidnight = Periods.getMidnightToNow(clock);
 
     CurrentPainLevel result = CurrentPainLevel
         .builder()
@@ -154,19 +141,7 @@ public class VerbalPainLevel {
    *     or {@code null} if not found
    */
   private MinimumOrMaximumPainLevel getDailyMinOrMax(String encounterId, MinOrMax minOrMax) {
-    ZonedDateTime now = ZonedDateTime.now(clock);
-    ZonedDateTime midnight = ZonedDateTime.of(
-        now.getYear(),
-        now.getMonthValue(),
-        now.getDayOfMonth(),
-        0,
-        0,
-        0,
-        0,
-        clock.getZone());
-    PeriodDt sinceMidnight = new PeriodDt();
-    sinceMidnight.setStart(new DateTimeDt(Date.from(midnight.toInstant())));
-    sinceMidnight.setEnd(new DateTimeDt(Date.from(now.toInstant())));
+    PeriodDt sinceMidnight = Periods.getMidnightToNow(clock);
 
     MinimumOrMaximumPainLevel result = MinimumOrMaximumPainLevel
         .builder()

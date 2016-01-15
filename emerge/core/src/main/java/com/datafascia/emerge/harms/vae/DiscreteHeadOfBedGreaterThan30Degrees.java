@@ -6,8 +6,8 @@ import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.client.Observations;
+import com.datafascia.emerge.ucsf.Periods;
 import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
-import com.datafascia.emerge.ucsf.ShiftUtils;
 import com.datafascia.emerge.ucsf.codes.MaybeEnum;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
@@ -74,7 +74,7 @@ public class DiscreteHeadOfBedGreaterThan30Degrees {
       return MaybeEnum.CONTRAINDICATED;
     }
 
-    PeriodDt fromCurrentOrPriorShift = ShiftUtils.getCurrentOrPriorShiftToNow(clock);
+    PeriodDt fromCurrentOrPriorShift = Periods.getCurrentOrPriorShiftToNow(clock);
     Instant effectiveLower = fromCurrentOrPriorShift.getStart().toInstant();
     Instant effectiveUpper = fromCurrentOrPriorShift.getEnd().toInstant();
 

@@ -4,14 +4,11 @@ package com.datafascia.emerge.harms.pain;
 
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
-import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
-import com.datafascia.emerge.ucsf.ShiftUtils;
+import com.datafascia.emerge.ucsf.Periods;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import java.time.Clock;
-import java.time.ZonedDateTime;
-import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
 
@@ -35,20 +32,8 @@ public class PainGoalImpl {
    * @return Numeric pain goal.
    */
   public int getPainGoal(String encounterId) {
-    PeriodDt fromCurrentOrPriorShift = ShiftUtils.getCurrentOrPriorShiftToNow(clock);
-    ZonedDateTime now = ZonedDateTime.now(clock);
-    ZonedDateTime midnight = ZonedDateTime.of(
-        now.getYear(),
-        now.getMonthValue(),
-        now.getDayOfMonth(),
-        0,
-        0,
-        0,
-        0,
-        clock.getZone());
-    PeriodDt sinceMidnight = new PeriodDt();
-    sinceMidnight.setStart(new DateTimeDt(Date.from(midnight.toInstant())));
-    sinceMidnight.setEnd(new DateTimeDt(Date.from(now.toInstant())));
+    PeriodDt fromCurrentOrPriorShift = Periods.getCurrentOrPriorShiftToNow(clock);
+    PeriodDt sinceMidnight = Periods.getMidnightToNow(clock);
 
     List<Observation> observationsSinceMidnight = ObservationUtils.searchByTimeFrame(apiClient,
         encounterId, sinceMidnight);

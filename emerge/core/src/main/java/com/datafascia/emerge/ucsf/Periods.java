@@ -8,13 +8,11 @@ import java.time.Clock;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.Date;
-import lombok.extern.slf4j.Slf4j;
 
 /**
- * Utilities for calculating nursing shift time windows.
+ * Calculates time periods, such as nursing shifts.
  */
-@Slf4j
-public class ShiftUtils {
+public class Periods {
 
   private static final int YESTERDAY = -1;
   private static final int TODAY = 0;
@@ -22,12 +20,11 @@ public class ShiftUtils {
 
   /**
    * Based on the current time, return the start and end of either the current or previous shift.
-   * If the current time is within 4 hrs of the start of the current shift, return the
-   * previous shift.
-   * Otherwise return the current shift.
+   * If the current time is within 4 hours of the start of the current shift, then return the
+   * previous shift, otherwise return the current shift.
    *
    * @param clock
-   *    A clock with the relevant time zone.
+   *     clock with the relevant time zone.
    * @return
    *     The start and end time of the current or previous shift.
    */
@@ -97,5 +94,29 @@ public class ShiftUtils {
     shift.setEnd(new DateTimeDt(Date.from(Instant.now(clock))));
 
     return shift;
+  }
+
+  /**
+   * Gets period from midnight to now.
+   *
+   * @param clock
+   *     clock with the relevant time zone
+   * @return period from midnight to now.
+   */
+  public static PeriodDt getMidnightToNow(Clock clock) {
+    ZonedDateTime now = ZonedDateTime.now(clock);
+    ZonedDateTime midnight = ZonedDateTime.of(
+        now.getYear(),
+        now.getMonthValue(),
+        now.getDayOfMonth(),
+        0,
+        0,
+        0,
+        0,
+        clock.getZone());
+    PeriodDt sinceMidnight = new PeriodDt();
+    sinceMidnight.setStart(new DateTimeDt(Date.from(midnight.toInstant())));
+    sinceMidnight.setEnd(new DateTimeDt(Date.from(now.toInstant())));
+    return sinceMidnight;
   }
 }

@@ -6,7 +6,7 @@ import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationUtils;
-import com.datafascia.emerge.ucsf.ShiftUtils;
+import com.datafascia.emerge.ucsf.Periods;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import java.time.Clock;
 import javax.inject.Inject;
@@ -54,7 +54,7 @@ public class CamImpl {
    * @return Cam UTA Reason and Result, or Optional.empty if not found.
    */
   public CamImplResult getCam(String encounterId) {
-    PeriodDt fromCurrentOrPriorShift = ShiftUtils.getCurrentOrPriorShiftToNow(clock);
+    PeriodDt fromCurrentOrPriorShift = Periods.getCurrentOrPriorShiftToNow(clock);
 
     Observation freshestFromShift = ObservationUtils.getFreshestByCodeInTimeFrame(apiClient,
         encounterId, ObservationCodeEnum.CAM_ICU.getCode(), fromCurrentOrPriorShift);

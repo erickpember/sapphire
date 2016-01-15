@@ -6,7 +6,7 @@ import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.client.Observations;
-import com.datafascia.emerge.ucsf.ShiftUtils;
+import com.datafascia.emerge.ucsf.Periods;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import java.time.Clock;
 import java.time.Instant;
@@ -44,7 +44,7 @@ public class SCDsInUse {
    * @return true if SCDs are in use
    */
   public boolean isSCDsInUse(String encounterId) {
-    PeriodDt fromCurrentOrPriorShift = ShiftUtils.getCurrentOrPriorShiftToNow(clock);
+    PeriodDt fromCurrentOrPriorShift = Periods.getCurrentOrPriorShiftToNow(clock);
     Instant effectiveLower = fromCurrentOrPriorShift.getStart().toInstant();
     Instant effectiveUpper = fromCurrentOrPriorShift.getEnd().toInstant();
 

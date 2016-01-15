@@ -4,10 +4,10 @@ package com.datafascia.emerge.harms.rass;
 
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
-import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.client.Observations;
 import com.datafascia.emerge.ucsf.ObservationUtils;
+import com.datafascia.emerge.ucsf.Periods;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import java.time.Clock;
 import java.time.ZonedDateTime;
@@ -142,19 +142,7 @@ public class RassLevel {
    *     or {@code null} if not found
    */
   private MinimumOrMaximumRassLevel getDailyMinOrMax(String encounterId, MinOrMax minOrMax) {
-    ZonedDateTime now = ZonedDateTime.now(clock);
-    ZonedDateTime midnight = ZonedDateTime.of(
-        now.getYear(),
-        now.getMonthValue(),
-        now.getDayOfMonth(),
-        0,
-        0,
-        0,
-        0,
-        clock.getZone());
-    PeriodDt sinceMidnight = new PeriodDt();
-    sinceMidnight.setStart(new DateTimeDt(Date.from(midnight.toInstant())));
-    sinceMidnight.setEnd(new DateTimeDt(Date.from(now.toInstant())));
+    PeriodDt sinceMidnight = Periods.getMidnightToNow(clock);
 
     MinimumOrMaximumRassLevel result = MinimumOrMaximumRassLevel
         .builder()

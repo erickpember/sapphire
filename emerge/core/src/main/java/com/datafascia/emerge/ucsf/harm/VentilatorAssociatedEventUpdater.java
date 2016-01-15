@@ -111,8 +111,10 @@ public class VentilatorAssociatedEventUpdater {
    *
    * @param harmEvidence
    *     to modify
+   * @param encounter
+   *     encounter
    */
-  public void admitPatient(HarmEvidence harmEvidence) {
+  public void admitPatient(HarmEvidence harmEvidence, Encounter encounter) {
     VAE vae = getVAE(harmEvidence);
     Ventilation ventilation = getVentilation(harmEvidence);
 
@@ -136,8 +138,11 @@ public class VentilatorAssociatedEventUpdater {
         .withUpdateTime(Date.from(Instant.now(clock)));
     vae.setSubglotticSuctionSurgicalAirway(newSubglotticSuctionSurgicalAirway);
 
+    String encounterId = encounter.getId().getIdPart();
+    TimestampedMaybe.Value value = subglotticSuctionNonSurgicalAirway.test(encounterId);
+
     TimestampedMaybe newSubglotticSuctionNonSurgicalAirway = new TimestampedMaybe()
-        .withValue(TimestampedMaybe.Value.NOT_DOCUMENTED)
+        .withValue(value)
         .withUpdateTime(Date.from(Instant.now(clock)));
     vae.setSubglotticSuctionNonSurgicalAirway(newSubglotticSuctionNonSurgicalAirway);
 
@@ -316,10 +321,10 @@ public class VentilatorAssociatedEventUpdater {
       HarmEvidence harmEvidence, Encounter encounter) {
 
     String encounterId = encounter.getId().getIdPart();
-    boolean value = subglotticSuctionNonSurgicalAirway.test(encounterId);
+    TimestampedMaybe.Value value = subglotticSuctionNonSurgicalAirway.test(encounterId);
 
     TimestampedMaybe newSubglotticSuctionNonSurgicalAirway = new TimestampedMaybe()
-        .withValue(value ? TimestampedMaybe.Value.YES : TimestampedMaybe.Value.NO)
+        .withValue(value)
         .withUpdateTime(Date.from(Instant.now(clock)));
 
     getVAE(harmEvidence).setSubglotticSuctionNonSurgicalAirway(

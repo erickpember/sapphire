@@ -17,8 +17,9 @@ global com.datafascia.emerge.ucsf.harm.VentilatorAssociatedEventUpdater ventilat
 rule "Initialize ventilator associated event data with default values"
 when
   Event( type == EventType.ADMIT_PATIENT )
+  $encounter: Encounter()
 then
-  ventilatorAssociatedEventUpdater.admitPatient(harmEvidence);
+  ventilatorAssociatedEventUpdater.admitPatient(harmEvidence, $encounter);
 end
 
 rule "Update daily sedation interruption"

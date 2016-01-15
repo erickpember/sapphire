@@ -6,6 +6,7 @@ import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.client.Observations;
 import com.datafascia.emerge.ucsf.ObservationUtils;
+import com.datafascia.emerge.ucsf.TimestampedMaybe;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -37,14 +38,14 @@ public class SubglotticSuctionNonSurgicalAirway {
    *     encounter to search
    * @return true if sub-glottic suction non-surgical airway is active the encounter
    */
-  public boolean test(String encounterId) {
+  public TimestampedMaybe.Value test(String encounterId) {
     Observations observations = apiClient.getObservationClient().list(encounterId);
 
     Optional<Observation> freshestAirwayDevice = observations.findFreshest(
         ObservationCodeEnum.AIRWAY_DEVICE_CODE.getCode());
 
     if (!freshestAirwayDevice.isPresent()) {
-      return false;
+      return TimestampedMaybe.Value.NOT_DOCUMENTED;
     }
 
     if (freshestAirwayDevice.get().getValue() != null) {
@@ -55,10 +56,10 @@ public class SubglotticSuctionNonSurgicalAirway {
           ObservationUtils.getValueAsString(freshestAirwayDevice.get())) &&
           airwayName.contains("Non-Surgical Airway") &&
           !airwayName.contains("REMOVED")) {
-        return true;
+        return TimestampedMaybe.Value.YES;
       }
     }
 
-    return false;
+    return TimestampedMaybe.Value.NO;
   }
 }

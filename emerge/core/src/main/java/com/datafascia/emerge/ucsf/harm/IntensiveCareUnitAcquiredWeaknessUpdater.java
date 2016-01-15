@@ -8,9 +8,10 @@ import com.datafascia.emerge.harms.iaw.RNAssist;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.IAW;
 import com.datafascia.emerge.ucsf.MedicalData;
-import com.datafascia.emerge.ucsf.MobilityAchieved;
+import com.datafascia.emerge.ucsf.Mobility;
 import java.time.Clock;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Date;
 import javax.inject.Inject;
 
@@ -54,20 +55,20 @@ public class IntensiveCareUnitAcquiredWeaknessUpdater {
           String assistDevice = RNAssist.getAssistDevices(observation);
           String numberOfAssists = RNAssist.getNumberOfAssists(observation);
 
-          MobilityAchieved mobilityAchieved = new MobilityAchieved()
+          Mobility mobility = new Mobility()
               .withLevelMobilityAchieved(
                   level)
               .withMobilityScoreTime(
                   scoreTime)
               .withClinicianType(
-                  MobilityAchieved.ClinicianType.fromValue(clinicianType))
+                  Mobility.ClinicianType.fromValue(clinicianType))
               .withAssistDevice(
-                  MobilityAchieved.AssistDevice.fromValue(assistDevice))
+                  Mobility.AssistDevice.fromValue(assistDevice))
               .withNumberOfAssists(
-                  MobilityAchieved.NumberOfAssists.fromValue(numberOfAssists))
+                  Mobility.NumberOfAssists.fromValue(numberOfAssists))
               .withUpdateTime(Date.from(Instant.now(clock)));
 
-          getIAW(harmEvidence).setMobilityAchieved(mobilityAchieved);
+          getIAW(harmEvidence).setMobility(Arrays.asList(mobility));
         });
   }
 }

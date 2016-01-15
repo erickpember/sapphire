@@ -700,58 +700,57 @@
         },
         "IAW": {
           "type": "object",
-          "description": "An explanation about the purpose of this instance described by this schema.",
           "properties": {
-            "mobilityAchieved": {
-              "type": "object",
-              "description": "An explanation about the purpose of this instance described by this schema.",
-              "properties": {
-                "updateTime": {
-                  "type": "string",
-                  "format": "date-time",
-                  "description": "An explanation about the purpose of this instance described by this schema."
-                },
-                "levelMobilityAchieved": {
-                  "type": "integer",
-                  "minimum": 0,
-                  "maximum":  10
-                },
-                "mobilityScoreTime": {
-                  "type": "string",
-                  "format": "date-time",
-                  "description": "An explanation about the purpose of this instance described by this schema."
-                },
-                "clinicianType": {
-                  "type": "string",
-                  "enum": [ "PT", "OT", "RN" ],
-                  "description": "An explanation about the purpose of this instance described by this schema."
-                },
-                "assistDevice": {
-                  "type": "string",
-                  "enum": [
-                    "Not Documented",
-                    "Ceiling Lift",
-                    "Vertical dependent lift",
-                    "Neuro Chair",
-                    "Lateral Transfer Device",
-                    "Wheelchair",
-                    "Sit-to-stand Device (Powered)",
-                    "Sit-to-stand Device (Non-powered)",
-                    "Toilet Riser",
-                    "Shower chair",
-                    "Gait Belt",
-                    "Walker",
-                    "Crutches",
-                    "Cane",
-                    "Other",
-                    "None"
-                  ],
-                  "description": "An explanation about the purpose of this instance described by this schema."
-                },
-                "numberOfAssists": {
-                  "type": "string",
-                  "enum": [ "Not Documented", "None", "1", "2", "3+" ],
-                  "description": "An explanation about the purpose of this instance described by this schema."
+            "mobility": {
+              "type": "array",
+              "description": "Mobility records",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "updateTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "When this record was updated"
+                  },
+                  "levelMobilityAchieved": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 10
+                  },
+                  "mobilityScoreTime": {
+                    "type": "string",
+                    "format": "date-time",
+                    "description": "When the mobility score was observed"
+                  },
+                  "clinicianType": {
+                    "type": "string",
+                    "enum": ["PT", "OT", "RN"]
+                  },
+                  "assistDevice": {
+                    "type": "string",
+                    "enum": [
+                      "Not Documented",
+                      "Ceiling Lift",
+                      "Vertical dependent lift",
+                      "Neuro Chair",
+                      "Lateral Transfer Device",
+                      "Wheelchair",
+                      "Sit-to-stand Device (Powered)",
+                      "Sit-to-stand Device (Non-powered)",
+                      "Toilet Riser",
+                      "Shower chair",
+                      "Gait Belt",
+                      "Walker",
+                      "Crutches",
+                      "Cane",
+                      "Other",
+                      "None"
+                    ]
+                  },
+                  "numberOfAssists": {
+                    "type": "string",
+                    "enum": ["Not Documented", "None", "1", "2", "3+"]
+                  }
                 }
               }
             }

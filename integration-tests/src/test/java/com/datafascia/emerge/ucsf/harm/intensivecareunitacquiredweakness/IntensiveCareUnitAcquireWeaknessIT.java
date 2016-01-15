@@ -3,7 +3,7 @@
 package com.datafascia.emerge.ucsf.harm.intensivecareunitacquiredweakness;
 
 import com.datafascia.emerge.ucsf.HarmEvidence;
-import com.datafascia.emerge.ucsf.MobilityAchieved;
+import com.datafascia.emerge.ucsf.Mobility;
 import com.datafascia.emerge.ucsf.harm.HarmEvidenceTestSupport;
 import java.time.Instant;
 import org.testng.annotations.AfterMethod;
@@ -33,16 +33,15 @@ public class IntensiveCareUnitAcquireWeaknessIT extends HarmEvidenceTestSupport 
     processMessage("mobility-achieved.hl7");
 
     HarmEvidence harmEvidence = readHarmEvidence();
-    MobilityAchieved mobilityAchieved =
-        harmEvidence.getMedicalData().getIAW().getMobilityAchieved();
+    Mobility mobility = harmEvidence.getMedicalData().getIAW().getMobility().get(0);
 
-    assertEquals(mobilityAchieved.getLevelMobilityAchieved(), 2);
+    assertEquals(mobility.getLevelMobilityAchieved(), 2);
     assertEquals(
-        mobilityAchieved.getMobilityScoreTime().toInstant().toString(), "2015-10-06T21:00:00Z");
-    assertEquals(mobilityAchieved.getClinicianType(), MobilityAchieved.ClinicianType.RN);
+        mobility.getMobilityScoreTime().toInstant().toString(), "2015-10-06T21:00:00Z");
+    assertEquals(mobility.getClinicianType(), Mobility.ClinicianType.RN);
     assertEquals(
-        mobilityAchieved.getAssistDevice(), MobilityAchieved.AssistDevice.LATERAL_TRANSFER_DEVICE);
-    assertEquals(mobilityAchieved.getNumberOfAssists(), MobilityAchieved.NumberOfAssists._2);
-    assertEquals(mobilityAchieved.getUpdateTime().toInstant(), Instant.now(clock));
+        mobility.getAssistDevice(), Mobility.AssistDevice.LATERAL_TRANSFER_DEVICE);
+    assertEquals(mobility.getNumberOfAssists(), Mobility.NumberOfAssists._2);
+    assertEquals(mobility.getUpdateTime().toInstant(), Instant.now(clock));
   }
 }

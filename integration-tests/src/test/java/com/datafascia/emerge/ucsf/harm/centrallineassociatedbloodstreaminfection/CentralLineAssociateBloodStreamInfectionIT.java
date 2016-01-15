@@ -116,6 +116,7 @@ public class CentralLineAssociateBloodStreamInfectionIT extends HarmEvidenceTest
       throws Exception {
 
     processMessage("double-lumen-hemodialysis-pheresis-catheter-internal-jugular-left.hl7");
+    processMessage("double-lumen-hemodialysis-pheresis-catheter-internal-jugular-left2.hl7");
 
     HarmEvidence harmEvidence = readHarmEvidence();
     CLABSI clabsi = harmEvidence.getMedicalData().getCLABSI();
@@ -124,7 +125,7 @@ public class CentralLineAssociateBloodStreamInfectionIT extends HarmEvidenceTest
         centralLine.getType(), CentralLine.Type.DOUBLE_LUMEN_HEMODIALYSIS_PHERESIS_CATHETER);
     assertEquals(centralLine.getSite(), CentralLine.Site.INTERNAL_JUGULAR);
     assertEquals(centralLine.getSide(), CentralLine.Side.LEFT);
-    assertEquals(centralLine.getInsertionDate().toInstant().toString(), "2015-11-05T16:57:00Z");
+    assertEquals(centralLine.getInsertionDate().toInstant().toString(), "2016-01-10T16:57:00Z");
     assertEquals(centralLine.getUpdateTime(), Date.from(Instant.now(clock)));
   }
 

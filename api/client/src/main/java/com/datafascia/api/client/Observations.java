@@ -71,6 +71,15 @@ public class Observations {
     return EFFECTIVE_COMPARATOR.compare(left.orElse(null), right.orElse(null)) > 0;
   }
 
+  /**
+   * Streams observations
+   *
+   * @return stream
+   */
+  public Stream<Observation> stream() {
+    return observations.stream();
+  }
+
   private static String getCode(Observation observation) {
     return observation.getCode().getCodingFirstRep().getCode();
   }
@@ -81,7 +90,7 @@ public class Observations {
           .stream();
     }
 
-    return observations.stream()
+    return stream()
         .filter(observation -> codes.contains(getCode(observation)));
   }
 

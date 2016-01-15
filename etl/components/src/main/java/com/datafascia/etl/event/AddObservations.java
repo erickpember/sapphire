@@ -80,7 +80,7 @@ public class AddObservations {
     UnitedStatesPatient patient = getPatient(patientIdentifier);
 
     FlagBuilder flagBuilder = new FlagBuilder(patient);
-    ProcedureBuilder procedureBuilder = new ProcedureBuilder(encounter, clock);
+    ProcedureBuilder procedureBuilder = new ProcedureBuilder(encounter, apiClient, clock);
 
     for (Observation observation : observations) {
       observation

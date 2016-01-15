@@ -31,7 +31,7 @@
 
   <!-- Small source code files -->
   <module name="FileLength">
-    <property name="max" value="500"/>
+    <property name="max" value="600"/>
   </module>
 
   <!-- Check for ^M at end of line -->

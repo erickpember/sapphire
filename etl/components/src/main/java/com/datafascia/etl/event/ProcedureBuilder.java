@@ -4,6 +4,7 @@ package com.datafascia.etl.event;
 
 import ca.uhn.fhir.model.api.ResourceMetadataKeyEnum;
 import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
+import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
 import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
@@ -12,6 +13,8 @@ import ca.uhn.fhir.model.dstu2.valueset.ProcedureStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import ca.uhn.fhir.model.primitive.InstantDt;
 import ca.uhn.fhir.model.primitive.StringDt;
+import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.api.client.Observations;
 import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.domain.fhir.Dates;
 import com.datafascia.emerge.ucsf.codes.ProcedureCategoryEnum;
@@ -101,6 +104,7 @@ public class ProcedureBuilder {
   private static final String TUNNELED = "Tunneled";
 
   private final Encounter encounter;
+  private final ClientBuilder apiClient;
   private final Clock clock;
   private final Map<String, Observation> codeToObservationMap = new HashMap<>();
   private boolean removed;
@@ -110,11 +114,14 @@ public class ProcedureBuilder {
    *
    * @param encounter
    *    encounter while procedure was performed
+   * @param apiClient
+   *    API client
    * @param clock
    *    to read current time from
    */
-  public ProcedureBuilder(Encounter encounter, Clock clock) {
+  public ProcedureBuilder(Encounter encounter, ClientBuilder apiClient, Clock clock) {
     this.encounter = encounter;
+    this.apiClient = apiClient;
     this.clock = clock;
   }
 
@@ -127,6 +134,17 @@ public class ProcedureBuilder {
   public void add(Observation observation) {
     String code = observation.getCode().getCodingFirstRep().getCode();
     codeToObservationMap.put(code, observation);
+  }
+
+  private void readObservations(String encounterId, String procedureIdentifier) {
+    codeToObservationMap.clear();
+
+    apiClient.getObservationClient().list(encounterId)
+        .stream()
+        .filter(observation ->
+            procedureIdentifier.equals(observation.getIdentifierFirstRep().getValue()))
+        .sorted(Observations.EFFECTIVE_COMPARATOR)
+        .forEach(observation -> add(observation));
   }
 
   private Optional<Observation> getObservation(String... codes) {
@@ -379,6 +397,9 @@ public class ProcedureBuilder {
       return Optional.empty();
     }
 
+    IdentifierDt procedureIdentifier = inputLineType.get().getIdentifierFirstRep();
+    readObservations(encounter.getId().getIdPart(), procedureIdentifier.getValue());
+
     Optional<LineType> optionalLineType =
         extractBasicLineType(inputLineType.get().getCode().getText());
     if (!optionalLineType.isPresent()) {
@@ -399,7 +420,7 @@ public class ProcedureBuilder {
         .setCategory(
             ProcedureCategoryEnum.CENTRAL_LINE.toCodeableConcept())
         .addIdentifier(
-            inputLineType.get().getIdentifierFirstRep())
+            procedureIdentifier)
         .setCode(
             new CodeableConceptDt(
                 CodingSystems.PROCEDURE, computeLineProcedureCode(tunneledStatus, lineType)))

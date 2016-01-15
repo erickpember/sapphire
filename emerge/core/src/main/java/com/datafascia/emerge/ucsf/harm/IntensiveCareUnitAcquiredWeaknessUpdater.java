@@ -3,16 +3,14 @@
 package com.datafascia.emerge.ucsf.harm;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
-import com.datafascia.emerge.harms.iaw.MobilityScore;
-import com.datafascia.emerge.harms.iaw.RNAssist;
+import com.datafascia.emerge.harms.iaw.MobilityImpl;
+import com.datafascia.emerge.harms.iaw.MobilityImpl.MobilityScore;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.IAW;
 import com.datafascia.emerge.ucsf.MedicalData;
 import com.datafascia.emerge.ucsf.Mobility;
-import java.time.Clock;
-import java.time.Instant;
-import java.util.Arrays;
-import java.util.Date;
+import java.util.ArrayList;
+import java.util.List;
 import javax.inject.Inject;
 
 /**
@@ -21,10 +19,7 @@ import javax.inject.Inject;
 public class IntensiveCareUnitAcquiredWeaknessUpdater {
 
   @Inject
-  private Clock clock;
-
-  @Inject
-  private MobilityScore mobilityScore;
+  private MobilityImpl mobilityScore;
 
   private static IAW getIAW(HarmEvidence harmEvidence) {
     MedicalData medicalData = harmEvidence.getMedicalData();
@@ -47,28 +42,23 @@ public class IntensiveCareUnitAcquiredWeaknessUpdater {
    */
   public void update(HarmEvidence harmEvidence, Encounter encounter) {
     String encounterId = encounter.getId().getIdPart();
-    mobilityScore.getFreshestObservation(encounterId)
-        .ifPresent(observation -> {
-          int level = MobilityScore.getMobilityLevelAchieved(observation);
-          Date scoreTime = MobilityScore.getMobilityScoreTime(observation);
-          String clinicianType = MobilityScore.getClinicianType(observation);
-          String assistDevice = RNAssist.getAssistDevices(observation);
-          String numberOfAssists = RNAssist.getNumberOfAssists(observation);
-
-          Mobility mobility = new Mobility()
-              .withLevelMobilityAchieved(
-                  level)
-              .withMobilityScoreTime(
-                  scoreTime)
-              .withClinicianType(
-                  Mobility.ClinicianType.fromValue(clinicianType))
-              .withAssistDevice(
-                  Mobility.AssistDevice.fromValue(assistDevice))
-              .withNumberOfAssists(
-                  Mobility.NumberOfAssists.fromValue(numberOfAssists))
-              .withUpdateTime(Date.from(Instant.now(clock)));
-
-          getIAW(harmEvidence).setMobility(Arrays.asList(mobility));
-        });
+    List<MobilityScore> scores = mobilityScore.getMobility(encounterId);
+    List<Mobility> results = new ArrayList<>();
+    for (MobilityScore score : scores) {
+      Mobility result = new Mobility();
+      result.setAssistDevice((score.getAssistDevice() != null) ? Mobility.AssistDevice.fromValue(
+          score.getAssistDevice().getCode()) : null);
+      result.setClinicianType((score.getClinicianType() != null) ? Mobility.ClinicianType.fromValue(
+          score.getClinicianType().getCode()) : null);
+      result.setLevelMobilityAchieved(score.getLevelMobilityAchieved());
+      result.setMobilityScoreTime(score.getMobilityScoreTime());
+      result.setNumberOfAssists((score.getNumberOfAssists() != null) ? Mobility.NumberOfAssists
+          .fromValue(score.getNumberOfAssists().getCode()) : null);
+      result.setUpdateTime(score.getUpdateTime());
+      results.add(result);
+    }
+    if (!results.isEmpty()) {
+      getIAW(harmEvidence).setMobility(results);
+    }
   }
 }

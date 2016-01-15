@@ -34,14 +34,15 @@ public class IntensiveCareUnitAcquireWeaknessIT extends HarmEvidenceTestSupport 
 
     HarmEvidence harmEvidence = readHarmEvidence();
     Mobility mobility = harmEvidence.getMedicalData().getIAW().getMobility().get(0);
-
     assertEquals(mobility.getLevelMobilityAchieved(), 2);
     assertEquals(
-        mobility.getMobilityScoreTime().toInstant().toString(), "2015-10-06T21:00:00Z");
+        mobility.getMobilityScoreTime().toInstant().toString(), "2014-09-29T21:51:42Z");
     assertEquals(mobility.getClinicianType(), Mobility.ClinicianType.RN);
     assertEquals(
         mobility.getAssistDevice(), Mobility.AssistDevice.LATERAL_TRANSFER_DEVICE);
     assertEquals(mobility.getNumberOfAssists(), Mobility.NumberOfAssists._2);
     assertEquals(mobility.getUpdateTime().toInstant(), Instant.now(clock));
+
+    assertEquals(harmEvidence.getMedicalData().getIAW().getMobility().size(), 1);
   }
 }

@@ -61,17 +61,11 @@ public class PainGoalImpl {
         observationsSinceMidnight);
     Observation freshestVerbalScore = PainUtils.freshestHighestVerbalPainScore(
         observationsSinceMidnight);
-    Observation freshestCpotScore = PainUtils.freshestCpot(observationsSinceMidnight);
 
-    if (ObservationUtils.firstIsFresher(freshestVerbalScore, freshestNumericalScore)
-        && ObservationUtils.firstIsFresher(freshestVerbalScore, freshestCpotScore)) {
+    if (ObservationUtils.firstIsFresher(freshestVerbalScore, freshestNumericalScore)) {
       freshestPainType = PainUtils.PainType.VERBAL;
-    } else if (ObservationUtils.firstIsFresher(freshestNumericalScore, freshestVerbalScore)
-        && ObservationUtils.firstIsFresher(freshestNumericalScore, freshestCpotScore)) {
+    } else if (ObservationUtils.firstIsFresher(freshestNumericalScore, freshestVerbalScore)) {
       freshestPainType = PainUtils.PainType.NUMERICAL;
-    } else if (ObservationUtils.firstIsFresher(freshestCpotScore, freshestVerbalScore)
-        && ObservationUtils.firstIsFresher(freshestCpotScore, freshestNumericalScore)) {
-      freshestPainType = PainUtils.PainType.CPOT;
     } else {
       // No pain type found
       return 11;
@@ -80,57 +74,52 @@ public class PainGoalImpl {
 
     Observation freshestScore = null;
 
-    if (freshestPainType.equals(PainUtils.PainType.NUMERICAL)
-        || freshestPainType.equals(PainUtils.PainType.VERBAL)) {
-      List<Observation> acceptableLevelOfPainAssessments = PainUtils
-          .getAcceptableLevelOfPainAssessments(apiClient, encounterId, fromCurrentOrPriorShift);
+    List<Observation> acceptableLevelOfPainAssessments = PainUtils
+        .getAcceptableLevelOfPainAssessments(apiClient, encounterId, fromCurrentOrPriorShift);
 
-      if (acceptableLevelOfPainAssessments.isEmpty() || !acceptableLevelOfPainAssessments.stream()
-          .anyMatch(observation -> !ObservationUtils.getValueAsString(observation).equals(
-                  "Unable to assess"))) {
-        return 11;
-      } else if (!acceptableLevelOfPainAssessments.stream().anyMatch(observation
-          -> !ObservationUtils.getValueAsString(observation).equals("No Pain"))) {
-        return 0;
-      }
-
-      if (freshestPainType.equals(PainUtils.PainType.NUMERICAL)) {
-        freshestScore = freshestNumericalScore;
-      } else if (freshestPainType.equals(PainUtils.PainType.VERBAL)) {
-        freshestScore = freshestVerbalScore;
-      }
-
-      if (freshestScore != null) {
-        if (ObservationCodeEnum.NUMERICAL_PAIN_01.isCodeEquals(freshestScore.getCode())
-            || ObservationCodeEnum.VERBAL_PAIN_01.isCodeEquals(freshestScore.getCode())) {
-
-          return PainUtils.acceptableLevelOfPainAssessment(
-              acceptableLevelOfPainAssessments,
-              ObservationCodeEnum.PAIN_GOAL_01.getCode(),
-              freshestPainType);
-        } else if (ObservationCodeEnum.NUMERICAL_PAIN_02.isCodeEquals(freshestScore.getCode())
-            || ObservationCodeEnum.VERBAL_PAIN_02.isCodeEquals(freshestScore.getCode())) {
-          return PainUtils.acceptableLevelOfPainAssessment(
-              acceptableLevelOfPainAssessments,
-              ObservationCodeEnum.PAIN_GOAL_02.getCode(),
-              freshestPainType);
-        } else if (ObservationCodeEnum.NUMERICAL_PAIN_03.isCodeEquals(freshestScore.getCode())
-            || ObservationCodeEnum.VERBAL_PAIN_03.isCodeEquals(freshestScore.getCode())) {
-          return PainUtils.acceptableLevelOfPainAssessment(
-              acceptableLevelOfPainAssessments,
-              ObservationCodeEnum.PAIN_GOAL_03.getCode(),
-              freshestPainType);
-        } else if (ObservationCodeEnum.NUMERICAL_PAIN_04.isCodeEquals(freshestScore.getCode())
-            || ObservationCodeEnum.VERBAL_PAIN_04.isCodeEquals(freshestScore.getCode())) {
-          return PainUtils.acceptableLevelOfPainAssessment(
-              acceptableLevelOfPainAssessments,
-              ObservationCodeEnum.PAIN_GOAL_04.getCode(),
-              freshestPainType);
-        }
-      } // end if freshestScore is not null
-    } else if (freshestPainType.equals(PainUtils.PainType.CPOT)) {
-      return 2;
+    if (acceptableLevelOfPainAssessments.isEmpty() || !acceptableLevelOfPainAssessments.stream()
+        .anyMatch(observation -> !ObservationUtils.getValueAsString(observation).equals(
+                "Unable to assess"))) {
+      return 11;
+    } else if (!acceptableLevelOfPainAssessments.stream().anyMatch(observation
+        -> !ObservationUtils.getValueAsString(observation).equals("No Pain"))) {
+      return 0;
     }
+
+    if (freshestPainType.equals(PainUtils.PainType.NUMERICAL)) {
+      freshestScore = freshestNumericalScore;
+    } else if (freshestPainType.equals(PainUtils.PainType.VERBAL)) {
+      freshestScore = freshestVerbalScore;
+    }
+
+    if (freshestScore != null) {
+      if (ObservationCodeEnum.NUMERICAL_PAIN_01.isCodeEquals(freshestScore.getCode())
+          || ObservationCodeEnum.VERBAL_PAIN_01.isCodeEquals(freshestScore.getCode())) {
+
+        return PainUtils.acceptableLevelOfPainAssessment(
+            acceptableLevelOfPainAssessments,
+            ObservationCodeEnum.PAIN_GOAL_01.getCode(),
+            freshestPainType);
+      } else if (ObservationCodeEnum.NUMERICAL_PAIN_02.isCodeEquals(freshestScore.getCode())
+          || ObservationCodeEnum.VERBAL_PAIN_02.isCodeEquals(freshestScore.getCode())) {
+        return PainUtils.acceptableLevelOfPainAssessment(
+            acceptableLevelOfPainAssessments,
+            ObservationCodeEnum.PAIN_GOAL_02.getCode(),
+            freshestPainType);
+      } else if (ObservationCodeEnum.NUMERICAL_PAIN_03.isCodeEquals(freshestScore.getCode())
+          || ObservationCodeEnum.VERBAL_PAIN_03.isCodeEquals(freshestScore.getCode())) {
+        return PainUtils.acceptableLevelOfPainAssessment(
+            acceptableLevelOfPainAssessments,
+            ObservationCodeEnum.PAIN_GOAL_03.getCode(),
+            freshestPainType);
+      } else if (ObservationCodeEnum.NUMERICAL_PAIN_04.isCodeEquals(freshestScore.getCode())
+          || ObservationCodeEnum.VERBAL_PAIN_04.isCodeEquals(freshestScore.getCode())) {
+        return PainUtils.acceptableLevelOfPainAssessment(
+            acceptableLevelOfPainAssessments,
+            ObservationCodeEnum.PAIN_GOAL_04.getCode(),
+            freshestPainType);
+      }
+    } // end if freshestScore is not null
 
     return 11;
   }

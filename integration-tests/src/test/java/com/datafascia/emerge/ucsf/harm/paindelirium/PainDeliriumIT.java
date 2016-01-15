@@ -121,13 +121,15 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
   }
 
   @Test
-  public void should_export_cpot_pain_goal_2() throws Exception {
+  public void should_export_cpot_pain_goal_8() throws Exception {
+    processMessage("numerical-pain-8.hl7");
+    processMessage("pain-goal.hl7");
     processMessage("cpot-8.hl7");
 
     HarmEvidence harmEvidence = readHarmEvidence();
     PainGoal goal = harmEvidence.getMedicalData().getDelirium().getPain().getPainGoal();
 
-    assertEquals(goal.getGoal(), 2);
+    assertEquals(goal.getGoal(), 8);
     assertEquals(
         goal.getDataEntryTime().toInstant().toString(), "2014-09-29T23:48:59Z");
   }

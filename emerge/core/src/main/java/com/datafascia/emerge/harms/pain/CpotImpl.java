@@ -87,7 +87,7 @@ public class CpotImpl {
     CurrentCpotLevel result = CurrentCpotLevel
         .builder()
         .painScore(11)
-        .timeOfDataAquisition(sinceMidnight.getEnd())
+        .timeOfDataAquisition(sinceMidnight.getStart())
         .build();
 
     Observation freshestCpotScore = ObservationUtils.getFreshestByCodeInTimeFrame(apiClient,

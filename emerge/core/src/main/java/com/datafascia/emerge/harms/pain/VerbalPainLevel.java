@@ -93,7 +93,7 @@ public class VerbalPainLevel {
     CurrentPainLevel result = CurrentPainLevel
         .builder()
         .painScore(11)
-        .timeOfDataAquisition(sinceMidnight.getEnd())
+        .timeOfDataAquisition(sinceMidnight.getStart())
         .build();
 
     List<Observation> observationsSinceMidnight = ObservationUtils.searchByTimeFrame(apiClient,

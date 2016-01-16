@@ -85,7 +85,7 @@ public class RassLevel {
 
     CurrentRassLevel result = CurrentRassLevel.builder()
         .rassScore(11)
-        .timeOfDataAquisition(Date.from(now.toInstant()))
+        .timeOfDataAquisition(Date.from(midnight.toInstant()))
         .build();
 
     Observations observations = apiClient.getObservationClient().list(encounterId);

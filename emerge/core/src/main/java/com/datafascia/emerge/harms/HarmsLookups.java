@@ -56,14 +56,14 @@ public class HarmsLookups {
    * @param timeTaken
    *    The time the drug was administered.
    * @param period
-   *    The period, in seconds, that the drug is active.
+   *    The period, in milliseconds, that the drug is active.
    * @param clock
    *    Shared configurable timekeeping instance.
    * @return Whether the time taken is within the period of efficacy for the drug to now.
    */
   public static boolean withinDrugPeriod(Date timeTaken, long period, Clock clock) {
     long timeTakenLong = timeTaken.getTime();
-    Date lastEffectiveTime = new Date(timeTakenLong + (1000l * period));
+    Date lastEffectiveTime = new Date(timeTakenLong + period);
 
     Date now = Date.from(Instant.now(clock));
 

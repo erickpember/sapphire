@@ -8,6 +8,7 @@ import com.datafascia.api.client.Observations;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.TimestampedMaybe;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
+import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
 
@@ -20,6 +21,37 @@ public class SubglotticSuctionNonSurgicalAirway {
   private ClientBuilder apiClient;
 
   /**
+   * Checks if the airway has been discontinued
+   *
+   * @param observations
+   *     observations for the encounter
+   * @param encounterId
+   *     airway ID to search
+   * @return true if the airway is active
+   */
+  private boolean airwayIsActive(Observations observations, String airwayId) {
+    List<Observation> removedDateObservations =
+        observations.list(ObservationCodeEnum.LINE_REMOVAL_DATE.getCode(), null, null);
+    for (Observation observation : removedDateObservations) {
+      String observationAirwayId = observation.getIdentifierFirstRep().getValue();
+      if (airwayId.equals(observationAirwayId)) {
+        return false;
+      }
+    }
+
+    List<Observation> removedTimeObservations =
+        observations.list(ObservationCodeEnum.LINE_REMOVAL_TIME.getCode(), null, null);
+    for (Observation observation : removedTimeObservations) {
+      String observationAirwayId = observation.getIdentifierFirstRep().getValue();
+      if (airwayId.equals(observationAirwayId)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
    * Checks if observation is relevant to sub-glottic suction non-surgical airway.
    *
    * @param observation
@@ -28,7 +60,11 @@ public class SubglotticSuctionNonSurgicalAirway {
    */
   public static boolean isRelevant(Observation observation) {
     return ObservationCodeEnum.AIRWAY_DEVICE_CODE.getCode()
-        .equals(observation.getCode().getCodingFirstRep().getCode());
+            .equals(observation.getCode().getCodingFirstRep().getCode()) ||
+        ObservationCodeEnum.LINE_REMOVAL_DATE.getCode()
+            .equals(observation.getCode().getCodingFirstRep().getCode()) ||
+        ObservationCodeEnum.LINE_REMOVAL_TIME.getCode()
+            .equals(observation.getCode().getCodingFirstRep().getCode());
   }
 
   /**
@@ -55,7 +91,8 @@ public class SubglotticSuctionNonSurgicalAirway {
       if ("Endotracheal Tube - Subglottic".equals(
           ObservationUtils.getValueAsString(freshestAirwayDevice.get())) &&
           airwayName.contains("Non-Surgical Airway") &&
-          !airwayName.contains("REMOVED")) {
+          airwayIsActive(observations,
+              freshestAirwayDevice.get().getIdentifierFirstRep().getValue())) {
         return TimestampedMaybe.Value.YES;
       }
     }

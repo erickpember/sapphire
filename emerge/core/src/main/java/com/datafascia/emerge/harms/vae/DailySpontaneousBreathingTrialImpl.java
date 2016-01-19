@@ -84,7 +84,7 @@ public class DailySpontaneousBreathingTrialImpl {
         effectiveLowerBound);
 
     if (freshestSBTAdmin.isPresent()
-        && freshestSBTAdmin.get().getValue().equals("Yes")) {
+        && ObservationUtils.getValueAsString(freshestSBTAdmin.get()).equals("Yes")) {
       return DailySpontaneousBreathingTrialValueEnum.GIVEN;
     }
 
@@ -125,7 +125,7 @@ public class DailySpontaneousBreathingTrialImpl {
         apiClient, encounterId, ObservationCodeEnum.TRAIN_OF_FOUR.getCode(), twentyFiveHoursAgo);
 
     if (freshestTrainOfFour.isPresent()) {
-      switch (freshestTrainOfFour.get().getValue().toString()) {
+      switch (ObservationUtils.getValueAsString(freshestTrainOfFour.get())) {
         case "0":
         case "1":
         case "2":
@@ -141,17 +141,19 @@ public class DailySpontaneousBreathingTrialImpl {
         twentyFiveHoursAgo);
 
     if (freshestSBTContraindication.isPresent()) {
-      if (freshestSBTContraindication.get().getValue().toString().contains("Clinically Unstable")) {
+      if (ObservationUtils.getValueAsString(freshestSBTContraindication.get())
+          .contains("Clinically Unstable")) {
         return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.CLINICALLY_UNSTABLE);
       }
 
-      if (freshestSBTContraindication.get().getValue().toString()
+      if (ObservationUtils.getValueAsString(freshestSBTContraindication.get())
           .contains("Limited Respiratory Effort")) {
         return Optional.of(
             DailySpontaneousBreathingTrialContraindicatedEnum.LIMITED_RESPIRATORY_EFFORT);
       }
 
-      if (freshestSBTContraindication.get().getValue().toString().equals("Other (see comment)")) {
+      if (ObservationUtils.getValueAsString(freshestSBTContraindication.get())
+          .equals("Other (see comment)")) {
         return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.OTHER);
       }
     }
@@ -175,7 +177,8 @@ public class DailySpontaneousBreathingTrialImpl {
     if (freshestPEEP.isPresent()
         && freshestFIO2.isPresent()
         && freshestSBTContraindication.isPresent()
-        && freshestSBTContraindication.get().getValue().toString().equals("Respiratory Status")
+        && ObservationUtils.getValueAsString(freshestSBTContraindication.get())
+            .equals("Respiratory Status")
         && ((QuantityDt) freshestFIO2.get().getValue()).getValue().compareTo(FIFTY) < 0
         && ((QuantityDt) freshestPEEP.get().getValue()).getValue().compareTo(EIGHT) < 0) {
       return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.OTHER);

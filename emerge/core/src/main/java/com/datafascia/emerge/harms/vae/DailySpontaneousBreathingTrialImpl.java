@@ -8,6 +8,7 @@ import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.api.client.Observations;
 import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.codes.MedsSetEnum;
@@ -57,31 +58,43 @@ public class DailySpontaneousBreathingTrialImpl {
    */
   public DailySpontaneousBreathingTrialValueEnum getValue(String encounterId) {
     Instant now = Instant.now(clock);
-    Date effectiveLowerBound = Date.from(now.minus(25, ChronoUnit.HOURS));
 
-    Optional<Observation> freshestSBTAdmin = ObservationUtils.getFreshestByCodeAfterTime(
-        apiClient,
-        encounterId,
+    Observations observations = apiClient.getObservationClient().list(encounterId);
+
+    return getValue(observations, now, encounterId);
+  }
+
+  /**
+   * Gets value field of daily spontaneous breathing trial. Encapsulates API-independent operation.
+   *
+   * @param observations
+   *     All observations for an encounter
+   * @param now
+   *     The current time.
+   * @param encounterId
+   *     The encounter in question.
+   * @return
+   *     Whether the trial was given, not given or contraindicated.
+   */
+  public DailySpontaneousBreathingTrialValueEnum getValue(Observations observations, Instant now,
+      String encounterId) {
+    Instant effectiveLowerBound = now.minus(25, ChronoUnit.HOURS);
+
+    Optional<Observation> freshestSBTAdmin = observations.findFreshest(
         ObservationCodeEnum.SPONTANEOUS_BREATHING_TRIAL.getCode(),
-        effectiveLowerBound);
+        effectiveLowerBound, null);
 
-    Optional<Observation> freshestPressureSupport = ObservationUtils.getFreshestByCodeAfterTime(
-        apiClient,
-        encounterId,
+    Optional<Observation> freshestPressureSupport = observations.findFreshest(
         ObservationCodeEnum.PRESSURE_SUPPORT.getCode(),
-        effectiveLowerBound);
+        effectiveLowerBound, null);
 
-    Optional<Observation> freshestFIO2 = ObservationUtils.getFreshestByCodeAfterTime(
-        apiClient,
-        encounterId,
+    Optional<Observation> freshestFIO2 = observations.findFreshest(
         ObservationCodeEnum.FIO2.getCode(),
-        effectiveLowerBound);
+        effectiveLowerBound, null);
 
-    Optional<Observation> freshestPEEP = ObservationUtils.getFreshestByCodeAfterTime(
-        apiClient,
-        encounterId,
+    Optional<Observation> freshestPEEP = observations.findFreshest(
         ObservationCodeEnum.PEEP.getCode(),
-        effectiveLowerBound);
+        effectiveLowerBound, null);
 
     if (freshestSBTAdmin.isPresent()
         && ObservationUtils.getValueAsString(freshestSBTAdmin.get()).equals("Yes")) {
@@ -97,7 +110,7 @@ public class DailySpontaneousBreathingTrialImpl {
       return DailySpontaneousBreathingTrialValueEnum.GIVEN;
     }
 
-    if (getContraindicatedReason(encounterId).isPresent()) {
+    if (getContraindicatedReason(observations, now, encounterId).isPresent()) {
       return DailySpontaneousBreathingTrialValueEnum.CONTRAINDICATED;
     }
 
@@ -108,21 +121,41 @@ public class DailySpontaneousBreathingTrialImpl {
    * Gets contraindicated reason field of daily spontaneous breathing trial.
    *
    * @param encounterId
-   *     encounter to search
+   *     The encounter in question.
    * @return optional contraindicated reason, empty if not found
    */
   public Optional<DailySpontaneousBreathingTrialContraindicatedEnum> getContraindicatedReason(
       String encounterId) {
 
     Instant now = Instant.now(clock);
-    Date twoHoursAgo = Date.from(now.minus(2, ChronoUnit.HOURS));
-    Date twentyFiveHoursAgo = Date.from(now.minus(25, ChronoUnit.HOURS));
+
+    Observations observations = apiClient.getObservationClient().list(encounterId);
+
+    return getContraindicatedReason(observations, now, encounterId);
+  }
+
+  /**
+   * Gets contraindicated reason field of daily spontaneous breathing trial.
+   * Encapsulates API-independent logic for easier testing.
+   *
+   * @param observations
+   *     All observations for an encounter
+   * @param now
+   *     The current time.
+   * @param encounterId
+   *     The encounter in question.
+   * @return optional contraindicated reason, empty if not found
+   */
+  public Optional<DailySpontaneousBreathingTrialContraindicatedEnum> getContraindicatedReason(
+      Observations observations, Instant now, String encounterId) {
+    Instant twoHoursAgo = now.minus(2, ChronoUnit.HOURS);
+    Instant twentyFiveHoursAgo = now.minus(25, ChronoUnit.HOURS);
     PeriodDt lastTwoHours = new PeriodDt()
-        .setStart(new DateTimeDt(twoHoursAgo))
+        .setStart(new DateTimeDt(Date.from(twoHoursAgo)))
         .setEnd(new DateTimeDt(Date.from(now)));
 
-    Optional<Observation> freshestTrainOfFour = ObservationUtils.getFreshestByCodeAfterTime(
-        apiClient, encounterId, ObservationCodeEnum.TRAIN_OF_FOUR.getCode(), twentyFiveHoursAgo);
+    Optional<Observation> freshestTrainOfFour = observations.findFreshest(
+        ObservationCodeEnum.TRAIN_OF_FOUR.getCode(), twentyFiveHoursAgo, null);
 
     if (freshestTrainOfFour.isPresent()) {
       switch (ObservationUtils.getValueAsString(freshestTrainOfFour.get())) {
@@ -134,11 +167,9 @@ public class DailySpontaneousBreathingTrialImpl {
       }
     }
 
-    Optional<Observation> freshestSBTContraindication = ObservationUtils.getFreshestByCodeAfterTime(
-        apiClient,
-        encounterId,
+    Optional<Observation> freshestSBTContraindication = observations.findFreshest(
         ObservationCodeEnum.SPONTANEOUS_BREATHING_TRIAL_CONTRAINDICATED.getCode(),
-        twentyFiveHoursAgo);
+        twentyFiveHoursAgo, null);
 
     if (freshestSBTContraindication.isPresent()) {
       if (ObservationUtils.getValueAsString(freshestSBTContraindication.get())
@@ -158,16 +189,16 @@ public class DailySpontaneousBreathingTrialImpl {
       }
     }
 
-    Optional<Observation> freshestPEEP = ObservationUtils.getFreshestByCodeAfterTime(
-        apiClient, encounterId, ObservationCodeEnum.PEEP.getCode(), twentyFiveHoursAgo);
+    Optional<Observation> freshestPEEP = observations.findFreshest(ObservationCodeEnum.PEEP
+        .getCode(), twentyFiveHoursAgo, null);
 
     if (freshestPEEP.isPresent()
         && ((QuantityDt) freshestPEEP.get().getValue()).getValue().compareTo(EIGHT) > 0) {
       return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.PEEP_OVER_8);
     }
 
-    Optional<Observation> freshestFIO2 = ObservationUtils.getFreshestByCodeAfterTime(
-        apiClient, encounterId, ObservationCodeEnum.FIO2.getCode(), twentyFiveHoursAgo);
+    Optional<Observation> freshestFIO2 = observations.findFreshest(ObservationCodeEnum.FIO2
+        .getCode(), twentyFiveHoursAgo, null);
 
     if (freshestFIO2.isPresent()
         && ((QuantityDt) freshestFIO2.get().getValue()).getValue().compareTo(FIFTY) > 0) {
@@ -178,15 +209,13 @@ public class DailySpontaneousBreathingTrialImpl {
         && freshestFIO2.isPresent()
         && freshestSBTContraindication.isPresent()
         && ObservationUtils.getValueAsString(freshestSBTContraindication.get())
-            .equals("Respiratory Status")
+        .equals("Respiratory Status")
         && ((QuantityDt) freshestFIO2.get().getValue()).getValue().compareTo(FIFTY) < 0
         && ((QuantityDt) freshestPEEP.get().getValue()).getValue().compareTo(EIGHT) < 0) {
       return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.OTHER);
     }
 
-    List<MedicationAdministration> adminsForEncounter = apiClient.
-        getMedicationAdministrationClient()
-        .search(encounterId);
+    List<MedicationAdministration> adminsForEncounter = getAdminsForEncounter(encounterId);
 
     for (String medsSet : HAVE_THESE_BEEN_ADMINISTERED) {
       boolean administered = MedicationAdministrationUtils.inProgressOrCompletedInTimeFrame(
@@ -205,5 +234,18 @@ public class DailySpontaneousBreathingTrialImpl {
     }
 
     return Optional.empty();
+  }
+
+  /**
+   * Wraps API access for medication administrations for easier testing.
+   *
+   * @param encounterId
+   *     Id of the encounter in question.
+   * @return a list of medication administrations for the encounter
+   */
+  protected List<MedicationAdministration> getAdminsForEncounter(String encounterId) {
+    return apiClient.
+        getMedicationAdministrationClient()
+        .search(encounterId);
   }
 }

@@ -68,7 +68,7 @@ public class AdmitPatient {
    * @return true if trigger event is admit or transfer
    */
   public static boolean isAdmitOrTransfer(String triggerEvent) {
-    return "A01".equals(triggerEvent) || "A02".equals(triggerEvent);
+    return "A01".equals(triggerEvent) || "A02".equals(triggerEvent) || "A06".equals(triggerEvent);
   }
 
   private Optional<String> getPointOfCare(Location location) {

@@ -13,6 +13,7 @@ import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -59,7 +60,8 @@ public class MobilityImplTest {
   }
 
   private Observation createObservation(String value) {
-    DateTimeDt effectiveTime = DateTimeDt.withCurrentTime();
+    DateTimeDt effectiveTime = new DateTimeDt(Date.from(Instant.now().minus(1,
+        ChronoUnit.MINUTES)));
     String code = ObservationCodeEnum.MOBILITY_SCORE.getCode();
     Observation observation = new Observation()
         .setCode(new CodeableConceptDt("system", code))

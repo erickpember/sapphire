@@ -37,6 +37,28 @@ public class PainUtils {
   }
 
   /**
+   * Translates the acceptable level of pain value to an integer.
+   *
+   * @param observation
+   *     the pain goal observation
+   * @return Pain score from the observation.
+   */
+  public static int getPainGoal(Observation observation) {
+    switch (ObservationUtils.getValueAsString(observation)) {
+      case "No pain":
+        return 0;
+      case "Other (comment)":
+        return 11;
+      default:
+        Integer score = getPainScoreFromValue(observation);
+        if (score != null) {
+          return score;
+        }
+    }
+    return 11;
+  }
+
+  /**
    * Finds freshest observation with a given code and a value that's parseable to integer.
    *
    * @param observations
@@ -54,20 +76,48 @@ public class PainUtils {
     for (Observation observation : observations) {
       if (observation.getCode().getCodingFirstRep().getCode().equals(code)) {
 
-        switch (ObservationUtils.getValueAsString(observation)) {
-          case "No pain":
-            return 0;
-          case "Other (comment)":
-            return 11;
-          default:
-            Integer score = getPainScoreFromValue(observation);
-            if (score != null) {
-              return score;
-            }
-        }
+        return getPainGoal(observation);
       }
     }
     return 11;
+  }
+
+  /**
+   * Given a list of observations, returns the freshest of a list of observations
+   * that contains one of four codes indicating an acceptable level of pain, aka pain goal.
+   * In the event there are multiple simultaneous freshest observations, the one with the highest
+   * score is returned.
+   *
+   * @param observations
+   *     observations to search
+   * @return Freshest observation found with the code. {@code null} if not found.
+   */
+  public static Observation freshestHighestPainGoal(List<Observation> observations) {
+    observations.sort(new ObservationEffectiveComparator().reversed());
+
+    Observation result = null;
+    ObservationEffectiveComparator comparator = new ObservationEffectiveComparator();
+
+    for (Observation observation : observations) {
+      switch (observation.getCode().getCodingFirstRep().getCode()) {
+        case "304894105":
+        case "304890004":
+        case "304890005":
+        case "304890006":
+          // In the event of simultaneous observations, get the highest pain level of those.
+          if (getPainScoreFromValue(observation) != null
+              && getPainScoreFromValue(observation) != 11
+              && (result == null || (comparator.compare(observation, result) == 0
+              && getPainScoreFromValue(observation) > getPainScoreFromValue(result)))) {
+            result = observation;
+          } else if (comparator.compare(observation, result) < 0) {
+            // we are now in older observations, give up
+            break;
+          }
+      }
+    }
+
+    return result;
   }
 
   /**

@@ -69,16 +69,16 @@ public class CpotImpl {
    * @return CPOT level and time of acquisition, or {@code null} if not found
    */
   public CurrentCpotLevel getCurrentCpotLevel(String encounterId) {
-    PeriodDt sinceMidnight = Periods.getMidnightToNow(clock);
+    PeriodDt sevenHoursAgo = Periods.getPastHoursToNow(clock, 7);
 
     CurrentCpotLevel result = CurrentCpotLevel
         .builder()
         .painScore(11)
-        .timeOfDataAquisition(sinceMidnight.getStart())
+        .timeOfDataAquisition(sevenHoursAgo.getStart())
         .build();
 
     Observation freshestCpotScore = ObservationUtils.getFreshestByCodeInTimeFrame(apiClient,
-        encounterId, ObservationCodeEnum.CPOT.getCode(), sinceMidnight);
+        encounterId, ObservationCodeEnum.CPOT.getCode(), sevenHoursAgo);
 
     if (freshestCpotScore != null) {
       result.setPainScore(PainUtils.getPainScoreFromValue(freshestCpotScore));

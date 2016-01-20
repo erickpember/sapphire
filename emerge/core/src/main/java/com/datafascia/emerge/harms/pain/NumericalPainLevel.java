@@ -73,18 +73,18 @@ public class NumericalPainLevel {
    * @return Numeric pain level and time of acquisition, or {@code null} if not found
    */
   public CurrentPainLevel getCurrentPainLevel(String encounterId) {
-    PeriodDt sinceMidnight = Periods.getMidnightToNow(clock);
+    PeriodDt sevenHoursAgo = Periods.getPastHoursToNow(clock, 7);
 
     CurrentPainLevel result = CurrentPainLevel.builder()
         .painScore(11)
-        .timeOfDataAquisition(sinceMidnight.getStart())
+        .timeOfDataAquisition(sevenHoursAgo.getStart())
         .build();
 
-    List<Observation> observationsSinceMidnight = ObservationUtils.searchByTimeFrame(apiClient,
-        encounterId, sinceMidnight);
+    List<Observation> observationsSinceSevenHoursAgo =
+        ObservationUtils.searchByTimeFrame(apiClient, encounterId, sevenHoursAgo);
 
     Observation freshestNumericalPainScore = PainUtils.freshestHighestNumericalPainScore(
-        observationsSinceMidnight);
+        observationsSinceSevenHoursAgo);
 
     if (freshestNumericalPainScore != null) {
       result.setEffectiveDateTime(ObservationUtils.getEffectiveDate(freshestNumericalPainScore));

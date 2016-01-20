@@ -10,7 +10,6 @@ import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.Periods;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import java.time.Clock;
-import java.time.ZonedDateTime;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -72,26 +71,18 @@ public class RassLevel {
    * @return RASS level and time of acquisition, or {@code null} if not found
    */
   public CurrentRassLevel getCurrentRassLevel(String encounterId) {
-    ZonedDateTime now = ZonedDateTime.now(clock);
-    ZonedDateTime midnight = ZonedDateTime.of(
-        now.getYear(),
-        now.getMonthValue(),
-        now.getDayOfMonth(),
-        0,
-        0,
-        0,
-        0,
-        clock.getZone());
+    PeriodDt sevenHoursAgo = Periods.getPastHoursToNow(clock, 7);
 
     CurrentRassLevel result = CurrentRassLevel.builder()
         .rassScore(11)
-        .timeOfDataAquisition(Date.from(midnight.toInstant()))
+        .timeOfDataAquisition(sevenHoursAgo.getStart())
         .build();
 
     Observations observations = apiClient.getObservationClient().list(encounterId);
 
     Optional<Observation> freshestRassScore = observations.filter(
-        ObservationCodeEnum.RASS.getCode(), midnight.toInstant(), now.toInstant())
+        ObservationCodeEnum.RASS.getCode(), sevenHoursAgo.getStart().toInstant(),
+            sevenHoursAgo.getEnd().toInstant())
         .max(Observations.EFFECTIVE_COMPARATOR);
 
     if (freshestRassScore.isPresent()) {

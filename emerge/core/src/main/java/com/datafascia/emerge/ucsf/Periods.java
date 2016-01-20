@@ -7,6 +7,7 @@ import ca.uhn.fhir.model.primitive.DateTimeDt;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.ZonedDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 /**
@@ -118,5 +119,21 @@ public class Periods {
     sinceMidnight.setStart(new DateTimeDt(Date.from(midnight.toInstant())));
     sinceMidnight.setEnd(new DateTimeDt(Date.from(now.toInstant())));
     return sinceMidnight;
+  }
+
+  /**
+   * Gets period from X hours in the past to now.
+   *
+   * @param clock
+   *     clock with the relevant time zone
+   * @param hours
+   *     hours in the past
+   * @return period from X hours ago to now.
+   */
+  public static PeriodDt getPastHoursToNow(Clock clock, int hours) {
+    Instant now = Instant.now(clock);
+    return new PeriodDt()
+        .setStart(new DateTimeDt(Date.from(now.minus(hours, ChronoUnit.HOURS))))
+        .setEnd(new DateTimeDt(Date.from(now)));
   }
 }

@@ -32,12 +32,11 @@ public class PainGoalImpl {
    * @return Numeric pain goal.
    */
   public int getPainGoal(String encounterId) {
-    PeriodDt fromCurrentOrPriorShift = Periods.getCurrentOrPriorShiftToNow(clock);
+    PeriodDt thirteenHoursAgo = Periods.getPastHoursToNow(clock, 13);
     PeriodDt sinceMidnight = Periods.getMidnightToNow(clock);
 
     List<Observation> observationsSinceMidnight = ObservationUtils.searchByTimeFrame(apiClient,
         encounterId, sinceMidnight);
-
 
 
     PainUtils.PainType freshestPainType = null;
@@ -51,16 +50,11 @@ public class PainGoalImpl {
       freshestPainType = PainUtils.PainType.VERBAL;
     } else if (ObservationUtils.firstIsFresher(freshestNumericalScore, freshestVerbalScore)) {
       freshestPainType = PainUtils.PainType.NUMERICAL;
-    } else {
-      // No pain type found
-      return 11;
     }
 
 
-    Observation freshestScore = null;
-
     List<Observation> acceptableLevelOfPainAssessments = PainUtils
-        .getAcceptableLevelOfPainAssessments(apiClient, encounterId, fromCurrentOrPriorShift);
+        .getAcceptableLevelOfPainAssessments(apiClient, encounterId, thirteenHoursAgo);
 
     if (acceptableLevelOfPainAssessments.isEmpty() || !acceptableLevelOfPainAssessments.stream()
         .anyMatch(observation -> !ObservationUtils.getValueAsString(observation).equals(
@@ -71,6 +65,12 @@ public class PainGoalImpl {
       return 0;
     }
 
+    Observation freshestPainGoal = PainUtils.freshestHighestPainGoal(
+        acceptableLevelOfPainAssessments);
+
+
+    Observation freshestScore = null;
+
     if (freshestPainType.equals(PainUtils.PainType.NUMERICAL)) {
       freshestScore = freshestNumericalScore;
     } else if (freshestPainType.equals(PainUtils.PainType.VERBAL)) {
@@ -80,7 +80,6 @@ public class PainGoalImpl {
     if (freshestScore != null) {
       if (ObservationCodeEnum.NUMERICAL_PAIN_01.isCodeEquals(freshestScore.getCode())
           || ObservationCodeEnum.VERBAL_PAIN_01.isCodeEquals(freshestScore.getCode())) {
-
         return PainUtils.acceptableLevelOfPainAssessment(
             acceptableLevelOfPainAssessments,
             ObservationCodeEnum.PAIN_GOAL_01.getCode(),
@@ -104,7 +103,11 @@ public class PainGoalImpl {
             ObservationCodeEnum.PAIN_GOAL_04.getCode(),
             freshestPainType);
       }
-    } // end if freshestScore is not null
+    } else if (freshestPainGoal != null) {
+      // No numerical or verbal pain score since midnight so
+      // take the freshest pain goal from the last 13 hours.
+      return PainUtils.getPainGoal(freshestPainGoal);
+    }
 
     return 11;
   }

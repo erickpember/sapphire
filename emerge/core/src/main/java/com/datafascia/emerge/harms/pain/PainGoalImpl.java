@@ -71,10 +71,12 @@ public class PainGoalImpl {
 
     Observation freshestScore = null;
 
-    if (freshestPainType.equals(PainUtils.PainType.NUMERICAL)) {
-      freshestScore = freshestNumericalScore;
-    } else if (freshestPainType.equals(PainUtils.PainType.VERBAL)) {
-      freshestScore = freshestVerbalScore;
+    if (freshestPainType != null) {
+      if (freshestPainType.equals(PainUtils.PainType.NUMERICAL)) {
+        freshestScore = freshestNumericalScore;
+      } else if (freshestPainType.equals(PainUtils.PainType.VERBAL)) {
+        freshestScore = freshestVerbalScore;
+      }
     }
 
     if (freshestScore != null) {

@@ -9,19 +9,15 @@ import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.client.ProcedureRequests;
 import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
 import com.google.common.annotations.VisibleForTesting;
-import java.time.Clock;
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 
 /**
  * VTE SCDs Ordered Implementation
  */
 public class SCDsOrdered {
-
-  @Inject
-  private Clock clock;
 
   @Inject
   private ClientBuilder apiClient;
@@ -49,9 +45,9 @@ public class SCDsOrdered {
   public boolean isSCDsOrdered(Encounter encounter) {
     String encounterId = encounter.getId().getIdPart();
     List<ProcedureRequest> requests = apiClient.getProcedureRequestClient().search(
-        encounterId, null, ProcedureRequestStatusEnum.IN_PROGRESS.getCode());
+        encounterId, null, null);
 
-    return isSCDsOrdered(requests, null, null);
+    return isSCDsOrdered(requests);
   }
 
   /**
@@ -59,26 +55,27 @@ public class SCDsOrdered {
    *
    * @param procedureRequests
    *     procedure requests for the encounter
-   * @param scheduledLower
-   *     ICU admit time
-   * @param scheduledUpper
-   *     current time
    * @return true if SCDs have been ordered
    */
   @VisibleForTesting
-  boolean isSCDsOrdered(
-      List<ProcedureRequest> procedureRequests, Instant scheduledLower, Instant scheduledUpper) {
+  boolean isSCDsOrdered(List<ProcedureRequest> procedureRequests) {
 
+    // in this rare case we treat null statuses as in progress
+    procedureRequests = procedureRequests.stream()
+        .filter(procedurerequest -> procedurerequest.getStatus() == null
+            || ProcedureRequestStatusEnum.IN_PROGRESS.getCode().equals(procedurerequest
+                .getStatus()))
+        .collect(Collectors.toList());
     ProcedureRequests requests = new ProcedureRequests(procedureRequests);
 
     boolean ordered = false;
 
     Optional<ProcedureRequest> placeStart = requests.findFreshest(
-        ProcedureRequestCodeEnum.PLACE_SCDS.getCode(), scheduledLower, scheduledUpper);
+        ProcedureRequestCodeEnum.PLACE_SCDS.getCode(), null, null);
     Optional<ProcedureRequest> maintainStart = requests.findFreshest(
-        ProcedureRequestCodeEnum.MAINTAIN_SCDS.getCode(), scheduledLower, scheduledUpper);
+        ProcedureRequestCodeEnum.MAINTAIN_SCDS.getCode(), null, null);
     Optional<ProcedureRequest> removeStart = requests.findFreshest(
-        ProcedureRequestCodeEnum.REMOVE_SCDS.getCode(), scheduledLower, scheduledUpper);
+        ProcedureRequestCodeEnum.REMOVE_SCDS.getCode(), null, null);
 
     if (!removeStart.isPresent()) {
       if (placeStart.isPresent() || maintainStart.isPresent()) {

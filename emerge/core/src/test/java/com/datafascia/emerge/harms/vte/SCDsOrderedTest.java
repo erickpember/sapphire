@@ -7,6 +7,7 @@ import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
+import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
@@ -47,11 +48,8 @@ public class SCDsOrderedTest extends SCDsOrdered {
     ProcedureRequest newRemoveTime
         = createProcedureRequest(ProcedureRequestCodeEnum.REMOVE_SCDS.getCode(), newTime);
 
-    assertTrue(isSCDsOrdered(Arrays.asList(oldMaintainTime), threeHoursAgo, null));
-    assertFalse(isSCDsOrdered(Arrays.asList(oldMaintainTime, newRemoveTime), threeHoursAgo, null));
-
-    // tests the lower bound
-    assertFalse(isSCDsOrdered(Arrays.asList(oldMaintainTime), now, null));
+    assertTrue(isSCDsOrdered(Arrays.asList(oldMaintainTime)));
+    assertFalse(isSCDsOrdered(Arrays.asList(oldMaintainTime, newRemoveTime)));
 
     ProcedureRequest oldPlacePeriod
         = createProcedureRequest(ProcedureRequestCodeEnum.PLACE_SCDS.getCode(), oldPeriod);
@@ -59,14 +57,15 @@ public class SCDsOrderedTest extends SCDsOrdered {
     ProcedureRequest newRemovePeriod
         = createProcedureRequest(ProcedureRequestCodeEnum.REMOVE_SCDS.getCode(), newPeriod);
 
-    assertTrue(isSCDsOrdered(Arrays.asList(oldPlacePeriod), threeHoursAgo, null));
-    assertFalse(isSCDsOrdered(Arrays.asList(oldPlacePeriod, newRemovePeriod), threeHoursAgo, null));
+    assertTrue(isSCDsOrdered(Arrays.asList(oldPlacePeriod)));
+    assertFalse(isSCDsOrdered(Arrays.asList(oldPlacePeriod, newRemovePeriod)));
   }
 
   private ProcedureRequest createProcedureRequest(String typeCode, IDatatype scheduled) {
     ProcedureRequest procedurerequest = new ProcedureRequest()
         .setCode(new CodeableConceptDt(CodingSystems.PROCEDURE_REQUEST, typeCode))
         .setScheduled(scheduled)
+        .setStatus((ProcedureRequestStatusEnum)null)
         .setOrderedOn(new DateTimeDt(new Date(), TemporalPrecisionEnum.SECOND));
     return procedurerequest;
   }

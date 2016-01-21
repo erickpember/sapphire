@@ -100,6 +100,9 @@ public class DailySpontaneousBreathingTrialImplTest extends DailySpontaneousBrea
     assertEquals(getContraindicatedReason(new Observations(Arrays.asList(tof)), Instant.now(),
         encounterId).get(), DailySpontaneousBreathingTrialContraindicatedEnum.RECEIVING_NMBA);
 
+    tof.setEffective(new DateTimeDt(Date.from(Instant.now().minus(2,
+        ChronoUnit.MINUTES))));
+
     Observation tof2 = createObservation(ObservationCodeEnum.TRAIN_OF_FOUR.getCode(),
         "4");
 

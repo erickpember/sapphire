@@ -6,6 +6,7 @@ import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Medication;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
+import ca.uhn.fhir.rest.server.exceptions.ResourceNotFoundException;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.common.configuration.ConfigurationNode;
 import com.datafascia.common.configuration.Configure;
@@ -138,9 +139,10 @@ public class MedAdminDiffTransformer {
     for (Object obj : patients) {
       if (obj instanceof JSONObject) {
         String encounterId = ((JSONObject) obj).get("CSN").toString();
-        Encounter encounter = apiClient.getEncounterClient().getEncounter(encounterId);
-
-        if (encounter == null) {
+        Encounter encounter;
+        try {
+          encounter = apiClient.getEncounterClient().getEncounter(encounterId);
+        } catch (ResourceNotFoundException e) {
           log.warn("Encounter " + encounterId + " is not known in FHIR. Associated medication "
               + "orders and admins will be dropped for now.");
           continue;

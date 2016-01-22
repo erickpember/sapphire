@@ -4,6 +4,7 @@ package com.datafascia.emerge.harms.pain;
 
 import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
 import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
+import ca.uhn.fhir.model.dstu2.valueset.MedicationOrderStatusEnum;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.domain.fhir.IdentifierSystems;
@@ -91,6 +92,12 @@ public class SedativeOrder {
   public List<OrderResult> processSedativeOrders(List<MedicationOrder> medOrders) {
     List<OrderResult> results = new ArrayList<>();
     for (MedicationOrder order : medOrders) {
+      if (order.getStatus() == null ||
+          (!order.getStatus().equals(MedicationOrderStatusEnum.ACTIVE.getCode()) &&
+          !order.getStatus().equals(MedicationOrderStatusEnum.DRAFT.getCode()))) {
+        continue;
+      }
+
       OrderResult result = OrderResult.builder()
           .dosageRoute(null)
           .drug(null)

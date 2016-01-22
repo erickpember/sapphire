@@ -44,19 +44,19 @@ public class SedativeOrderTest {
     for (String benzo : SEDATIVE_MEDS_SETS) {
       // These are valid.
       orders.add(createMedicationOrder(benzo, MedicationOrderStatusEnum.ACTIVE));
-      orders.add(createMedicationOrder(benzo, MedicationOrderStatusEnum.COMPLETED));
-      orders.add(createMedicationOrder(benzo, MedicationOrderStatusEnum.ENTERED_IN_ERROR));
-      orders.add(createMedicationOrder(benzo, MedicationOrderStatusEnum.STOPPED));
+      orders.add(createMedicationOrder(benzo, MedicationOrderStatusEnum.DRAFT));
       // We are counting orders with null statuses.
       orders.add(createMedicationOrder(benzo, null));
 
       // These are invalid.
       orders.add(createMedicationOrder(null, null));
+      orders.add(createMedicationOrder(benzo, MedicationOrderStatusEnum.COMPLETED));
+      orders.add(createMedicationOrder(benzo, MedicationOrderStatusEnum.ENTERED_IN_ERROR));
+      orders.add(createMedicationOrder(benzo, MedicationOrderStatusEnum.STOPPED));
       orders.add(createMedicationOrder("not a benzo", MedicationOrderStatusEnum.STOPPED));
     }
 
-    assertEquals(sedativeOrderImpl.processSedativeOrders(orders).size(), SEDATIVE_MEDS_SETS.size()
-        * 5);
+    assertEquals(sedativeOrderImpl.processSedativeOrders(orders).size(), 20);
   }
 
   private MedicationOrder createMedicationOrder(

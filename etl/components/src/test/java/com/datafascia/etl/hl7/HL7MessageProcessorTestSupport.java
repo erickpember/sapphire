@@ -10,8 +10,8 @@ import com.datafascia.common.accumulo.AccumuloConfiguration;
 import com.datafascia.common.accumulo.ConnectorFactory;
 import com.datafascia.common.configuration.guice.ConfigureModule;
 import com.datafascia.common.persist.Id;
+import com.datafascia.domain.persist.EncounterMessageRepository;
 import com.datafascia.domain.persist.EncounterRepository;
-import com.datafascia.domain.persist.IngestMessageRepository;
 import com.datafascia.domain.persist.LocationRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.domain.persist.PractitionerRepository;
@@ -69,7 +69,7 @@ public class HL7MessageProcessorTestSupport {
   private Parser parser;
 
   @Inject
-  private IngestMessageRepository ingestMessageRepository;
+  private EncounterMessageRepository encounterMessageRepository;
 
   @Inject
   private HL7MessageProcessor hl7MessageProcessor;
@@ -104,7 +104,7 @@ public class HL7MessageProcessorTestSupport {
     Terser terser = new Terser(message);
     String encounterIdentifier = terser.get("/.PV1-19");
 
-    ingestMessageRepository.save(Id.of(encounterIdentifier), hl7);
+    encounterMessageRepository.save(Id.of(encounterIdentifier), hl7);
 
     hl7MessageProcessor.accept(hl7);
   }

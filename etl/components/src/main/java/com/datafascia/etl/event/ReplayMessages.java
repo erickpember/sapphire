@@ -4,7 +4,7 @@ package com.datafascia.etl.event;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import com.datafascia.common.persist.Id;
-import com.datafascia.domain.persist.IngestMessageRepository;
+import com.datafascia.domain.persist.EncounterMessageRepository;
 import com.datafascia.etl.UrlToFetchedTimeMap;
 import com.datafascia.etl.hl7.HL7MessageProcessor;
 import java.nio.charset.StandardCharsets;
@@ -20,7 +20,7 @@ public class ReplayMessages implements Consumer<String> {
   private UrlToFetchedTimeMap urlToFetchedTimeMap;
 
   @Inject
-  private IngestMessageRepository ingestMessageRepository;
+  private EncounterMessageRepository encounterMessageRepository;
 
   @Inject
   private HL7MessageProcessor hl7MessageProcessor;
@@ -42,7 +42,7 @@ public class ReplayMessages implements Consumer<String> {
     urlToFetchedTimeMap.clear();
 
     Id<Encounter> encounterId = Id.of(encounterIdentifier);
-    ingestMessageRepository.findByEncounterId(encounterId)
+    encounterMessageRepository.findByEncounterId(encounterId)
         .stream()
         .forEach(message -> processMessage(message.getPayload().array()));
   }

@@ -18,8 +18,8 @@ import com.datafascia.common.persist.entity.AccumuloReflectEntityStore;
 import com.datafascia.common.persist.entity.EntityId;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
+import com.datafascia.domain.persist.EncounterMessageRepository;
 import com.datafascia.domain.persist.EncounterRepository;
-import com.datafascia.domain.persist.IngestMessageRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
@@ -47,7 +47,7 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
   private Parser parser;
 
   @Inject
-  private IngestMessageRepository ingestMessageRepository;
+  private EncounterMessageRepository encounterMessageRepository;
 
   @Inject
   private HL7MessageProcessor hl7MessageProcessor;
@@ -104,7 +104,7 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
     Terser terser = new Terser(message);
     String encounterIdentifier = terser.get("/.PV1-19");
 
-    ingestMessageRepository.save(Id.of(encounterIdentifier), hl7);
+    encounterMessageRepository.save(Id.of(encounterIdentifier), hl7);
   }
 
   protected void saveMessage(String hl7File) throws HL7Exception, IOException {
@@ -138,7 +138,7 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
   protected void deleteIngestedData() {
     entityStore.delete(new EntityId(Encounter.class, ENCOUNTER_ID));
     entityStore.delete(new EntityId(UnitedStatesPatient.class, PATIENT_ID));
-    ingestMessageRepository.delete(ENCOUNTER_ID);
+    encounterMessageRepository.delete(ENCOUNTER_ID);
 
     apiClient.invalidateEncounter(ENCOUNTER_IDENTIFIER);
   }

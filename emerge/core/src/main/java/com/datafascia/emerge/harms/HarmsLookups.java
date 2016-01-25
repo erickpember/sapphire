@@ -67,12 +67,7 @@ public class HarmsLookups {
 
     Date now = Date.from(Instant.now(clock));
 
-    // Right now is after the last effective time.
-    if (now.after(lastEffectiveTime)) {
-      return false;
-    }
-
-    return true;
+    return !now.after(lastEffectiveTime);
   }
 
   /**
@@ -98,7 +93,8 @@ public class HarmsLookups {
     if (quantity instanceof QuantityDt) {
       return ((QuantityDt) quantity).getValue().compareTo(FIFTY) < 0;
     } else {
-      throw new NumberFormatException("Observation value is not of type QuantityDt.");
+      log.warn("Observation value is not of type QuantityDt: " + quantity);
+      return false;
     }
   }
 
@@ -123,7 +119,8 @@ public class HarmsLookups {
     if (quantity instanceof QuantityDt) {
       return ((QuantityDt) quantity).getValue().compareTo(ONE_POINT_FIVE) > 0;
     } else {
-      throw new NumberFormatException("Observation value is not of type QuantityDt.");
+      log.warn("Observation value is not of type QuantityDt: " + quantity);
+      return false;
     }
   }
 
@@ -162,7 +159,7 @@ public class HarmsLookups {
         log.warn("Reference range is null");
       }
     } else {
-      throw new NumberFormatException("Observation value is not of type QuantityDt.");
+      log.warn("Observation value is not of type QuantityDt: " + quantity);
     }
 
     return false;
@@ -195,21 +192,24 @@ public class HarmsLookups {
       if (quantity instanceof QuantityDt) {
         return ((QuantityDt) quantity).getValue().multiply(OUNCES_PER_KILOGRAM);
       } else {
-        throw new NumberFormatException("Observation value is not of type QuantityDt.");
+        log.warn("Observation value is not of type QuantityDt: " + quantity);
+        return new BigDecimal("-1");
       }
     } else if (ObservationUtils.firstIsFresher(freshestClinicalWeight, freshestAdmissionWeight)) {
       IDatatype quantity = freshestClinicalWeight.getValue();
       if (quantity instanceof QuantityDt) {
         return ((QuantityDt) quantity).getValue();
       } else {
-        throw new NumberFormatException("Observation value is not of type QuantityDt.");
+        log.warn("Observation value is not of type QuantityDt: " + quantity);
+        return new BigDecimal("-1");
       }
     } else if (freshestAdmissionWeight != null) {
       IDatatype quantity = freshestAdmissionWeight.getValue();
       if (quantity instanceof QuantityDt) {
         return ((QuantityDt) quantity).getValue();
       } else {
-        throw new NumberFormatException("Observation value is not of type QuantityDt.");
+        log.warn("Observation value is not of type QuantityDt: " + quantity);
+        return new BigDecimal("-1");
       }
     }
 

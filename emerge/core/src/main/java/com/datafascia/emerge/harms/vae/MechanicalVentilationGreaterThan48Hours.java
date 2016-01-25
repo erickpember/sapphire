@@ -5,12 +5,14 @@ package com.datafascia.emerge.harms.vae;
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.api.client.Observations;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Date;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import javax.inject.Inject;
 
@@ -28,8 +30,6 @@ public class MechanicalVentilationGreaterThan48Hours {
   @Inject
   private Ventilated ventilatedImpl;
 
-  private static final boolean DEFAULT_RESULT = false;
-
   /**
    * Checks if there is mechanical ventilation greater than 48 hours.
    *
@@ -38,88 +38,80 @@ public class MechanicalVentilationGreaterThan48Hours {
    * @return true if there is an observation in this encounter that meets the conditions
    */
   public boolean isMechanicalVentilationGreaterThan48Hours(Encounter encounter) {
-    String encounterId = encounter.getId().getIdPart();
-    Instant now = Instant.now(clock);
-    Date fortyEightHoursAgo = Date.from(now.minus(48, ChronoUnit.HOURS));
+    Observations observations =
+        apiClient.getObservationClient().list(encounter.getId().getIdPart());
 
-    // grouping of negative short-circuit logic
+    Instant now = Instant.now(clock);
+
     if (!ventilatedImpl.isVentilated(encounter)) {
       return false;
     }
 
-    List<Observation> extubations = ObservationUtils.getObservationByCodeAfterTime(apiClient,
-        encounterId, ObservationCodeEnum.EXTUBATION.getCode(), fortyEightHoursAgo);
+    return isMechanicalVentilationGreaterThan48Hours(observations, now);
+  }
+
+  /**
+   * Checks if there is mechanical ventilation greater than 48 hours.
+   * Encapsulates non-API-dependent logic.
+   * Does not include test for ventilated.
+   *
+   * @param observations
+   *     All observations for this encounter.
+   * @param now
+   *     The current time.
+   * @return true if there is an observation in this encounter that meets the conditions
+   */
+  public boolean isMechanicalVentilationGreaterThan48Hours(Observations observations, Instant now) {
+    Instant fortyEightHoursAgo = now.minus(48, ChronoUnit.HOURS);
+    Instant seventyTwoHoursAgo = now.minus(72, ChronoUnit.HOURS);
+
+    // grouping of negative short-circuit logic
+    List<Observation> extubations = observations.list(ObservationCodeEnum.EXTUBATION.getCode(),
+        fortyEightHoursAgo, null);
     for (Observation extubation : extubations) {
-      if (extubation.getValue().toString().equals("Yes")) {
+      if (ObservationUtils.getValueAsString(extubation).equals("Yes")) {
+        System.out.println("\n\nextubations false");
         return false;
       }
     }
 
-    List<Observation> ettInvasiveVentStatuses = ObservationUtils.getObservationByCodeAfterTime(
-        apiClient, encounterId, ObservationCodeEnum.ETT_INVASIVE_VENT_STATUS.getCode(),
-        fortyEightHoursAgo);
-    for (Observation ettInvasiveVentStatus : ettInvasiveVentStatuses) {
-      if (ettInvasiveVentStatus.getValue().toString().equals("Patient taken off")
-          || ettInvasiveVentStatus.getValue().toString().equals("Discontinue")) {
+    List<Observation> newEttInvasiveAndTrachInvasiveVentStatuses = observations.list(
+        new HashSet<>(Arrays.asList(ObservationCodeEnum.ETT_INVASIVE_VENT_STATUS.getCode(),
+                ObservationCodeEnum.TRACH_INVASIVE_VENT_STATUS.getCode())),
+        fortyEightHoursAgo, null);
+    for (Observation ettOrTrachStatus : newEttInvasiveAndTrachInvasiveVentStatuses) {
+      if (ObservationUtils.getValueAsString(ettOrTrachStatus).equals("Patient taken off")
+          || ObservationUtils.getValueAsString(ettOrTrachStatus).equals("Discontinue")) {
         return false;
       }
     }
 
-    List<Observation> trachInvasiveVentStatuses = ObservationUtils.getObservationByCodeAfterTime(
-        apiClient, encounterId, ObservationCodeEnum.TRACH_INVASIVE_VENT_STATUS.getCode(),
-        fortyEightHoursAgo);
-    for (Observation trachInvasiveVentStatus : trachInvasiveVentStatuses) {
-      if (trachInvasiveVentStatus.getValue().toString().equals("Patient taken off")
-          || trachInvasiveVentStatus.getValue().toString().equals("Discontinue")) {
-        return false;
+    List<Observation> oldEttInvasiveAndTrachInvasiveVentStatuses = observations.list(
+        new HashSet<>(Arrays.asList(ObservationCodeEnum.ETT_INVASIVE_VENT_STATUS.getCode(),
+                ObservationCodeEnum.TRACH_INVASIVE_VENT_STATUS.getCode())),
+        seventyTwoHoursAgo, fortyEightHoursAgo);
+    for (Observation ettOrTrachStatus : oldEttInvasiveAndTrachInvasiveVentStatuses) {
+      if (ObservationUtils.getValueAsString(ettOrTrachStatus).equals("Patient back on Invasive")
+          || ObservationUtils.getValueAsString(ettOrTrachStatus).equals("Continue")) {
+        return true;
       }
     }
 
     // grouping of positive short-circuit logic
-    List<Observation> intubations = apiClient.getObservationClient().searchObservation(encounterId,
-        ObservationCodeEnum.INTUBATION.getCode(), null);
-    for (Observation intubation : intubations) {
-      if (intubation.getValue().toString().equals("Yes")
-          && !ObservationUtils.isAfter(intubation, fortyEightHoursAgo)) {
+    List<Observation> intermittentVentilationTypes = observations.list(
+        new HashSet<>(Arrays.asList(ObservationCodeEnum.INTUBATION.getCode(),
+                ObservationCodeEnum.ETT_INVASIVE_VENT_INITIATION.getCode(),
+                ObservationCodeEnum.ETT_ONGOING_INVASIVE_VENT.getCode(),
+                ObservationCodeEnum.TRACH_INVASIVE_VENT_INITIATION.getCode(),
+                ObservationCodeEnum.TRACH_ONGOING_INVASIVE_VENT.getCode())),
+        seventyTwoHoursAgo, fortyEightHoursAgo);
+    for (Observation anyIntermittentVentilationType : intermittentVentilationTypes) {
+      if (ObservationUtils.getValueAsString(anyIntermittentVentilationType).equals("Yes")) {
         return true;
       }
     }
 
-    List<Observation> ettInvasiveVentInitiations = apiClient.getObservationClient()
-        .searchObservation(encounterId, ObservationCodeEnum.ETT_INVASIVE_VENT_INITIATION.getCode(),
-            null);
-    for (Observation ettInvasiveVentInitiation : ettInvasiveVentInitiations) {
-      if (ettInvasiveVentInitiation.getValue().toString().equals("Yes")) {
-        return true;
-      }
-    }
-
-    List<Observation> ettOngoingInvasiveVents = apiClient.getObservationClient().searchObservation(
-        encounterId, ObservationCodeEnum.ETT_ONGOING_INVASIVE_VENT.getCode(), null);
-    for (Observation ettOngoingInvasiveVent : ettOngoingInvasiveVents) {
-      if (ettOngoingInvasiveVent.getValue().toString().equals("Yes")) {
-        return true;
-      }
-    }
-
-    List<Observation> trachInvasiveVentInitiations = apiClient.getObservationClient()
-        .searchObservation(
-            encounterId, ObservationCodeEnum.TRACH_INVASIVE_VENT_INITIATION.getCode(), null);
-    for (Observation trachInvasiveVentInitiation : trachInvasiveVentInitiations) {
-      if (trachInvasiveVentInitiation.getValue().toString().equals("Yes")) {
-        return true;
-      }
-    }
-
-    List<Observation> trachOngoingInvasiveVents = apiClient.getObservationClient()
-        .searchObservation(encounterId, ObservationCodeEnum.TRACH_ONGOING_INVASIVE_VENT.getCode(),
-            null);
-    for (Observation trachOngoingInvasiveVent : trachOngoingInvasiveVents) {
-      if (trachOngoingInvasiveVent.getValue().toString().equals("Yes")) {
-        return true;
-      }
-    }
-
-    return DEFAULT_RESULT;
+    System.out.println("\n\ndefault return  false");
+    return false;
   }
 }

@@ -77,7 +77,8 @@ public class DailySedationInterruption {
     }
 
     // Get a list of sedative administrations in the time window without erroneous or empty status.
-    List<MedicationAdministration> sortedSedativeAdmins = admins.stream()
+    List<MedicationAdministration> sortedSedativeAdmins =
+        MedicationAdministrationUtils.freshestOfAllOrders(admins).values().stream()
         .filter(admin ->
             MedicationAdministrationUtils.hasMedsSet(
                 admin, MedsSetEnum.ANY_SEDATIVE_INFUSION.getCode()))

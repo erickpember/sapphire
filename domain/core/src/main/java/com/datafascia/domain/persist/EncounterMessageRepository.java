@@ -4,16 +4,18 @@ package com.datafascia.domain.persist;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
 import com.datafascia.common.accumulo.AccumuloTemplate;
-import com.datafascia.common.accumulo.RowMapper;
 import com.datafascia.common.persist.Id;
 import com.datafascia.common.time.InstantFormatter;
 import com.datafascia.domain.model.EncounterMessage;
 import com.datafascia.domain.model.IngestMessage;
+import com.google.common.base.Strings;
 import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import javax.inject.Inject;
@@ -41,7 +43,7 @@ public class EncounterMessageRepository extends BaseRepository {
 
   private static final String COLUMN_FAMILY = IngestMessage.class.getSimpleName();
   private static final String PAYLOAD = "payload";
-  private static final MessageRowMapper MESSAGE_ROW_MAPPER = new MessageRowMapper();
+  private static final String LAST_PROCESSED_MESSAGE_ID = "lastProcessedMessageId";
   private static final BaseEncoding ENCODING = BaseEncoding.base64Url().omitPadding();
 
   /**
@@ -55,31 +57,6 @@ public class EncounterMessageRepository extends BaseRepository {
     super(accumuloTemplate);
 
     accumuloTemplate.createTableIfNotExist(Tables.ENCOUNTER);
-  }
-
-  private static class MessageRowMapper implements RowMapper<EncounterMessage> {
-    private EncounterMessage message;
-
-    @Override
-    public void onBeginRow(Key key) {
-      message = new EncounterMessage();
-      message.setId(key.getRow().toString());
-    }
-
-    @Override
-    public void onReadEntry(Map.Entry<Key, Value> entry) {
-      byte[] value = entry.getValue().get();
-      switch (entry.getKey().getColumnQualifier().toString()) {
-        case PAYLOAD:
-          message.setPayload(ByteBuffer.wrap(value));
-          break;
-      }
-    }
-
-    @Override
-    public EncounterMessage onEndRow() {
-      return message;
-    }
   }
 
   private static String toRowIdPrefix(Id<Encounter> encounterId) {
@@ -111,6 +88,52 @@ public class EncounterMessageRepository extends BaseRepository {
                 .put(PAYLOAD, new Value(value)));
   }
 
+  private String readLastProcessedMessageId(Id<Encounter> encounterId) {
+    Scanner scanner = accumuloTemplate.createScanner(Tables.ENCOUNTER);
+    scanner.setRange(Range.exact(encounterId.toString()));
+    scanner.fetchColumn(new Text(COLUMN_FAMILY), new Text(LAST_PROCESSED_MESSAGE_ID));
+    Iterator<Map.Entry<Key, Value>> iterator = scanner.iterator();
+    try {
+      return iterator.hasNext() ? decodeString(iterator.next().getValue().get()) : null;
+    } finally {
+      scanner.close();
+    }
+  }
+
+  private String findLastMessageId(Id<Encounter> encounterId) {
+    Scanner scanner = accumuloTemplate.createScanner(Tables.ENCOUNTER);
+    scanner.setRange(Range.prefix(toRowIdPrefix(encounterId)));
+    scanner.fetchColumn(new Text(COLUMN_FAMILY), new Text(PAYLOAD));
+    try {
+      String lastMessageId = null;
+      for (Map.Entry<Key, Value> entry : scanner) {
+        lastMessageId = entry.getKey().getRow().toString();
+      }
+
+      return lastMessageId;
+    } finally {
+      scanner.close();
+    }
+  }
+
+  /**
+   * Sets last processsed message ID to last message if not already set.
+   *
+   * @param encounterId
+   *     encounter ID
+   */
+  public void initializeLastProcessedMessageId(Id<Encounter> encounterId) {
+    String lastProcesssedMessageId = readLastProcessedMessageId(encounterId);
+    if (!Strings.isNullOrEmpty(lastProcesssedMessageId)) {
+      return;
+    }
+
+    String lastMessageId = findLastMessageId(encounterId);
+    if (!Strings.isNullOrEmpty(lastMessageId)) {
+      saveLastProcessedMessageId(encounterId, lastMessageId);
+    }
+  }
+
   /**
    * Finds messages for an encounter.
    *
@@ -120,10 +143,35 @@ public class EncounterMessageRepository extends BaseRepository {
    */
   public List<EncounterMessage> findByEncounterId(Id<Encounter> encounterId) {
     Scanner scanner = accumuloTemplate.createScanner(Tables.ENCOUNTER);
-    scanner.setRange(Range.prefix(toRowIdPrefix(encounterId)));
-    scanner.fetchColumnFamily(new Text(COLUMN_FAMILY));
+    scanner.fetchColumn(new Text(COLUMN_FAMILY), new Text(PAYLOAD));
 
-    return accumuloTemplate.queryForList(scanner, MESSAGE_ROW_MAPPER);
+    String rowIdPrefix = toRowIdPrefix(encounterId);
+    String lastProcessedMessageId = readLastProcessedMessageId(encounterId);
+    if (Strings.isNullOrEmpty(lastProcessedMessageId)) {
+      scanner.setRange(Range.prefix(rowIdPrefix));
+    } else {
+      scanner.setRange(new Range(lastProcessedMessageId, false, null, true));
+    }
+
+    try {
+      List<EncounterMessage> messages = new ArrayList<>();
+      for (Map.Entry<Key, Value> entry : scanner) {
+        String id = entry.getKey().getRow().toString();
+        if (!id.startsWith(rowIdPrefix)) {
+          break;
+        }
+
+        EncounterMessage message = new EncounterMessage();
+        message.setId(id);
+        message.setPayload(ByteBuffer.wrap(entry.getValue().get()));
+
+        messages.add(message);
+      }
+
+      return messages;
+    } finally {
+      scanner.close();
+    }
   }
 
   /**
@@ -134,5 +182,23 @@ public class EncounterMessageRepository extends BaseRepository {
    */
   public void delete(Id<Encounter> encounterId) {
     accumuloTemplate.deleteRowIdPrefix(Tables.ENCOUNTER, toRowIdPrefix(encounterId));
+  }
+
+  /**
+   * Saves last processed message ID.
+   *
+   * @param encounterId
+   *     encounter ID
+   * @param lastProcessedMessageId
+   *     row ID
+   */
+  public void saveLastProcessedMessageId(Id<Encounter> encounterId, String lastProcessedMessageId) {
+    accumuloTemplate.save(
+        Tables.ENCOUNTER,
+        encounterId.toString(),
+        mutationBuilder ->
+            mutationBuilder
+                .columnFamily(COLUMN_FAMILY)
+                .put(LAST_PROCESSED_MESSAGE_ID, lastProcessedMessageId));
   }
 }

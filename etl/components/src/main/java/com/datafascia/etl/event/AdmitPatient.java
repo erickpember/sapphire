@@ -18,6 +18,7 @@ import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.LocationRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater;
+import com.datafascia.etl.UrlToFetchedTimeMap;
 import com.datafascia.etl.hl7.EncounterStatusTransition;
 import com.google.common.base.Splitter;
 import com.google.common.base.Strings;
@@ -55,6 +56,9 @@ public class AdmitPatient {
   private EncounterRepository encounterRepository;
 
   @Inject
+  private UrlToFetchedTimeMap urlToFetchedTimeMap;
+
+  @Inject
   private HarmEvidenceUpdater harmEvidenceUpdater;
 
   @Inject
@@ -72,7 +76,7 @@ public class AdmitPatient {
   }
 
   private Optional<String> getPointOfCare(Location location) {
-    String[] locationParts = location.getIdentifierFirstRep().getValue().split("\\^");
+    String[] locationParts = location.getIdentifierFirstRep().getValue().split("\\^", 2);
     if (locationParts.length > 0) {
       String pointOfCare = locationParts[0];
       return Optional.of(pointOfCare);
@@ -167,7 +171,10 @@ public class AdmitPatient {
     encounterRepository.save(newEncounter);
     apiClient.invalidateEncounter(newEncounter.getId().getIdPart());
 
-    if (isAdmitOrTransfer(triggerEvent)) {
+    if (isAdmitOrTransfer(triggerEvent) && isIcu(location)) {
+      // Force web service ingest processors to refresh all data.
+      urlToFetchedTimeMap.clear();
+
       harmEvidenceUpdater.admitPatient(patient, location, newEncounter);
     } else {
       harmEvidenceUpdater.updatePatient(patient, location, newEncounter);

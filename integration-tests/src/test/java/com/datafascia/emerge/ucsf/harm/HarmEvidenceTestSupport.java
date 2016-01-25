@@ -23,7 +23,7 @@ import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.domain.persist.PatientRepository;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
-import com.datafascia.etl.hl7.HL7MessageProcessor;
+import com.datafascia.etl.event.PlayMessages;
 import com.datafascia.etl.ucsf.web.NursingOrdersTransformer;
 import com.google.common.io.Resources;
 import java.io.IOException;
@@ -50,7 +50,7 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
   private EncounterMessageRepository encounterMessageRepository;
 
   @Inject
-  private HL7MessageProcessor hl7MessageProcessor;
+  private PlayMessages playMessages;
 
   @Inject
   private NursingOrdersTransformer nursingOrdersTransformer;
@@ -115,7 +115,7 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
   protected void processMessage(String hl7File) throws HL7Exception, IOException {
     String hl7 = readHL7Resource(hl7File);
     saveMessageByEncounter(hl7);
-    hl7MessageProcessor.accept(hl7);
+    playMessages.accept(ENCOUNTER_IDENTIFIER);
   }
 
   protected void processNursingOrder(String jsonFile) throws IOException {

@@ -23,7 +23,7 @@ import com.datafascia.common.persist.entity.FhirEntityStore;
 import com.datafascia.common.persist.entity.ReflectEntityStore;
 import com.datafascia.domain.persist.Tables;
 import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater;
-import com.datafascia.etl.event.ReplayMessages;
+import com.datafascia.etl.event.PlayMessages;
 import com.datafascia.etl.hl7.EncounterStatusTransition;
 import com.datafascia.etl.hl7.HL7MessageProcessor;
 import com.google.inject.AbstractModule;
@@ -80,10 +80,10 @@ public class ComponentsModule extends AbstractModule {
         .in(Singleton.class);
     bind(HarmEvidenceUpdater.class)
         .in(Singleton.class);
+    bind(PlayMessages.class)
+        .in(Singleton.class);
     bind(ReflectEntityStore.class)
         .to(AccumuloReflectEntityStore.class)
-        .in(Singleton.class);
-    bind(ReplayMessages.class)
         .in(Singleton.class);
 
     bindConstant()

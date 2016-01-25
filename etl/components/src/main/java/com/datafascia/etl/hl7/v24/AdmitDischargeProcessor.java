@@ -24,13 +24,11 @@ import com.datafascia.etl.event.AddObservations;
 import com.datafascia.etl.event.AddParticipant;
 import com.datafascia.etl.event.AdmitPatient;
 import com.datafascia.etl.event.DischargePatient;
-import com.datafascia.etl.event.ReplayMessages;
 import com.datafascia.etl.hl7.GenderFormatter;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Date;
 import java.util.List;
-import java.util.concurrent.ConcurrentHashMap;
 import javax.inject.Inject;
 
 /**
@@ -41,14 +39,8 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
   private static final String OBX_PATH_PATTERN = "/OBX(%2$d)";
   private static final String NTE_PATH_PATTERN = null;
 
-  private static final ConcurrentHashMap<String, Boolean> encounterIdentifierToReplayFlagMap =
-      new ConcurrentHashMap<>();
-
   @Inject
   private Clock clock;
-
-  @Inject
-  private ReplayMessages replayMessages;
 
   @Inject
   private AdmitPatient admitPatient;
@@ -185,31 +177,6 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
     }
   }
 
-  private boolean isReplaying(String encounterIdentifier) {
-    return encounterIdentifierToReplayFlagMap.containsKey(encounterIdentifier);
-  }
-
-  private void doAdmitPatient(
-      Message message, MSH msh, PID pid, PV1 pv1, List<ROL> rolList, List<ROL> rol2List)
-      throws HL7Exception {
-
-    UnitedStatesPatient patient = toPatient(pid);
-    Location location = toLocation(pv1);
-    Encounter encounter = toEncounter(pv1);
-    admitPatient.accept(
-        msh.getMessageType().getTriggerEvent().getValue(),
-        TimeStamps.toDateTime(msh.getDateTimeOfMessage()),
-        patient,
-        location,
-        encounter);
-
-    readPrimaryCareAttending(pv1, encounter);
-    readParticipants(rolList, encounter);
-    readParticipants(rol2List, encounter);
-
-    addObservations(message, pid, pv1);
-  }
-
   /**
    * Admits, transfers, updates patient.
    *
@@ -231,24 +198,21 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
       Message message, MSH msh, PID pid, PV1 pv1, List<ROL> rolList, List<ROL> rol2List)
       throws HL7Exception {
 
-    // Check if currently replaying messages to prevent infinite recursion.
-    String encounterIdentifier = getEncounterIdentifier(pv1);
-    if (isReplaying(encounterIdentifier)) {
-      doAdmitPatient(message, msh, pid, pv1, rolList, rol2List);
-      return;
-    }
+    UnitedStatesPatient patient = toPatient(pid);
+    Location location = toLocation(pv1);
+    Encounter encounter = toEncounter(pv1);
+    admitPatient.accept(
+        msh.getMessageType().getTriggerEvent().getValue(),
+        TimeStamps.toDateTime(msh.getDateTimeOfMessage()),
+        patient,
+        location,
+        encounter);
 
-    if (AdmitPatient.isAdmitOrTransfer(msh.getMessageType().getTriggerEvent().getValue())) {
-      // Set flag indicating we are replaying messages for the encounter.
-      encounterIdentifierToReplayFlagMap.put(encounterIdentifier, true);
+    readPrimaryCareAttending(pv1, encounter);
+    readParticipants(rolList, encounter);
+    readParticipants(rol2List, encounter);
 
-      replayMessages.accept(encounterIdentifier);
-
-      // Clear flag indicating we are replaying messages for the encounter.
-      encounterIdentifierToReplayFlagMap.remove(encounterIdentifier);
-    } else {
-      doAdmitPatient(message, msh, pid, pv1, rolList, rol2List);
-    }
+    addObservations(message, pid, pv1);
   }
 
   /**

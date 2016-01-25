@@ -3,7 +3,8 @@
 package com.datafascia.etl.ucsf.hl7;
 
 import com.datafascia.common.nifi.DependencyInjectingProcessor;
-import com.datafascia.etl.hl7.HL7MessageProcessor;
+import com.datafascia.etl.event.PlayMessages;
+import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 import java.nio.charset.StandardCharsets;
@@ -35,6 +36,8 @@ import org.kohsuke.MetaInfServices;
 @Tags({"datafascia", "HL7", "health level 7", "healthcare", "input"})
 public class ProcessHL7 extends DependencyInjectingProcessor {
 
+  private static final String ENCOUNTER_IDENTIFIER = "encounterIdentifier";
+
   public static final Relationship FAILURE = new Relationship.Builder()
       .name("failure")
       .description("HL7 message that could not be processed")
@@ -47,7 +50,7 @@ public class ProcessHL7 extends DependencyInjectingProcessor {
   private static final Set<Relationship> RELATIONSHIPS = ImmutableSet.of(FAILURE, SUCCESS);
 
   @Inject
-  private volatile HL7MessageProcessor hl7MessageProcessor;
+  private volatile PlayMessages playMessages;
 
   @Override
   public Set<Relationship> getRelationships() {
@@ -57,6 +60,11 @@ public class ProcessHL7 extends DependencyInjectingProcessor {
   @Override
   protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
     return Collections.emptyList();
+  }
+
+  @Override
+  protected void onInjected(ProcessContext processContext) {
+    playMessages.initializeLastProcessedMessageIds();
   }
 
   private static String readString(ProcessSession session, FlowFile flowFile) {
@@ -73,9 +81,14 @@ public class ProcessHL7 extends DependencyInjectingProcessor {
     }
 
     try {
-      String message = readString(session, flowFile);
+      readString(session, flowFile);
 
-      hl7MessageProcessor.accept(message);
+      String encounterIdentifier = flowFile.getAttribute(ENCOUNTER_IDENTIFIER);
+      if (Strings.isNullOrEmpty(encounterIdentifier)) {
+        throw new IllegalStateException("FlowFile does not have attribute " + ENCOUNTER_IDENTIFIER);
+      }
+
+      playMessages.accept(encounterIdentifier);
 
       session.transfer(flowFile, SUCCESS);
     } catch (RuntimeException e) {

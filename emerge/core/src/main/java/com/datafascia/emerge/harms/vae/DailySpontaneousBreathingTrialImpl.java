@@ -227,7 +227,8 @@ public class DailySpontaneousBreathingTrialImpl {
 
     for (String medsSet : ARE_THESE_IN_PROGRESS) {
       boolean inProgress = MedicationAdministrationUtils.inProgressInTimeFrame(
-          adminsForEncounter, lastTwoHours, medsSet);
+          MedicationAdministrationUtils.freshestOfAllOrders(adminsForEncounter).values(),
+          lastTwoHours, medsSet);
       if (inProgress) {
         return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.RECEIVING_NMBA);
       }

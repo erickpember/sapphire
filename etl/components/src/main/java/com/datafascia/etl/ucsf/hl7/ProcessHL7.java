@@ -3,12 +3,11 @@
 package com.datafascia.etl.ucsf.hl7;
 
 import com.datafascia.common.nifi.DependencyInjectingProcessor;
-import com.datafascia.etl.event.ReplayMessages;
 import com.datafascia.etl.hl7.HL7MessageProcessor;
 import com.google.common.base.Throwables;
 import com.google.common.collect.ImmutableSet;
 import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import javax.inject.Inject;
@@ -45,21 +44,7 @@ public class ProcessHL7 extends DependencyInjectingProcessor {
       .description("HL7 message that was successfully processed")
       .build();
 
-  public static final PropertyDescriptor REPLAY_MESSAGES = new PropertyDescriptor.Builder()
-      .name("Replay messages on admit or transfer")
-      .description(
-          "If true, will replay messages for the encounter when a patient is admited or " +
-          "transferred")
-      .defaultValue("true")
-      .allowableValues("true", "false")
-      .build();
-
   private static final Set<Relationship> RELATIONSHIPS = ImmutableSet.of(FAILURE, SUCCESS);
-  private static final List<PropertyDescriptor> PROPERTY_DESCRIPTORS =
-      Arrays.asList(REPLAY_MESSAGES);
-
-  @Inject
-  private volatile ReplayMessages replayMessages;
 
   @Inject
   private volatile HL7MessageProcessor hl7MessageProcessor;
@@ -71,12 +56,7 @@ public class ProcessHL7 extends DependencyInjectingProcessor {
 
   @Override
   protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
-    return PROPERTY_DESCRIPTORS;
-  }
-
-  @Override
-  protected void onInjected(ProcessContext context) {
-    replayMessages.setEnabled(context.getProperty(REPLAY_MESSAGES).asBoolean());
+    return Collections.emptyList();
   }
 
   private static String readString(ProcessSession session, FlowFile flowFile) {

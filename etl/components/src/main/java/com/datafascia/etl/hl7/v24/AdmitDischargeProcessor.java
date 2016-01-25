@@ -233,7 +233,7 @@ public abstract class AdmitDischargeProcessor extends BaseProcessor {
 
     // Check if currently replaying messages to prevent infinite recursion.
     String encounterIdentifier = getEncounterIdentifier(pv1);
-    if (!replayMessages.isEnabled() || isReplaying(encounterIdentifier)) {
+    if (isReplaying(encounterIdentifier)) {
       doAdmitPatient(message, msh, pid, pv1, rolList, rol2List);
       return;
     }

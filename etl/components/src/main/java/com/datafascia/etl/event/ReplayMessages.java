@@ -10,17 +10,11 @@ import com.datafascia.etl.hl7.HL7MessageProcessor;
 import java.nio.charset.StandardCharsets;
 import java.util.function.Consumer;
 import javax.inject.Inject;
-import lombok.Getter;
-import lombok.Setter;
 
 /**
  * Replays messages for the encounter.
  */
 public class ReplayMessages implements Consumer<String> {
-
-  @Getter
-  @Setter
-  private boolean enabled = true;
 
   @Inject
   private UrlToFetchedTimeMap urlToFetchedTimeMap;
@@ -44,10 +38,6 @@ public class ReplayMessages implements Consumer<String> {
    *     encounter identifier
    */
   public void accept(String encounterIdentifier) {
-    if (!enabled) {
-      return;
-    }
-
     // Force web service ingest processors to refresh all data.
     urlToFetchedTimeMap.clear();
 

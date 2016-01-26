@@ -3,6 +3,7 @@
 package com.datafascia.etl.ucsf.hl7;
 
 import com.datafascia.common.nifi.DependencyInjectingProcessor;
+import com.datafascia.etl.event.EncounterExecutor;
 import com.datafascia.etl.event.PlayMessages;
 import com.google.common.base.Strings;
 import com.google.common.base.Throwables;
@@ -52,6 +53,9 @@ public class ProcessHL7 extends DependencyInjectingProcessor {
   @Inject
   private volatile PlayMessages playMessages;
 
+  @Inject
+  private volatile EncounterExecutor encounterExecutor;
+
   @Override
   public Set<Relationship> getRelationships() {
     return RELATIONSHIPS;
@@ -88,7 +92,7 @@ public class ProcessHL7 extends DependencyInjectingProcessor {
         throw new IllegalStateException("FlowFile does not have attribute " + ENCOUNTER_IDENTIFIER);
       }
 
-      playMessages.accept(encounterIdentifier);
+      encounterExecutor.accept(encounterIdentifier);
 
       session.transfer(flowFile, SUCCESS);
     } catch (RuntimeException e) {

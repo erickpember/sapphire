@@ -23,6 +23,7 @@ import com.datafascia.common.persist.entity.FhirEntityStore;
 import com.datafascia.common.persist.entity.ReflectEntityStore;
 import com.datafascia.domain.persist.Tables;
 import com.datafascia.emerge.ucsf.harm.HarmEvidenceUpdater;
+import com.datafascia.etl.event.EncounterExecutor;
 import com.datafascia.etl.event.PlayMessages;
 import com.datafascia.etl.hl7.EncounterStatusTransition;
 import com.datafascia.etl.hl7.HL7MessageProcessor;
@@ -70,6 +71,8 @@ public class ComponentsModule extends AbstractModule {
         .toInstance(Clock.system(ZONE_ID));
     bind(ColumnVisibilityPolicy.class)
         .to(FixedColumnVisibilityPolicy.class)
+        .in(Singleton.class);
+    bind(EncounterExecutor.class)
         .in(Singleton.class);
     bind(EncounterStatusTransition.class)
         .in(Singleton.class);

@@ -105,10 +105,9 @@ public class PainUtils {
         case "304890005":
         case "304890006":
           // In the event of simultaneous observations, get the highest pain level of those.
-          if (getPainScoreFromValue(observation) != null
-              && getPainScoreFromValue(observation) != 11
+          if (getPainGoal(observation) != 11
               && (result == null || (comparator.compare(observation, result) == 0
-              && getPainScoreFromValue(observation) > getPainScoreFromValue(result)))) {
+              && getPainGoal(observation) > getPainGoal(result)))) {
             result = observation;
           } else if (comparator.compare(observation, result) < 0) {
             // we are now in older observations, give up

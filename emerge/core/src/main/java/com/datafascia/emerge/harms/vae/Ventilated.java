@@ -7,11 +7,10 @@ import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.client.Observations;
 import com.datafascia.emerge.ucsf.EncounterUtils;
+import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import com.google.common.collect.ImmutableSet;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import javax.inject.Inject;
@@ -47,10 +46,6 @@ public class Ventilated {
     return RELEVANT_OBSERVATION_CODES.contains(observation.getCode().getCodingFirstRep().getCode());
   }
 
-  private static boolean valueEquals(Optional<Observation> observation, String value) {
-    return observation.get().getValue().toString().equals(value);
-  }
-
   /**
    * Checks if the patient is ventilated.
    *
@@ -60,74 +55,125 @@ public class Ventilated {
    */
   public boolean isVentilated(Encounter encounter) {
     Instant icuAdmitTime = EncounterUtils.getIcuPeriodStart(encounter);
-    Observations observations = apiClient.getObservationClient()
-        .list(encounter.getId().getIdPart());
+    Observations observations =
+        apiClient.getObservationClient().list(encounter.getId().getIdPart());
+    return isVentilated(observations, icuAdmitTime);
+  }
 
-    List<Observation> invasiveVentStatus = new ArrayList<>();
+  /**
+   * Checks if the patient is ventilated.
+   *
+   * @param observations
+   *     Observations for the encounter.
+   * @param icuAdmitTime
+   *     ICU admit time.
+   * @return true if the conditions that indicate ventilation are met
+   */
+  public boolean isVentilated(Observations observations, Instant icuAdmitTime) {
+    Optional<Observation> freshestEttInvasiveVentStatus = observations.findFreshest(
+        ObservationCodeEnum.ETT_INVASIVE_VENT_STATUS.getCode(), icuAdmitTime,
+        null);
 
-    observations.findFreshest(ObservationCodeEnum.ETT_INVASIVE_VENT_STATUS.getCode(), icuAdmitTime,
-        null)
-        .ifPresent(observation -> invasiveVentStatus.add(observation));
-
-    observations.findFreshest(ObservationCodeEnum.TRACH_INVASIVE_VENT_STATUS.getCode())
-        .ifPresent(observation -> invasiveVentStatus.add(observation));
-
-    Optional<Observation> freshestInvasiveVentStatus = invasiveVentStatus.stream()
-        .max(Observations.EFFECTIVE_COMPARATOR);
-
-    Optional<Observation> freshestIntubation = observations.findFreshest(
-        ObservationCodeEnum.INTUBATION.getCode(), "Yes", icuAdmitTime, null);
-
-    Optional<Observation> freshestExtubation = observations.findFreshest(
-        ObservationCodeEnum.EXTUBATION.getCode(), "Yes");
+    Optional<Observation> freshestTrachInvasiveVentStatus = observations.findFreshest(
+        ObservationCodeEnum.TRACH_INVASIVE_VENT_STATUS.getCode(), icuAdmitTime,
+        null);
 
     Optional<Observation> freshestETTInvasiveVentInitiation = observations.findFreshest(
-        ObservationCodeEnum.ETT_INVASIVE_VENT_INITIATION.getCode());
+        ObservationCodeEnum.ETT_INVASIVE_VENT_INITIATION.getCode(), icuAdmitTime,
+        null);
 
     Optional<Observation> freshestETTOngoingInvasiveVent = observations.findFreshest(
-        ObservationCodeEnum.ETT_ONGOING_INVASIVE_VENT.getCode());
+        ObservationCodeEnum.ETT_ONGOING_INVASIVE_VENT.getCode(), icuAdmitTime,
+        null);
 
     Optional<Observation> freshestTrachInvasiveVentInitiation = observations.findFreshest(
-        ObservationCodeEnum.TRACH_INVASIVE_VENT_INITIATION.getCode());
+        ObservationCodeEnum.TRACH_INVASIVE_VENT_INITIATION.getCode(), icuAdmitTime,
+        null);
 
     Optional<Observation> freshestTrachOngoingInvasiveVent = observations.findFreshest(
-        ObservationCodeEnum.TRACH_ONGOING_INVASIVE_VENT.getCode(), "Yes");
+        ObservationCodeEnum.TRACH_ONGOING_INVASIVE_VENT.getCode(), icuAdmitTime,
+        null);
 
-    if (freshestInvasiveVentStatus.isPresent()) {
-      String value = freshestInvasiveVentStatus.get().getValue().toString();
-      if ((value.equals("Continue") || value.equals("Patient back on Invasive")) &&
-          (!freshestExtubation.isPresent() ||
-           isEffectiveAfter(freshestInvasiveVentStatus, freshestExtubation))) {
-        return true;
+    if (freshestEttInvasiveVentStatus.isPresent()) {
+      if (isContinueOrBackOnInvasive(freshestEttInvasiveVentStatus.get())) {
+        if (freshestTrachInvasiveVentStatus.isPresent()
+            && isEffectiveAfter(freshestTrachInvasiveVentStatus, freshestEttInvasiveVentStatus)
+            && isDiscontinueOrPatientTakenOff(freshestTrachInvasiveVentStatus.get())) {
+          return false;
+        } else {
+          return true;
+        }
+      }
+
+      if (isDiscontinueOrPatientTakenOff(freshestEttInvasiveVentStatus.get())) {
+        if (freshestETTInvasiveVentInitiation.isPresent()
+            && isEffectiveAfter(freshestETTInvasiveVentInitiation, freshestEttInvasiveVentStatus)
+            && isYes(freshestETTInvasiveVentInitiation.get())) {
+          return true;
+        } else if (freshestETTOngoingInvasiveVent.isPresent()
+            && isEffectiveAfter(freshestETTOngoingInvasiveVent, freshestEttInvasiveVentStatus)
+            && isYes(freshestETTOngoingInvasiveVent.get())) {
+          return true;
+        } else if (freshestTrachInvasiveVentInitiation.isPresent()
+            && isEffectiveAfter(freshestTrachInvasiveVentInitiation, freshestEttInvasiveVentStatus)
+            && isYes(freshestTrachInvasiveVentInitiation.get())) {
+          return true;
+        } else if (freshestTrachOngoingInvasiveVent.isPresent()
+            && isEffectiveAfter(freshestTrachOngoingInvasiveVent, freshestEttInvasiveVentStatus)
+            && isYes(freshestTrachOngoingInvasiveVent.get())) {
+          return true;
+        }
       }
     }
 
-    if (freshestIntubation.isPresent() &&
-        (!freshestExtubation.isPresent() ||
-         !isEffectiveAfter(freshestExtubation, freshestIntubation)) &&
-        (!freshestInvasiveVentStatus.isPresent() ||
-         !valueEquals(freshestInvasiveVentStatus, "Discontinue") ||
-         !valueEquals(freshestInvasiveVentStatus, "Patient Taken Off") ||
-         !isEffectiveAfter(freshestInvasiveVentStatus, freshestIntubation))) {
-      return true;
+    if (freshestTrachInvasiveVentStatus.isPresent()) {
+      if (isContinueOrBackOnInvasive(freshestTrachInvasiveVentStatus.get())) {
+        if (freshestEttInvasiveVentStatus.isPresent() && isEffectiveAfter(
+            freshestEttInvasiveVentStatus, freshestTrachInvasiveVentStatus)
+            && isDiscontinueOrPatientTakenOff(freshestEttInvasiveVentStatus.get())) {
+          return false;
+        } else {
+          return true;
+        }
+      }
+
+      if (isDiscontinueOrPatientTakenOff(freshestTrachInvasiveVentStatus.get())) {
+        if (freshestETTInvasiveVentInitiation.isPresent()
+            && isEffectiveAfter(freshestETTInvasiveVentInitiation, freshestTrachInvasiveVentStatus)
+            && isYes(freshestETTInvasiveVentInitiation.get())) {
+          return true;
+        } else if (freshestETTOngoingInvasiveVent.isPresent()
+            && isEffectiveAfter(freshestETTOngoingInvasiveVent, freshestTrachInvasiveVentStatus)
+            && isYes(freshestETTOngoingInvasiveVent.get())) {
+          return true;
+        } else if (freshestTrachInvasiveVentInitiation.isPresent()
+            && isEffectiveAfter(freshestTrachInvasiveVentInitiation,
+                freshestTrachInvasiveVentStatus)
+            && isYes(freshestTrachInvasiveVentInitiation.get())) {
+          return true;
+        } else if (freshestTrachOngoingInvasiveVent.isPresent()
+            && isEffectiveAfter(freshestTrachOngoingInvasiveVent, freshestTrachInvasiveVentStatus)
+            && isYes(freshestTrachOngoingInvasiveVent.get())) {
+          return true;
+        }
+      }
     }
 
-    if (freshestInvasiveVentStatus.isPresent() &&
-        (valueEquals(freshestInvasiveVentStatus, "Discontinue") ||
-         valueEquals(freshestInvasiveVentStatus, "Patient Taken Off")) &&
-        (freshestIntubation.isPresent() &&
-         isEffectiveAfter(freshestIntubation, freshestInvasiveVentStatus)) ||
-        (freshestETTInvasiveVentInitiation.isPresent() && freshestInvasiveVentStatus.isPresent() &&
-         isEffectiveAfter(freshestETTInvasiveVentInitiation, freshestInvasiveVentStatus)) ||
-        (freshestETTOngoingInvasiveVent.isPresent() && freshestInvasiveVentStatus.isPresent() &&
-         isEffectiveAfter(freshestETTOngoingInvasiveVent, freshestInvasiveVentStatus)) ||
-        (freshestTrachInvasiveVentInitiation.isPresent() &&
-         freshestInvasiveVentStatus.isPresent() &&
-         isEffectiveAfter(freshestTrachInvasiveVentInitiation, freshestInvasiveVentStatus)) ||
-        (freshestTrachOngoingInvasiveVent.isPresent() && freshestInvasiveVentStatus.isPresent() &&
-         isEffectiveAfter(freshestTrachOngoingInvasiveVent, freshestInvasiveVentStatus))) {
-      return true;
-    }
     return false;
+  }
+
+  private boolean isContinueOrBackOnInvasive(Observation obs) {
+    String value = ObservationUtils.getValueAsString(obs);
+    return ("Continue".equals(value) || "Patient back on Invasive".equals(value));
+  }
+
+  private boolean isDiscontinueOrPatientTakenOff(Observation obs) {
+    String value = ObservationUtils.getValueAsString(obs);
+    return ("Discontinue".equals(value) || "Patient taken off".equals(value));
+  }
+
+  private boolean isYes(Observation obs) {
+    String value = ObservationUtils.getValueAsString(obs);
+    return ("Yes".equals(value));
   }
 }

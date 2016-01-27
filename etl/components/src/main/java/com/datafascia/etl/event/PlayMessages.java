@@ -3,7 +3,6 @@
 package com.datafascia.etl.event;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
-import ca.uhn.fhir.model.dstu2.valueset.EncounterStateEnum;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.model.EncounterMessage;
 import com.datafascia.domain.persist.EncounterMessageRepository;
@@ -18,7 +17,7 @@ import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
 /**
- * Plays pending HL7 messages for the encounter.
+ * Plays pending HL7 messages for an encounter.
  */
 @Slf4j
 public class PlayMessages implements Consumer<String> {
@@ -33,10 +32,10 @@ public class PlayMessages implements Consumer<String> {
   private HL7MessageProcessor hl7MessageProcessor;
 
   /**
-   * Sets last processsed message ID for in-progress encounters.
+   * Sets last processsed message ID for all encounters.
    */
   public void initializeLastProcessedMessageIds() {
-    encounterRepository.list(Optional.of(EncounterStateEnum.IN_PROGRESS))
+    encounterRepository.list(Optional.empty())
         .stream()
         .forEach(encounter ->
             messageRepository.initializeLastProcessedMessageId(
@@ -53,7 +52,7 @@ public class PlayMessages implements Consumer<String> {
   }
 
   /**
-   * Plays pending HL7 messages for the encounter.
+   * Plays pending HL7 messages for an encounter.
    *
    * @param encounterIdentifier
    *     encounter identifier

@@ -1,0 +1,9 @@
+MSH|^~\&|APeX|UCSF|IE|UCSF|20151201160417|IPRN|ORU^R01|1178|T|2.3
+PID|1||97546762||SIX^AEMERGE||19810303|M||W|3333 TESTING LANE^^SAN FRANCISCO^CA^94114^000^P||(415)987-3425^P^PH||ENG|S||3005022|928357932||Six^Aemergemom|N||||||||N
+PV1|1||M9I^DGRM9I^P^HOSP^R^^^^^^OUTADT|||||||Hos|||||||83252^AGARWAL^PRIYANKA||5014212|KAISER||||||||||||||||||||||||20151201
+OBR|1||728176220160124000000||||20160124000000
+OBX|1|DT|304890002^Placement Date-Hemodialysis/Pheresis  Catheter 01/24/16 Arteriovenous fistula Right Arm|93|20160124||||||F|||20160124183627
+OBX|2|TM|304890078^Placement Time-Hemodialysis/Pheresis  Catheter 01/24/16 Arteriovenous fistula Right Arm|93|183600||||||F|||20160124183627
+OBX|3|ST|304890091^Access Type-Hemodialysis/Pheresis  Catheter 01/24/16 Arteriovenous fistula Right Arm|93|Arteriovenous fistula||||||F|||20160124183627
+OBX|4|ST|304890092^Orientation-Hemodialysis/Pheresis  Catheter 01/24/16 Arteriovenous fistula Right Arm|93|Right||||||F|||20160124183627
+OBX|5|ST|304890093^Access Location-Hemodialysis/Pheresis  Catheter 01/24/16 Arteriovenous fistula Right Arm|93|Arm||||||F|||20160124183627

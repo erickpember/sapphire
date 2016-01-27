@@ -46,6 +46,15 @@ public class CentralLineAssociateBloodStreamInfectionIT extends HarmEvidenceTest
   }
 
   @Test
+  public void should_not_export_arteriovenous_fistula() throws Exception {
+    processMessage("arteriovenous-fistula.hl7");
+
+    HarmEvidence harmEvidence = readHarmEvidence();
+    CLABSI clabsi = harmEvidence.getMedicalData().getCLABSI();
+    assertNull(clabsi);
+  }
+
+  @Test
   public void should_export_introducer_femoral_right() throws Exception {
     processMessage("introducer-femoral-right.hl7");
 

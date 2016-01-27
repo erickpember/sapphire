@@ -98,6 +98,7 @@ public class ProcedureBuilder {
   private static final String NECK = "Neck";
   private static final String SUBCLAVIAN = "Subclavian";
 
+  private static final String ARTERIOVENOUS_FISTULA = "Arteriovenous fistula";
   private static final String NON_TUNNELED_CATHETER = "Non-tunneled Catheter";
   private static final String NON_TUNNELED = "Non-tunneled";
   private static final String TUNNELED_CATHETER = "Tunneled Catheter";
@@ -182,6 +183,14 @@ public class ProcedureBuilder {
     }
 
     return LineType.of(inputCode);
+  }
+
+  private boolean isArteriovenousFistula(LineType basicLineType) {
+    if (basicLineType == LineType.HEMODIALYSIS_PHERESIS_CATHETER) {
+      String accessType = getValue(LINE_ACCESS_TYPE).orElse("");
+      return ARTERIOVENOUS_FISTULA.equals(accessType);
+    }
+    return false;
   }
 
   private String extractLineType(LineType basicLineType) {
@@ -406,6 +415,10 @@ public class ProcedureBuilder {
       return Optional.empty();
     }
     LineType basicLineType = optionalLineType.get();
+
+    if (isArteriovenousFistula(basicLineType)) {
+      return Optional.empty();
+    }
 
     String tunneledStatus = extractLineTunneledStatus(basicLineType);
     String lineType = extractLineType(basicLineType);

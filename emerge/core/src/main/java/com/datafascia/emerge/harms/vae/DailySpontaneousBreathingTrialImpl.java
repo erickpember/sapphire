@@ -78,6 +78,10 @@ public class DailySpontaneousBreathingTrialImpl {
    */
   public DailySpontaneousBreathingTrialValueEnum getValue(Observations observations, Instant now,
       String encounterId) {
+    if (getContraindicatedReason(observations, now, encounterId).isPresent()) {
+      return DailySpontaneousBreathingTrialValueEnum.CONTRAINDICATED;
+    }
+
     Instant effectiveLowerBound = now.minus(25, ChronoUnit.HOURS);
 
     Optional<Observation> freshestSBTAdmin = observations.findFreshest(
@@ -108,10 +112,6 @@ public class DailySpontaneousBreathingTrialImpl {
         && ((QuantityDt) freshestPEEP.get().getValue()).getValue().compareTo(FIVE) < 1
         && ((QuantityDt) freshestFIO2.get().getValue()).getValue().compareTo(FIFTY) < 1) {
       return DailySpontaneousBreathingTrialValueEnum.GIVEN;
-    }
-
-    if (getContraindicatedReason(observations, now, encounterId).isPresent()) {
-      return DailySpontaneousBreathingTrialValueEnum.CONTRAINDICATED;
     }
 
     return DailySpontaneousBreathingTrialValueEnum.NOT_GIVEN;

@@ -70,7 +70,6 @@ public class MechanicalVentilationGreaterThan48Hours {
         fortyEightHoursAgo, null);
     for (Observation extubation : extubations) {
       if (ObservationUtils.getValueAsString(extubation).equals("Yes")) {
-        System.out.println("\n\nextubations false");
         return false;
       }
     }
@@ -111,7 +110,6 @@ public class MechanicalVentilationGreaterThan48Hours {
       }
     }
 
-    System.out.println("\n\ndefault return  false");
     return false;
   }
 }

@@ -65,15 +65,6 @@ public class MechanicalVentilationGreaterThan48Hours {
     Instant fortyEightHoursAgo = now.minus(48, ChronoUnit.HOURS);
     Instant seventyTwoHoursAgo = now.minus(72, ChronoUnit.HOURS);
 
-    // grouping of negative short-circuit logic
-    List<Observation> extubations = observations.list(ObservationCodeEnum.EXTUBATION.getCode(),
-        fortyEightHoursAgo, null);
-    for (Observation extubation : extubations) {
-      if (ObservationUtils.getValueAsString(extubation).equals("Yes")) {
-        return false;
-      }
-    }
-
     List<Observation> newEttInvasiveAndTrachInvasiveVentStatuses = observations.list(
         new HashSet<>(Arrays.asList(ObservationCodeEnum.ETT_INVASIVE_VENT_STATUS.getCode(),
                 ObservationCodeEnum.TRACH_INVASIVE_VENT_STATUS.getCode())),
@@ -98,7 +89,7 @@ public class MechanicalVentilationGreaterThan48Hours {
 
     // grouping of positive short-circuit logic
     List<Observation> intermittentVentilationTypes = observations.list(
-        new HashSet<>(Arrays.asList(ObservationCodeEnum.INTUBATION.getCode(),
+        new HashSet<>(Arrays.asList(
                 ObservationCodeEnum.ETT_INVASIVE_VENT_INITIATION.getCode(),
                 ObservationCodeEnum.ETT_ONGOING_INVASIVE_VENT.getCode(),
                 ObservationCodeEnum.TRACH_INVASIVE_VENT_INITIATION.getCode(),

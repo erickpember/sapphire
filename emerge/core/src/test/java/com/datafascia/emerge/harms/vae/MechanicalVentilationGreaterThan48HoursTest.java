@@ -37,21 +37,6 @@ public class MechanicalVentilationGreaterThan48HoursTest
     Instant fortySevenHoursAgo = Instant.now().minus(47, ChronoUnit.HOURS);
     Instant fortyNineHoursAgo = Instant.now().minus(49, ChronoUnit.HOURS);
 
-    Observation oldExtubation = createObservation(ObservationCodeEnum.EXTUBATION.getCode(),
-        "Yes", fortyNineHoursAgo);
-
-    Observation oldIntubation = createObservation(ObservationCodeEnum.INTUBATION.getCode(),
-        "Yes", fortyNineHoursAgo);
-
-    assertTrue(isMechanicalVentilationGreaterThan48Hours(new Observations(Arrays.asList(
-        oldExtubation, oldIntubation)), Instant.now()));
-
-    Observation newExtubation = createObservation(ObservationCodeEnum.EXTUBATION.getCode(),
-        "Yes", fortySevenHoursAgo);
-
-    assertFalse(isMechanicalVentilationGreaterThan48Hours(new Observations(Arrays.asList(
-        newExtubation, oldIntubation)), Instant.now()));
-
     Observation newInitiateInvasive = createObservation(
         ObservationCodeEnum.ETT_INVASIVE_VENT_INITIATION.getCode(),
         "Yes", fortySevenHoursAgo);

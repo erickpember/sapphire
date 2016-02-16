@@ -4,7 +4,9 @@ package com.datafascia.emerge.harms.vte;
 
 import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
+import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
+import ca.uhn.fhir.model.dstu2.valueset.MedicationOrderStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.domain.fhir.CodingSystems;
@@ -40,9 +42,11 @@ public class AnticoagulationImpl {
    * @return optional anticoagulant type, or empty if none.
    */
   public Optional<AnticoagulationTypeEnum> getAnticoagulationType(String encounterId) {
+    List<MedicationOrder> orders = apiClient.getMedicationOrderClient()
+        .search(encounterId);
     List<MedicationAdministration> administrations = apiClient.getMedicationAdministrationClient()
         .search(encounterId);
-    return getAnticoagulationType(administrations, encounterId);
+    return getAnticoagulationType(administrations, orders, encounterId);
   }
 
   /**
@@ -50,15 +54,31 @@ public class AnticoagulationImpl {
    *
    * @param administrations
    *     All medication administrations for an encounter.
+   * @param orders
+   *     All medication orders for an encounter.
    * @param encounterId
    *     encounter to search
    * @return optional anticoagulant type, or empty if none.
    */
   public Optional<AnticoagulationTypeEnum> getAnticoagulationType(
-      Collection<MedicationAdministration> administrations, String encounterId) {
+      Collection<MedicationAdministration> administrations, Collection<MedicationOrder> orders,
+      String encounterId) {
     administrations = MedicationAdministrationUtils.freshestOfAllOrders(administrations).values();
 
+    boolean isActive = false;
     for (MedicationAdministration admin : administrations) {
+      String orderId = admin.getPrescription().getReference().getIdPart();
+      for (MedicationOrder order : orders) {
+        if (order.getIdentifierFirstRep().getValue().equals(orderId)) {
+          isActive = MedicationOrderStatusEnum.ACTIVE.toString()
+              .equalsIgnoreCase(order.getStatus());
+          break;
+        }
+      }
+      if (!isActive) {
+        continue;
+      }
+
       if (admin.getEffectiveTime() == null) {
         log.warn("Ignoring admin [{}] as it lacks an effective time.",
             admin.getIdentifierFirstRep().getValue());

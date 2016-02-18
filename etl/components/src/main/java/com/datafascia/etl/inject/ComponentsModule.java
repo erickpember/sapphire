@@ -9,6 +9,8 @@ import ca.uhn.hl7v2.HapiContext;
 import ca.uhn.hl7v2.parser.CanonicalModelClassFactory;
 import ca.uhn.hl7v2.parser.Parser;
 import ca.uhn.hl7v2.validation.impl.NoValidation;
+import com.codahale.metrics.JmxReporter;
+import com.codahale.metrics.MetricRegistry;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.common.accumulo.AuthorizationsSupplier;
 import com.datafascia.common.accumulo.ColumnVisibilityPolicy;
@@ -143,6 +145,14 @@ public class ComponentsModule extends AbstractModule {
     context.setModelClassFactory(new CanonicalModelClassFactory("2.4"));
 
     return context;
+  }
+
+  @Provides @Singleton
+  public MetricRegistry metricRegistry() {
+    MetricRegistry metrics = new MetricRegistry();
+    JmxReporter reporter = JmxReporter.forRegistry(metrics).build();
+    reporter.start();
+    return metrics;
   }
 
   @Provides @Singleton

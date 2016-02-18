@@ -50,7 +50,7 @@
     <kafka.version>0.8.2.1</kafka.version>
     <logback.version>1.0.13</logback.version>
     <lombok.version>1.16.4</lombok.version>
-    <metrics.version>3.1.0</metrics.version>
+    <metrics.version>3.1.1</metrics.version>
     <neovisionaries.version>1.14</neovisionaries.version>
     <nifi.version>0.1.0-incubating</nifi.version>
     <reflections.version>0.9.9</reflections.version>

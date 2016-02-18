@@ -2,6 +2,9 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.etl.event;
 
+import com.codahale.metrics.Gauge;
+import com.codahale.metrics.MetricRegistry;
+import com.datafascia.etl.ucsf.hl7.ProcessHL7;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -47,6 +50,13 @@ public class EncounterExecutor implements Consumer<String> {
   private PlayMessages playMessages;
 
   private Map<String, ThreadPoolExecutor> identifierToExecutorMap = new HashMap<>();
+
+  @Inject
+  private void initialize(MetricRegistry metrics) {
+    metrics.register(
+        MetricRegistry.name(ProcessHL7.class, "pendingEncounterCount"),
+        (Gauge<Integer>) () -> identifierToExecutorMap.size());
+  }
 
   private ExecutorService getExecutor(String encounterIdentifier) {
     return identifierToExecutorMap.computeIfAbsent(

@@ -5,7 +5,11 @@ package com.datafascia.emerge.harms.pain;
 import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.api.client.Observations;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
+import java.time.Clock;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import javax.inject.Inject;
 
@@ -15,19 +19,41 @@ import javax.inject.Inject;
 public class BenzodiazepineAvoidance {
 
   @Inject
+  private Clock clock;
+
+  @Inject
   private ClientBuilder apiClient;
 
   /**
    * Determines whether benzodiazepine avoidance is contraindicated.
    *
-   * @param encounterId The encounter to check.
+   * @param encounterId
+   *     The encounter to check.
    * @return Whether benzodiazepine avoidance is contraindicated.
    */
   public boolean isBenzodiazepineAvoidanceContraindicated(String encounterId) {
-    List<Observation> observations = apiClient.getObservationClient().searchObservation(encounterId,
-        ObservationCodeEnum.BENZODIAZEPINE_AVOIDANCE.getCode(), null);
+    Observations observations = apiClient.getObservationClient().list(encounterId);
 
-    for (Observation observation : observations) {
+    return isBenzodiazepineAvoidanceContraindicated(observations, Instant.now(clock));
+  }
+
+  /**
+   * Determines whether benzodiazepine avoidance is contraindicated.
+   *
+   * @param observations
+   *     The encounter to check.
+   * @param now
+   *     The current time.
+   * @return Whether benzodiazepine avoidance is contraindicated.
+   */
+  public boolean isBenzodiazepineAvoidanceContraindicated(Observations observations, Instant now) {
+    Instant twentyFourHoursAgo = now.minus(24, ChronoUnit.HOURS);
+
+    List<Observation> filteredObservations = observations.list(
+        ObservationCodeEnum.BENZODIAZEPINE_AVOIDANCE.getCode(),
+        twentyFourHoursAgo, null);
+
+    for (Observation observation : filteredObservations) {
       if (observation.getValue() instanceof QuantityDt
           && ((QuantityDt) observation.getValue()).getValue().doubleValue() > 0) {
         return true;

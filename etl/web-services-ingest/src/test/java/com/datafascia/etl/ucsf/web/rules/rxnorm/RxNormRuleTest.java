@@ -607,7 +607,7 @@ public class RxNormRuleTest {
     meds.add(ucsfa69);
     RxNorm ucsfa70 = new RxNorm() {
       {
-        setAhfs("56:28.12");
+        setAhfs(Arrays.asList("56:28.12"));
       }
     };
     meds.add(ucsfa70);
@@ -673,7 +673,7 @@ public class RxNormRuleTest {
     RxNorm ucsfa79 = new RxNorm() {
       {
         setRoute("11");
-        setAhfs("10:00.00");
+        setAhfs(Arrays.asList("10:00.00"));
       }
     };
     meds.add(ucsfa79);

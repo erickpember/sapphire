@@ -189,6 +189,11 @@ public class MedAdminDiffTransformer {
     String[] routeParts = orderJson.get("Route").toString().split("\\^");
     String[] frequencyParts = orderJson.get("Frequency").toString().split("\\^");
     List<String> rxNormIngredients = new ArrayList<>();
+    String ahfs = orderJson.get("AHFS").toString();
+    List<String> ahfslist = new ArrayList<>();
+    if (ahfs != null && !ahfs.isEmpty()) {
+      ahfslist.add(ahfs);
+    }
     if (orderJson.get("RxNorm") != null && !((JSONArray) orderJson.get("RxNorm")).isEmpty()) {
       rxNormIngredients.addAll(
           UcsfMedicationUtils.extractRxNormIngredients((JSONArray) orderJson.get("RxNorm")));
@@ -196,6 +201,7 @@ public class MedAdminDiffTransformer {
       if (orderJson.get("Mixture") != null) {
         for (Object mixobj : (JSONArray) orderJson.get("Mixture")) {
           JSONObject mixjson = (JSONObject) mixobj;
+          ahfslist.add(mixjson.get("AHFS").toString());
           if (mixjson.get("rxNormMix") != null) {
             rxNormIngredients.addAll(
                 UcsfMedicationUtils.extractRxNormIngredients((JSONArray) mixjson.get("rxNormMix")));
@@ -207,7 +213,7 @@ public class MedAdminDiffTransformer {
     RxNorm droolNorm = new RxNorm() {
       {
         setRxcuiSCD(scd);
-        setAhfs(orderJson.get("AHFS").toString());
+        setAhfs(ahfslist);
         setPca(orderJson.get("PCA").toString());
         setDrugId(orderJson.get("DrugID").toString());
         setRxcuiIn(rxNormIngredients);

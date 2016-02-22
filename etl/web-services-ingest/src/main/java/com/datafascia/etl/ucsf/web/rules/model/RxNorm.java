@@ -42,7 +42,7 @@ public class RxNorm {
 
   /** AHFS class number. */
   @JsonProperty("ahfs")
-  private String ahfs;
+  private List<String> ahfs;
 
   /** Drug ID. */
   @JsonProperty("drugId")

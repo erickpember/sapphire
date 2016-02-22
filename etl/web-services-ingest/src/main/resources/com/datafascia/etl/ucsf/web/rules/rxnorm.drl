@@ -842,10 +842,8 @@ end
 
 rule "Stress Ulcer Prophylactics"
   when
-    $p:RxNorm(ahfs == "56:28.12" ||
-              ahfs == "56:28.36" ||
-              ahfs == "56:28.12" ||
-              ahfs == "56:28.36")
+    $p:RxNorm(ahfs contains "56:28.12" ||
+              ahfs contains "56:28.36")
   then
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A70");
@@ -938,7 +936,7 @@ end
 
 rule "Chemotherapy IV"
   when
-    $p:RxNorm(ahfs == "10:00.00" && RouteLookup.isIV(route))
+    $p:RxNorm(ahfs contains "10:00.00" && RouteLookup.isIV(route))
   then
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A79");

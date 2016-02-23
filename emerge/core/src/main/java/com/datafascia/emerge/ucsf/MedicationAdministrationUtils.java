@@ -9,7 +9,6 @@ import ca.uhn.fhir.model.dstu2.composite.TimingDt;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
-import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.domain.fhir.CodingSystems;
 import java.math.BigDecimal;
 import java.util.Collection;
@@ -51,48 +50,6 @@ public class MedicationAdministrationUtils {
     } else {
       throw new RuntimeException("Unexpected type: " + effectiveTime.getClass().getCanonicalName());
     }
-  }
-
-  /**
-   * Returns false if there exists a MedicationAdministration for a given encounter with
-   *   - Status: In Progress
-   *   - Dosage.quantity > 0
-   *   - Identifier that is present in a list of known Continuous MedSets, except PCAs
-   *
-   * Otherwise returns true.
-   *
-   * @param encounterId
-   *    encounter to search for medication administrations
-   * @param client
-   *    API client
-   * @param medsSet
-   *    Meds group name that UCSF uses.
-   * @return
-   *    True if there is not a medicationAdministration that matches criteria for in progress
-   *    infusion.
-   */
-  public static boolean notInfusing(ClientBuilder client, String encounterId, String medsSet) {
-    return !activelyInfusing(client, encounterId, medsSet);
-  }
-
-  /**
-   * Given an encounter and a Meds Set group name, return true if the freshest administration
-   * with a given meds set has a status of in-progress and a dosage over zero.
-   *
-   * @param encounterId
-   *    encounter to search for medication administrations
-   * @param client
-   *    API client
-   * @param medsSet
-   *    Meds group name that UCSF uses.
-   * @return
-   *    True if there is a medicationAdministration that matches criteria for in progress
-   *    infusion.
-   */
-  public static boolean activelyInfusing(ClientBuilder client, String encounterId, String medsSet) {
-    return activelyInfusing(
-        client.getMedicationAdministrationClient().search(encounterId),
-        medsSet);
   }
 
   /**

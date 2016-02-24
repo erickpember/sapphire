@@ -7,11 +7,16 @@ import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.composite.TimingDt;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
+import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
+import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.domain.fhir.CodingSystems;
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -53,25 +58,86 @@ public class MedicationAdministrationUtils {
   }
 
   /**
+   * Given one medication administration, return true if the administration
+   * with a given meds set has a status of in-progress and a dosage over zero.
+   * This method does not determine if the meds set entered is intermittent or continuous.
+   *
+   * @param admin
+   *    A particular medication administration.
+   * @param medsSet
+   *    Meds group name that UCSF uses.
+   * @param now
+   *    The current time.
+   * @param hoursAgo
+   *    The duration of the look-back window, in hours.
+   * @param apiClient
+   *    The API client.
+   * @param encounterId
+   *    The identifier for the corresponding encounter.
+   * @return
+   *    True if there is a medicationAdministration that matches criteria for in progress
+   *    infusion.
+   */
+  public static boolean isActivelyInfusing(MedicationAdministration admin,
+      String medsSet, Instant now, Long hoursAgo, ClientBuilder apiClient, String encounterId) {
+    return isActivelyInfusing(Collections.singleton(admin), medsSet, now, hoursAgo, apiClient,
+        encounterId);
+  }
+
+  /**
    * Given a full list of med admins for an encounter, return true if the freshest administration
    * with a given meds set has a status of in-progress and a dosage over zero.
+   * This method does not determine if the meds set entered is intermittent or continuous.
    *
    * @param allAdminsPerEncounter
    *    A full list of medication administrations for an encounter.
    * @param medsSet
    *    Meds group name that UCSF uses.
+   * @param now
+   *    The current time.
+   * @param hoursAgo
+   *    The duration of the look-back window, in hours.
+   * @param apiClient
+   *    The API client.
+   * @param encounterId
+   *    The identifier for the corresponding encounter.
    * @return
    *    True if there is a medicationAdministration that matches criteria for in progress
    *    infusion.
    */
-  public static boolean activelyInfusing(Collection<MedicationAdministration> allAdminsPerEncounter,
-      String medsSet) {
+  public static boolean isActivelyInfusing(
+      Collection<MedicationAdministration> allAdminsPerEncounter,
+      String medsSet, Instant now, Long hoursAgo, ClientBuilder apiClient, String encounterId) {
     allAdminsPerEncounter = freshestOfAllOrders(allAdminsPerEncounter).values();
+
+    Date lowerTimeBound = Date.from(now.minus(hoursAgo, ChronoUnit.HOURS));
     return allAdminsPerEncounter.stream()
         .filter(admin -> hasMedsSet(admin, medsSet))
-        .filter(medicationAdministration -> medicationAdministration.getStatusElement().
-            getValueAsEnum() == MedicationAdministrationStatusEnum.IN_PROGRESS)
-        .filter(medicationAdministration -> dosageOverZero(medicationAdministration)).count() > 0;
+        .filter(admin -> dosageOverZero(admin))
+        .anyMatch(admin -> admin.getStatusElement().getValueAsEnum()
+            == MedicationAdministrationStatusEnum.IN_PROGRESS &&
+            (isAfter(admin, lowerTimeBound) ||
+                orderIsActiveOrDraft(admin, apiClient, encounterId)));
+  }
+
+  /**
+   * Return true if the medication order to which a given medication administration refers to
+   * has a status of active or draft.
+   *
+   * @param admin
+   *    The medication administration to check.
+   * @param apiClient
+   *    The API client.
+   * @param encounterId
+   *    The identifier for the corresponding encounter.
+   * @return
+   *    True if the medication order the administration refers to has a status of active or draft.
+   */
+  public static boolean orderIsActiveOrDraft(MedicationAdministration admin,
+      ClientBuilder apiClient, String encounterId) {
+    String orderId = admin.getPrescription().getReference().getIdPart();
+    MedicationOrder order = apiClient.getMedicationOrderClient().read(orderId, encounterId);
+    return MedicationOrderUtils.isActiveOrDraft(order);
   }
 
   /**
@@ -130,7 +196,6 @@ public class MedicationAdministrationUtils {
             || medicationAdministration.getStatusElement().getValueAsEnum()
             == MedicationAdministrationStatusEnum.COMPLETED)
         .filter(admin -> hasMedsSet(admin, medsSet))
-        .filter(medicationAdministration -> dosageOverZero(medicationAdministration))
         .filter(medicationAdministration -> insideTimeFrame(medicationAdministration, timeFrame))
         .anyMatch(medicationAdministration -> dosageOverZero(medicationAdministration));
   }

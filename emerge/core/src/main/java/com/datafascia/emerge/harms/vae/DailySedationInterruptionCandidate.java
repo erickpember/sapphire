@@ -52,8 +52,8 @@ public class DailySedationInterruptionCandidate {
       this.notCandidateReason = notCandidateReason;
     }
 
-    private boolean candidate;
-    private String notCandidateReason;
+    private final boolean candidate;
+    private final String notCandidateReason;
   }
 
   @Inject
@@ -61,6 +61,8 @@ public class DailySedationInterruptionCandidate {
 
   @Inject
   private ClientBuilder apiClient;
+
+  private static final Long ACTIVELY_INFUSING_LOOKBACK = 4l;
 
   /**
    * Determines if the patient is a candidate for daily sedation interruption.
@@ -89,12 +91,13 @@ public class DailySedationInterruptionCandidate {
      * “Continuous Infusion Propofol IV”, “Continuous Infusion Lorazepam IV” or “Continuous Infusion
      * Midazolam IV”) then Daily Sedation Interruption Candidate = “No: Off Sedation”
      */
-    boolean activelyInfusingSedative = false;
-    if (MedicationAdministrationUtils.activelyInfusing(freshestAdminForOrders,
-        MedsSetEnum.ANY_SEDATIVE_INFUSION.getCode())) {
-      // Save this for returning YES later on.
-      activelyInfusingSedative = true;
-    } else {
+    if (!MedicationAdministrationUtils.isActivelyInfusing(
+        freshestAdminForOrders,
+        MedsSetEnum.ANY_SEDATIVE_INFUSION.getCode(),
+        nowInstance,
+        ACTIVELY_INFUSING_LOOKBACK,
+        apiClient,
+        encounterId)) {
       return CandidateResult.OFF_SEDATION;
     }
 
@@ -113,13 +116,14 @@ public class DailySedationInterruptionCandidate {
       return CandidateResult.RECEIVING_NMBA;
     }
 
-    /* if there are any MedicationAdministration resources where
-     * MedicationAdministration.identifier.value == (“Continuous Infusion Cisatracurium IV”,
-     * “Continuous Infusion Vecuronium IV”) and activelyInfusing(MedicationAdministrations) then
-     * Daily Sedation Interruption Candidate = “No: Receiving NMBA”
-     */
-    if (MedicationAdministrationUtils.beenAdministered(medicationAdministrations, twoHourPeriod,
-        MedsSetEnum.ANY_INFUSION_NMBA.getCode())) {
+    Long nmbaLookbackHours = ACTIVELY_INFUSING_LOOKBACK + 2;
+    if (MedicationAdministrationUtils.isActivelyInfusing(
+        medicationAdministrations,
+        MedsSetEnum.ANY_INFUSION_NMBA.getCode(),
+        nowInstance,
+        nmbaLookbackHours,
+        apiClient,
+        encounterId)) {
       return CandidateResult.RECEIVING_NMBA;
     }
 
@@ -343,14 +347,9 @@ public class DailySedationInterruptionCandidate {
 
     /* if there are one or more MedicationAdministration.identifier.value == (“Continuous Infusion
      * Dexmedetomidine IV”, “Continuous Infusion Propofol IV”, “Continuous Infusion Lorazepam IV” or
-     * “Continuous Infusion Midazolam IV”) and activelyInfusing(MedicationAdministrations) then
+     * “Continuous Infusion Midazolam IV”) and isActivelyInfusing(MedicationAdministrations) then
      * Daily Sedation Interruption Candidate = “Yes”
      */
-    if (activelyInfusingSedative) {
-      return CandidateResult.YES;
-    }
-
-    // None of the specified circumstances were met.
-    return CandidateResult.INVALID;
+    return CandidateResult.YES;
   }
 }

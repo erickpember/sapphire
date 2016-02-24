@@ -33,6 +33,7 @@ public class DailySpontaneousBreathingTrialImpl {
   private static final BigDecimal FIVE = new BigDecimal("5");
   private static final BigDecimal EIGHT = new BigDecimal("8");
   private static final BigDecimal FIFTY = new BigDecimal("50");
+  private static final Long ACTIVELY_INFUSING_LOOKBACK = 4l;
   private static final List<String> HAVE_THESE_BEEN_ADMINISTERED = Arrays.asList(
       MedsSetEnum.INTERMITTENT_CISATRACURIUM_IV.getCode(),
       MedsSetEnum.INTERMITTENT_VECURONIUM_IV.getCode(),
@@ -217,6 +218,7 @@ public class DailySpontaneousBreathingTrialImpl {
 
     List<MedicationAdministration> adminsForEncounter = getAdminsForEncounter(encounterId);
 
+    // For intermittent meds.
     for (String medsSet : HAVE_THESE_BEEN_ADMINISTERED) {
       boolean administered = MedicationAdministrationUtils.inProgressOrCompletedInTimeFrame(
           adminsForEncounter, lastTwoHours, medsSet);
@@ -225,11 +227,16 @@ public class DailySpontaneousBreathingTrialImpl {
       }
     }
 
+    // For continuous meds.
+    Long nmbaLookbackHours = ACTIVELY_INFUSING_LOOKBACK + 2;
     for (String medsSet : ARE_THESE_IN_PROGRESS) {
-      boolean inProgress = MedicationAdministrationUtils.inProgressInTimeFrame(
-          MedicationAdministrationUtils.freshestOfAllOrders(adminsForEncounter).values(),
-          lastTwoHours, medsSet);
-      if (inProgress) {
+      if (MedicationAdministrationUtils.isActivelyInfusing(
+          adminsForEncounter,
+          medsSet,
+          now,
+          nmbaLookbackHours,
+          apiClient,
+          encounterId)) {
         return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.RECEIVING_NMBA);
       }
     }

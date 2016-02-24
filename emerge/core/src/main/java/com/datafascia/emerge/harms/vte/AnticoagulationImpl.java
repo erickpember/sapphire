@@ -4,9 +4,7 @@ package com.datafascia.emerge.harms.vte;
 
 import ca.uhn.fhir.model.dstu2.composite.IdentifierDt;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
-import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
-import ca.uhn.fhir.model.dstu2.valueset.MedicationOrderStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.domain.fhir.CodingSystems;
@@ -14,9 +12,11 @@ import com.datafascia.emerge.harms.HarmsLookups;
 import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
 import java.math.BigDecimal;
 import java.time.Clock;
+import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AnticoagulationImpl {
   private static final BigDecimal NEGATIVE_ONE = new BigDecimal("-1");
   private static final BigDecimal ZERO_POINT_EIGHT_SIX = new BigDecimal("0.86");
+  private static final Long ACTIVELY_INFUSING_LOOKBACK = 4l;
 
   @Inject
   private ClientBuilder apiClient;
@@ -42,11 +43,10 @@ public class AnticoagulationImpl {
    * @return optional anticoagulant type, or empty if none.
    */
   public Optional<AnticoagulationTypeEnum> getAnticoagulationType(String encounterId) {
-    List<MedicationOrder> orders = apiClient.getMedicationOrderClient()
-        .search(encounterId);
     List<MedicationAdministration> administrations = apiClient.getMedicationAdministrationClient()
         .search(encounterId);
-    return getAnticoagulationType(administrations, orders, encounterId);
+    return getAnticoagulationType(administrations, encounterId, Instant.now(clock),
+        apiClient);
   }
 
   /**
@@ -54,28 +54,22 @@ public class AnticoagulationImpl {
    *
    * @param administrations
    *     All medication administrations for an encounter.
-   * @param orders
-   *     All medication orders for an encounter.
    * @param encounterId
    *     encounter to search
+   * @param now
+   *     The current time.
+   * @param client
+   *     The API client.
    * @return optional anticoagulant type, or empty if none.
    */
   public Optional<AnticoagulationTypeEnum> getAnticoagulationType(
-      Collection<MedicationAdministration> administrations, Collection<MedicationOrder> orders,
-      String encounterId) {
+      Collection<MedicationAdministration> administrations,
+      String encounterId, Instant now,
+      ClientBuilder client) {
     administrations = MedicationAdministrationUtils.freshestOfAllOrders(administrations).values();
 
-    boolean isActive = false;
     for (MedicationAdministration admin : administrations) {
-      String orderId = admin.getPrescription().getReference().getIdPart();
-      for (MedicationOrder order : orders) {
-        if (order.getIdentifierFirstRep().getValue().equals(orderId)) {
-          isActive = MedicationOrderStatusEnum.ACTIVE.toString()
-              .equalsIgnoreCase(order.getStatus());
-          break;
-        }
-      }
-      if (!isActive) {
+      if (!MedicationAdministrationUtils.orderIsActiveOrDraft(admin, client, encounterId)) {
         continue;
       }
 
@@ -93,21 +87,19 @@ public class AnticoagulationImpl {
 
             // Get duration for evaluating completed admins.
             Long period = HarmsLookups.efficacyList.get(medsSet);
+            Long lookbackHours = ACTIVELY_INFUSING_LOOKBACK + TimeUnit.MILLISECONDS.toHours(period);
             DateTimeDt timeTaken = (DateTimeDt) admin.getEffectiveTime();
 
             if (medsSet.contains("Continuous")) {
-              if (MedicationAdministrationStatusEnum.IN_PROGRESS
-                  .equals(admin.getStatusElement().getValueAsEnum())) {
+              if (admin.getReasonNotGiven().isEmpty()
+                  && MedicationAdministrationUtils.isActivelyInfusing(
+                      admin,
+                      medsSet,
+                      now,
+                      lookbackHours,
+                      client,
+                      encounterId)) {
                 return Optional.of(antiType);
-              } else if (MedicationAdministrationStatusEnum.COMPLETED
-                  .equals(admin.getStatusElement().getValueAsEnum())
-                  || MedicationAdministrationStatusEnum.ON_HOLD
-                  .equals(admin.getStatusElement().getValueAsEnum())) {
-                if (MedicationAdministrationUtils.dosageOverZero(admin) &&
-                    admin.getReasonNotGiven().isEmpty() &&
-                    HarmsLookups.withinDrugPeriod(timeTaken.getValue(), period, clock)) {
-                  return Optional.of(antiType);
-                }
               }
             } else if (medsSet.contains("Intermittent")) {
               if (medsSet.equals(AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN

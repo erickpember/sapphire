@@ -4,9 +4,9 @@ package com.datafascia.emerge.harms.vae;
 
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.MedicationOrderUtils;
+import com.datafascia.emerge.ucsf.codes.MedsSetEnum;
 import javax.inject.Inject;
 
-import static com.datafascia.emerge.ucsf.codes.MedicationOrderEnum.STRESS_ULCER_PROPHYLACTICS;
 
 /**
  * VAE Stress Ulcer Prophylactics Order Status implementation
@@ -29,7 +29,7 @@ public class StressUlcerProphylacticsOrder {
         .stream()
         .filter(order -> order.getIdentifier().stream()
             .anyMatch(ident -> ident.getValue()
-                .equals(STRESS_ULCER_PROPHYLACTICS.getCode())))
+                .equals(MedsSetEnum.STRESS_ULCER_PROPHYLACTICS.getCode())))
         .anyMatch(order -> MedicationOrderUtils.isActiveOrDraft(order));
   }
 }

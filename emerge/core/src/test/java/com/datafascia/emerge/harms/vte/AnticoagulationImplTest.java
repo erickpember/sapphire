@@ -2,20 +2,19 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.harms.vte;
 
-import ca.uhn.fhir.model.dstu2.composite.RatioDt;
-import ca.uhn.fhir.model.dstu2.composite.ResourceReferenceDt;
-import ca.uhn.fhir.model.dstu2.composite.SimpleQuantityDt;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationOrderStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
-import ca.uhn.fhir.model.primitive.IdDt;
-import com.datafascia.domain.fhir.CodingSystems;
+import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.domain.fhir.IdentifierSystems;
+import com.datafascia.emerge.testUtils.TestResources;
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Date;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -33,34 +32,115 @@ public class AnticoagulationImplTest extends AnticoagulationImpl {
    */
   @Test
   public void testGetAnticoagulationType_List_String() {
-    List<MedicationOrder> orders = Arrays.asList(new MedicationOrder[] {createMedicationOrder()});
+    ClientBuilder apiClient = TestResources.createMockClient();
 
-    MedicationAdministration enoxPass = createMedicationAdministration(
+    MedicationAdministration enoxPass = TestResources.createMedicationAdministration(
+        "id",
         AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN.getCode(),
-        MedicationAdministrationStatusEnum.IN_PROGRESS, 1, "mg/kg");
+        MedicationAdministrationStatusEnum.IN_PROGRESS,
+        1,
+        "mg/kg",
+        DateTimeDt.withCurrentTime(),
+        "activeOrder");
 
-    assertEquals(getAnticoagulationType(Arrays.asList(enoxPass), orders, "whatever").get(),
+    assertEquals(getAnticoagulationType(Arrays.asList(enoxPass), "encounterId", Instant
+        .now(),
+        apiClient).get(),
         AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN);
 
-    MedicationAdministration enoxPass2 = createMedicationAdministration(
+    MedicationAdministration enoxPass2 = TestResources.createMedicationAdministration(
+        "id",
         AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN.getCode(),
-        MedicationAdministrationStatusEnum.IN_PROGRESS, 100, "mg");
+        MedicationAdministrationStatusEnum.IN_PROGRESS,
+        100,
+        "mg",
+        DateTimeDt.withCurrentTime(),
+        "activeOrder");
 
-    assertEquals(getAnticoagulationType(Arrays.asList(enoxPass2), orders, "whatever").get(),
+    assertEquals(getAnticoagulationType(Arrays.asList(enoxPass2), "encounterId", Instant
+        .now(),
+        apiClient).get(),
         AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN);
 
-    MedicationAdministration enoxFail = createMedicationAdministration(
+    MedicationAdministration enoxFail = TestResources.createMedicationAdministration(
+        "id",
         AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN.getCode(),
-        MedicationAdministrationStatusEnum.IN_PROGRESS, 85, "mg");
+        MedicationAdministrationStatusEnum.IN_PROGRESS,
+        85,
+        "mg",
+        DateTimeDt.withCurrentTime(),
+        "activeOrder");
 
-    assertFalse(getAnticoagulationType(Arrays.asList(enoxFail), orders, "whatever").isPresent());
+    assertFalse(
+        getAnticoagulationType(Arrays.asList(enoxFail), "encounterId", Instant.now(),
+            apiClient)
+        .isPresent());
 
-    MedicationAdministration argaPass = createMedicationAdministration(
+    MedicationAdministration argaPass = TestResources.createMedicationAdministration(
+        "id",
         AnticoagulationTypeEnum.CONTINUOUS_INFUSION_ARGATROBAN_IV.getCode(),
-        MedicationAdministrationStatusEnum.IN_PROGRESS, 85, "mg");
+        MedicationAdministrationStatusEnum.IN_PROGRESS,
+        85,
+        "mg",
+        DateTimeDt.withCurrentTime(),
+        "activeOrder");
 
-    assertEquals(getAnticoagulationType(Arrays.asList(argaPass), orders, "whatever").get(),
+    assertEquals(getAnticoagulationType(Arrays.asList(argaPass), "encounterId", Instant
+        .now(),
+        apiClient).get(),
         AnticoagulationTypeEnum.CONTINUOUS_INFUSION_ARGATROBAN_IV);
+
+    MedicationAdministration hepFailTooOldCompletedOrder = TestResources
+        .createMedicationAdministration(
+            "id",
+            AnticoagulationTypeEnum.CONTINUOUS_INFUSION_HEPARIN_IV.getCode(),
+            MedicationAdministrationStatusEnum.IN_PROGRESS,
+            85,
+            "mg",
+            new DateTimeDt(Date.from(Instant.now().minus(15, ChronoUnit.HOURS))),
+            "completedOrder");
+
+    assertFalse(getAnticoagulationType(Arrays.asList(hepFailTooOldCompletedOrder),
+        "encounterId",
+        Instant.now(),
+        apiClient)
+        .isPresent());
+
+    MedicationAdministration hepPassOldButActiveOrder = TestResources
+        .createMedicationAdministration(
+            "id",
+            AnticoagulationTypeEnum.CONTINUOUS_INFUSION_HEPARIN_IV.getCode(),
+            MedicationAdministrationStatusEnum.IN_PROGRESS,
+            85,
+            "mg",
+            new DateTimeDt(Date.from(Instant.now().minus(15, ChronoUnit.HOURS))),
+            "activeOrder");
+
+    assertEquals(getAnticoagulationType(Arrays.asList(hepPassOldButActiveOrder),
+        "encounterId",
+        Instant.now(),
+        apiClient).get(),
+        AnticoagulationTypeEnum.CONTINUOUS_INFUSION_HEPARIN_IV);
+
+    MedicationAdministration hepFailNewWithCompletedOrder = TestResources
+        .createMedicationAdministration(
+            "id",
+            AnticoagulationTypeEnum.CONTINUOUS_INFUSION_HEPARIN_IV.getCode(),
+            MedicationAdministrationStatusEnum.IN_PROGRESS,
+            85,
+            "mg",
+            new DateTimeDt(Date.from(Instant.now().minus(13, ChronoUnit.HOURS))),
+            "completedOrder");
+
+    assertFalse(getAnticoagulationType(Arrays.asList(hepFailNewWithCompletedOrder),
+        "encounterId",
+        Instant.now(),
+        apiClient).isPresent());
+  }
+
+  @Override
+  public BigDecimal getPatientWeight(String encounterId) {
+    return weight;
   }
 
   private MedicationOrder createMedicationOrder() {
@@ -69,31 +149,6 @@ public class AnticoagulationImplTest extends AnticoagulationImpl {
         .setSystem(IdentifierSystems.INSTITUTION_MEDICATION_ORDER);
     order.setStatus(MedicationOrderStatusEnum.ACTIVE);
     return order;
-  }
-
-  private MedicationAdministration createMedicationAdministration(String medsSet,
-      MedicationAdministrationStatusEnum status, int dose, String unit) {
-
-    MedicationAdministration administration = new MedicationAdministration();
-    administration.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_MEDICATION_ADMINISTRATION)
-        .setValue("whatever");
-    administration.addIdentifier()
-        .setSystem(CodingSystems.UCSF_MEDICATION_GROUP_NAME)
-        .setValue(medsSet);
-    administration.setStatus(status);
-    administration.setEffectiveTime(DateTimeDt.withCurrentTime());
-    MedicationAdministration.Dosage dosage = new MedicationAdministration.Dosage();
-    dosage.setQuantity(new SimpleQuantityDt(dose, "", unit));
-    dosage.setRate(new RatioDt());
-    administration.setDosage(dosage);
-    administration.setPrescription(new ResourceReferenceDt((new IdDt()).setValue("activeOrder")));
-    return administration;
-  }
-
-  @Override
-  public BigDecimal getPatientWeight(String encounterId) {
-    return weight;
   }
 
 }

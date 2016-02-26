@@ -39,7 +39,7 @@ public class DailySpontaneousBreathingTrialImpl {
       MedsSetEnum.INTERMITTENT_VECURONIUM_IV.getCode(),
       MedsSetEnum.INTERMITTENT_ROCURONIUM_IV.getCode(),
       MedsSetEnum.INTERMITTENT_PANCURONIUM_IV.getCode());
-  private static final List<String> ARE_THESE_IN_PROGRESS = Arrays.asList(
+  private static final List<String> ARE_THESE_ACTIVELY_INFUSING = Arrays.asList(
       MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode(),
       MedsSetEnum.CONTINUOUS_INFUSION_MIDAZOLAM_IV.getCode());
 
@@ -62,7 +62,7 @@ public class DailySpontaneousBreathingTrialImpl {
 
     Observations observations = apiClient.getObservationClient().list(encounterId);
 
-    return getValue(observations, now, encounterId);
+    return getValue(observations, now, encounterId, apiClient);
   }
 
   /**
@@ -74,12 +74,14 @@ public class DailySpontaneousBreathingTrialImpl {
    *     The current time.
    * @param encounterId
    *     The encounter in question.
+   * @param client
+   *     The API client.
    * @return
    *     Whether the trial was given, not given or contraindicated.
    */
   public DailySpontaneousBreathingTrialValueEnum getValue(Observations observations, Instant now,
-      String encounterId) {
-    if (getContraindicatedReason(observations, now, encounterId).isPresent()) {
+      String encounterId, ClientBuilder client) {
+    if (getContraindicatedReason(observations, now, encounterId, client).isPresent()) {
       return DailySpontaneousBreathingTrialValueEnum.CONTRAINDICATED;
     }
 
@@ -132,7 +134,7 @@ public class DailySpontaneousBreathingTrialImpl {
 
     Observations observations = apiClient.getObservationClient().list(encounterId);
 
-    return getContraindicatedReason(observations, now, encounterId);
+    return getContraindicatedReason(observations, now, encounterId, apiClient);
   }
 
   /**
@@ -145,10 +147,12 @@ public class DailySpontaneousBreathingTrialImpl {
    *     The current time.
    * @param encounterId
    *     The encounter in question.
+   * @param client
+   *     The API client.
    * @return optional contraindicated reason, empty if not found
    */
   public Optional<DailySpontaneousBreathingTrialContraindicatedEnum> getContraindicatedReason(
-      Observations observations, Instant now, String encounterId) {
+      Observations observations, Instant now, String encounterId, ClientBuilder client) {
     Instant twoHoursAgo = now.minus(2, ChronoUnit.HOURS);
     Instant twentyFiveHoursAgo = now.minus(25, ChronoUnit.HOURS);
     PeriodDt lastTwoHours = new PeriodDt()
@@ -229,13 +233,13 @@ public class DailySpontaneousBreathingTrialImpl {
 
     // For continuous meds.
     Long nmbaLookbackHours = ACTIVELY_INFUSING_LOOKBACK + 2;
-    for (String medsSet : ARE_THESE_IN_PROGRESS) {
+    for (String medsSet : ARE_THESE_ACTIVELY_INFUSING) {
       if (MedicationAdministrationUtils.isActivelyInfusing(
           adminsForEncounter,
           medsSet,
           now,
           nmbaLookbackHours,
-          apiClient,
+          client,
           encounterId)) {
         return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.RECEIVING_NMBA);
       }

@@ -6,16 +6,14 @@ import ca.uhn.fhir.model.api.IDatatype;
 import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
 import ca.uhn.fhir.model.dstu2.composite.CodeableConceptDt;
 import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
-import ca.uhn.fhir.model.dstu2.composite.RatioDt;
-import ca.uhn.fhir.model.dstu2.composite.SimpleQuantityDt;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import ca.uhn.fhir.model.primitive.StringDt;
+import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.client.Observations;
-import com.datafascia.domain.fhir.CodingSystems;
-import com.datafascia.domain.fhir.IdentifierSystems;
+import com.datafascia.emerge.testUtils.TestResources;
 import com.datafascia.emerge.ucsf.codes.MedsSetEnum;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import com.datafascia.emerge.ucsf.codes.ventilation.DailySpontaneousBreathingTrialContraindicatedEnum;
@@ -27,6 +25,7 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import org.testng.annotations.AfterMethod;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
@@ -36,10 +35,17 @@ import static org.testng.Assert.assertEquals;
  */
 public class DailySpontaneousBreathingTrialImplTest extends DailySpontaneousBreathingTrialImpl {
   private int observationCount;
-  private final String encounterId = "1";
+  private final String encounterId = "encounterId";
   private List<MedicationAdministration> admins = new ArrayList<>();
+  private final ClientBuilder mockClient;
 
   public DailySpontaneousBreathingTrialImplTest() {
+    mockClient = TestResources.createMockClient();
+  }
+
+  @AfterMethod
+  public void tearDown() {
+    admins = new ArrayList<>();
   }
 
   /**
@@ -50,7 +56,7 @@ public class DailySpontaneousBreathingTrialImplTest extends DailySpontaneousBrea
     Observation given = createObservation(ObservationCodeEnum.SPONTANEOUS_BREATHING_TRIAL.getCode(),
         "Yes");
     assertEquals(getValue(new Observations(Arrays.asList(given)), Instant.now(),
-        encounterId), DailySpontaneousBreathingTrialValueEnum.GIVEN);
+        encounterId, mockClient), DailySpontaneousBreathingTrialValueEnum.GIVEN);
 
     Observation pressureSupport = createObservation(ObservationCodeEnum.PRESSURE_SUPPORT.getCode(),
         4);
@@ -58,24 +64,24 @@ public class DailySpontaneousBreathingTrialImplTest extends DailySpontaneousBrea
     Observation fio2 = createObservation(ObservationCodeEnum.FIO2.getCode(), 49);
 
     assertEquals(getValue(new Observations(Arrays
-        .asList(pressureSupport, peep, fio2)), Instant.now(), encounterId),
+        .asList(pressureSupport, peep, fio2)), Instant.now(), encounterId, mockClient),
         DailySpontaneousBreathingTrialValueEnum.GIVEN);
 
     fio2 = createObservation(ObservationCodeEnum.FIO2.getCode(), 51);
     assertEquals(getValue(new Observations(Arrays
-        .asList(pressureSupport, peep, fio2)), Instant.now(), encounterId),
+        .asList(pressureSupport, peep, fio2)), Instant.now(), encounterId, mockClient),
         DailySpontaneousBreathingTrialValueEnum.CONTRAINDICATED);
 
     Observation notGiven = createObservation(ObservationCodeEnum.SPONTANEOUS_BREATHING_TRIAL
         .getCode(), "No");
     assertEquals(getValue(new Observations(Arrays.asList(notGiven)), Instant.now(),
-        encounterId), DailySpontaneousBreathingTrialValueEnum.NOT_GIVEN);
+        encounterId, mockClient), DailySpontaneousBreathingTrialValueEnum.NOT_GIVEN);
 
     Instant tooLongAgo = Instant.now().minus(26, ChronoUnit.HOURS);
     given.setEffective(new DateTimeDt(Date.from(tooLongAgo)));
 
     assertEquals(getValue(new Observations(Arrays.asList(given)), Instant.now(),
-        encounterId), DailySpontaneousBreathingTrialValueEnum.NOT_GIVEN);
+        encounterId, mockClient), DailySpontaneousBreathingTrialValueEnum.NOT_GIVEN);
   }
 
   /**
@@ -83,14 +89,21 @@ public class DailySpontaneousBreathingTrialImplTest extends DailySpontaneousBrea
    */
   @Test
   public void testGetContraindicatedReason_3args() {
-    MedicationAdministration nmba = createMedicationAdministration(
-        MedsSetEnum.INTERMITTENT_VECURONIUM_IV.getCode(),
-        MedicationAdministrationStatusEnum.IN_PROGRESS, 100, "mg");
+    MedicationAdministration intermittentNmba = TestResources
+        .createMedicationAdministration(
+            "id",
+            MedsSetEnum.INTERMITTENT_VECURONIUM_IV.getCode(),
+            MedicationAdministrationStatusEnum.IN_PROGRESS,
+            100,
+            "mg",
+            new DateTimeDt(Date.from(Instant.now().minus(1, ChronoUnit.HOURS))),
+            "completedOrder");
 
-    admins = Arrays.asList(nmba);
+    admins = Arrays.asList(intermittentNmba);
 
     assertEquals(getContraindicatedReason(new Observations(new ArrayList<>()), Instant.now(),
-        encounterId).get(), DailySpontaneousBreathingTrialContraindicatedEnum.RECEIVING_NMBA);
+        encounterId, mockClient).get(),
+        DailySpontaneousBreathingTrialContraindicatedEnum.RECEIVING_NMBA);
 
     admins = new ArrayList<>();
 
@@ -98,7 +111,8 @@ public class DailySpontaneousBreathingTrialImplTest extends DailySpontaneousBrea
         "1");
 
     assertEquals(getContraindicatedReason(new Observations(Arrays.asList(tof)), Instant.now(),
-        encounterId).get(), DailySpontaneousBreathingTrialContraindicatedEnum.RECEIVING_NMBA);
+        encounterId, mockClient).get(),
+        DailySpontaneousBreathingTrialContraindicatedEnum.RECEIVING_NMBA);
 
     tof.setEffective(new DateTimeDt(Date.from(Instant.now().minus(2,
         ChronoUnit.MINUTES))));
@@ -107,12 +121,77 @@ public class DailySpontaneousBreathingTrialImplTest extends DailySpontaneousBrea
         "4");
 
     assertEquals(getContraindicatedReason(new Observations(Arrays.asList(tof, tof2)), Instant.now(),
-        encounterId), Optional.empty());
+        encounterId, mockClient), Optional.empty());
 
     Observation fio2 = createObservation(ObservationCodeEnum.FIO2.getCode(), 51);
 
     assertEquals(getContraindicatedReason(new Observations(Arrays.asList(tof, tof2, fio2)), Instant
-        .now(), encounterId).get(), DailySpontaneousBreathingTrialContraindicatedEnum.FIO2_OVER_50);
+        .now(), encounterId, mockClient).get(),
+        DailySpontaneousBreathingTrialContraindicatedEnum.FIO2_OVER_50);
+
+    MedicationAdministration continuousCompletedNmba = TestResources
+        .createMedicationAdministration(
+            "id",
+            MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode(),
+            MedicationAdministrationStatusEnum.IN_PROGRESS,
+            100,
+            "mg",
+            new DateTimeDt(Date.from(Instant.now().minus(7, ChronoUnit.HOURS))),
+            "completedOrder");
+
+    admins = Arrays.asList(continuousCompletedNmba);
+
+    assertEquals(getContraindicatedReason(new Observations(new ArrayList<>()), Instant.now(),
+        encounterId, mockClient), Optional.empty());
+
+    MedicationAdministration continuousActiveNmba = TestResources
+        .createMedicationAdministration(
+            "id",
+            MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode(),
+            MedicationAdministrationStatusEnum.IN_PROGRESS,
+            100,
+            "mg",
+            new DateTimeDt(Date.from(Instant.now().minus(7, ChronoUnit.HOURS))),
+            "activeOrder");
+
+    admins = Arrays.asList(continuousActiveNmba);
+
+    assertEquals(getContraindicatedReason(new Observations(new ArrayList<>()), Instant.now(),
+        encounterId, mockClient).get(),
+        DailySpontaneousBreathingTrialContraindicatedEnum.RECEIVING_NMBA);
+
+    MedicationAdministration continuousActiveNmbaZeroDose = TestResources
+        .createMedicationAdministration(
+            "id",
+            MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode(),
+            MedicationAdministrationStatusEnum.IN_PROGRESS,
+            0,
+            "mg",
+            new DateTimeDt(Date.from(Instant.now().minus(7, ChronoUnit.HOURS))),
+            "activeOrder");
+
+    admins = Arrays.asList(continuousActiveNmbaZeroDose);
+
+    assertEquals(getContraindicatedReason(new Observations(new ArrayList<>()), Instant.now(),
+        encounterId, mockClient), Optional.empty());
+
+    MedicationAdministration recentCompletedNmba = TestResources
+        .createMedicationAdministration(
+            "id",
+            MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode(),
+            MedicationAdministrationStatusEnum.IN_PROGRESS,
+            100,
+            "mg",
+            new DateTimeDt(Date.from(Instant.now().minus(3, ChronoUnit.HOURS))),
+            "completedOrder");
+
+    admins = Arrays.asList(recentCompletedNmba);
+
+    assertEquals(getContraindicatedReason(new Observations(new ArrayList<>()), Instant.now(),
+        encounterId, mockClient).get(),
+        DailySpontaneousBreathingTrialContraindicatedEnum.RECEIVING_NMBA);
+
+    admins = new ArrayList<>();
   }
 
   @Override
@@ -138,25 +217,5 @@ public class DailySpontaneousBreathingTrialImplTest extends DailySpontaneousBrea
         .setEffective(effectiveTime);
     observation.setId(this.getClass().getSimpleName() + code + ":" + observationCount++);
     return observation;
-  }
-
-  private MedicationAdministration createMedicationAdministration(String medsSet,
-      MedicationAdministrationStatusEnum status, int dose, String unit) {
-
-    MedicationAdministration administration = new MedicationAdministration();
-    administration.addIdentifier()
-        .setSystem(IdentifierSystems.INSTITUTION_MEDICATION_ADMINISTRATION)
-        .setValue("whatever");
-    administration.addIdentifier()
-        .setSystem(CodingSystems.UCSF_MEDICATION_GROUP_NAME)
-        .setValue(medsSet);
-    administration.setStatus(status);
-    administration.setEffectiveTime(new DateTimeDt(Date.from(Instant.now().minus(1,
-        ChronoUnit.MINUTES))));
-    MedicationAdministration.Dosage dosage = new MedicationAdministration.Dosage();
-    dosage.setQuantity(new SimpleQuantityDt(dose, "", unit));
-    dosage.setRate(new RatioDt());
-    administration.setDosage(dosage);
-    return administration;
   }
 }

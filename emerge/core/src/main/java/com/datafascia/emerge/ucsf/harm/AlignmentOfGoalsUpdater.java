@@ -12,14 +12,17 @@ import com.datafascia.emerge.ucsf.CodeStatus;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.MedicalData;
 import com.datafascia.emerge.ucsf.PatientCareConferenceNote;
+import com.google.common.base.Strings;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Date;
 import javax.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Updates alignment of goals for a patient.
  */
+@Slf4j
 public class AlignmentOfGoalsUpdater {
 
   @Inject
@@ -66,6 +69,12 @@ public class AlignmentOfGoalsUpdater {
    */
   public void updateAdvanceDirective(HarmEvidence harmEvidence, Encounter encounter) {
     String patientId = encounter.getPatient().getReference().getIdPart();
+    if (Strings.isNullOrEmpty(patientId)) {
+      log.warn(
+          "Advance directive not updated because encounter {} lacks patient",
+          encounter.getId().getIdPart());
+      return;
+    }
 
     ADPOLST adpolst = getADPOLST(harmEvidence);
     adpolst.setAdValue(adpolstImpl.haveAdvanceDirective(patientId));

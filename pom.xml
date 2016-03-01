@@ -72,7 +72,6 @@
     <module>common/test</module>
     <module>domain/core</module>
     <module>emerge/core</module>
-    <module>emerge/csv</module>
     <module>etl/components</module>
     <module>etl/hl7-ingest</module>
     <module>etl/nar</module>

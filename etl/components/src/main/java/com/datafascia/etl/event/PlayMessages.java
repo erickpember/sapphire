@@ -3,7 +3,6 @@
 package com.datafascia.etl.event;
 
 import ca.uhn.fhir.model.dstu2.resource.Encounter;
-import com.codahale.metrics.Counter;
 import com.codahale.metrics.Meter;
 import com.codahale.metrics.MetricRegistry;
 import com.datafascia.common.persist.Id;
@@ -16,7 +15,8 @@ import com.google.common.base.Strings;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Consumer;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiConsumer;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,7 +24,7 @@ import lombok.extern.slf4j.Slf4j;
  * Plays pending HL7 messages for an encounter.
  */
 @Slf4j
-public class PlayMessages implements Consumer<String> {
+public class PlayMessages implements BiConsumer<String, AtomicInteger> {
 
   @Inject
   private EncounterRepository encounterRepository;
@@ -35,13 +35,10 @@ public class PlayMessages implements Consumer<String> {
   @Inject
   private HL7MessageProcessor hl7MessageProcessor;
 
-  private Counter pendingMessageCounter;
   private Meter processedMessageMeter;
 
   @Inject
   private void initialize(MetricRegistry metrics) {
-    pendingMessageCounter = metrics.counter(
-        MetricRegistry.name(ProcessHL7.class, "pendingMessageCount"));
     processedMessageMeter = metrics.meter(
         MetricRegistry.name(ProcessHL7.class, "processedMessages"));
   }
@@ -71,18 +68,21 @@ public class PlayMessages implements Consumer<String> {
    *
    * @param encounterIdentifier
    *     encounter identifier
+   * @param pendingMessageCount
+   *     to output pending message count
    */
-  public void accept(String encounterIdentifier) {
+  public void accept(String encounterIdentifier, AtomicInteger pendingMessageCount) {
     Id<Encounter> encounterId = Id.of(encounterIdentifier);
     List<EncounterMessage> messages = messageRepository.findByEncounterId(encounterId);
     log.info("Processing {} messages for encounter {}", messages.size(), encounterIdentifier);
-    pendingMessageCounter.inc(messages.size());
+    pendingMessageCount.set(messages.size());
 
     String lastProcessedMessageId = null;
     for (EncounterMessage message : messages) {
       processMessage(message.getPayload().array());
       lastProcessedMessageId = message.getId();
-      pendingMessageCounter.dec();
+
+      pendingMessageCount.decrementAndGet();
       processedMessageMeter.mark();
     }
 

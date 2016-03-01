@@ -8,7 +8,6 @@ import com.datafascia.etl.ucsf.hl7.ProcessHL7;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -43,40 +42,59 @@ public class EncounterExecutor implements Consumer<String> {
     }
   }
 
+  private static class Worker {
+    public ThreadPoolExecutor executor;
+    public AtomicInteger pendingMessageCount = new AtomicInteger();
+
+    public Worker(String id) {
+      executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(
+          1, new NamedThreadFactory(String.format(NAME_PREFIX, id)));
+    }
+  }
+
   private static final String NAME_PREFIX =
       EncounterExecutor.class.getSimpleName() + " encounter %s thread ";
 
   @Inject
   private PlayMessages playMessages;
 
-  private Map<String, ThreadPoolExecutor> identifierToExecutorMap = new HashMap<>();
+  private Map<String, Worker> encounterToWorkerMap = new HashMap<>();
 
   @Inject
   private void initialize(MetricRegistry metrics) {
     metrics.register(
         MetricRegistry.name(ProcessHL7.class, "pendingEncounterCount"),
-        (Gauge<Integer>) () -> identifierToExecutorMap.size());
+        (Gauge<Integer>) () -> encounterToWorkerMap.size());
+    metrics.register(
+        MetricRegistry.name(ProcessHL7.class, "pendingMessageCount"),
+        (Gauge<Integer>) () -> getPendingMessageCount());
   }
 
-  private ExecutorService getExecutor(String encounterIdentifier) {
-    return identifierToExecutorMap.computeIfAbsent(
+  private Worker getWorker(String encounterIdentifier) {
+    return encounterToWorkerMap.computeIfAbsent(
         encounterIdentifier,
-        id ->
-            (ThreadPoolExecutor) Executors.newFixedThreadPool(
-                1, new NamedThreadFactory(String.format(NAME_PREFIX, id))));
+        id -> new Worker(id));
   }
 
-  private void removeEmptyExecutors() {
-    Iterator<Map.Entry<String, ThreadPoolExecutor>> iterator =
-        identifierToExecutorMap.entrySet().iterator();
+  private void removeEmptyWorkers() {
+    Iterator<Map.Entry<String, Worker>> iterator =
+        encounterToWorkerMap.entrySet().iterator();
     while (iterator.hasNext()) {
-      Map.Entry<String, ThreadPoolExecutor> entry = iterator.next();
-      ThreadPoolExecutor executor = entry.getValue();
-      if (executor.getQueue().isEmpty()) {
-        executor.shutdown();
+      Map.Entry<String, Worker> entry = iterator.next();
+      Worker worker = entry.getValue();
+      if (worker.executor.getQueue().isEmpty()) {
+        worker.executor.shutdown();
         iterator.remove();
       }
     }
+  }
+
+  private int getPendingMessageCount() {
+    int count = 0;
+    for (Worker worker : encounterToWorkerMap.values()) {
+      count += worker.pendingMessageCount.get();
+    }
+    return count;
   }
 
   /**
@@ -86,9 +104,10 @@ public class EncounterExecutor implements Consumer<String> {
    *     encounter identifier
    */
   public synchronized void accept(String encounterIdentifier) {
-    ExecutorService executor = getExecutor(encounterIdentifier);
-    executor.submit(() -> playMessages.accept(encounterIdentifier));
+    Worker worker = getWorker(encounterIdentifier);
+    worker.executor.submit(
+        () -> playMessages.accept(encounterIdentifier, worker.pendingMessageCount));
 
-    removeEmptyExecutors();
+    removeEmptyWorkers();
   }
 }

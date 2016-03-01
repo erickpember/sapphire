@@ -31,6 +31,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import javax.inject.Inject;
 
 /**
@@ -115,7 +116,7 @@ public abstract class HarmEvidenceTestSupport extends ApiTestSupport {
   protected void processMessage(String hl7File) throws HL7Exception, IOException {
     String hl7 = readHL7Resource(hl7File);
     saveMessageByEncounter(hl7);
-    playMessages.accept(ENCOUNTER_IDENTIFIER);
+    playMessages.accept(ENCOUNTER_IDENTIFIER, new AtomicInteger());
   }
 
   protected void processNursingOrder(String jsonFile) throws IOException {

@@ -73,18 +73,43 @@ public class DailySedationInterruptionCandidate {
    */
   public CandidateResult getDailySedationInterruptionCandidate(String encounterId) {
     Instant nowInstance = Instant.now(clock);
-    Date now = Date.from(nowInstance);
-    Date twoHoursAgo = Date.from(nowInstance.minus(2, ChronoUnit.HOURS));
-    Date sevenHoursAgo = Date.from(nowInstance.minus(7, ChronoUnit.HOURS));
-    Date twentyFiveHoursAgo = Date.from(nowInstance.minus(25, ChronoUnit.HOURS));
-    Date fourtyEightHoursAgo = Date.from(nowInstance.minus(48, ChronoUnit.HOURS));
 
     // Gather the list of medication administrations we will be using.
-    List<MedicationAdministration> medicationAdministrations =
-        apiClient.getMedicationAdministrationClient().search(encounterId);
+    List<MedicationAdministration> medicationAdministrations = apiClient
+        .getMedicationAdministrationClient().search(encounterId);
+    return getDailySedationInterruptionCandidate(
+        encounterId,
+        medicationAdministrations,
+        nowInstance,
+        apiClient);
+  }
+
+  /**
+   * Determines if the patient is a candidate for daily sedation interruption.
+   *
+   * @param encounterId
+   *     Encounter to search.
+   * @param administrations
+   *     All medication administrations for an encounter.
+   * @param now
+   *     The current time.
+   * @param client
+   *     The API client.
+   * @return object encapsulating whether they are a candidate, and a reason for why not.
+   */
+  public CandidateResult getDailySedationInterruptionCandidate(
+      String encounterId,
+      Collection<MedicationAdministration> administrations,
+      Instant now,
+      ClientBuilder client) {
+    Date nowDate = Date.from(now);
+    Date twoHoursAgo = Date.from(now.minus(2, ChronoUnit.HOURS));
+    Date sevenHoursAgo = Date.from(now.minus(7, ChronoUnit.HOURS));
+    Date twentyFiveHoursAgo = Date.from(now.minus(25, ChronoUnit.HOURS));
+    Date fortyEightHoursAgo = Date.from(now.minus(48, ChronoUnit.HOURS));
 
     Collection<MedicationAdministration> freshestAdminForOrders
-        = MedicationAdministrationUtils.freshestOfAllOrders(medicationAdministrations).values();
+        = MedicationAdministrationUtils.freshestOfAllOrders(administrations).values();
 
     /* If there are no MedicationAdministration resources where
      * MedicationAdministration.identifier.value == (“Continuous Infusion Dexmedetomidine IV”,
@@ -94,16 +119,16 @@ public class DailySedationInterruptionCandidate {
     if (!MedicationAdministrationUtils.isActivelyInfusing(
         freshestAdminForOrders,
         MedsSetEnum.ANY_SEDATIVE_INFUSION.getCode(),
-        nowInstance,
+        now,
         ACTIVELY_INFUSING_LOOKBACK,
-        apiClient,
+        client,
         encounterId)) {
       return CandidateResult.OFF_SEDATION;
     }
 
     PeriodDt twoHourPeriod = new PeriodDt();
     twoHourPeriod.setStart(twoHoursAgo, TemporalPrecisionEnum.SECOND);
-    twoHourPeriod.setEnd(now, TemporalPrecisionEnum.SECOND);
+    twoHourPeriod.setEnd(nowDate, TemporalPrecisionEnum.SECOND);
 
     /* if there are any MedicationAdministration resources where
      * MedicationAdministration.identifier.value == (“Intermittent Cisatracurium IV”, “Intermittent
@@ -111,61 +136,61 @@ public class DailySedationInterruptionCandidate {
      * beenAdministered(MedicationAdministration) within the last 2 hours then Daily Sedation
      * Interruption Candidate = “No: Receiving NMBA”
      */
-    if (MedicationAdministrationUtils.beenAdministered(medicationAdministrations, twoHourPeriod,
+    if (MedicationAdministrationUtils.beenAdministered(administrations, twoHourPeriod,
         MedsSetEnum.ANY_BOLUS_NMBA.getCode())) {
       return CandidateResult.RECEIVING_NMBA;
     }
 
     Long nmbaLookbackHours = ACTIVELY_INFUSING_LOOKBACK + 2;
     if (MedicationAdministrationUtils.isActivelyInfusing(
-        medicationAdministrations,
+        administrations,
         MedsSetEnum.ANY_INFUSION_NMBA.getCode(),
-        nowInstance,
+        now,
         nmbaLookbackHours,
-        apiClient,
+        client,
         encounterId)) {
       return CandidateResult.RECEIVING_NMBA;
     }
 
     // Gather observations needed.
     String freshestTrainOfFour = ObservationUtils.getFreshestByCodeAfterTime(
-        apiClient, encounterId, ObservationCodeEnum.TRAIN_OF_FOUR.getCode(), twoHoursAgo)
+        client, encounterId, ObservationCodeEnum.TRAIN_OF_FOUR.getCode(), twoHoursAgo)
         .map(observation -> observation.getValue().toString())
         .orElse("");
 
     String freshestWakeUpAction = ObservationUtils.getFreshestByCodeAfterTime(
-        apiClient, encounterId, ObservationCodeEnum.SEDATION_WAKE_UP.getCode(), twentyFiveHoursAgo)
+        client, encounterId, ObservationCodeEnum.SEDATION_WAKE_UP.getCode(), twentyFiveHoursAgo)
         .map(observation -> observation.getValue().toString())
         .orElse("");
 
     List<ProcedureRequest> hypothermiaBlanketOrders = ProcedureRequestUtils.getByCodeAfterTime(
-        apiClient, encounterId, ProcedureRequestCodeEnum.HYPOTHERMIA_BLANKET_ORDER_1.getCode(),
+        client, encounterId, ProcedureRequestCodeEnum.HYPOTHERMIA_BLANKET_ORDER_1.getCode(),
         twentyFiveHoursAgo);
     hypothermiaBlanketOrders.addAll(ProcedureRequestUtils.getByCodeAfterTime(
-        apiClient, encounterId, ProcedureRequestCodeEnum.HYPOTHERMIA_BLANKET_ORDER_2.getCode(),
+        client, encounterId, ProcedureRequestCodeEnum.HYPOTHERMIA_BLANKET_ORDER_2.getCode(),
         twentyFiveHoursAgo));
 
     Optional<Observation> freshestCoolingPadStatusFromPast25Hours = ObservationUtils
-        .getFreshestByCodeAfterTime(apiClient, encounterId,
+        .getFreshestByCodeAfterTime(client, encounterId,
             ObservationCodeEnum.COOLING_PAD_STATUS.getCode(), twentyFiveHoursAgo);
 
     List<Observation> temperatureFromPast48Hours = ObservationUtils.getObservationByCodeAfterTime(
-        apiClient, encounterId, ObservationCodeEnum.TEMPERATURE.getCode(), fourtyEightHoursAgo);
+        client, encounterId, ObservationCodeEnum.TEMPERATURE.getCode(), fortyEightHoursAgo);
 
     List<Observation> coolingPadPatientTemperatureFromPast48Hours = ObservationUtils
-        .getObservationByCodeAfterTime(apiClient, encounterId,
-            ObservationCodeEnum.COOLING_PAD_PATIENT_TEMPERATURE.getCode(), fourtyEightHoursAgo);
+        .getObservationByCodeAfterTime(client, encounterId,
+            ObservationCodeEnum.COOLING_PAD_PATIENT_TEMPERATURE.getCode(), fortyEightHoursAgo);
 
     List<Observation> coolingPadWaterTemperatureFromPast48Hours = ObservationUtils
-        .getObservationByCodeAfterTime(apiClient, encounterId,
-            ObservationCodeEnum.COOLING_PAD_WATER_TEMPERATURE.getCode(), fourtyEightHoursAgo);
+        .getObservationByCodeAfterTime(client, encounterId,
+            ObservationCodeEnum.COOLING_PAD_WATER_TEMPERATURE.getCode(), fortyEightHoursAgo);
 
     Optional<Observation> freshestCoolingPadWaterTemperatureFromPast2Hours = ObservationUtils
-        .getFreshestByCodeAfterTime(apiClient, encounterId,
+        .getFreshestByCodeAfterTime(client, encounterId,
             ObservationCodeEnum.COOLING_PAD_WATER_TEMPERATURE.getCode(), twoHoursAgo);
 
     Optional<Observation> freshestActualRASSFromPast7Hours = ObservationUtils
-        .getFreshestByCodeAfterTime(apiClient, encounterId, ObservationCodeEnum.ACTUAL_RASS
+        .getFreshestByCodeAfterTime(client, encounterId, ObservationCodeEnum.ACTUAL_RASS
             .getCode(), sevenHoursAgo);
 
     /* if freshestTrainOfFour.getValue() == (“0”, “1”, “2”, “3”) then Daily Sedation Interruption
@@ -212,7 +237,7 @@ public class DailySedationInterruptionCandidate {
 
       if (obv.getValue() instanceof QuantityDt) {
         if (((QuantityDt) obv.getValue()).getValue().doubleValue() <= 36.5
-            && ObservationUtils.getEffectiveDate(obv).after(now)) {
+            && ObservationUtils.getEffectiveDate(obv).after(nowDate)) {
           allOverEqualThreeSixPointFive = false;
         }
       }
@@ -226,9 +251,9 @@ public class DailySedationInterruptionCandidate {
      * Hypothermia”
      */
     if (!hypothermiaBlanketOrders.isEmpty()
-        && (ProcedureRequestUtils.activeNonMedicationOrder(apiClient, encounterId,
+        && (ProcedureRequestUtils.activeNonMedicationOrder(client, encounterId,
             ProcedureRequestCodeEnum.HYPOTHERMIA_BLANKET_ORDER_1.getCode())
-        || ProcedureRequestUtils.activeNonMedicationOrder(apiClient, encounterId,
+        || ProcedureRequestUtils.activeNonMedicationOrder(client, encounterId,
             ProcedureRequestCodeEnum.HYPOTHERMIA_BLANKET_ORDER_2.getCode()))) {
       return CandidateResult.THERAPEUTIC_HYPOTHERMIA;
     }

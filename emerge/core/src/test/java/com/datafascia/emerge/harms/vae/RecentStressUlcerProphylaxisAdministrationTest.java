@@ -7,7 +7,6 @@ import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
-import com.datafascia.emerge.harms.vae.RecentStressUlcerProphylaxisAdministration;
 import com.datafascia.emerge.testUtils.TestResources;
 import com.datafascia.emerge.ucsf.codes.MedsSetEnum;
 import java.time.Instant;
@@ -37,7 +36,7 @@ public class RecentStressUlcerProphylaxisAdministrationTest
 
     MedicationAdministration supPassOldActiveOrder = TestResources.createMedicationAdministration(
         "id",
-        MedsSetEnum.STRESS_ULCER_PROPHYLACTICS.getCode(),
+        Arrays.asList(MedsSetEnum.STRESS_ULCER_PROPHYLACTICS.getCode()),
         MedicationAdministrationStatusEnum.IN_PROGRESS,
         1,
         "mg/kg",
@@ -50,7 +49,7 @@ public class RecentStressUlcerProphylaxisAdministrationTest
     MedicationAdministration supFailOldCompletedOrder = TestResources
         .createMedicationAdministration(
             "id",
-            MedsSetEnum.STRESS_ULCER_PROPHYLACTICS.getCode(),
+            Arrays.asList(MedsSetEnum.STRESS_ULCER_PROPHYLACTICS.getCode()),
             MedicationAdministrationStatusEnum.IN_PROGRESS,
             1,
             "mg/kg",
@@ -62,7 +61,7 @@ public class RecentStressUlcerProphylaxisAdministrationTest
 
     MedicationAdministration supPassNewAdmin = TestResources.createMedicationAdministration(
         "id",
-        MedsSetEnum.STRESS_ULCER_PROPHYLACTICS.getCode(),
+        Arrays.asList(MedsSetEnum.STRESS_ULCER_PROPHYLACTICS.getCode()),
         MedicationAdministrationStatusEnum.IN_PROGRESS,
         1,
         "mg/kg",
@@ -74,7 +73,7 @@ public class RecentStressUlcerProphylaxisAdministrationTest
 
     MedicationAdministration supFailReasonNotGiven = TestResources.createMedicationAdministration(
         "id",
-        MedsSetEnum.STRESS_ULCER_PROPHYLACTICS.getCode(),
+        Arrays.asList(MedsSetEnum.STRESS_ULCER_PROPHYLACTICS.getCode()),
         MedicationAdministrationStatusEnum.IN_PROGRESS,
         1,
         "mg/kg",

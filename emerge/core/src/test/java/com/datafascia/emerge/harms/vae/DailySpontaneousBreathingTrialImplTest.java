@@ -92,7 +92,7 @@ public class DailySpontaneousBreathingTrialImplTest extends DailySpontaneousBrea
     MedicationAdministration intermittentNmba = TestResources
         .createMedicationAdministration(
             "id",
-            MedsSetEnum.INTERMITTENT_VECURONIUM_IV.getCode(),
+            Arrays.asList(MedsSetEnum.INTERMITTENT_VECURONIUM_IV.getCode()),
             MedicationAdministrationStatusEnum.IN_PROGRESS,
             100,
             "mg",
@@ -132,7 +132,7 @@ public class DailySpontaneousBreathingTrialImplTest extends DailySpontaneousBrea
     MedicationAdministration continuousCompletedNmba = TestResources
         .createMedicationAdministration(
             "id",
-            MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode(),
+            Arrays.asList(MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode()),
             MedicationAdministrationStatusEnum.IN_PROGRESS,
             100,
             "mg",
@@ -147,7 +147,7 @@ public class DailySpontaneousBreathingTrialImplTest extends DailySpontaneousBrea
     MedicationAdministration continuousActiveNmba = TestResources
         .createMedicationAdministration(
             "id",
-            MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode(),
+            Arrays.asList(MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode()),
             MedicationAdministrationStatusEnum.IN_PROGRESS,
             100,
             "mg",
@@ -163,7 +163,7 @@ public class DailySpontaneousBreathingTrialImplTest extends DailySpontaneousBrea
     MedicationAdministration continuousActiveNmbaZeroDose = TestResources
         .createMedicationAdministration(
             "id",
-            MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode(),
+            Arrays.asList(MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode()),
             MedicationAdministrationStatusEnum.IN_PROGRESS,
             0,
             "mg",
@@ -178,7 +178,7 @@ public class DailySpontaneousBreathingTrialImplTest extends DailySpontaneousBrea
     MedicationAdministration recentCompletedNmba = TestResources
         .createMedicationAdministration(
             "id",
-            MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode(),
+            Arrays.asList(MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode()),
             MedicationAdministrationStatusEnum.IN_PROGRESS,
             100,
             "mg",

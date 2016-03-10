@@ -36,7 +36,7 @@ public class AnticoagulationImplTest extends AnticoagulationImpl {
 
     MedicationAdministration enoxPass = TestResources.createMedicationAdministration(
         "id",
-        AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN.getCode(),
+        Arrays.asList(AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN.getCode()),
         MedicationAdministrationStatusEnum.IN_PROGRESS,
         1,
         "mg/kg",
@@ -50,7 +50,7 @@ public class AnticoagulationImplTest extends AnticoagulationImpl {
 
     MedicationAdministration enoxPass2 = TestResources.createMedicationAdministration(
         "id",
-        AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN.getCode(),
+        Arrays.asList(AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN.getCode()),
         MedicationAdministrationStatusEnum.IN_PROGRESS,
         100,
         "mg",
@@ -64,7 +64,7 @@ public class AnticoagulationImplTest extends AnticoagulationImpl {
 
     MedicationAdministration enoxFail = TestResources.createMedicationAdministration(
         "id",
-        AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN.getCode(),
+        Arrays.asList(AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN.getCode()),
         MedicationAdministrationStatusEnum.IN_PROGRESS,
         85,
         "mg",
@@ -78,7 +78,7 @@ public class AnticoagulationImplTest extends AnticoagulationImpl {
 
     MedicationAdministration argaPass = TestResources.createMedicationAdministration(
         "id",
-        AnticoagulationTypeEnum.CONTINUOUS_INFUSION_ARGATROBAN_IV.getCode(),
+        Arrays.asList(AnticoagulationTypeEnum.CONTINUOUS_INFUSION_ARGATROBAN_IV.getCode()),
         MedicationAdministrationStatusEnum.IN_PROGRESS,
         85,
         "mg",
@@ -93,7 +93,7 @@ public class AnticoagulationImplTest extends AnticoagulationImpl {
     MedicationAdministration hepFailTooOldCompletedOrder = TestResources
         .createMedicationAdministration(
             "id",
-            AnticoagulationTypeEnum.CONTINUOUS_INFUSION_HEPARIN_IV.getCode(),
+            Arrays.asList(AnticoagulationTypeEnum.CONTINUOUS_INFUSION_HEPARIN_IV.getCode()),
             MedicationAdministrationStatusEnum.IN_PROGRESS,
             85,
             "mg",
@@ -109,7 +109,7 @@ public class AnticoagulationImplTest extends AnticoagulationImpl {
     MedicationAdministration hepPassOldButActiveOrder = TestResources
         .createMedicationAdministration(
             "id",
-            AnticoagulationTypeEnum.CONTINUOUS_INFUSION_HEPARIN_IV.getCode(),
+            Arrays.asList(AnticoagulationTypeEnum.CONTINUOUS_INFUSION_HEPARIN_IV.getCode()),
             MedicationAdministrationStatusEnum.IN_PROGRESS,
             85,
             "mg",
@@ -125,7 +125,7 @@ public class AnticoagulationImplTest extends AnticoagulationImpl {
     MedicationAdministration hepFailNewWithCompletedOrder = TestResources
         .createMedicationAdministration(
             "id",
-            AnticoagulationTypeEnum.CONTINUOUS_INFUSION_HEPARIN_IV.getCode(),
+            Arrays.asList(AnticoagulationTypeEnum.CONTINUOUS_INFUSION_HEPARIN_IV.getCode()),
             MedicationAdministrationStatusEnum.IN_PROGRESS,
             85,
             "mg",

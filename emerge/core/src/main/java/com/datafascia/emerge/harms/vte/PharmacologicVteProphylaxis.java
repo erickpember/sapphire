@@ -107,7 +107,6 @@ public class PharmacologicVteProphylaxis {
     }
 
     if ("mg/kg".equals(unit)) {
-      System.out.println("mg/kg");
       return (dose.compareTo(ZERO_POINT_EIGHT_SIX) < 0);
     } else if ("mg".equals(unit)) {
       BigDecimal weight = getPatientWeight(encounterId);

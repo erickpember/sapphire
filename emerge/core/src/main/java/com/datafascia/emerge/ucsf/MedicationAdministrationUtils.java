@@ -111,6 +111,11 @@ public class MedicationAdministrationUtils {
     allAdminsPerEncounter = freshestOfAllOrders(allAdminsPerEncounter).values();
 
     Date lowerTimeBound = Date.from(now.minus(hoursAgo, ChronoUnit.HOURS));
+
+    log.debug(
+        "isActivelyInfusing: encounter[{}], medsSet[{}], now[{}], hoursAgo[{}], lowerTimeBound[{}]",
+        encounterId, medsSet, now, hoursAgo, lowerTimeBound);
+
     return allAdminsPerEncounter.stream()
         .filter(admin -> hasMedsSet(admin, medsSet))
         .filter(admin -> dosageOverZero(admin))

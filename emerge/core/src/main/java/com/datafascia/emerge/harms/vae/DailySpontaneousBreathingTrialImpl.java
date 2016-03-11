@@ -19,7 +19,6 @@ import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -34,14 +33,6 @@ public class DailySpontaneousBreathingTrialImpl {
   private static final BigDecimal EIGHT = new BigDecimal("8");
   private static final BigDecimal FIFTY = new BigDecimal("50");
   private static final Long ACTIVELY_INFUSING_LOOKBACK = 4l;
-  private static final List<String> HAVE_THESE_BEEN_ADMINISTERED = Arrays.asList(
-      MedsSetEnum.INTERMITTENT_CISATRACURIUM_IV.getCode(),
-      MedsSetEnum.INTERMITTENT_VECURONIUM_IV.getCode(),
-      MedsSetEnum.INTERMITTENT_ROCURONIUM_IV.getCode(),
-      MedsSetEnum.INTERMITTENT_PANCURONIUM_IV.getCode());
-  private static final List<String> ARE_THESE_ACTIVELY_INFUSING = Arrays.asList(
-      MedsSetEnum.CONTINUOUS_INFUSION_LORAZEPAM_IV.getCode(),
-      MedsSetEnum.CONTINUOUS_INFUSION_MIDAZOLAM_IV.getCode());
 
   @Inject
   private Clock clock;
@@ -223,26 +214,23 @@ public class DailySpontaneousBreathingTrialImpl {
     List<MedicationAdministration> adminsForEncounter = getAdminsForEncounter(encounterId);
 
     // For intermittent meds.
-    for (String medsSet : HAVE_THESE_BEEN_ADMINISTERED) {
-      boolean administered = MedicationAdministrationUtils.inProgressOrCompletedInTimeFrame(
-          adminsForEncounter, lastTwoHours, medsSet);
-      if (administered) {
-        return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.RECEIVING_NMBA);
-      }
+    if (MedicationAdministrationUtils.inProgressOrCompletedInTimeFrame(
+        adminsForEncounter,
+        lastTwoHours,
+        MedsSetEnum.ANY_BOLUS_NMBA.getCode())) {
+      return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.RECEIVING_NMBA);
     }
 
     // For continuous meds.
     Long nmbaLookbackHours = ACTIVELY_INFUSING_LOOKBACK + 2;
-    for (String medsSet : ARE_THESE_ACTIVELY_INFUSING) {
-      if (MedicationAdministrationUtils.isActivelyInfusing(
-          adminsForEncounter,
-          medsSet,
-          now,
-          nmbaLookbackHours,
-          client,
-          encounterId)) {
-        return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.RECEIVING_NMBA);
-      }
+    if (MedicationAdministrationUtils.isActivelyInfusing(
+        adminsForEncounter,
+        MedsSetEnum.ANY_INFUSION_NMBA.getCode(),
+        now,
+        nmbaLookbackHours,
+        client,
+        encounterId)) {
+      return Optional.of(DailySpontaneousBreathingTrialContraindicatedEnum.RECEIVING_NMBA);
     }
 
     return Optional.empty();

@@ -195,6 +195,8 @@ public class NursingOrdersTransformer {
 
         for (Object order : orders) {
           if (order instanceof JSONObject) {
+            log.info("Handling nursing order " + ((JSONObject) order).get("OrderID")
+                + " for encounter" + encounterId);
             process((JSONObject) order, encounterId);
           }
         }

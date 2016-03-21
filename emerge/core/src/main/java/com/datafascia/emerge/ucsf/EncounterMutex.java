@@ -4,10 +4,12 @@ package com.datafascia.emerge.ucsf;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Semaphore;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Ensures exclusive access to resource.
  */
+@Slf4j
 public class EncounterMutex {
 
   private ConcurrentHashMap<String, Semaphore> identifierToLockMap = new ConcurrentHashMap<>();
@@ -21,6 +23,7 @@ public class EncounterMutex {
    */
   public void acquire(String identifier) {
     Semaphore lock = identifierToLockMap.computeIfAbsent(identifier, id -> new Semaphore(1, true));
+    log.debug("Acquiring mutex {} for encounter {}", lock, identifier);
     lock.acquireUninterruptibly();
     identifierToLockMap.put(identifier, lock);
   }
@@ -33,6 +36,9 @@ public class EncounterMutex {
    */
   public void release(String identifier) {
     Semaphore lock = identifierToLockMap.remove(identifier);
-    lock.release();
+    log.debug("Releasing mutex {} for encounter {}", lock, identifier);
+    if (lock != null) {
+      lock.release();
+    }
   }
 }

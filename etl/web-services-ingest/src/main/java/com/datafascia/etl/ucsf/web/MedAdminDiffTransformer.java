@@ -288,7 +288,7 @@ public class MedAdminDiffTransformer {
         }
       }
 
-      if (!foundDiff) {
+      if (foundDiff) {
         // Recreate the prescription based on the new data.
         medOrder = UcsfMedicationUtils.populateMedicationOrder(
             orderJson,

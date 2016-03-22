@@ -11,10 +11,12 @@ import ca.uhn.fhir.model.dstu2.resource.Procedure;
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import com.datafascia.common.persist.Id;
 import com.datafascia.domain.fhir.UnitedStatesPatient;
-import com.datafascia.emerge.ucsf.EncounterMutex;
 import com.datafascia.emerge.ucsf.HarmEvidence;
 import com.datafascia.emerge.ucsf.MedicalData;
 import com.datafascia.emerge.ucsf.persist.HarmEvidenceRepository;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.cache.CacheLoader;
+import com.google.common.cache.LoadingCache;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -75,9 +77,6 @@ public class HarmEvidenceUpdater {
   }
 
   @Inject
-  private EncounterMutex encounterMutex;
-
-  @Inject
   private HarmEvidenceRepository harmEvidenceRepository;
 
   @Inject
@@ -105,6 +104,16 @@ public class HarmEvidenceUpdater {
   private PainAndDeliriumUpdater painAndDeliriumUpdater;
 
   private KieBase base;
+  private LoadingCache<String, Object> encounterIdToLockMap = CacheBuilder.newBuilder()
+      .maximumSize(256)
+      .build(
+          new CacheLoader<String, Object>() {
+            @Override
+            public Object load(String encounterId) throws Exception {
+              return new Object();
+            }
+          }
+      );
 
   /**
    * Constructor
@@ -183,11 +192,11 @@ public class HarmEvidenceUpdater {
       Object... additionalFacts) {
 
     String encounterIdentifier = encounter.getIdentifierFirstRep().getValue();
-    encounterMutex.acquire(encounterIdentifier);
-    try {
+    Object lock = encounterIdToLockMap.getUnchecked(encounterIdentifier);
+    log.debug("Acquiring lock for encounter {}", encounterIdentifier);
+    synchronized (lock) {
       doExecuteWithObservations(eventType, encounter, observations, additionalFacts);
-    } finally {
-      encounterMutex.release(encounterIdentifier);
+      log.debug("Releasing lock for encounter {}", encounterIdentifier);
     }
   }
 

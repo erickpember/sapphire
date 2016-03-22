@@ -5,9 +5,9 @@ package com.datafascia.etl.event;
 import com.codahale.metrics.Gauge;
 import com.codahale.metrics.MetricRegistry;
 import com.datafascia.etl.ucsf.hl7.ProcessHL7;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -58,7 +58,7 @@ public class EncounterExecutor implements Consumer<String> {
   @Inject
   private PlayMessages playMessages;
 
-  private Map<String, Worker> encounterToWorkerMap = new HashMap<>();
+  private ConcurrentHashMap<String, Worker> encounterToWorkerMap = new ConcurrentHashMap<>();
 
   @Inject
   private void initialize(MetricRegistry metrics) {

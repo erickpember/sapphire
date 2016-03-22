@@ -11,7 +11,6 @@ import com.datafascia.domain.persist.EncounterMessageRepository;
 import com.datafascia.domain.persist.EncounterRepository;
 import com.datafascia.etl.hl7.HL7MessageProcessor;
 import com.datafascia.etl.ucsf.hl7.ProcessHL7;
-import com.google.common.base.Strings;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
@@ -77,17 +76,12 @@ public class PlayMessages implements BiConsumer<String, AtomicInteger> {
     log.info("Processing {} messages for encounter {}", messages.size(), encounterIdentifier);
     pendingMessageCount.set(messages.size());
 
-    String lastProcessedMessageId = null;
     for (EncounterMessage message : messages) {
       processMessage(message.getPayload().array());
-      lastProcessedMessageId = message.getId();
+      messageRepository.saveLastProcessedMessageId(encounterId, message.getId());
 
       pendingMessageCount.decrementAndGet();
       processedMessageMeter.mark();
-    }
-
-    if (!Strings.isNullOrEmpty(lastProcessedMessageId)) {
-      messageRepository.saveLastProcessedMessageId(encounterId, lastProcessedMessageId);
     }
   }
 }

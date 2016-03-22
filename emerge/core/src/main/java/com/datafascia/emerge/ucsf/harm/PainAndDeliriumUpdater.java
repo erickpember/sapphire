@@ -18,6 +18,7 @@ import com.datafascia.emerge.harms.pain.VerbalPainLevel;
 import com.datafascia.emerge.harms.rass.RassGoalImpl;
 import com.datafascia.emerge.harms.rass.RassGoalImpl.RassGoalResult;
 import com.datafascia.emerge.harms.rass.RassLevel;
+import com.datafascia.emerge.harms.rass.RassLevel.AllRassLevels;
 import com.datafascia.emerge.harms.rass.RassLevel.CurrentRassLevel;
 import com.datafascia.emerge.harms.rass.RassLevel.MinimumOrMaximumRassLevel;
 import com.datafascia.emerge.harms.vae.DailySedationInterruptionCandidate;
@@ -283,19 +284,21 @@ public class PainAndDeliriumUpdater {
         .withGoal(rassGoalResult.getGoal())
         .withDataEntryTime(rassGoalResult.getDataEntryTime());
 
-    CurrentRassLevel currentLevel = rassLevelImpl.getCurrentRassLevel(encounterId);
+    AllRassLevels rassLevels = rassLevelImpl.getAllRassLevels(encounterId);
+
+    CurrentRassLevel currentLevel = rassLevels.getCurrent();
     CurrentScore___ currentScore = new CurrentScore___()
         .withRASSScore(currentLevel.getRassScore())
         .withTimeOfDataAquisition(currentLevel.getTimeOfDataAquisition());
 
-    MinimumOrMaximumRassLevel maxLevel = rassLevelImpl.getRassMax(encounterId);
+    MinimumOrMaximumRassLevel maxLevel = rassLevels.getMax();
     DailyMax___ dailyMax = new DailyMax___()
         .withEndOfTimePeriod(maxLevel.getEndOfTimePeriod())
         .withRASSMax(maxLevel.getRassScore())
         .withStartOfTimePeriod(maxLevel.getStartOfTimePeriod())
         .withTimeOfCalculation(maxLevel.getTimeOfCalculation());
 
-    MinimumOrMaximumRassLevel minLevel = rassLevelImpl.getRassMin(encounterId);
+    MinimumOrMaximumRassLevel minLevel = rassLevels.getMin();
     DailyMin___ dailyMin = new DailyMin___()
         .withEndOfTimePeriod(minLevel.getEndOfTimePeriod())
         .withRASSMin(minLevel.getRassScore())

@@ -32,6 +32,16 @@ public class RassLevel {
   private Clock clock;
 
   /**
+   * Result container for all of the pain and delirium RASS level (current + minimum + maximum)
+   */
+  @Data @Builder
+  public static class AllRassLevels {
+    private CurrentRassLevel current;
+    private MinimumOrMaximumRassLevel min;
+    private MinimumOrMaximumRassLevel max;
+  }
+
+  /**
    * Result container for the pain and delirium RASS level (current)
    */
   @Data @Builder
@@ -63,6 +73,25 @@ public class RassLevel {
   }
 
   /**
+   * Wraps implementation for all pain and delirium RASS levels (current, minimum, maximum)
+   *
+   * @param encounterId
+   *     encounter to check.
+   * @return Current, minimum and maximum RASS levels.
+   */
+  public AllRassLevels getAllRassLevels(String encounterId) {
+    CurrentRassLevel currentLevel = getCurrentRassLevel(encounterId);
+    MinimumOrMaximumRassLevel maxLevel = getRassMax(encounterId);
+    MinimumOrMaximumRassLevel minLevel = getRassMin(encounterId);
+
+    return AllRassLevels.builder()
+        .current(currentLevel)
+        .min(minLevel)
+        .max(maxLevel)
+        .build();
+  }
+
+  /**
    * Implements the pain and delirium RASS level (current)
    * Returns the RASS level and acquisition time from the newest RASS-coded observation.
    *
@@ -70,7 +99,7 @@ public class RassLevel {
    *     encounter to check.
    * @return RASS level and time of acquisition, or {@code null} if not found
    */
-  public CurrentRassLevel getCurrentRassLevel(String encounterId) {
+  private CurrentRassLevel getCurrentRassLevel(String encounterId) {
     PeriodDt sevenHoursAgo = Periods.getPastHoursToNow(clock, 7);
 
     CurrentRassLevel result = CurrentRassLevel.builder()
@@ -81,8 +110,9 @@ public class RassLevel {
     Observations observations = apiClient.getObservationClient().list(encounterId);
 
     Optional<Observation> freshestRassScore = observations.filter(
-        ObservationCodeEnum.RASS.getCode(), sevenHoursAgo.getStart().toInstant(),
-            sevenHoursAgo.getEnd().toInstant())
+        ObservationCodeEnum.RASS.getCode(),
+        sevenHoursAgo.getStart().toInstant(),
+        sevenHoursAgo.getEnd().toInstant())
         .max(Observations.EFFECTIVE_COMPARATOR);
 
     if (freshestRassScore.isPresent()) {
@@ -102,7 +132,7 @@ public class RassLevel {
    * @return RASS level, along with the period between midnight and now,
    *     or {@code null} if not found
    */
-  public MinimumOrMaximumRassLevel getRassMin(String encounterId) {
+  private MinimumOrMaximumRassLevel getRassMin(String encounterId) {
     return getDailyMinOrMax(encounterId, MinOrMax.MIN);
   }
 
@@ -116,7 +146,7 @@ public class RassLevel {
    * @return RASS level, along with the period between midnight and now,
    *     or {@code null} if not found
    */
-  public MinimumOrMaximumRassLevel getRassMax(String encounterId) {
+  private MinimumOrMaximumRassLevel getRassMax(String encounterId) {
     return getDailyMinOrMax(encounterId, MinOrMax.MAX);
   }
 

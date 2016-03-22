@@ -36,7 +36,7 @@ public class RassGoalImpl {
   private Clock clock;
 
   /**
-   * Checks if observation is relevant to Target RASS.
+   * Checks if procedure request is relevant to Target RASS.
    *
    * @param request
    *     the procedureRequest to check

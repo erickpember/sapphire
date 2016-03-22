@@ -76,13 +76,13 @@ public class EncounterExecutor implements Consumer<String> {
         id -> new Worker(id));
   }
 
-  private void removeEmptyWorkers() {
+  private void removeIdleWorkers() {
     Iterator<Map.Entry<String, Worker>> iterator =
         encounterToWorkerMap.entrySet().iterator();
     while (iterator.hasNext()) {
       Map.Entry<String, Worker> entry = iterator.next();
       Worker worker = entry.getValue();
-      if (worker.executor.getQueue().isEmpty()) {
+      if (worker.executor.getActiveCount() == 0 && worker.executor.getQueue().isEmpty()) {
         worker.executor.shutdown();
         iterator.remove();
       }
@@ -108,6 +108,6 @@ public class EncounterExecutor implements Consumer<String> {
     worker.executor.submit(
         () -> playMessages.accept(encounterIdentifier, worker.pendingMessageCount));
 
-    removeEmptyWorkers();
+    removeIdleWorkers();
   }
 }

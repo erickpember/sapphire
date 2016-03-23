@@ -10,10 +10,12 @@ import ca.uhn.fhir.rest.gclient.StringClientParam;
 import com.google.common.base.Strings;
 import java.util.ArrayList;
 import java.util.List;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Client utilities for Flag resources.
  */
+@Slf4j
 public class FlagClient extends BaseClient<Flag> {
   /**
    * Builds a FlagClient
@@ -63,11 +65,17 @@ public class FlagClient extends BaseClient<Flag> {
    */
   public List<Flag> searchFlag(String patientId, String code,
       String status) {
-    Bundle results = client.search().forResource(Flag.class)
-        .where(new StringClientParam(Flag.SP_PATIENT)
-            .matches()
-            .value(patientId))
-        .execute();
+    Bundle results = null;
+    try {
+      results = client.search().forResource(Flag.class)
+          .where(new StringClientParam(Flag.SP_PATIENT)
+              .matches()
+              .value(patientId))
+          .execute();
+    } catch (RuntimeException e) {
+      log.error("FlagClient search by patient failed. patientId:[{}]", patientId);
+      return new ArrayList<>();
+    }
 
     List<Flag> flags = extractBundle(results, Flag.class);
 

@@ -41,7 +41,7 @@ public class BenzodiazepineAvoidance {
    * Determines whether benzodiazepine avoidance is contraindicated.
    *
    * @param observations
-   *     The encounter to check.
+   *     The observations for an encounter.
    * @param now
    *     The current time.
    * @return Whether benzodiazepine avoidance is contraindicated.

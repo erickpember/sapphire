@@ -21,8 +21,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.CopyOnWriteArrayList;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 import org.json.simple.JSONArray;
@@ -43,6 +45,12 @@ public class NursingOrdersTransformer {
 
   @Inject
   private HarmEvidenceUpdater harmEvidenceUpdater;
+
+  // Encounter ID to thread handling its update.
+  private HashMap<String, Thread> threadMap = new HashMap<>();
+  // Data waiting for update to time it has been waiting since.
+  protected static CopyOnWriteArrayList<NursingOrderPendingUpdate> waitingList
+      = new CopyOnWriteArrayList<>();
 
   /**
    * A comparator class for medication order JSON blobs.
@@ -149,7 +157,7 @@ public class NursingOrdersTransformer {
     }
   }
 
-  private void process(JSONObject order, String encounterId) {
+  private Encounter process(JSONObject order, String encounterId, List<ProcedureRequest> requests) {
     Encounter encounter;
     try {
       encounter = apiClient.getEncounterClient().getEncounter(encounterId);
@@ -158,12 +166,21 @@ public class NursingOrdersTransformer {
           "Encounter ID [{}] not found. Discarded nursing order ID {}",
           encounterId,
           order.get("OrderID"));
-      return;
+      return null;
     }
 
     ProcedureRequest request = toProcedureRequest(order, encounter);
     save(request);
-    harmEvidenceUpdater.updateProcedureRequest(request, encounter);
+    requests.add(request);
+    return encounter;
+  }
+
+  private void clearFinishedThreads() {
+    for (String key : threadMap.keySet()) {
+      if (!threadMap.get(key).isAlive()) {
+        threadMap.remove(key);
+      }
+    }
   }
 
   /**
@@ -173,6 +190,7 @@ public class NursingOrdersTransformer {
    *     nursing order in JSON format
    */
   public void accept(String jsonString) {
+    clearFinishedThreads();
     JSONObject jsonObject;
     try {
       jsonObject = (JSONObject) new JSONParser().parse(jsonString);
@@ -188,6 +206,8 @@ public class NursingOrdersTransformer {
     JSONArray patients = (JSONArray) jsonObject.get("Patient");
     for (Object patient : patients) {
       if (patient instanceof JSONObject) {
+        List<ProcedureRequest> requests = new ArrayList<ProcedureRequest>();
+        Encounter encounter = null;
         String encounterId = ((JSONObject) patient).get("CSN").toString();
         JSONArray orders = (JSONArray) ((JSONObject) patient).get("Orders");
 
@@ -195,12 +215,50 @@ public class NursingOrdersTransformer {
 
         for (Object order : orders) {
           if (order instanceof JSONObject) {
-            log.info("Handling nursing order " + ((JSONObject) order).get("OrderID")
+            log.debug("Handling nursing order " + ((JSONObject) order).get("OrderID")
                 + " for encounter" + encounterId);
-            process((JSONObject) order, encounterId);
+            encounter = process((JSONObject) order, encounterId, requests);
           }
         }
+        if (!requests.isEmpty()) {
+          log.debug("Enqueueing update for encounter " + encounter);
+          enqueueUpdate(new NursingOrderPendingUpdate(requests, encounter));
+        }
       }
+    }
+  }
+
+  private void enqueueUpdate(NursingOrderPendingUpdate update) {
+    boolean foundThread = false;
+    for (String encounterId : threadMap.keySet()) {
+      if (update.getEncounter().getIdentifierFirstRep().getValue().equals(encounterId)) {
+        foundThread = true;
+        break;
+      }
+    }
+
+    if (foundThread) {
+      // A thread is already working on this update. Next to check if another update is queued.
+      boolean waitingFound = false;
+      for (NursingOrderPendingUpdate updateWaiting: waitingList) {
+        if (update.getEncounter().getIdentifierFirstRep().getValue()
+            .equals(updateWaiting.getEncounter().getIdentifierFirstRep().getValue())) {
+          // Another update is already queued, add the facts to it.
+          updateWaiting.getRequests().addAll(update.getRequests());
+          waitingFound = true;
+          break;
+        }
+      }
+
+      if (!waitingFound) {
+        // There's nothing already waiting, so let's queue it up.
+        waitingList.add(update);
+      }
+    } else {
+      // There's no thrad handling the update, start one.
+      Thread nursingThread = new Thread(new NursingOrderRunnable(update, harmEvidenceUpdater));
+      nursingThread.start();
+      threadMap.put(update.getEncounter().getIdentifierFirstRep().getValue(), nursingThread);
     }
   }
 }

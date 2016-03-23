@@ -204,6 +204,7 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
   @Test
   public void should_export_rass_goal_2() throws Exception {
     processNursingOrder("rass-goal-2.json");
+    Thread.sleep(1000);
 
     HarmEvidence harmEvidence = readHarmEvidence();
     RASS rass = harmEvidence.getMedicalData().getDelirium().getRASS();

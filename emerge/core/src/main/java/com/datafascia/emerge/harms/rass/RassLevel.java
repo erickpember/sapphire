@@ -10,9 +10,11 @@ import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.Periods;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import java.time.Clock;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import lombok.Builder;
 import lombok.Data;
@@ -30,6 +32,8 @@ public class RassLevel {
 
   @Inject
   private Clock clock;
+
+  private static final int RASS_LEVEL_LOOKBACK = 7;
 
   /**
    * Result container for all of the pain and delirium RASS level (current + minimum + maximum)
@@ -74,15 +78,40 @@ public class RassLevel {
 
   /**
    * Wraps implementation for all pain and delirium RASS levels (current, minimum, maximum)
+   * Handles all the observation filtering required.
    *
    * @param encounterId
    *     encounter to check.
    * @return Current, minimum and maximum RASS levels.
    */
   public AllRassLevels getAllRassLevels(String encounterId) {
-    CurrentRassLevel currentLevel = getCurrentRassLevel(encounterId);
-    MinimumOrMaximumRassLevel maxLevel = getRassMax(encounterId);
-    MinimumOrMaximumRassLevel minLevel = getRassMin(encounterId);
+    PeriodDt currentRassTimeRange = Periods.getPastHoursToNow(clock, RASS_LEVEL_LOOKBACK);
+    PeriodDt rassMinMaxTimeRange = Periods.getMidnightToNow(clock);
+
+    Instant lowestTimeBound = null;
+    if (currentRassTimeRange.getStart().after(rassMinMaxTimeRange.getStart())) {
+      lowestTimeBound = rassMinMaxTimeRange.getStart().toInstant();
+    } else {
+      lowestTimeBound = currentRassTimeRange.getStart().toInstant();
+    }
+
+    Observations observations = apiClient.getObservationClient().list(encounterId);
+    List<Observation> recentRassObservations = observations.list(ObservationCodeEnum.RASS.getCode(),
+        lowestTimeBound, null);
+
+    List<Observation> rassLevelObservations = recentRassObservations
+        .stream()
+        .filter(obs -> ObservationUtils.insideTimeFrame(obs, currentRassTimeRange))
+        .collect(Collectors.toList());
+    CurrentRassLevel currentLevel = getCurrentRassLevel(rassLevelObservations,
+        currentRassTimeRange);
+
+    List<Observation> rassMinMaxObservations = recentRassObservations
+        .stream()
+        .filter(obs -> ObservationUtils.insideTimeFrame(obs, rassMinMaxTimeRange))
+        .collect(Collectors.toList());
+    MinimumOrMaximumRassLevel maxLevel = getRassMax(rassMinMaxObservations, rassMinMaxTimeRange);
+    MinimumOrMaximumRassLevel minLevel = getRassMin(rassMinMaxObservations, rassMinMaxTimeRange);
 
     return AllRassLevels.builder()
         .current(currentLevel)
@@ -95,24 +124,20 @@ public class RassLevel {
    * Implements the pain and delirium RASS level (current)
    * Returns the RASS level and acquisition time from the newest RASS-coded observation.
    *
-   * @param encounterId
-   *     encounter to check.
+   * @param observations
+   *     The relevant observations for an encounter.
+   * @param timeRange
+   *     The time bound for this search.
    * @return RASS level and time of acquisition, or {@code null} if not found
    */
-  private CurrentRassLevel getCurrentRassLevel(String encounterId) {
-    PeriodDt sevenHoursAgo = Periods.getPastHoursToNow(clock, 7);
+  private CurrentRassLevel getCurrentRassLevel(List<Observation> observations, PeriodDt timeRange) {
 
     CurrentRassLevel result = CurrentRassLevel.builder()
         .rassScore(11)
-        .timeOfDataAquisition(sevenHoursAgo.getStart())
+        .timeOfDataAquisition(timeRange.getStart())
         .build();
 
-    Observations observations = apiClient.getObservationClient().list(encounterId);
-
-    Optional<Observation> freshestRassScore = observations.filter(
-        ObservationCodeEnum.RASS.getCode(),
-        sevenHoursAgo.getStart().toInstant(),
-        sevenHoursAgo.getEnd().toInstant())
+    Optional<Observation> freshestRassScore = observations.stream()
         .max(Observations.EFFECTIVE_COMPARATOR);
 
     if (freshestRassScore.isPresent()) {
@@ -127,13 +152,15 @@ public class RassLevel {
    * Returns the lowest RASS level from a period of between midnight and now, along with the
    * same period and a calculation time of now.
    *
-   * @param encounterId
-   *     encounter to check.
+   * @param observations
+   *     The relevant observations for an encounter.
+   * @param timeRange
+   *     The time bound for this search.
    * @return RASS level, along with the period between midnight and now,
    *     or {@code null} if not found
    */
-  private MinimumOrMaximumRassLevel getRassMin(String encounterId) {
-    return getDailyMinOrMax(encounterId, MinOrMax.MIN);
+  private MinimumOrMaximumRassLevel getRassMin(List<Observation> observations, PeriodDt timeRange) {
+    return getDailyMinOrMax(observations, timeRange, MinOrMax.MIN);
   }
 
   /**
@@ -141,13 +168,15 @@ public class RassLevel {
    * Returns the highest RASS level from a period of between midnight and now, along with the
    * same period and a calculation time of now.
    *
-   * @param encounterId
-   *     encounter to check.
+   * @param observations
+   *     The relevant observations for an encounter.
+   * @param timeRange
+   *     The time bound for this search.
    * @return RASS level, along with the period between midnight and now,
    *     or {@code null} if not found
    */
-  private MinimumOrMaximumRassLevel getRassMax(String encounterId) {
-    return getDailyMinOrMax(encounterId, MinOrMax.MAX);
+  private MinimumOrMaximumRassLevel getRassMax(List<Observation> observations, PeriodDt timeRange) {
+    return getDailyMinOrMax(observations, timeRange, MinOrMax.MAX);
   }
 
   /**
@@ -155,40 +184,37 @@ public class RassLevel {
    * Returns the RASS level and acquisition time from the newest observation with
    * either the highest or lowest level, depending on MinOrMax.
    *
-   * @param encounterId
-   *     encounter to check.
-   * @param minOrMax
-   *     Whether to return the highest or lowest RASS level.
+   * @param observations
+   *     The relevant observations for an encounter.
+   * @param timeRange
+   *     The time bound for this search.
    * @return RASS level, along with the period between midnight and now,
    *     or {@code null} if not found
    */
-  private MinimumOrMaximumRassLevel getDailyMinOrMax(String encounterId, MinOrMax minOrMax) {
-    PeriodDt sinceMidnight = Periods.getMidnightToNow(clock);
-
+  private MinimumOrMaximumRassLevel getDailyMinOrMax(List<Observation> observations,
+      PeriodDt timeRange,
+      MinOrMax minOrMax) {
     MinimumOrMaximumRassLevel result = MinimumOrMaximumRassLevel
         .builder()
         .rassScore(11)
-        .timeOfCalculation(sinceMidnight.getEnd())
-        .startOfTimePeriod(sinceMidnight.getStart())
-        .endOfTimePeriod(sinceMidnight.getEnd()).build();
-
-    List<Observation> observationsSinceMidnight = ObservationUtils.searchByTimeFrame(apiClient,
-        encounterId, sinceMidnight);
+        .timeOfCalculation(timeRange.getEnd())
+        .startOfTimePeriod(timeRange.getStart())
+        .endOfTimePeriod(timeRange.getEnd()).build();
 
     Observation highestOrLowestRassLevel = null;
 
     if (minOrMax == MinOrMax.MIN) {
-      highestOrLowestRassLevel = RassUtils.lowestRassLevel(observationsSinceMidnight);
+      highestOrLowestRassLevel = RassUtils.lowestRassLevel(observations);
     } else if (minOrMax == MinOrMax.MAX) {
       highestOrLowestRassLevel = RassUtils.highestRassLevel(
-          observationsSinceMidnight);
+          observations);
     }
 
     if (highestOrLowestRassLevel != null) {
       result.setRassScore(RassUtils.getRassScoreFromValue(highestOrLowestRassLevel));
-      result.setTimeOfCalculation(sinceMidnight.getEnd());
-      result.setStartOfTimePeriod(sinceMidnight.getStart());
-      result.setEndOfTimePeriod(sinceMidnight.getEnd());
+      result.setTimeOfCalculation(timeRange.getEnd());
+      result.setStartOfTimePeriod(timeRange.getStart());
+      result.setEndOfTimePeriod(timeRange.getEnd());
     }
     return result;
   }

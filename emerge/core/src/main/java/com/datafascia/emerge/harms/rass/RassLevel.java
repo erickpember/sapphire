@@ -78,7 +78,6 @@ public class RassLevel {
 
   /**
    * Wraps implementation for all pain and delirium RASS levels (current, minimum, maximum)
-   * Handles all the observation filtering required.
    *
    * @param encounterId
    *     encounter to check.
@@ -87,7 +86,25 @@ public class RassLevel {
   public AllRassLevels getAllRassLevels(String encounterId) {
     PeriodDt currentRassTimeRange = Periods.getPastHoursToNow(clock, RASS_LEVEL_LOOKBACK);
     PeriodDt rassMinMaxTimeRange = Periods.getMidnightToNow(clock);
+    Observations observations = apiClient.getObservationClient().list(encounterId);
 
+    return getAllRassLevels(observations, currentRassTimeRange, rassMinMaxTimeRange);
+  }
+
+  /**
+   * Wraps implementation for all pain and delirium RASS levels (current, minimum, maximum)
+   * Handles all the observation filtering required.
+   *
+   * @param observations
+   *     Observations for the encounter.
+   * @param currentRassTimeRange
+   *     Time range for the current RASS level.
+   * @param rassMinMaxTimeRange
+   *     Time range for the RASS min and max.
+   * @return Current, minimum and maximum RASS levels.
+   */
+  public AllRassLevels getAllRassLevels(Observations observations, PeriodDt currentRassTimeRange,
+      PeriodDt rassMinMaxTimeRange) {
     Instant lowestTimeBound = null;
     if (currentRassTimeRange.getStart().after(rassMinMaxTimeRange.getStart())) {
       lowestTimeBound = rassMinMaxTimeRange.getStart().toInstant();
@@ -95,7 +112,6 @@ public class RassLevel {
       lowestTimeBound = currentRassTimeRange.getStart().toInstant();
     }
 
-    Observations observations = apiClient.getObservationClient().list(encounterId);
     List<Observation> recentRassObservations = observations.list(ObservationCodeEnum.RASS.getCode(),
         lowestTimeBound, null);
 

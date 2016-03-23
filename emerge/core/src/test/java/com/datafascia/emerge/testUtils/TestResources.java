@@ -16,6 +16,7 @@ import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationOrderStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
+import ca.uhn.fhir.model.primitive.StringDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.client.MedicationOrderClient;
 import com.datafascia.api.client.ObservationClient;
@@ -26,7 +27,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.Setter;
 
 import static org.mockito.Matchers.anyString;
@@ -38,8 +38,8 @@ import static org.mockito.Mockito.when;
  */
 @Setter
 public class TestResources {
-  private static List<Observation> observations = new ArrayList<>();
-  private static List<ProcedureRequest> procedureRequests = new ArrayList<>();
+  private static final List<Observation> observations = new ArrayList<>();
+  private static final List<ProcedureRequest> procedureRequests = new ArrayList<>();
 
   public static MedicationAdministration createMedicationAdministration(String id,
       List<String> medsSets, MedicationAdministrationStatusEnum status, int dose, String unit,
@@ -93,14 +93,12 @@ public class TestResources {
     return apiClient;
   }
 
-  private static List<Observation> filterObservationsByCode(String code) {
-    return observations.stream().filter(
-        observation -> code.equals(observation.getCode().getCodingFirstRep().getCode()))
-        .collect(Collectors.toList());
-  }
-
   public static Observation createObservation(String code, Double value, Instant time) {
     return createObservation(code, new QuantityDt(value), time);
+  }
+
+  public static Observation createObservation(String code, String value, Instant time) {
+    return createObservation(code, new StringDt(value), time);
   }
 
   public static Observation createObservation(String code, IDatatype value, Instant time) {

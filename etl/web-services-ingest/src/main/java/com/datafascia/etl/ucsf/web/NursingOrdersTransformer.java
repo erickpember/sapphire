@@ -48,6 +48,7 @@ public class NursingOrdersTransformer {
 
   // Encounter ID to thread handling its update.
   private HashMap<String, Thread> threadMap = new HashMap<>();
+  private HashMap<Thread, Instant> threadStartTime = new HashMap<>();
   // Data waiting for update to time it has been waiting since.
   protected static CopyOnWriteArrayList<NursingOrderPendingUpdate> waitingList
       = new CopyOnWriteArrayList<>();
@@ -177,8 +178,13 @@ public class NursingOrdersTransformer {
 
   private void clearFinishedThreads() {
     for (String key : threadMap.keySet()) {
-      if (!threadMap.get(key).isAlive()) {
+      Thread thread = threadMap.get(key);
+      if (!thread.isAlive()) {
+        threadStartTime.remove(thread);
         threadMap.remove(key);
+      } else {
+        log.info("Nursing order harms update for encounter " + key + " has been processing since "
+            + threadStartTime.get(thread));
       }
     }
   }
@@ -259,6 +265,7 @@ public class NursingOrdersTransformer {
       Thread nursingThread = new Thread(new NursingOrderRunnable(update, harmEvidenceUpdater));
       nursingThread.start();
       threadMap.put(update.getEncounter().getIdentifierFirstRep().getValue(), nursingThread);
+      threadStartTime.put(nursingThread, Instant.now());
     }
   }
 }

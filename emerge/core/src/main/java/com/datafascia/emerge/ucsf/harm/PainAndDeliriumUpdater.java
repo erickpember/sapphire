@@ -10,6 +10,7 @@ import com.datafascia.emerge.harms.pain.CpotImpl;
 import com.datafascia.emerge.harms.pain.CpotImpl.CurrentCpotLevel;
 import com.datafascia.emerge.harms.pain.CpotImpl.MinimumOrMaximumCpotLevel;
 import com.datafascia.emerge.harms.pain.NumericalPainLevel;
+import com.datafascia.emerge.harms.pain.NumericalPainLevel.AllNumericPainLevels;
 import com.datafascia.emerge.harms.pain.NumericalPainLevel.CurrentPainLevel;
 import com.datafascia.emerge.harms.pain.NumericalPainLevel.MinimumOrMaximumPainLevel;
 import com.datafascia.emerge.harms.pain.PainGoalImpl;
@@ -131,20 +132,22 @@ public class PainAndDeliriumUpdater {
     PainGoal painGoal = new PainGoal().withGoal(painGoalImpl.getPainGoal(encounterId));
     getPain(harmEvidence).setPainGoal(painGoal);
 
-    CurrentPainLevel currentLevel = numericalPainLevelImpl.getCurrentPainLevel(encounterId);
+    AllNumericPainLevels painLevels = numericalPainLevelImpl.getAllNumericPainLevels(encounterId);
+
+    CurrentPainLevel currentLevel = painLevels.getCurrent();
     painGoal.setDataEntryTime(currentLevel.getEffectiveDateTime());
     CurrentScore currentScore = new CurrentScore()
         .withPainScore(currentLevel.getPainScore())
         .withTimeOfDataAquisition(currentLevel.getTimeOfDataAquisition());
 
-    MinimumOrMaximumPainLevel maxLevel = numericalPainLevelImpl.getDailyMax(encounterId);
+    MinimumOrMaximumPainLevel maxLevel = painLevels.getMax();
     DailyMax dailyMax = new DailyMax()
         .withEndOfTimePeriod(maxLevel.getEndOfTimePeriod())
         .withPainMax(maxLevel.getPainScore())
         .withStartOfTimePeriod(maxLevel.getStartOfTimePeriod())
         .withTimeOfCalculation(maxLevel.getTimeOfCalculation());
 
-    MinimumOrMaximumPainLevel minLevel = numericalPainLevelImpl.getDailyMin(encounterId);
+    MinimumOrMaximumPainLevel minLevel = painLevels.getMin();
     DailyMin dailyMin = new DailyMin()
         .withEndOfTimePeriod(minLevel.getEndOfTimePeriod())
         .withPainMin(minLevel.getPainScore())

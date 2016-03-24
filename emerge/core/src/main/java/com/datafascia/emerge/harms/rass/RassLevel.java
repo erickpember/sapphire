@@ -204,6 +204,8 @@ public class RassLevel {
    *     The relevant observations for an encounter.
    * @param timeRange
    *     The time bound for this search.
+   * @param minOrMax
+   *     Whether to return the min or max.
    * @return RASS level, along with the period between midnight and now,
    *     or {@code null} if not found
    */

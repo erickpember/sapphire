@@ -5,11 +5,14 @@ package com.datafascia.emerge.harms.pain;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.api.client.Observations;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.Periods;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
+import com.google.common.collect.ImmutableSet;
 import java.time.Clock;
 import java.util.List;
+import java.util.Set;
 import javax.inject.Inject;
 
 /**
@@ -23,8 +26,26 @@ public class PainGoalImpl {
   @Inject
   private Clock clock;
 
+  private static final Set<String> NUMERICAL_PAIN_OBSERVATION_CODES = ImmutableSet.of(
+      ObservationCodeEnum.NUMERICAL_PAIN_01.getCode(),
+      ObservationCodeEnum.NUMERICAL_PAIN_02.getCode(),
+      ObservationCodeEnum.NUMERICAL_PAIN_03.getCode(),
+      ObservationCodeEnum.NUMERICAL_PAIN_04.getCode());
+
+  private static final Set<String> VERBAL_PAIN_OBSERVATION_CODES = ImmutableSet.of(
+      ObservationCodeEnum.VERBAL_PAIN_01.getCode(),
+      ObservationCodeEnum.VERBAL_PAIN_02.getCode(),
+      ObservationCodeEnum.VERBAL_PAIN_03.getCode(),
+      ObservationCodeEnum.VERBAL_PAIN_04.getCode());
+
+  private static final Set<String> PAIN_GOAL_OBSERVATION_CODES = ImmutableSet.of(
+      ObservationCodeEnum.PAIN_GOAL_01.getCode(),
+      ObservationCodeEnum.PAIN_GOAL_02.getCode(),
+      ObservationCodeEnum.PAIN_GOAL_03.getCode(),
+      ObservationCodeEnum.PAIN_GOAL_04.getCode());
+
   /**
-   * Implements the Pain and Delirium Harm Acceptable Level of Pain (aka Clinician Pain Goal)
+   * Implements the Pain and Delirium Harm Acceptable Level of Pain (AKA Clinician Pain Goal)
    * Provides the numerical pain goal.
    *
    * @param encounterId
@@ -35,16 +56,33 @@ public class PainGoalImpl {
     PeriodDt thirteenHoursAgo = Periods.getPastHoursToNow(clock, 13);
     PeriodDt sinceMidnight = Periods.getMidnightToNow(clock);
 
-    List<Observation> observationsSinceMidnight = ObservationUtils.searchByTimeFrame(apiClient,
-        encounterId, sinceMidnight);
+    Observations observations = apiClient.getObservationClient().list(encounterId);
 
+    return getPainGoal(observations, thirteenHoursAgo, sinceMidnight);
+  }
 
+  /**
+   * Implements the Pain and Delirium Harm Acceptable Level of Pain (AKA Clinician Pain Goal)
+   * Provides the numerical pain goal.
+   *
+   * @param observations
+   *     Observations for the encounter.
+   * @param lastThirteenHours
+   *     Look-back period for acceptable level of pain assessments.
+   * @param sinceMidnight
+   *     Look-back period for min-max pain levels.
+   * @return Numeric pain goal.
+   */
+  public int getPainGoal(Observations observations, PeriodDt lastThirteenHours,
+      PeriodDt sinceMidnight) {
     PainUtils.PainType freshestPainType = null;
 
     Observation freshestNumericalScore = PainUtils.freshestHighestNumericalPainScore(
-        observationsSinceMidnight);
+        observations.list(NUMERICAL_PAIN_OBSERVATION_CODES, sinceMidnight.getStart().toInstant(),
+            sinceMidnight.getEnd().toInstant()));
     Observation freshestVerbalScore = PainUtils.freshestHighestVerbalPainScore(
-        observationsSinceMidnight);
+        observations.list(VERBAL_PAIN_OBSERVATION_CODES, sinceMidnight.getStart().toInstant(),
+            sinceMidnight.getEnd().toInstant()));
 
     if (ObservationUtils.firstIsFresher(freshestVerbalScore, freshestNumericalScore)) {
       freshestPainType = PainUtils.PainType.VERBAL;
@@ -52,9 +90,9 @@ public class PainGoalImpl {
       freshestPainType = PainUtils.PainType.NUMERICAL;
     }
 
-
-    List<Observation> acceptableLevelOfPainAssessments = PainUtils
-        .getAcceptableLevelOfPainAssessments(apiClient, encounterId, thirteenHoursAgo);
+    List<Observation> acceptableLevelOfPainAssessments = observations.list(
+        PAIN_GOAL_OBSERVATION_CODES, lastThirteenHours.getStart().toInstant(),
+        lastThirteenHours.getEnd().toInstant());
 
     if (acceptableLevelOfPainAssessments.isEmpty() || !acceptableLevelOfPainAssessments.stream()
         .anyMatch(observation -> !ObservationUtils.getValueAsString(observation).equals(
@@ -67,7 +105,6 @@ public class PainGoalImpl {
 
     Observation freshestPainGoal = PainUtils.freshestHighestPainGoal(
         acceptableLevelOfPainAssessments);
-
 
     Observation freshestScore = null;
 
@@ -113,5 +150,4 @@ public class PainGoalImpl {
 
     return 11;
   }
-
 }

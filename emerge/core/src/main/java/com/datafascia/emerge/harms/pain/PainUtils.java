@@ -2,18 +2,14 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.harms.pain;
 
-import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.composite.QuantityDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.primitive.StringDt;
-import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ObservationEffectiveComparator;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import com.google.common.base.Strings;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.extern.slf4j.Slf4j;
 
 /**
@@ -89,7 +85,7 @@ public class PainUtils {
    * score is returned.
    *
    * @param observations
-   *     observations to search
+   *     observations to search, pre-filtered to pain goal observation codes
    * @return Freshest observation found with the code. {@code null} if not found.
    */
   public static Observation freshestHighestPainGoal(List<Observation> observations) {
@@ -99,20 +95,14 @@ public class PainUtils {
     ObservationEffectiveComparator comparator = new ObservationEffectiveComparator();
 
     for (Observation observation : observations) {
-      switch (observation.getCode().getCodingFirstRep().getCode()) {
-        case "304894105":
-        case "304890004":
-        case "304890005":
-        case "304890006":
-          // In the event of simultaneous observations, get the highest pain level of those.
-          if (getPainGoal(observation) != 11
-              && (result == null || (comparator.compare(observation, result) == 0
-              && getPainGoal(observation) > getPainGoal(result)))) {
-            result = observation;
-          } else if (comparator.compare(observation, result) < 0) {
-            // we are now in older observations, give up
-            break;
-          }
+      // In the event of simultaneous observations, get the highest pain level of those.
+      if (getPainGoal(observation) != 11
+          && (result == null || (comparator.compare(observation, result) == 0
+          && getPainGoal(observation) > getPainGoal(result)))) {
+        result = observation;
+      } else if (comparator.compare(observation, result) < 0) {
+        // we are now in older observations, give up
+        break;
       }
     }
 
@@ -126,7 +116,7 @@ public class PainUtils {
    * score is returned.
    *
    * @param observations
-   *     observations to search
+   *     Observations to search, pre-filtered for appropriate codes.
    * @return Freshest observation found with the code. {@code null} if not found.
    */
   public static Observation freshestHighestNumericalPainScore(List<Observation> observations) {
@@ -136,21 +126,15 @@ public class PainUtils {
     ObservationEffectiveComparator comparator = new ObservationEffectiveComparator();
 
     for (Observation observation : observations) {
-      switch (observation.getCode().getCodingFirstRep().getCode()) {
-        case "304890008":
-        case "304890009":
-        case "304890010":
-        case "304890011":
-          // In the event of simultaneous observations, get the highest pain level of those.
-          if (getPainScoreFromValue(observation) != null
-              && getPainScoreFromValue(observation) != 11
-              && (result == null || (comparator.compare(observation, result) == 0
-              && getPainScoreFromValue(observation) > getPainScoreFromValue(result)))) {
-            result = observation;
-          } else if (comparator.compare(observation, result) < 0) {
-            // we are now in older observations, give up
-            break;
-          }
+      // In the event of simultaneous observations, get the highest pain level of those.
+      if (getPainScoreFromValue(observation) != null
+          && getPainScoreFromValue(observation) != 11
+          && (result == null || (comparator.compare(observation, result) == 0
+          && getPainScoreFromValue(observation) > getPainScoreFromValue(result)))) {
+        result = observation;
+      } else if (comparator.compare(observation, result) < 0) {
+        // we are now in older observations, give up
+        break;
       }
     }
 
@@ -356,31 +340,6 @@ public class PainUtils {
           + observation.getId().getValueAsString());
       return null;
     }
-  }
-
-  /**
-   * Returns Observations from a time window with codes that match acceptable level of pain
-   * assessments.
-   * @param apiClient
-   *     API client
-   * @param encounterId
-   *     Relevant encounter for search.
-   * @param currentOrPriorShift
-   *     Relevant time period for search.
-   * @return Acceptable level of pain assessment observations.
-   */
-  public static List<Observation> getAcceptableLevelOfPainAssessments(ClientBuilder apiClient,
-      String encounterId, PeriodDt currentOrPriorShift) {
-    List<String> codes = Arrays.asList(
-        ObservationCodeEnum.PAIN_GOAL_01.getCode(),
-        ObservationCodeEnum.PAIN_GOAL_02.getCode(),
-        ObservationCodeEnum.PAIN_GOAL_03.getCode(),
-        ObservationCodeEnum.PAIN_GOAL_04.getCode());
-
-    return ObservationUtils.searchByTimeFrame(apiClient, encounterId, currentOrPriorShift)
-        .stream()
-        .filter(observation -> codes.contains(observation.getCode().getCodingFirstRep().getCode()))
-        .collect(Collectors.toList());
   }
 
   /**

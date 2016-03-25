@@ -58,24 +58,6 @@ public class ObservationUtils {
   }
 
   /**
-   * Finds freshest observation for a given Encounter and Code.
-   *
-   * @param client
-   *     API client.
-   * @param encounterId
-   *     Relevant encounter ID.
-   * @param code
-   *     Observation code to search for.
-   * @return freshest observation for the given code, or {@code null} if no match is found
-   */
-  public static Observation findFreshestObservationForCode(ClientBuilder client,
-      String encounterId, String code) {
-    return client.getObservationClient().searchObservation(encounterId, code, null).stream()
-        .max(new ObservationEffectiveComparator())
-        .orElse(null);
-  }
-
-  /**
    * Finds the freshest observation for an encounter with the given code and after the given time.
    *
    * @param client

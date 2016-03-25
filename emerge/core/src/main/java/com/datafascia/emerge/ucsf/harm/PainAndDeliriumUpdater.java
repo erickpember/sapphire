@@ -7,6 +7,7 @@ import com.datafascia.emerge.harms.pain.BenzodiazepineAvoidance;
 import com.datafascia.emerge.harms.pain.CamImpl;
 import com.datafascia.emerge.harms.pain.CamImpl.CamImplResult;
 import com.datafascia.emerge.harms.pain.CpotImpl;
+import com.datafascia.emerge.harms.pain.CpotImpl.AllCpotLevels;
 import com.datafascia.emerge.harms.pain.CpotImpl.CurrentCpotLevel;
 import com.datafascia.emerge.harms.pain.CpotImpl.MinimumOrMaximumCpotLevel;
 import com.datafascia.emerge.harms.pain.NumericalPainLevel;
@@ -222,19 +223,21 @@ public class PainAndDeliriumUpdater {
         .withGoal(painGoalImpl.getPainGoal(encounterId));
     getPain(harmEvidence).setPainGoal(painGoal);
 
-    CurrentCpotLevel currentLevel = cpotImpl.getCurrentCpotLevel(encounterId);
+    AllCpotLevels cpotLevels = cpotImpl.getAllCpotLevels(encounterId);
+
+    CurrentCpotLevel currentLevel = cpotLevels.getCurrent();
     CurrentScore__ currentScore = new CurrentScore__()
         .withPainScore(currentLevel.getPainScore())
         .withTimeOfDataAquisition(currentLevel.getTimeOfDataAquisition());
 
-    MinimumOrMaximumCpotLevel maxLevel = cpotImpl.getCpotMax(encounterId);
+    MinimumOrMaximumCpotLevel maxLevel = cpotLevels.getMin();
     DailyMax__ dailyMax = new DailyMax__()
         .withEndOfTimePeriod(maxLevel.getEndOfTimePeriod())
         .withPainMax(maxLevel.getPainScore())
         .withStartOfTimePeriod(maxLevel.getStartOfTimePeriod())
         .withTimeOfCalculation(maxLevel.getTimeOfCalculation());
 
-    MinimumOrMaximumCpotLevel minLevel = cpotImpl.getCpotMin(encounterId);
+    MinimumOrMaximumCpotLevel minLevel = cpotLevels.getMax();
     DailyMin__ dailyMin = new DailyMin__()
         .withEndOfTimePeriod(minLevel.getEndOfTimePeriod())
         .withPainMin(minLevel.getPainScore())

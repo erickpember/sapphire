@@ -21,9 +21,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -47,8 +47,8 @@ public class NursingOrdersTransformer {
   private HarmEvidenceUpdater harmEvidenceUpdater;
 
   // Encounter ID to thread handling its update.
-  private HashMap<String, Thread> threadMap = new HashMap<>();
-  private HashMap<Thread, Instant> threadStartTime = new HashMap<>();
+  private ConcurrentHashMap<String, Thread> threadMap = new ConcurrentHashMap<>();
+  private ConcurrentHashMap<Thread, Instant> threadStartTime = new ConcurrentHashMap<>();
   // Data waiting for update to time it has been waiting since.
   protected static CopyOnWriteArrayList<NursingOrderPendingUpdate> waitingList
       = new CopyOnWriteArrayList<>();

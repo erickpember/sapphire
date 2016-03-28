@@ -17,6 +17,7 @@ import com.datafascia.emerge.harms.pain.NumericalPainLevel.MinimumOrMaximumPainL
 import com.datafascia.emerge.harms.pain.PainGoalImpl;
 import com.datafascia.emerge.harms.pain.SedativeOrder;
 import com.datafascia.emerge.harms.pain.VerbalPainLevel;
+import com.datafascia.emerge.harms.pain.VerbalPainLevel.AllVerbalPainLevels;
 import com.datafascia.emerge.harms.rass.RassGoalImpl;
 import com.datafascia.emerge.harms.rass.RassGoalImpl.RassGoalResult;
 import com.datafascia.emerge.harms.rass.RassLevel;
@@ -178,22 +179,22 @@ public class PainAndDeliriumUpdater {
         .withGoal(painGoalImpl.getPainGoal(encounterId));
     getPain(harmEvidence).setPainGoal(painGoal);
 
-    VerbalPainLevel.CurrentPainLevel currentLevel = verbalPainLevelImpl.getCurrentPainLevel(
-        encounterId);
+    AllVerbalPainLevels painLevels = verbalPainLevelImpl.getAllVerbalPainLevels(encounterId);
+    VerbalPainLevel.CurrentPainLevel currentLevel = painLevels.getCurrent();
+
+    painGoal.setDataEntryTime(currentLevel.getTimeOfDataAquisition());
     CurrentScore_ currentScore = new CurrentScore_()
         .withPainScore(currentLevel.getPainScore())
         .withTimeOfDataAquisition(currentLevel.getTimeOfDataAquisition());
 
-    VerbalPainLevel.MinimumOrMaximumPainLevel maxLevel = verbalPainLevelImpl
-        .getDailyMax(encounterId);
+    VerbalPainLevel.MinimumOrMaximumPainLevel maxLevel = painLevels.getMax();
     DailyMax_ dailyMax = new DailyMax_()
         .withEndOfTimePeriod(maxLevel.getEndOfTimePeriod())
         .withPainMax(maxLevel.getPainScore())
         .withStartOfTimePeriod(maxLevel.getStartOfTimePeriod())
         .withTimeOfCalculation(maxLevel.getTimeOfCalculation());
 
-    VerbalPainLevel.MinimumOrMaximumPainLevel minLevel = verbalPainLevelImpl
-        .getDailyMin(encounterId);
+    VerbalPainLevel.MinimumOrMaximumPainLevel minLevel = painLevels.getMin();
     DailyMin_ dailyMin = new DailyMin_()
         .withEndOfTimePeriod(minLevel.getEndOfTimePeriod())
         .withPainMin(minLevel.getPainScore())

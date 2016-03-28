@@ -62,6 +62,20 @@ public class AnticoagulationImplTest extends AnticoagulationImpl {
         apiClient).get(),
         AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN);
 
+    MedicationAdministration enoxPass3 = TestResources.createMedicationAdministration(
+        "id",
+        Arrays.asList(AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN.getCode()),
+        MedicationAdministrationStatusEnum.IN_PROGRESS,
+        100,
+        "mg",
+        DateTimeDt.withCurrentTime(),
+        "completedOrder");
+
+    assertEquals(getAnticoagulationType(Arrays.asList(enoxPass3), "encounterId", Instant
+        .now(),
+        apiClient).get(),
+        AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN);
+
     MedicationAdministration enoxFail = TestResources.createMedicationAdministration(
         "id",
         Arrays.asList(AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN.getCode()),
@@ -129,7 +143,7 @@ public class AnticoagulationImplTest extends AnticoagulationImpl {
             MedicationAdministrationStatusEnum.IN_PROGRESS,
             85,
             "mg",
-            new DateTimeDt(Date.from(Instant.now().minus(13, ChronoUnit.HOURS))),
+            new DateTimeDt(Date.from(Instant.now().minus(15, ChronoUnit.HOURS))),
             "completedOrder");
 
     assertFalse(getAnticoagulationType(Arrays.asList(hepFailNewWithCompletedOrder),

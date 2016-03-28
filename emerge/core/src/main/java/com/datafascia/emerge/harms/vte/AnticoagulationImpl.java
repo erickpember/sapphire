@@ -69,10 +69,6 @@ public class AnticoagulationImpl {
     administrations = MedicationAdministrationUtils.freshestOfAllOrders(administrations).values();
 
     for (MedicationAdministration admin : administrations) {
-      if (!MedicationAdministrationUtils.orderIsActiveOrDraft(admin, client, encounterId)) {
-        continue;
-      }
-
       if (admin.getEffectiveTime() == null) {
         log.warn("Ignoring admin [{}] as it lacks an effective time.",
             admin.getIdentifierFirstRep().getValue());

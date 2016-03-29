@@ -31,7 +31,7 @@ public class NursingOrderRunnable implements Runnable {
     NursingOrderPendingUpdate update = pendingUpdate;
 
     do {
-      for (ProcedureRequest request : pendingUpdate.getRequests()) {
+      for (ProcedureRequest request : update.getRequests()) {
         log.info("Updating nursing harms evidence for " + update);
         harmEvidenceUpdater.updateProcedureRequest(request, pendingUpdate.getEncounter());
 

@@ -144,7 +144,7 @@ public class RxNormRuleTest {
     meds.add(ucsfa5);
     RxNorm ucsfa6 = new RxNorm() {
       {
-        getRxcuiIn().add("319864");
+        setDrugId("40802736");
         setFrequency("200905");
       }
     };
@@ -543,7 +543,7 @@ public class RxNormRuleTest {
     meds.add(ucsfa59);
     RxNorm ucsfa60 = new RxNorm() {
       {
-        getRxcuiIn().add("15202");
+        setDrugId("400088");
         setFrequency("200905");
       }
     };

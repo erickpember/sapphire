@@ -87,7 +87,10 @@ end
 
 rule "Continuous Infusion Cisatracurium IV"
   when
-    $p:RxNorm($rxcuiIn : rxcuiIn contains "319864" && FrequencyLookup.isContinuous(frequency))
+    $p:RxNorm(($rxcuiIn : rxcuiIn contains "319864"
+              || drugId == "400114"
+              || drugId == "40802736")
+              && FrequencyLookup.isContinuous(frequency))
   then
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A6");
@@ -740,7 +743,9 @@ end
 
 rule "Continuous Infusion Argatroban IV"
   when
-    $p:RxNorm($rxcuiIn : rxcuiIn contains "15202" && FrequencyLookup.isContinuous(frequency))
+    $p:RxNorm(($rxcuiIn : rxcuiIn contains "15202"
+    || drugId == "400088")
+    && FrequencyLookup.isContinuous(frequency))
   then
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A60");

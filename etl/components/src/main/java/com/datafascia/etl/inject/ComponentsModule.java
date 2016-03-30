@@ -109,14 +109,15 @@ public class ComponentsModule extends AbstractModule {
     // Configure an HttpClient with increased limits.
     IRestfulClientFactory clientFactory = fhirContext.getRestfulClientFactory();
 
+    int timeoutMillis = 120_000;
     PoolingHttpClientConnectionManager connectionManager =
-        new PoolingHttpClientConnectionManager(30000, TimeUnit.MILLISECONDS);
+        new PoolingHttpClientConnectionManager(timeoutMillis, TimeUnit.MILLISECONDS);
     connectionManager.setDefaultMaxPerRoute(20);
     connectionManager.setMaxTotal(200);
     connectionManager.setValidateAfterInactivity(5000);
 
     RequestConfig defaultRequestConfig = RequestConfig.custom()
-        .setSocketTimeout(30000)
+        .setSocketTimeout(timeoutMillis)
         .setConnectTimeout(clientFactory.getConnectTimeout())
         .setConnectionRequestTimeout(clientFactory.getConnectionRequestTimeout())
         .build();

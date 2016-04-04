@@ -6,6 +6,8 @@ import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.client.Observations;
+import com.datafascia.common.inject.Injectors;
+import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.Periods;
 import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
 import com.datafascia.emerge.ucsf.codes.MaybeEnum;
@@ -50,7 +52,11 @@ public class DiscreteHeadOfBedGreaterThan30Degrees {
    * @return true if observation is relevant to head of bed greater than or equal to 30 degrees
    */
   public static boolean isRelevant(Observation observation) {
-    return ObservationCodeEnum.HEAD_OF_BED.isCodeEquals(observation.getCode());
+    PeriodDt fromCurrentOrPriorShift =
+        Periods.getCurrentOrPriorShiftToNow(Injectors.getInjector().getInstance(Clock.class));
+
+    return ObservationCodeEnum.HEAD_OF_BED.isCodeEquals(observation.getCode()) &&
+           ObservationUtils.isAfter(observation, fromCurrentOrPriorShift.getStart());
   }
 
   /**

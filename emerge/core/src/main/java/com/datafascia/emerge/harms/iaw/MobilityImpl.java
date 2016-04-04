@@ -6,6 +6,7 @@ import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.client.Observations;
+import com.datafascia.common.inject.Injectors;
 import com.datafascia.domain.fhir.Dates;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.Periods;
@@ -55,7 +56,11 @@ public class MobilityImpl {
    * @return true if observation is relevant to mobility score
    */
   public static boolean isRelevant(Observation observation) {
-    return ObservationCodeEnum.MOBILITY_SCORE.isCodeEquals(observation.getCode());
+    PeriodDt sinceMidnight =
+        Periods.getMidnightToNow(Injectors.getInjector().getInstance(Clock.class));
+
+    return ObservationCodeEnum.MOBILITY_SCORE.isCodeEquals(observation.getCode()) &&
+           ObservationUtils.isAfter(observation, sinceMidnight.getStart());
   }
 
   /**

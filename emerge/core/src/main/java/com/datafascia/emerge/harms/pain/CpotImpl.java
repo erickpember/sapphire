@@ -6,6 +6,7 @@ import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.client.Observations;
+import com.datafascia.common.inject.Injectors;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.Periods;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
@@ -65,14 +66,21 @@ public class CpotImpl {
   }
 
   /**
-   * Checks if observation is relevant to CPOT.
+   * Checks if observation is relevant to CPOT and within the necessary time window.
    *
    * @param observation
    *     the observation to check
    * @return true if observation is relevant to CPOT.
    */
   public static boolean isRelevant(Observation observation) {
-    return ObservationCodeEnum.CPOT.isCodeEquals(observation.getCode());
+    Clock clock = Injectors.getInjector().getInstance(Clock.class);
+    PeriodDt currentCpotTimeRange = Periods.getPastHoursToNow(clock, CPOT_LOOKBACK);
+    PeriodDt cpotMinMaxTimeRange = Periods.getMidnightToNow(clock);
+    return (ObservationUtils.isAfter(
+        observation, currentCpotTimeRange.getStart()) ||
+          ObservationUtils.isAfter(
+            observation, cpotMinMaxTimeRange.getStart())) &&
+        ObservationCodeEnum.CPOT.isCodeEquals(observation.getCode());
   }
 
   /**

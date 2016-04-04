@@ -5,6 +5,7 @@ package com.datafascia.emerge.harms.pain;
 import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.common.inject.Injectors;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.Periods;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
@@ -36,14 +37,17 @@ public class CamImpl {
   }
 
   /**
-   * Checks if observation is relevant to CAM-ICU.
+   * Checks if observation is relevant to CAM-ICU and within the necessary time window.
    *
    * @param observation
    *     the observation to check
    * @return true if observation is relevant to CAM-ICU.
    */
   public static boolean isRelevant(Observation observation) {
-    return ObservationCodeEnum.CAM_ICU.isCodeEquals(observation.getCode());
+    Clock clock = Injectors.getInjector().getInstance(Clock.class);
+    return ObservationUtils.isAfter(
+        observation, Periods.getCurrentOrPriorShiftToNow(clock).getStart()) &&
+        ObservationCodeEnum.CAM_ICU.isCodeEquals(observation.getCode());
   }
 
   /**

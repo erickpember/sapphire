@@ -6,6 +6,7 @@ import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.client.Observations;
+import com.datafascia.common.inject.Injectors;
 import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.Periods;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
@@ -75,14 +76,22 @@ public class NumericalPainLevel {
   }
 
   /**
-   * Checks if observation is relevant to Numerical Pain.
+   * Checks if observation is relevant to Numerical Pain and within the necessary time window.
    *
    * @param observation
    *     the observation to check
    * @return true if observation is relevant to Numerical Pain.
    */
   public static boolean isRelevant(Observation observation) {
-    return (ObservationCodeEnum.NUMERICAL_PAIN_01.isCodeEquals(observation.getCode())
+    Clock clock = Injectors.getInjector().getInstance(Clock.class);
+    PeriodDt currentPainTimeRange = Periods.getPastHoursToNow(clock, NUMERICAL_PAIN_LOOKBACK);
+    PeriodDt painMinMaxTimeRange = Periods.getMidnightToNow(clock);
+
+    return (ObservationUtils.isAfter(
+        observation, currentPainTimeRange.getStart()) ||
+          ObservationUtils.isAfter(
+            observation, painMinMaxTimeRange.getStart())) &&
+        (ObservationCodeEnum.NUMERICAL_PAIN_01.isCodeEquals(observation.getCode())
         || ObservationCodeEnum.NUMERICAL_PAIN_02.isCodeEquals(observation.getCode())
         || ObservationCodeEnum.NUMERICAL_PAIN_03.isCodeEquals(observation.getCode())
         || ObservationCodeEnum.NUMERICAL_PAIN_04.isCodeEquals(observation.getCode()));

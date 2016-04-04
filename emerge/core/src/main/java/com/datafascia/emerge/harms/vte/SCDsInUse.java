@@ -6,10 +6,14 @@ import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.client.Observations;
+import com.datafascia.common.inject.Injectors;
+import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.Periods;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import java.time.Clock;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.Optional;
 import javax.inject.Inject;
 
@@ -32,8 +36,12 @@ public class SCDsInUse {
    * @return true if observation is relevant to SCDS In Use.
    */
   public static boolean isRelevant(Observation observation) {
-    return ObservationCodeEnum.MECHANICAL_PPX_DEVICES.isCodeEquals(observation.getCode()) ||
-           ObservationCodeEnum.MECHANICAL_PPX_INTERVENTIONS.isCodeEquals(observation.getCode());
+    Clock clock = Injectors.getInjector().getInstance(Clock.class);
+    // Nurse shifts are 12 hours, so the lookback needs to be 24.
+    Date twentyFourHoursAgo = Date.from(clock.instant().minus(24L, ChronoUnit.HOURS));
+    return ObservationUtils.isAfter(observation, twentyFourHoursAgo) &&
+      (ObservationCodeEnum.MECHANICAL_PPX_DEVICES.isCodeEquals(observation.getCode()) ||
+      ObservationCodeEnum.MECHANICAL_PPX_INTERVENTIONS.isCodeEquals(observation.getCode()));
   }
 
   /**

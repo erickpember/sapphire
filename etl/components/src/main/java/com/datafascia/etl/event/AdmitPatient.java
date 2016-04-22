@@ -148,7 +148,7 @@ public class AdmitPatient {
         .setPatient(new ResourceReferenceDt(patient))
         .addLocation()
             .setLocation(new ResourceReferenceDt(location))
-            .setStatus(EncounterLocationStatusEnum.PRESENT);
+            .setStatus(EncounterLocationStatusEnum.ACTIVE);
 
     Id<Encounter> encounterId = EncounterRepository.generateId(newEncounter);
     Optional<Encounter> currentEncounter = encounterRepository.read(encounterId);

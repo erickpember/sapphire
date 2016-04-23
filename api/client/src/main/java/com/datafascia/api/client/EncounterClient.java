@@ -21,6 +21,7 @@ public class EncounterClient extends BaseClient<Encounter> {
       .expireAfterWrite(10, TimeUnit.MINUTES)
       .build(
           new CacheLoader<String, Encounter>() {
+            @Override
             public Encounter load(String encounterId) {
               return read(encounterId);
             }
@@ -47,7 +48,6 @@ public class EncounterClient extends BaseClient<Encounter> {
    *
    * @param csn The Contact Serial Number.
    * @return An encounter.
-   * @throws ResourceNotFoundException if encounter not found
    */
   public Encounter getEncounter(String csn) {
     try {

@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.client;
 
-import ca.uhn.fhir.model.api.Bundle;
+import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.rest.client.IGenericClient;
 import ca.uhn.fhir.rest.gclient.StringClientParam;
@@ -24,16 +24,18 @@ public class ObservationClient extends BaseClient<Observation> {
       .expireAfterWrite(30, TimeUnit.SECONDS)
       .build(
           new CacheLoader<String, List<Observation>>() {
+            @Override
             public List<Observation> load(String encounterId) {
               return search(encounterId);
             }
           });
 
-  private LoadingCache<String, Observations> encounterIdToObservationsMap =
+  private final LoadingCache<String, Observations> encounterIdToObservationsMap =
       CacheBuilder.newBuilder()
       .expireAfterWrite(30, TimeUnit.SECONDS)
       .build(
           new CacheLoader<String, Observations>() {
+            @Override
             public Observations load(String encounterId) {
               return new Observations(encounterIdToObservationListMap.getUnchecked(encounterId));
             }
@@ -54,6 +56,7 @@ public class ObservationClient extends BaseClient<Observation> {
         .where(new StringClientParam(Observation.SP_ENCOUNTER)
             .matches()
             .value(encounterId))
+        .returnBundle(Bundle.class)
         .execute();
 
     return extractBundle(results, Observation.class);

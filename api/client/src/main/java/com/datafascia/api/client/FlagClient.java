@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.client;
 
-import ca.uhn.fhir.model.api.Bundle;
+import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import ca.uhn.fhir.model.dstu2.resource.Flag;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.IGenericClient;
@@ -71,6 +71,7 @@ public class FlagClient extends BaseClient<Flag> {
           .where(new StringClientParam(Flag.SP_PATIENT)
               .matches()
               .value(patientId))
+          .returnBundle(Bundle.class)
           .execute();
     } catch (RuntimeException e) {
       log.error("FlagClient search by patient failed. patientId:[{}]", patientId);

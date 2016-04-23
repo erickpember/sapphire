@@ -2,9 +2,10 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.client;
 
-import ca.uhn.fhir.model.api.Bundle;
 import ca.uhn.fhir.model.api.IResource;
+import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import ca.uhn.fhir.rest.client.IGenericClient;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -31,11 +32,12 @@ public abstract class BaseClient<T extends IResource> {
    * @return Resource list extracted from bundle.
    */
   public List<T> extractBundle(Bundle bundle, Class resourceClass) {
-    List<T> resources = bundle.getResources(resourceClass);
-
-    while (bundle.getLinkNext().isEmpty() == false) {
-      bundle = client.loadPage().next(bundle).execute();
-      resources.addAll(bundle.getResources(resourceClass));
+    List<T> resources = new ArrayList<>();
+    for (Bundle.Entry entry : bundle.getEntry()) {
+      IResource resource = entry.getResource();
+      if (resource.getClass().isAssignableFrom(resourceClass)) {
+        resources.add((T) resource);
+      }
     }
     return resources;
   }

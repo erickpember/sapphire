@@ -2,8 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.client;
 
-import ca.uhn.fhir.model.api.Bundle;
-import ca.uhn.fhir.model.api.BundleEntry;
+import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import ca.uhn.fhir.model.dstu2.resource.QuestionnaireResponse;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.IGenericClient;
@@ -38,10 +37,11 @@ public class QuestionnaireResponseClient extends BaseClient<QuestionnaireRespons
         .where(new StringClientParam(QuestionnaireResponse.SP_RES_ID)
             .matches()
             .value(questionnaireResponseId))
+        .returnBundle(Bundle.class)
         .execute();
-    List<BundleEntry> entries = results.getEntries();
-    if (!entries.isEmpty()) {
-      return (QuestionnaireResponse) entries.get(0).getResource();
+    List<QuestionnaireResponse> resources = extractBundle(results, QuestionnaireResponse.class);
+    if (!resources.isEmpty()) {
+      return resources.get(0);
     } else {
       return null;
     }
@@ -81,6 +81,7 @@ public class QuestionnaireResponseClient extends BaseClient<QuestionnaireRespons
         .where(new StringClientParam(QuestionnaireResponse.SP_ENCOUNTER)
             .matches()
             .value(encounterId))
+        .returnBundle(Bundle.class)
         .execute();
 
     List<QuestionnaireResponse> medicationOrders = extractBundle(results,

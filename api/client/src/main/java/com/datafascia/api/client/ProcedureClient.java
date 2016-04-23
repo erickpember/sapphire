@@ -2,7 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.client;
 
-import ca.uhn.fhir.model.api.Bundle;
+import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import ca.uhn.fhir.model.dstu2.resource.Procedure;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.IGenericClient;
@@ -46,6 +46,7 @@ public class ProcedureClient extends BaseClient<Procedure> {
         .where(new StringClientParam(Procedure.SP_ENCOUNTER)
             .matches()
             .value(encounterId))
+        .returnBundle(Bundle.class)
         .execute();
 
     return extractBundle(results, Procedure.class);

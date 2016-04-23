@@ -2,8 +2,7 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.api.client;
 
-import ca.uhn.fhir.model.api.Bundle;
-import ca.uhn.fhir.model.api.BundleEntry;
+import ca.uhn.fhir.model.dstu2.resource.Bundle;
 import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import ca.uhn.fhir.rest.api.MethodOutcome;
 import ca.uhn.fhir.rest.client.IGenericClient;
@@ -57,10 +56,11 @@ public class MedicationOrderClient extends BaseClient<MedicationOrder> {
         .where(new StringClientParam(MedicationOrder.SP_RES_ID)
             .matches()
             .value(orderId))
+        .returnBundle(Bundle.class)
         .execute();
-    List<BundleEntry> entries = results.getEntries();
-    if (!entries.isEmpty()) {
-      return (MedicationOrder) entries.get(0).getResource();
+    List<MedicationOrder> resources = extractBundle(results, MedicationOrder.class);
+    if (!resources.isEmpty()) {
+      return resources.get(0);
     } else {
       return null;
     }
@@ -93,6 +93,7 @@ public class MedicationOrderClient extends BaseClient<MedicationOrder> {
         .where(new StringClientParam(MedicationOrder.SP_ENCOUNTER)
             .matches()
             .value(encounterId))
+        .returnBundle(Bundle.class)
         .execute();
     return extractBundle(results, MedicationOrder.class);
   }

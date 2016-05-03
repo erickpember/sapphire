@@ -6,6 +6,7 @@ import ca.uhn.fhir.context.FhirContext;
 import ca.uhn.fhir.rest.server.EncodingEnum;
 import ca.uhn.fhir.rest.server.IResourceProvider;
 import ca.uhn.fhir.rest.server.RestfulServer;
+import ca.uhn.fhir.rest.server.interceptor.ResponseHighlighterInterceptor;
 import com.google.inject.Injector;
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +62,8 @@ public class FhirServlet extends RestfulServer {
      * detected as the requesting client. This prevents browsers from trying to download resource
      * responses instead of displaying them inline which can be handy for troubleshooting.
      */
-    setUseBrowserFriendlyContentTypes(true);
+    ResponseHighlighterInterceptor interceptor = new ResponseHighlighterInterceptor();
+    registerInterceptor(interceptor);
 
     setDefaultResponseEncoding(EncodingEnum.JSON);
     setDefaultPrettyPrint(true);

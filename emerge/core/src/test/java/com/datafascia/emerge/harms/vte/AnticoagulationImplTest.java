@@ -4,12 +4,15 @@ package com.datafascia.emerge.harms.vte;
 
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
+import ca.uhn.fhir.model.dstu2.resource.Observation;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationOrderStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.api.client.Observations;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.emerge.testUtils.TestResources;
+import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -34,6 +37,13 @@ public class AnticoagulationImplTest extends AnticoagulationImpl {
   public void testGetAnticoagulationType_List_String() {
     ClientBuilder apiClient = TestResources.createMockClient();
 
+    Observation inrOver1point5 = TestResources.createObservation(
+        ObservationCodeEnum.INR.getCode(),
+        1.6, Instant.now());
+
+    Observations observations = new Observations(
+        Arrays.asList(inrOver1point5));
+
     MedicationAdministration enoxPass = TestResources.createMedicationAdministration(
         "id",
         Arrays.asList(AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN.getCode()),
@@ -43,8 +53,10 @@ public class AnticoagulationImplTest extends AnticoagulationImpl {
         DateTimeDt.withCurrentTime(),
         "activeOrder");
 
-    assertEquals(getAnticoagulationType(Arrays.asList(enoxPass), "encounterId", Instant
-        .now(),
+    assertEquals(getAnticoagulationType(Arrays.asList(enoxPass),
+        observations,
+        "encounterId",
+        Instant.now(),
         apiClient).get(),
         AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN);
 
@@ -57,8 +69,10 @@ public class AnticoagulationImplTest extends AnticoagulationImpl {
         DateTimeDt.withCurrentTime(),
         "activeOrder");
 
-    assertEquals(getAnticoagulationType(Arrays.asList(enoxPass2), "encounterId", Instant
-        .now(),
+    assertEquals(getAnticoagulationType(Arrays.asList(enoxPass2),
+        observations,
+        "encounterId",
+        Instant.now(),
         apiClient).get(),
         AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN);
 
@@ -71,8 +85,10 @@ public class AnticoagulationImplTest extends AnticoagulationImpl {
         DateTimeDt.withCurrentTime(),
         "completedOrder");
 
-    assertEquals(getAnticoagulationType(Arrays.asList(enoxPass3), "encounterId", Instant
-        .now(),
+    assertEquals(getAnticoagulationType(Arrays.asList(enoxPass3),
+        observations,
+        "encounterId",
+        Instant.now(),
         apiClient).get(),
         AnticoagulationTypeEnum.INTERMITTENT_ENOXAPARIN);
 
@@ -86,7 +102,10 @@ public class AnticoagulationImplTest extends AnticoagulationImpl {
         "activeOrder");
 
     assertFalse(
-        getAnticoagulationType(Arrays.asList(enoxFail), "encounterId", Instant.now(),
+        getAnticoagulationType(Arrays.asList(enoxFail),
+        observations,
+        "encounterId",
+        Instant.now(),
             apiClient)
         .isPresent());
 
@@ -99,8 +118,10 @@ public class AnticoagulationImplTest extends AnticoagulationImpl {
         DateTimeDt.withCurrentTime(),
         "activeOrder");
 
-    assertEquals(getAnticoagulationType(Arrays.asList(argaPass), "encounterId", Instant
-        .now(),
+    assertEquals(getAnticoagulationType(Arrays.asList(argaPass),
+        observations,
+        "encounterId",
+        Instant.now(),
         apiClient).get(),
         AnticoagulationTypeEnum.CONTINUOUS_INFUSION_ARGATROBAN_IV);
 
@@ -115,6 +136,7 @@ public class AnticoagulationImplTest extends AnticoagulationImpl {
             "completedOrder");
 
     assertFalse(getAnticoagulationType(Arrays.asList(hepFailTooOldCompletedOrder),
+        observations,
         "encounterId",
         Instant.now(),
         apiClient)
@@ -131,10 +153,41 @@ public class AnticoagulationImplTest extends AnticoagulationImpl {
             "activeOrder");
 
     assertEquals(getAnticoagulationType(Arrays.asList(hepPassOldButActiveOrder),
+        observations,
         "encounterId",
         Instant.now(),
         apiClient).get(),
         AnticoagulationTypeEnum.CONTINUOUS_INFUSION_HEPARIN_IV);
+
+    MedicationAdministration warfPassOldButActiveOrder = TestResources
+        .createMedicationAdministration(
+            "id",
+            Arrays.asList(AnticoagulationTypeEnum.INTERMITTENT_WARFARIN_ENTERAL.getCode()),
+            MedicationAdministrationStatusEnum.COMPLETED,
+            5,
+            "mg",
+            new DateTimeDt(Date.from(Instant.now().minus(19, ChronoUnit.HOURS))),
+            "completedOrder");
+
+    assertEquals(getAnticoagulationType(Arrays.asList(warfPassOldButActiveOrder),
+        observations,
+        "encounterId",
+        Instant.now(),
+        apiClient).get(),
+        AnticoagulationTypeEnum.INTERMITTENT_WARFARIN_ENTERAL);
+
+    Observation inrUnder1point5 = TestResources.createObservation(
+        ObservationCodeEnum.INR.getCode(),
+        1.4, Instant.now());
+
+    observations = new Observations(Arrays.asList(inrUnder1point5));
+
+    // Now fails because INR <= 1.5.
+    assertFalse(getAnticoagulationType(Arrays.asList(warfPassOldButActiveOrder),
+        observations,
+        "encounterId",
+        Instant.now(),
+        apiClient).isPresent());
 
     MedicationAdministration hepFailNewWithCompletedOrder = TestResources
         .createMedicationAdministration(
@@ -147,6 +200,7 @@ public class AnticoagulationImplTest extends AnticoagulationImpl {
             "completedOrder");
 
     assertFalse(getAnticoagulationType(Arrays.asList(hepFailNewWithCompletedOrder),
+        observations,
         "encounterId",
         Instant.now(),
         apiClient).isPresent());

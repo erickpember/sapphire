@@ -11,7 +11,7 @@ import com.datafascia.emerge.harms.HarmsLookups;
 import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
 import java.math.BigDecimal;
 import java.time.Clock;
-import java.util.Date;
+import java.time.Instant;
 import java.util.List;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
@@ -41,7 +41,8 @@ public class PharmacologicVteProphylaxisAdministered {
     List<MedicationAdministration> administrations = apiClient.getMedicationAdministrationClient()
         .search(encounterId);
 
-    return isPharmacologicVteProphylaxisAdministered(administrations, encounterId);
+    return isPharmacologicVteProphylaxisAdministered(administrations, encounterId,
+        Instant.now(clock));
   }
 
   /**
@@ -51,10 +52,12 @@ public class PharmacologicVteProphylaxisAdministered {
    *     All medication administrations for a specific encounter.
    * @param encounterId
    *     ID for the same encounter, to use for patient weight retrieval in case of Enoxaparin.
+   * @param now
+   *     The current time.
    * @return true if VTE prophylaxis was administered
    */
   public boolean isPharmacologicVteProphylaxisAdministered(
-      List<MedicationAdministration> administrations, String encounterId) {
+      List<MedicationAdministration> administrations, String encounterId, Instant now) {
     boolean administered = false;
 
     // Check if any recent VTE prophylactic administrations have been made.
@@ -73,7 +76,7 @@ public class PharmacologicVteProphylaxisAdministered {
           DateTimeDt timeTaken = (DateTimeDt) administration.getEffectiveTime();
           Long period = HarmsLookups.efficacyList.get(medsSet);
           if (vtePpx.getCode().equals(medsSet)
-              && withinDrugPeriod(timeTaken.getValue(), period, clock)) {
+              && HarmsLookups.withinDrugPeriod(timeTaken.getValue(), period, now)) {
 
             // Check dose ratio for Enoxaparin SC
             if (vtePpx.getCode().equals(
@@ -135,20 +138,5 @@ public class PharmacologicVteProphylaxisAdministered {
    */
   public BigDecimal getPatientWeight(String encounterId) {
     return HarmsLookups.getPatientWeight(apiClient, encounterId);
-  }
-
-  /**
-   * Wraps HarmsLookups within drug period method to facilitate unit testing.
-   *
-   * @param timeTaken
-   *    The time the drug was administered.
-   * @param period
-   *    The period, in seconds, that the drug is active.
-   * @param clock
-   *    Shared configurable timekeeping instance.
-   * @return Whether the time taken is within the period of efficacy for the drug to now.
-   */
-  public boolean withinDrugPeriod(Date timeTaken, long period, Clock clock) {
-    return HarmsLookups.withinDrugPeriod(timeTaken, period, clock);
   }
 }

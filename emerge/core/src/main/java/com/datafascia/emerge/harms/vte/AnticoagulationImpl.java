@@ -7,6 +7,7 @@ import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
+import com.datafascia.api.client.Observations;
 import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.emerge.harms.HarmsLookups;
 import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
@@ -45,7 +46,8 @@ public class AnticoagulationImpl {
   public Optional<AnticoagulationTypeEnum> getAnticoagulationType(String encounterId) {
     List<MedicationAdministration> administrations = apiClient.getMedicationAdministrationClient()
         .search(encounterId);
-    return getAnticoagulationType(administrations, encounterId, Instant.now(clock),
+    Observations observations = apiClient.getObservationClient().list(encounterId);
+    return getAnticoagulationType(administrations, observations, encounterId, Instant.now(clock),
         apiClient);
   }
 
@@ -54,6 +56,8 @@ public class AnticoagulationImpl {
    *
    * @param administrations
    *     All medication administrations for an encounter.
+   * @param observations
+   *     All observations for this encounter.
    * @param encounterId
    *     encounter to search
    * @param now
@@ -64,6 +68,7 @@ public class AnticoagulationImpl {
    */
   public Optional<AnticoagulationTypeEnum> getAnticoagulationType(
       Collection<MedicationAdministration> administrations,
+      Observations observations,
       String encounterId, Instant now,
       ClientBuilder client) {
     administrations = MedicationAdministrationUtils.freshestOfAllOrders(administrations).values();
@@ -106,23 +111,39 @@ public class AnticoagulationImpl {
                     return Optional.of(antiType);
                   } else if (MedicationAdministrationStatusEnum.COMPLETED
                       .equals(admin.getStatusElement().getValueAsEnum())) {
-                    if (HarmsLookups.withinDrugPeriod(timeTaken.getValue(), period, clock)) {
+                    if (HarmsLookups.withinDrugPeriod(timeTaken.getValue(), period, now)) {
                       return Optional.of(antiType);
                     }
                   }
                 }
-              } else {
-                // Intermittent but not Enoxaparin
+              } else if (medsSet.equals(AnticoagulationTypeEnum.INTERMITTENT_WARFARIN_ENTERAL
+                  .getCode())) {
+                // Special case for Warfarin: "Been administered within 3 days + INR > 1.5"
+                if (!HarmsLookups.inrOver1point5(observations, null)) {
+                  return Optional.empty();
+                }
+
                 if (MedicationAdministrationStatusEnum.IN_PROGRESS
                     .equals(admin.getStatusElement().getValueAsEnum())) {
                   return Optional.of(antiType);
                 } else if (MedicationAdministrationStatusEnum.COMPLETED
                     .equals(admin.getStatusElement().getValueAsEnum())) {
-                  if (HarmsLookups.withinDrugPeriod(timeTaken.getValue(), period, clock)) {
+                  if (HarmsLookups.withinDrugPeriod(timeTaken.getValue(), period, now)) {
                     return Optional.of(antiType);
                   }
                 } // end if admin is in progress or completed
-              } // end if intermittent is or isn't enoxaparin
+              } else {
+                // Intermittent but not Enoxaparin or Warfarin
+                if (MedicationAdministrationStatusEnum.IN_PROGRESS
+                    .equals(admin.getStatusElement().getValueAsEnum())) {
+                  return Optional.of(antiType);
+                } else if (MedicationAdministrationStatusEnum.COMPLETED
+                    .equals(admin.getStatusElement().getValueAsEnum())) {
+                  if (HarmsLookups.withinDrugPeriod(timeTaken.getValue(), period, now)) {
+                    return Optional.of(antiType);
+                  }
+                } // end if admin is in progress or completed
+              } // end if intermittent is or isn't enoxaparin or warfarin
             } // end if is or isn't intermittent
           } // end if meds set matches an anticoagulation type
         }

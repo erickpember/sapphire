@@ -11,7 +11,6 @@ import com.datafascia.emerge.ucsf.ObservationUtils;
 import com.datafascia.emerge.ucsf.codes.MedsSetEnum;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
 import java.math.BigDecimal;
-import java.time.Clock;
 import java.time.Instant;
 import java.util.Date;
 import java.util.HashMap;
@@ -46,7 +45,7 @@ public class HarmsLookups {
       put(MedsSetEnum.INTERMITTENT_RIVAROXABAN_ENTERAL.getCode(), TimeUnit.HOURS.toMillis(25));
       put(MedsSetEnum.INTERMITTENT_EDOXABAN_ENTERAL.getCode(), TimeUnit.HOURS.toMillis(25));
       put(MedsSetEnum.INTERMITTENT_FONDAPARINUX_SC.getCode(), TimeUnit.HOURS.toMillis(25));
-      put(MedsSetEnum.INTERMITTENT_WARFARIN_ENTERAL.getCode(), TimeUnit.HOURS.toMillis(3));
+      put(MedsSetEnum.INTERMITTENT_WARFARIN_ENTERAL.getCode(), TimeUnit.DAYS.toMillis(3));
     }
   };
 
@@ -57,17 +56,15 @@ public class HarmsLookups {
    *    The time the drug was administered.
    * @param period
    *    The period, in milliseconds, that the drug is active.
-   * @param clock
-   *    Shared configurable timekeeping instance.
+   * @param now
+   *    Current time.
    * @return Whether the time taken is within the period of efficacy for the drug to now.
    */
-  public static boolean withinDrugPeriod(Date timeTaken, long period, Clock clock) {
+  public static boolean withinDrugPeriod(Date timeTaken, long period, Instant now) {
     long timeTakenLong = timeTaken.getTime();
     Date lastEffectiveTime = new Date(timeTakenLong + period);
 
-    Date now = Date.from(Instant.now(clock));
-
-    return !now.after(lastEffectiveTime);
+    return !Date.from(now).after(lastEffectiveTime);
   }
 
   /**

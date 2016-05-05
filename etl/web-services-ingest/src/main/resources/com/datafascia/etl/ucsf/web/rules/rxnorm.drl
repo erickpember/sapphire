@@ -825,9 +825,10 @@ end
 
 rule "Continuous Infusion Heparin IV"
   when
-    $p:RxNorm(drugId == "206328" || 
+    $p:RxNorm(drugName != null && drugName.contains("25,000 UNIT") &&
+             (drugId == "206328" ||
               drugId == "15845"  ||
-              drugId == "15846")
+              drugId == "15846"))
   then
     MedsSet result = new MedsSet();
     result.setCode("UCSF_A68");

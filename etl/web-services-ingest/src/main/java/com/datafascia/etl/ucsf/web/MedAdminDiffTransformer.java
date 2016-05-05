@@ -216,6 +216,7 @@ public class MedAdminDiffTransformer {
         setAhfs(ahfslist);
         setPca(orderJson.get("PCA").toString());
         setDrugId(orderJson.get("DrugID").toString());
+        setDrugName(drugName);
         setRxcuiIn(rxNormIngredients);
       }
     };

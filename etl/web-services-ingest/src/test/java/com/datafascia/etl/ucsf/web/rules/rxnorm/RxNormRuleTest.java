@@ -595,9 +595,16 @@ public class RxNormRuleTest {
     RxNorm ucsfa68 = new RxNorm() {
       {
         setDrugId("206328");
+        setDrugName("HEPARIN (PORCINE) 25,000 UNIT/500 ML (50 UNIT/ML) IN DEXTROSE 5 % IV\"");
       }
     };
     meds.add(ucsfa68);
+    RxNorm ucsfa68fail = new RxNorm() {
+      {
+        setDrugId("206328");
+      }
+    };
+    meds.add(ucsfa68fail);
     RxNorm ucsfa69 = new RxNorm() {
       {
         getRxcuiIn().add("235473");
@@ -874,6 +881,7 @@ public class RxNormRuleTest {
     assertEquals(ucsfa67.getMedsSets().get(0).getCode(), "UCSF_A67");
     assertEquals(ucsfa68.getMedsSets().get(0).getCode(), "UCSF_A68");
     assertEquals(ucsfa69.getMedsSets().get(0).getCode(), "UCSF_A69");
+    assertEquals(ucsfa68fail.getMedsSets().size(), 0);
     assertEquals(ucsfa70.getMedsSets().get(0).getCode(), "UCSF_A70");
     assertEquals(ucsfa71.getMedsSets().get(0).getCode(), "UCSF_A71");
     assertEquals(ucsfa72.getMedsSets().get(0).getCode(), "UCSF_A72");

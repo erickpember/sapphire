@@ -48,6 +48,10 @@ public class RxNorm {
   @JsonProperty("drugId")
   private String drugId;
 
+  /** Unprocessed Pre-normalized "Drug Name". */
+  @JsonProperty("drugName")
+  private String drugName;
+
   /** RxNorm (RXCUI for TTY = IN). */
   @JsonProperty("rxcuiIn")
   private List<String> rxcuiIn = new ArrayList();

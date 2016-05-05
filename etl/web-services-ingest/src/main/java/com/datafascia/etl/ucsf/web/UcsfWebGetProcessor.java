@@ -13,6 +13,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
 import java.time.Instant;
+import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -302,7 +303,12 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
         try {
           JSONObject jsonObject = (JSONObject) new JSONParser().parse(jsonString);
           String extractDateTime = jsonObject.get("ExtractDateTime").toString();
-          Instant correctTime = epicDateToInstant(extractDateTime);
+          Instant correctTime;
+          try {
+            correctTime = Instant.parse(extractDateTime);
+          } catch (DateTimeParseException e) {
+            correctTime = epicDateToInstant(extractDateTime);
+          }
           // The webservice is off by its UTC offset, we need to account for that.
           Instant incorrectTime
               = correctTime.minus(getOffset(extractDateTime), ChronoUnit.MILLIS);

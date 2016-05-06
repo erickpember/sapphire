@@ -192,10 +192,12 @@ public class MedicationAdministrationUtils {
       PeriodDt timeFrame, String medsSet) {
     allAdminsPerEncounter = freshestOfAllOrders(allAdminsPerEncounter).values();
     return allAdminsPerEncounter.stream()
-        .filter(medicationAdministration -> medicationAdministration.getStatusElement().
-            getValueAsEnum() == MedicationAdministrationStatusEnum.IN_PROGRESS
-            || medicationAdministration.getStatusElement().getValueAsEnum()
-            == MedicationAdministrationStatusEnum.COMPLETED)
+        .filter(medicationAdministration ->
+            medicationAdministration.getReasonNotGiven().isEmpty() &&
+            (medicationAdministration.getStatusElement().getValueAsEnum() ==
+                MedicationAdministrationStatusEnum.IN_PROGRESS ||
+            medicationAdministration.getStatusElement().getValueAsEnum() ==
+                MedicationAdministrationStatusEnum.COMPLETED))
         .filter(admin -> hasMedsSet(admin, medsSet))
         .filter(medicationAdministration -> insideTimeFrame(medicationAdministration, timeFrame))
         .anyMatch(medicationAdministration -> dosageOverZero(medicationAdministration));

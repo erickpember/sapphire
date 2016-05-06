@@ -34,16 +34,16 @@ public class RecentStressUlcerProphylaxisAdministrationTest
   public void testTest_4args() {
     ClientBuilder apiClient = TestResources.createMockClient();
 
-    MedicationAdministration supPassOldActiveOrder = TestResources.createMedicationAdministration(
+    MedicationAdministration supPassActiveOrder = TestResources.createMedicationAdministration(
         "id",
         Arrays.asList(MedsSetEnum.STRESS_ULCER_PROPHYLACTICS.getCode()),
         MedicationAdministrationStatusEnum.IN_PROGRESS,
         1,
         "mg/kg",
-        new DateTimeDt(Date.from(Instant.now().minus(30, ChronoUnit.HOURS))),
+        new DateTimeDt(Date.from(Instant.now().minus(20, ChronoUnit.HOURS))),
         "activeOrder");
 
-    assertTrue(test(Arrays.asList(supPassOldActiveOrder), "encounterId", Instant.now(),
+    assertTrue(test(Arrays.asList(supPassActiveOrder), "encounterId", Instant.now(),
         apiClient));
 
     MedicationAdministration supFailOldCompletedOrder = TestResources

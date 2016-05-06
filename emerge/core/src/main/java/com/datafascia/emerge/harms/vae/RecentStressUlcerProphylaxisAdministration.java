@@ -2,18 +2,24 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.harms.vae;
 
+import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
+import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
 import com.datafascia.emerge.ucsf.codes.MedsSetEnum;
 import java.time.Clock;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
+import lombok.extern.slf4j.Slf4j;
 
 /**
  * Checks if there is a recent stress ulcer prophylaxis administration.
  */
+@Slf4j
 public class RecentStressUlcerProphylaxisAdministration {
 
   @Inject
@@ -22,7 +28,6 @@ public class RecentStressUlcerProphylaxisAdministration {
   @Inject
   private ClientBuilder apiClient;
 
-  private static final long ACTIVELY_INFUSING_LOOKBACK = 4;
   private static final long SUP_LOOKBACK = 25;
 
   /**
@@ -53,15 +58,12 @@ public class RecentStressUlcerProphylaxisAdministration {
    */
   public boolean test(List<MedicationAdministration> admins, String encounterId, Instant now,
       ClientBuilder client) {
-    return MedicationAdministrationUtils.freshestOfAllOrders(admins).values()
-        .stream()
-        .filter(administration -> administration.getReasonNotGiven().isEmpty())
-        .anyMatch(admin -> MedicationAdministrationUtils.isActivelyInfusing(
-                admin,
-                MedsSetEnum.STRESS_ULCER_PROPHYLACTICS.getCode(),
-                now,
-                ACTIVELY_INFUSING_LOOKBACK + SUP_LOOKBACK,
-                client,
-                encounterId));
+    Date twentyFiveHoursAgo = Date.from(now.minus(SUP_LOOKBACK, ChronoUnit.HOURS));
+    PeriodDt supPeriod = new PeriodDt();
+    supPeriod.setStart(twentyFiveHoursAgo, TemporalPrecisionEnum.SECOND);
+    supPeriod.setEnd(Date.from(now), TemporalPrecisionEnum.SECOND);
+
+    return MedicationAdministrationUtils.beenAdministered(
+        admins, supPeriod, MedsSetEnum.STRESS_ULCER_PROPHYLACTICS.getCode());
   }
 }

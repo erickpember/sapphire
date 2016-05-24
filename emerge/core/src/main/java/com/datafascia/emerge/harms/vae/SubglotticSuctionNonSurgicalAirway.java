@@ -80,11 +80,7 @@ public class SubglotticSuctionNonSurgicalAirway {
     Optional<Observation> freshestAirwayDevice = observations.findFreshest(
         ObservationCodeEnum.AIRWAY_DEVICE_CODE.getCode());
 
-    if (!freshestAirwayDevice.isPresent()) {
-      return TimestampedMaybe.Value.NOT_DOCUMENTED;
-    }
-
-    if (freshestAirwayDevice.get().getValue() != null) {
+    if (freshestAirwayDevice.isPresent() && freshestAirwayDevice.get().getValue() != null) {
 
       String airwayName = ObservationUtils.airwayName(freshestAirwayDevice.get());
 

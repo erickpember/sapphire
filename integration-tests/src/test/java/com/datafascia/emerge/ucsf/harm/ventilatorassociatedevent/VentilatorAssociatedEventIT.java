@@ -46,7 +46,7 @@ public class VentilatorAssociatedEventIT extends HarmEvidenceTestSupport {
     TimestampedMaybe subglotticSuctionNonSurgicalAirway =
         vae.getSubglotticSuctionNonSurgicalAirway();
     assertEquals(
-        subglotticSuctionNonSurgicalAirway.getValue(), TimestampedMaybe.Value.NOT_DOCUMENTED);
+        subglotticSuctionNonSurgicalAirway.getValue(), TimestampedMaybe.Value.NO);
     assertEquals(subglotticSuctionNonSurgicalAirway.getUpdateTime(), Date.from(Instant.now(clock)));
   }
 

@@ -51,7 +51,7 @@ end
 
 rule "Update code status"
 when
-  Event( type == EventType.UPDATE_PROCEDURE_REQUEST )
+  Event( type in ( EventType.TIMER, EventType.UPDATE_PROCEDURE_REQUEST ) )
   $request: ProcedureRequest( CodeStatusImpl.isRelevant($request) )
   $encounter: Encounter()
 then

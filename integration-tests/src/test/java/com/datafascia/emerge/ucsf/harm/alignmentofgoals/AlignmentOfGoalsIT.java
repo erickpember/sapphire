@@ -89,11 +89,16 @@ public class AlignmentOfGoalsIT extends HarmEvidenceTestSupport {
   @Test
   public void should_export_code_status_attending_dnr_dni() throws Exception {
     processNursingOrder("code-status-attending-dnr-dni.json");
-    Thread.sleep(1000);
-    processTimer();
 
     HarmEvidence harmEvidence = readHarmEvidence();
     CodeStatus codeStatus = harmEvidence.getMedicalData().getAOG().getCodeStatus();
+    assertEquals(codeStatus.getValue(), CodeStatus.Value.NO_CURRENT_CODE_STATUS);
+
+    Thread.sleep(1000);
+    processTimer();
+
+    harmEvidence = readHarmEvidence();
+    codeStatus = harmEvidence.getMedicalData().getAOG().getCodeStatus();
     assertEquals(codeStatus.getValue(), CodeStatus.Value.ATTENDING_DNR_DNI);
     assertEquals(codeStatus.getUpdateTime(), Date.from(Instant.now(clock)));
   }

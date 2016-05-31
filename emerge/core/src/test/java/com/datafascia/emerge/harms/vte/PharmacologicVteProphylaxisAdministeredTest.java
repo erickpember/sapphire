@@ -23,7 +23,7 @@ import static org.testng.Assert.assertTrue;
 public class PharmacologicVteProphylaxisAdministeredTest
     extends PharmacologicVteProphylaxisAdministered {
 
-  private static final BigDecimal weight = new BigDecimal("100");
+  private static final BigDecimal WEIGHT = new BigDecimal("100");
 
   /**
    * Test of isPharmacologicVteProphylaxisAdministered method, of
@@ -83,6 +83,6 @@ public class PharmacologicVteProphylaxisAdministeredTest
 
   @Override
   public BigDecimal getPatientWeight(String encounterId) {
-    return weight;
+    return WEIGHT;
   }
 }

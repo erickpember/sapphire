@@ -40,8 +40,6 @@ public class PharmacologicVteProphylaxis {
    * @return optional pharmacologic VTE prophylaxis type, empty if not found
    */
   public Optional<String> getPharmacologicVteProphylaxisType(String encounterId) {
-    String type = null;
-
     List<MedicationOrder> medicationOrders = apiClient.getMedicationOrderClient()
         .search(encounterId);
 

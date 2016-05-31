@@ -33,7 +33,7 @@ public class HarmsLookups {
    * Drug efficacy durations.  See the current UCSF Emerge Medication Info Master spreadsheet,
    * VTE Duration of Anitcoagulation sheet, for details.
    */
-  public final static Map<String, Long> efficacyList = new HashMap<String, Long>() {
+  public final static Map<String, Long> EFFICACY_LIST = new HashMap<String, Long>() {
     {
       put(MedsSetEnum.CONTINUOUS_INFUSION_HEPARIN_IV.getCode(), TimeUnit.HOURS.toMillis(10));
       put(MedsSetEnum.INTERMITTENT_HEPARIN_SC.getCode(), TimeUnit.HOURS.toMillis(12));

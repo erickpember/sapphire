@@ -87,7 +87,7 @@ public class AnticoagulationImpl {
           if (antiType.getCode().equals(medsSet)) {
 
             // Get duration for evaluating completed admins.
-            Long period = HarmsLookups.efficacyList.get(medsSet);
+            Long period = HarmsLookups.EFFICACY_LIST.get(medsSet);
             Long lookbackHours = ACTIVELY_INFUSING_LOOKBACK + TimeUnit.MILLISECONDS.toHours(period);
             DateTimeDt timeTaken = (DateTimeDt) admin.getEffectiveTime();
 

@@ -11,7 +11,9 @@ import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
+import java.util.Date;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertFalse;
@@ -44,8 +46,8 @@ public class PharmacologicVteProphylaxisAdministeredTest
         PharmacologicVtePpxTypeEnum.INTERMITTENT_ENOXAPARIN.getCode(),
         MedicationAdministrationStatusEnum.IN_PROGRESS, 85, "mg");
 
-    assertTrue(isPharmacologicVteProphylaxisAdministered(Arrays.asList(enoxpass), "whatever",
-        now));
+    assertTrue(isPharmacologicVteProphylaxisAdministered(Arrays.asList(enoxFail, enoxpass),
+        "whatever", now));
 
     MedicationAdministration enoxFail2 = createMedicationAdministration(
         PharmacologicVtePpxTypeEnum.INTERMITTENT_ENOXAPARIN.getCode(),
@@ -53,6 +55,21 @@ public class PharmacologicVteProphylaxisAdministeredTest
 
     assertFalse(isPharmacologicVteProphylaxisAdministered(Arrays.asList(enoxFail2), "whatever",
         now));
+
+    DateTimeDt tooLongAgo = new DateTimeDt(Date.from(now.minus(26, ChronoUnit.HOURS)));
+    MedicationAdministration enoxFail3 = createMedicationAdministration(
+        PharmacologicVtePpxTypeEnum.INTERMITTENT_ENOXAPARIN.getCode(),
+        MedicationAdministrationStatusEnum.IN_PROGRESS, 85, "mg", tooLongAgo);
+
+    assertFalse(isPharmacologicVteProphylaxisAdministered(Arrays.asList(enoxFail3), "whatever",
+        now));
+
+    assertTrue(isPharmacologicVteProphylaxisAdministered(Arrays.asList(enoxFail3, enoxpass),
+        "whatever", now));
+
+    assertTrue(isPharmacologicVteProphylaxisAdministered(Arrays.asList(enoxpass, enoxFail3),
+        "whatever", now));
+
 
     MedicationAdministration hepPass = createMedicationAdministration(
         PharmacologicVtePpxTypeEnum.INTERMITTENT_HEPARIN_SC.getCode(),
@@ -64,6 +81,12 @@ public class PharmacologicVteProphylaxisAdministeredTest
 
   private MedicationAdministration createMedicationAdministration(String medsSet,
       MedicationAdministrationStatusEnum status, int dose, String unit) {
+    return createMedicationAdministration(medsSet, status, dose, unit,
+        DateTimeDt.withCurrentTime());
+  }
+
+  private MedicationAdministration createMedicationAdministration(String medsSet,
+      MedicationAdministrationStatusEnum status, int dose, String unit, DateTimeDt effectiveTime) {
 
     MedicationAdministration administration = new MedicationAdministration();
     administration.addIdentifier()
@@ -73,7 +96,7 @@ public class PharmacologicVteProphylaxisAdministeredTest
         .setSystem(CodingSystems.UCSF_MEDICATION_GROUP_NAME)
         .setValue(medsSet);
     administration.setStatus(status);
-    administration.setEffectiveTime(DateTimeDt.withCurrentTime());
+    administration.setEffectiveTime(effectiveTime);
     MedicationAdministration.Dosage dosage = new MedicationAdministration.Dosage();
     dosage.setQuantity(new SimpleQuantityDt(dose, "", unit));
     dosage.setRate(new RatioDt());

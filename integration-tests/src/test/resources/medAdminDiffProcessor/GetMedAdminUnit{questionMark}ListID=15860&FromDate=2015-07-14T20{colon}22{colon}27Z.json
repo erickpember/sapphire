@@ -18,6 +18,7 @@
               "User": "   4188^ANTONY, AJISH"
             }
           ], 
+          "DateTimeEnded": "/Date(0000000000000-0000)/", 
           "DateTimeOrdered": "/Date(1433499300000-0700)/", 
           "DrugID": "2402", 
           "DrugName": "DIAZEPAM 5 MG/5 ML ORAL SOLUTION", 
@@ -1738,6 +1739,7 @@
               "User": "  18060^SANSOM, DAVID"
             }
           ], 
+          "DateTimeEnded": "/Date(0000000000000-0000)/", 
           "DateTimeOrdered": "/Date(1434013689000-0700)/", 
           "DrugID": "99", 
           "DrugName": "ACETAMINOPHEN 80 MG CHEWABLE TABLET", 

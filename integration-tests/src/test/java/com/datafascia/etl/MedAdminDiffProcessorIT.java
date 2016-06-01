@@ -245,6 +245,8 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
     assertEquals(order.getIdentifierFirstRep().getValue(), expected.identifier);
     assertEquals(order.getDateWritten(), new DateTimeDt(Date.from(
         UcsfWebGetProcessor.epicDateToInstant(expected.dateTimeOrdered))).getValue());
+    assertEquals(order.getDateEnded(), new DateTimeDt(Date.from(
+        UcsfWebGetProcessor.epicDateToInstant(expected.dateTimeEnded))).getValue());
     assertEquals(order.getStatus().toUpperCase(), expected.orderStatus);
     if (expectedDosage.getDose() != null) {
       MedicationOrder.DosageInstruction dosage = order.getDosageInstructionFirstRep();
@@ -545,6 +547,7 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
     {
       put("159301110", new TestNewOrder().builder()
           .identifier("159301110")
+          .dateTimeEnded("/Date(0000000000000-0000)/")
           .dateTimeOrdered("/Date(1432896430000-0700)/")
           .orderStatus("STOPPED")
           .orderedDose("1")
@@ -552,6 +555,7 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
           .build());
       put("159301111", new TestNewOrder().builder()
           .identifier("159301111")
+          .dateTimeEnded("/Date(0000000000000-0000)/")
           .dateTimeOrdered("/Date(1433149283000-0700)/")
           .orderStatus("ACTIVE")
           .orderedDose("800")
@@ -559,6 +563,7 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
           .build());
       put("159301112", new TestNewOrder().builder()
           .identifier("159301112")
+          .dateTimeEnded("/Date(0000000000000-0000)/")
           .dateTimeOrdered("/Date(1433150574000-0700)/")
           .orderStatus("ACTIVE")
           .orderedDose("50")
@@ -566,6 +571,7 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
           .build());
       put("159301113", new TestNewOrder().builder()
           .identifier("159301113")
+          .dateTimeEnded("/Date(0000000000000-0000)/")
           .dateTimeOrdered("/Date(1433499153000-0700)/")
           .orderStatus("ACTIVE")
           .orderedDose("2")
@@ -573,6 +579,7 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
           .build());
       put("159301114", new TestNewOrder().builder()
           .identifier("159301114")
+          .dateTimeEnded("/Date(0000000000000-0000)/")
           .dateTimeOrdered("/Date(1433499300000-0700)/")
           .orderStatus("ACTIVE")
           .orderedDose("5")
@@ -580,6 +587,7 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
           .build());
       put("159301115", new TestNewOrder().builder()
           .identifier("159301115")
+          .dateTimeEnded("/Date(0000000000000-0000)/")
           .dateTimeOrdered("/Date(1433499567000-0700)/")
           .orderStatus("STOPPED")
           .orderedDose("10")
@@ -587,6 +595,7 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
           .build());
       put("159301116", new TestNewOrder().builder()
           .identifier("159301116")
+          .dateTimeEnded("/Date(0000000000000-0000)/")
           .dateTimeOrdered("/Date(1433499692000-0700)/")
           .orderStatus("ACTIVE")
           .orderedDose("2")
@@ -594,6 +603,7 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
           .build());
       put("159301117", new TestNewOrder().builder()
           .identifier("159301117")
+          .dateTimeEnded("/Date(0000000000000-0000)/")
           .dateTimeOrdered("/Date(1434013133000-0700)/")
           .orderStatus("COMPLETED")
           .orderedDose("650")
@@ -601,12 +611,14 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
           .build());
       put("159301118", new TestNewOrder().builder()
           .identifier("159301118")
+          .dateTimeEnded("/Date(0000000000000-0000)/")
           .dateTimeOrdered("/Date(1434013430000-0700)/")
           .orderStatus("ACTIVE")
           .orderedDoseUnit("")
           .build());
       put("159301119", new TestNewOrder().builder()
           .identifier("159301119")
+          .dateTimeEnded("/Date(0000000000000-0000)/")
           .dateTimeOrdered("/Date(1434013689000-0700)/")
           .orderStatus("DRAFT")
           .orderedDose("80")
@@ -614,6 +626,7 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
           .build());
       put("159301120", new TestNewOrder().builder()
           .identifier("159301120")
+          .dateTimeEnded("/Date(0000000000000-0000)/")
           .dateTimeOrdered("/Date(1434112582000-0700)/")
           .frequency("Twice Daily")
           .orderStatus("DRAFT")
@@ -623,6 +636,7 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
           .build());
       put("159301127", new TestNewOrder().builder()
           .identifier("159301127")
+          .dateTimeEnded("/Date(0000000000000-0000)/")
           .dateTimeOrdered("/Date(1436361637000-0700)/")
           .orderStatus("DRAFT")
           .orderedDose("0-20")
@@ -630,6 +644,7 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
           .build());
       put("159301128", new TestNewOrder().builder()
           .identifier("159301128")
+          .dateTimeEnded("/Date(0000000000000-0000)/")
           .dateTimeOrdered("/Date(1436361638000-0700)/")
           .orderStatus("DRAFT")
           .orderedDose("5-10")
@@ -638,6 +653,7 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
           .build());
       put("159301145", new TestNewOrder().builder()
           .identifier("159301145")
+          .dateTimeEnded("/Date(0000000000000-0000)/")
           .dateTimeOrdered("/Date(1436792480000-0700)/")
           .frequency("Once")
           .orderStatus("COMPLETED")
@@ -646,6 +662,7 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
           .build());
       put("159301146", new TestNewOrder().builder()
           .identifier("159301146")
+          .dateTimeEnded("/Date(0000000000000-0000)/")
           .dateTimeOrdered("/Date(1436792480000-0700)/")
           .orderStatus("COMPLETED")
           .orderedDose("5")
@@ -653,6 +670,7 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
           .build());
       put("159301147", new TestNewOrder().builder()
           .identifier("159301147")
+          .dateTimeEnded("/Date(0000000000000-0000)/")
           .dateTimeOrdered("/Date(1436792480000-0700)/")
           .orderStatus("DRAFT")
           .orderedDose("20000")
@@ -660,6 +678,7 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
           .build());
       put("159301150", new TestNewOrder().builder()
           .identifier("159301150")
+          .dateTimeEnded("/Date(0000000000000-0000)/")
           .dateTimeOrdered("/Date(1436879925000-0700)/")
           .orderStatus("DRAFT")
           .orderedDose("50")
@@ -667,6 +686,7 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
           .build());
       put("159301151", new TestNewOrder().builder()
           .identifier("159301151")
+          .dateTimeEnded("/Date(0000000000000-0000)/")
           .dateTimeOrdered("/Date(1436879926000-0700)/")
           .orderStatus("DRAFT")
           .orderedDose("1")
@@ -674,6 +694,7 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
           .build());
       put("159301152", new TestNewOrder().builder()
           .identifier("159301152")
+          .dateTimeEnded("/Date(0000000000000-0000)/")
           .dateTimeOrdered("/Date(1436879926000-0700)/")
           .orderStatus("DRAFT")
           .orderedDose("2")
@@ -681,6 +702,7 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
           .build());
       put("159301153", new TestNewOrder().builder()
           .identifier("159301153")
+          .dateTimeEnded("/Date(0000000000000-0000)/")
           .dateTimeOrdered("/Date(1436879927000-0700)/")
           .orderStatus("DRAFT")
           .orderedDose("500")
@@ -688,6 +710,7 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
           .build());
       put("159301154", new TestNewOrder().builder()
           .identifier("159301154")
+          .dateTimeEnded("/Date(0000000000000-0000)/")
           .dateTimeOrdered("/Date(1436880679000-0700)/")
           .orderStatus("DRAFT")
           .orderedDose("1")
@@ -754,6 +777,7 @@ public class MedAdminDiffProcessorIT extends ApiTestSupport implements MedAdminD
   public static class TestNewOrder {
     private String identifier = "";
     private String dateTimeOrdered = "";
+    private String dateTimeEnded = "";
     private String frequency = "";
     private String orderStatus = "";
     private String orderedDose = "";

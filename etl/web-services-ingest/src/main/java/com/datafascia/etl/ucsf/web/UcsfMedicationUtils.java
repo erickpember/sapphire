@@ -232,6 +232,15 @@ public class UcsfMedicationUtils {
 
     // Fetch fields from the JSON.
     String dateTimeOrdered = orderJson.get("DateTimeOrdered").toString();
+    DateTimeDt endedDateDt = null;
+    if (orderJson.get("DateTimeEnded") == null) {
+      endedDateDt = new DateTimeDt(Date.from(Instant.EPOCH));
+    } else {
+      String dateTimeEnded = orderJson.get("DateTimeEnded").toString();
+      Instant endedInstant = UcsfWebGetProcessor.epicDateToInstant(dateTimeEnded);
+      endedDateDt = new DateTimeDt(Date.from(endedInstant));
+    }
+
     String orderStatus = orderJson.get("OrderStatus").toString();
     if (!orderStatus.isEmpty()) {
       String[] orderStatusParts = orderStatus.split("\\^");
@@ -259,7 +268,10 @@ public class UcsfMedicationUtils {
       throw new IllegalArgumentException("Medication order " + orderId
           + " lacks a reference to a medication:\n" + orderJson.toJSONString());
     }
+
     medicationOrder.setDateWritten(orderedDateDt);
+    medicationOrder.setDateEnded(endedDateDt);
+
     try {
       medicationOrder.setStatus(UcsfMedicationUtils.webOrderStatusToFhir(orderStatus));
     } catch (IllegalArgumentException e) {

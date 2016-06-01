@@ -16,6 +16,7 @@
               "User": "   IPRN^INPATIENT, NURSE"
             }
           ], 
+          "DateTimeEnded": "/Date(0000000000000-0000)/", 
           "DateTimeOrdered": "/Date(1436880679000-0700)/", 
           "DrugID": "112990", 
           "DrugName": "DOPAMINE 200 MG/250 ML (800 MCG/ML) IN 5 % DEXTROSE INTRAVENOUS SOLN", 

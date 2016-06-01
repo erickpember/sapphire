@@ -18,6 +18,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447236710000-0800)/",
                     "DrugID": "110674",
                     "DrugName": "LIDOCAINE (PF) 10 MG/ML (1 %) INJECTION SOLUTION",
@@ -175,6 +176,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447236710000-0800)/",
                     "DrugID": "208044",
                     "DrugName": "DEXMEDETOMIDINE 400 MCG/100 ML (4 MCG/ML) IN 0.9 % SODIUM CHLORIDE IV",
@@ -246,6 +248,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447236711000-0800)/",
                     "DrugID": "30807",
                     "DrugName": "FENTANYL (PF) 10 MCG/ML IN 0.9 % SODIUM CHLORIDE INTRAVENOUS",
@@ -312,6 +315,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447244597000-0800)/",
                     "DrugID": "40800107",
                     "DrugName": "MIDAZOLAM 125MG/250ML NS IV SOLN",
@@ -379,6 +383,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447252654000-0800)/",
                     "DrugID": "112307",
                     "DrugName": "WHITE PETROLATUM-MINERAL OIL 56.8 %-42.5 % EYE OINTMENT",
@@ -973,6 +978,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447252654000-0800)/",
                     "DrugID": "16168",
                     "DrugName": "CISATRACURIUM 2 MG/ML INTRAVENOUS SOLUTION",
@@ -1044,6 +1050,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447252654000-0800)/",
                     "DrugID": "400114",
                     "DrugName": "CISATRACURIUM INFUSION",
@@ -1127,6 +1134,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447252654000-0800)/",
                     "DrugID": "40800107",
                     "DrugName": "MIDAZOLAM 125MG/250ML NS IV SOLN",
@@ -1188,6 +1196,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447257052000-0800)/",
                     "DrugID": "110550",
                     "DrugName": "HEPARIN, PORCINE (PF) 100 UNIT/ML INTRAVENOUS SYRINGE",
@@ -1426,6 +1435,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447556541000-0800)/",
                     "DrugID": "40800107",
                     "DrugName": "MIDAZOLAM 125MG/250ML NS IV SOLN",
@@ -1482,6 +1492,7 @@
                             "User": "   IPRN^INPATIENT, NURSE"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447556829000-0800)/",
                     "DrugID": "26226",
                     "DrugName": "PANTOPRAZOLE 40 MG INTRAVENOUS SOLUTION",
@@ -1644,6 +1655,7 @@
                             "User": "   IPRN^INPATIENT, NURSE"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447556829000-0800)/",
                     "DrugID": "110556",
                     "DrugName": "HEPARIN, PORCINE (PF) 5,000 UNIT/0.5 ML INJECTION SYRINGE",
@@ -1989,6 +2001,7 @@
                             "User": "   IPRN^INPATIENT, NURSE"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447556541000-0800)/",
                     "DrugID": "110556",
                     "DrugName": "HEPARIN, PORCINE (PF) 5,000 UNIT/0.5 ML INJECTION SYRINGE",
@@ -2217,6 +2230,7 @@
                             "User": "   IPRN^INPATIENT, NURSE"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447556541000-0800)/",
                     "DrugID": "110556",
                     "DrugName": "HEPARIN, PORCINE (PF) 5,000 UNIT/0.5 ML INJECTION SYRINGE",
@@ -2447,6 +2461,7 @@
                             "User": "   IPRN^INPATIENT, NURSE"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447556633000-0800)/",
                     "DrugID": "26226",
                     "DrugName": "PANTOPRAZOLE 40 MG INTRAVENOUS SOLUTION",
@@ -2570,6 +2585,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447556633000-0800)/",
                     "DrugID": "12734",
                     "DrugName": "ROCURONIUM 10 MG/ML INTRAVENOUS SOLUTION",
@@ -2646,6 +2662,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447343310000-0800)/",
                     "DrugID": "26226",
                     "DrugName": "PANTOPRAZOLE 40 MG INTRAVENOUS SOLUTION",
@@ -2849,6 +2866,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447343472000-0800)/",
                     "DrugID": "40800107",
                     "DrugName": "MIDAZOLAM 125MG/250ML NS IV SOLN",
@@ -2903,6 +2921,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447346904000-0800)/",
                     "DrugID": "40800107",
                     "DrugName": "MIDAZOLAM 125MG/250ML NS IV SOLN",
@@ -2960,6 +2979,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447346904000-0800)/",
                     "DrugID": "400114",
                     "DrugName": "CISATRACURIUM INFUSION",
@@ -3043,6 +3063,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447405990000-0800)/",
                     "DrugID": "11150",
                     "DrugName": "PROPOFOL 10 MG/ML INTRAVENOUS EMULSION",
@@ -3137,6 +3158,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447406008000-0800)/",
                     "DrugID": "110556",
                     "DrugName": "HEPARIN, PORCINE (PF) 5,000 UNIT/0.5 ML INJECTION SYRINGE",
@@ -3599,6 +3621,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447406049000-0800)/",
                     "DrugID": "400088",
                     "DrugName": "ARGATROBAN INFUSION",
@@ -3667,6 +3690,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447406224000-0800)/",
                     "DrugID": "112307",
                     "DrugName": "WHITE PETROLATUM-MINERAL OIL 56.8 %-42.5 % EYE OINTMENT",
@@ -4272,6 +4296,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447406224000-0800)/",
                     "DrugID": "103297",
                     "DrugName": "ARTIFICIAL TEARS (HYPROMELLOSE) 0.4 % EYE DROPS",
@@ -4395,6 +4420,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447406224000-0800)/",
                     "DrugID": "400114",
                     "DrugName": "CISATRACURIUM INFUSION",
@@ -4477,6 +4503,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447406225000-0800)/",
                     "DrugID": "40800107",
                     "DrugName": "MIDAZOLAM 125MG/250ML NS IV SOLN",
@@ -4534,6 +4561,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447406225000-0800)/",
                     "DrugID": "40800107",
                     "DrugName": "MIDAZOLAM 125MG/250ML NS IV SOLN",
@@ -4590,6 +4618,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447406309000-0800)/",
                     "DrugID": "26226",
                     "DrugName": "PANTOPRAZOLE 40 MG INTRAVENOUS SOLUTION",
@@ -4799,6 +4828,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447154948000-0800)/",
                     "DrugID": "11150",
                     "DrugName": "PROPOFOL 10 MG/ML INTRAVENOUS EMULSION",
@@ -4901,6 +4931,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447154948000-0800)/",
                     "DrugID": "30807",
                     "DrugName": "FENTANYL (PF) 10 MCG/ML IN 0.9 % SODIUM CHLORIDE INTRAVENOUS",
@@ -5016,6 +5047,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447155226000-0800)/",
                     "DrugID": "15845",
                     "DrugName": "HEPARIN (PORCINE) 25,000 UNIT/500 ML (50 UNIT/ML) IN DEXTROSE 5 % IV",
@@ -5098,6 +5130,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447155226000-0800)/",
                     "DrugID": "26226",
                     "DrugName": "PANTOPRAZOLE 40 MG INTRAVENOUS SOLUTION",
@@ -5272,6 +5305,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447161154000-0800)/",
                     "DrugID": "400088",
                     "DrugName": "ARGATROBAN INFUSION",
@@ -5353,6 +5387,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447154948000-0800)/",
                     "DrugID": "215414",
                     "DrugName": "MIDAZOLAM (PF) 1 MG/ML INJECTION SOLUTION",
@@ -5439,6 +5474,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447155226000-0800)/",
                     "DrugID": "10176",
                     "DrugName": "HEPARIN (PORCINE) 1,000 UNIT/ML INJECTION SOLUTION",
@@ -5510,6 +5546,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447346904000-0800)/",
                     "DrugID": "16168",
                     "DrugName": "CISATRACURIUM 2 MG/ML INTRAVENOUS SOLUTION",
@@ -5581,6 +5618,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447406224000-0800)/",
                     "DrugID": "16168",
                     "DrugName": "CISATRACURIUM 2 MG/ML INTRAVENOUS SOLUTION",
@@ -5655,6 +5693,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447497073000-0800)/",
                     "DrugID": "104992",
                     "DrugName": "ENOXAPARIN 40 MG/0.4 ML SUBCUTANEOUS SYRINGE",
@@ -5804,6 +5843,7 @@
                             "User": "   IPRN^INPATIENT, NURSE"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447501065000-0800)/",
                     "DrugID": "26226",
                     "DrugName": "PANTOPRAZOLE 40 MG INTRAVENOUS SOLUTION",
@@ -5975,6 +6015,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447490674000-0800)/",
                     "DrugID": "11150",
                     "DrugName": "PROPOFOL 10 MG/ML INTRAVENOUS EMULSION",
@@ -6089,6 +6130,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447488695000-0800)/",
                     "DrugID": "11150",
                     "DrugName": "PROPOFOL 10 MG/ML INTRAVENOUS EMULSION",
@@ -6198,6 +6240,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447488698000-0800)/",
                     "DrugID": "30807",
                     "DrugName": "FENTANYL (PF) 10 MCG/ML IN 0.9 % SODIUM CHLORIDE INTRAVENOUS",
@@ -6277,6 +6320,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447488877000-0800)/",
                     "DrugID": "26226",
                     "DrugName": "PANTOPRAZOLE 40 MG INTRAVENOUS SOLUTION",
@@ -6445,6 +6489,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447625484000-0800)/",
                     "DrugID": "400088",
                     "DrugName": "ARGATROBAN INFUSION",
@@ -6513,6 +6558,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447488500000-0800)/",
                     "DrugID": "15845",
                     "DrugName": "HEPARIN (PORCINE) 25,000 UNIT/500 ML (50 UNIT/ML) IN DEXTROSE 5 % IV",
@@ -6602,6 +6648,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447488501000-0800)/",
                     "DrugID": "10176",
                     "DrugName": "HEPARIN (PORCINE) 1,000 UNIT/ML INJECTION SOLUTION",
@@ -6671,6 +6718,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447488841000-0800)/",
                     "DrugID": "215414",
                     "DrugName": "MIDAZOLAM (PF) 1 MG/ML INJECTION SOLUTION",
@@ -6762,6 +6810,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447525008000-0800)/",
                     "DrugID": "208044",
                     "DrugName": "DEXMEDETOMIDINE 400 MCG/100 ML (4 MCG/ML) IN 0.9 % SODIUM CHLORIDE IV",
@@ -6846,6 +6895,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447525009000-0800)/",
                     "DrugID": "30807",
                     "DrugName": "FENTANYL (PF) 10 MCG/ML IN 0.9 % SODIUM CHLORIDE INTRAVENOUS",
@@ -6923,6 +6973,7 @@
                             "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
                         }
                     ],
+                    "DateTimeEnded": "/Date(0000000000000-0000)/",
                     "DateTimeOrdered": "/Date(1447531291000-0800)/",
                     "DrugID": "10011",
                     "DrugName": "FAMOTIDINE 20 MG TABLET",

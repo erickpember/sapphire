@@ -58,7 +58,6 @@ public class PharmacologicVteProphylaxisAdministered {
    */
   public boolean isPharmacologicVteProphylaxisAdministered(
       List<MedicationAdministration> administrations, String encounterId, Instant now) {
-    boolean administered = false;
 
     // Check if any recent VTE prophylactic administrations have been made.
     for (MedicationAdministration administration : administrations) {
@@ -81,18 +80,18 @@ public class PharmacologicVteProphylaxisAdministered {
             // Check dose ratio for Enoxaparin SC
             if (vtePpx.getCode().equals(
                 PharmacologicVtePpxTypeEnum.INTERMITTENT_ENOXAPARIN.getCode())) {
-              administered = isEnoxaparinUnderPoint86(administration, encounterId);
-              break;
+              if (isEnoxaparinUnderPoint86(administration, encounterId)) {
+                return true;
+              }
             } else {
-              administered = true;
-              break;
+              return true;
             }
           }
         }
       }
     }
 
-    return administered;
+    return false;
   }
 
   private boolean isEnoxaparinUnderPoint86(MedicationAdministration admin, String encounterId) {

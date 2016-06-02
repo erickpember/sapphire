@@ -8,6 +8,7 @@ import ca.uhn.fhir.model.dstu2.resource.MedicationOrder;
 import ca.uhn.fhir.model.dstu2.valueset.MedicationOrderStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
+import java.time.Instant;
 import java.util.Date;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -85,6 +86,25 @@ public class MedicationOrderUtils {
   public static boolean isBefore(MedicationOrder medicationOrder, Date startTime) {
     IDatatype effectiveTime = medicationOrder.getDateWrittenElement();
     return ((DateTimeDt) effectiveTime).getValue().before(startTime);
+  }
+
+  /**
+   * Returns true if a specified medicationOrder is before a specified time.
+   *
+   * @param medicationOrder
+   *     MedicationOrder resource.
+   * @param expirationTime
+   *     Expiration time to compare.
+   * @return
+   *     True if the medication order's date ended is before the specified expiration time.
+   */
+  public static boolean isExpired(MedicationOrder medicationOrder, Date expirationTime) {
+    IDatatype effectiveTime = medicationOrder.getDateEndedElement();
+    if (effectiveTime != null &&
+        !((DateTimeDt) effectiveTime).getValue().equals(Date.from(Instant.EPOCH))) {
+      return ((DateTimeDt) effectiveTime).getValue().before(expirationTime);
+    }
+    return false;
   }
 
   /**

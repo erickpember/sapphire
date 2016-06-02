@@ -10,6 +10,9 @@ import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.emerge.harms.HarmsLookups;
 import com.datafascia.emerge.ucsf.MedicationOrderUtils;
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Instant;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import javax.inject.Inject;
@@ -22,6 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 public class PharmacologicVteProphylaxis {
   private static final BigDecimal NEGATIVE_ONE = new BigDecimal("-1");
   private static final BigDecimal ZERO_POINT_EIGHT_SIX = new BigDecimal("0.86");
+
+  @Inject
+  private Clock clock;
 
   @Inject
   private ClientBuilder apiClient;
@@ -39,7 +45,7 @@ public class PharmacologicVteProphylaxis {
     List<MedicationOrder> medicationOrders = apiClient.getMedicationOrderClient()
         .search(encounterId);
 
-    return getPharmacologicVteProphylaxisType(medicationOrders, encounterId);
+    return getPharmacologicVteProphylaxisType(medicationOrders, encounterId, Instant.now(clock));
   }
 
   /**
@@ -49,10 +55,12 @@ public class PharmacologicVteProphylaxis {
    *     All medication orders for a specific encounter.
    * @param encounterId
    *     ID for the same encounter, to use for patient weight retrieval in case of Enoxaparin.
+   * @param now
+   *     The current time.
    * @return optional pharmacologic VTE prophylaxis type, empty if not found
    */
   public Optional<String> getPharmacologicVteProphylaxisType(List<MedicationOrder> medicationOrders,
-      String encounterId) {
+      String encounterId, Instant now) {
     String type = null;
 
     for (MedicationOrder medicationOrder : medicationOrders) {
@@ -61,7 +69,8 @@ public class PharmacologicVteProphylaxis {
         for (IdentifierDt ident : MedicationOrderUtils.findIdentifiers(medicationOrder,
             CodingSystems.UCSF_MEDICATION_GROUP_NAME)) {
           for (PharmacologicVtePpxTypeEnum atEnum : PharmacologicVtePpxTypeEnum.values()) {
-            if (atEnum.getCode().equals(ident.getValue())) {
+            if (atEnum.getCode().equals(ident.getValue()) &&
+                !MedicationOrderUtils.isExpired(medicationOrder, Date.from(now))) {
               // Check dose ratio for Intermittent Enoxaparin SC
               if (ident.getValue().equals(PharmacologicVtePpxTypeEnum.INTERMITTENT_ENOXAPARIN
                   .getCode())) {

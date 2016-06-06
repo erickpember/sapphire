@@ -96,8 +96,6 @@ public class RassGoalImpl {
           ProcedureRequestCodeEnum.TARGET_RASS_NA_SEIZURES_STATUS_EPILEPTICUS.getCode())) {
         result.setGoal(13);
       }
-
-      result.setDataEntryTime(targetRass.getOrderedOn());
     }
 
     return result;

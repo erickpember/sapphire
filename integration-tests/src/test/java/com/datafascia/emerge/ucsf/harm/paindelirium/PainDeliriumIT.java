@@ -211,7 +211,6 @@ public class PainDeliriumIT extends HarmEvidenceTestSupport {
 
     RassGoal rassGoal = rass.getRassGoal();
     assertEquals(rassGoal.getGoal(), -2);
-    assertEquals(rassGoal.getDataEntryTime().toInstant().toString(), "2015-10-30T02:49:50Z");
   }
 
   @Test

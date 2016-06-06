@@ -233,10 +233,10 @@ public class UcsfMedicationUtils {
     // Fetch fields from the JSON.
     String dateTimeOrdered = orderJson.get("DateTimeOrdered").toString();
     DateTimeDt endedDateDt = null;
-    if (orderJson.get("DateTimeEnded") == null) {
+    if (orderJson.get("EndDate") == null) {
       endedDateDt = new DateTimeDt(Date.from(Instant.EPOCH));
     } else {
-      String dateTimeEnded = orderJson.get("DateTimeEnded").toString();
+      String dateTimeEnded = orderJson.get("EndDate").toString();
       Instant endedInstant = UcsfWebGetProcessor.epicDateToInstant(dateTimeEnded);
       endedDateDt = new DateTimeDt(Date.from(endedInstant));
     }

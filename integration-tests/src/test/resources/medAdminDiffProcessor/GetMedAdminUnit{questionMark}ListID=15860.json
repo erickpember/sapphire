@@ -18,7 +18,7 @@
               "User": "   4188^ANTONY, AJISH"
             }
           ], 
-          "DateTimeEnded": "/Date(0000000000000-0000)/", 
+          "EndDate": "/Date(0000000000000-0000)/", 
           "DateTimeOrdered": "/Date(1433149283000-0700)/", 
           "DrugID": "3845", 
           "DrugName": "IBUPROFEN 800 MG TABLET", 
@@ -73,7 +73,7 @@
               "User": "   4188^ANTONY, AJISH"
             }
           ], 
-          "DateTimeEnded": "/Date(0000000000000-0000)/", 
+          "EndDate": "/Date(0000000000000-0000)/", 
           "DateTimeOrdered": "/Date(1433150574000-0700)/", 
           "DrugID": "3037", 
           "DrugName": "FENTANYL (PF) 50 MCG/ML INJECTION SOLUTION", 
@@ -2033,7 +2033,7 @@
               "User": "   4188^ANTONY, AJISH"
             }
           ], 
-          "DateTimeEnded": "/Date(0000000000000-0000)/", 
+          "EndDate": "/Date(0000000000000-0000)/", 
           "DateTimeOrdered": "/Date(1433499153000-0700)/", 
           "DrugID": "106139", 
           "DrugName": "DIAZEPAM 5 MG/ML INJECTION SYRINGE", 
@@ -2090,7 +2090,7 @@
               "User": "   4188^ANTONY, AJISH"
             }
           ], 
-          "DateTimeEnded": "/Date(0000000000000-0000)/", 
+          "EndDate": "/Date(0000000000000-0000)/", 
           "DateTimeOrdered": "/Date(1433499300000-0700)/", 
           "DrugID": "2402", 
           "DrugName": "DIAZEPAM 5 MG/5 ML ORAL SOLUTION", 
@@ -3811,7 +3811,7 @@
               "User": "   4188^ANTONY, AJISH"
             }
           ], 
-          "DateTimeEnded": "/Date(0000000000000-0000)/", 
+          "EndDate": "/Date(0000000000000-0000)/", 
           "DateTimeOrdered": "/Date(1433499692000-0700)/", 
           "DrugID": "2404", 
           "DrugName": "DIAZEPAM 2 MG TABLET", 
@@ -3905,7 +3905,7 @@
               "User": "   4188^ANTONY, AJISH"
             }
           ], 
-          "DateTimeEnded": "/Date(0000000000000-0000)/", 
+          "EndDate": "/Date(0000000000000-0000)/", 
           "DateTimeOrdered": "/Date(1434013430000-0700)/", 
           "DrugID": "3726", 
           "DrugName": "HYDROCORTISONE 1 % TOPICAL CREAM", 
@@ -4911,7 +4911,7 @@
               "User": "  18060^SANSOM, DAVID"
             }
           ], 
-          "DateTimeEnded": "/Date(0000000000000-0000)/", 
+          "EndDate": "/Date(0000000000000-0000)/", 
           "DateTimeOrdered": "/Date(1434013689000-0700)/", 
           "DrugID": "99", 
           "DrugName": "ACETAMINOPHEN 80 MG CHEWABLE TABLET", 
@@ -4992,7 +4992,7 @@
               "User": "   IPMD^INPATIENT, ATTENDING PHYSICIAN"
             }
           ], 
-          "DateTimeEnded": "/Date(0000000000000-0000)/", 
+          "EndDate": "/Date(0000000000000-0000)/", 
           "DateTimeOrdered": "/Date(1434112582000-0700)/", 
           "DrugID": "451", 
           "DrugName": "AMOXICILLIN 500 MG CAPSULE", 
@@ -5041,7 +5041,7 @@
               "User": " RXPHARM^WILLOW INPATIENT, PHARMACIST"
             }
           ], 
-          "DateTimeEnded": "/Date(0000000000000-0000)/", 
+          "EndDate": "/Date(0000000000000-0000)/", 
           "DateTimeOrdered": "/Date(1436361637000-0700)/", 
           "DrugID": "40800107", 
           "DrugName": "MIDAZOLAM 125MG/250ML NS IV SOLN", 
@@ -5096,7 +5096,7 @@
               "User": " RXPHARM^WILLOW INPATIENT, PHARMACIST"
             }
           ], 
-          "DateTimeEnded": "/Date(0000000000000-0000)/", 
+          "EndDate": "/Date(0000000000000-0000)/", 
           "DateTimeOrdered": "/Date(1436361638000-0700)/", 
           "DrugID": "215413", 
           "DrugName": "MIDAZOLAM (PF) 5 MG/ML INJECTION SOLUTION", 
@@ -5144,7 +5144,7 @@
               "User": "  18060^SANSOM, DAVID"
             }
           ], 
-          "DateTimeEnded": "/Date(0000000000000-0000)/", 
+          "EndDate": "/Date(0000000000000-0000)/", 
           "DateTimeOrdered": "/Date(1436792480000-0700)/", 
           "DrugID": "14643", 
           "DrugName": "EPOETIN ALFA 20,000 UNIT/ML INJECTION SOLUTION", 
@@ -5207,7 +5207,7 @@
               "User": "   4188^ANTONY, AJISH"
             }
           ], 
-          "DateTimeEnded": "/Date(0000000000000-0000)/", 
+          "EndDate": "/Date(0000000000000-0000)/", 
           "DateTimeOrdered": "/Date(1432896430000-0700)/", 
           "DrugID": "19474", 
           "DrugName": "ACETAMINOPHEN 300 MG-CODEINE 15 MG TABLET", 
@@ -5266,7 +5266,7 @@
               "User": "   4188^ANTONY, AJISH"
             }
           ], 
-          "DateTimeEnded": "/Date(0000000000000-0000)/", 
+          "EndDate": "/Date(0000000000000-0000)/", 
           "DateTimeOrdered": "/Date(1433499567000-0700)/", 
           "DrugID": "2405", 
           "DrugName": "DIAZEPAM 5 MG TABLET", 
@@ -5309,7 +5309,7 @@
               "User": "  18060^SANSOM, DAVID"
             }
           ], 
-          "DateTimeEnded": "/Date(0000000000000-0000)/", 
+          "EndDate": "/Date(0000000000000-0000)/", 
           "DateTimeOrdered": "/Date(1434013133000-0700)/", 
           "DrugID": "13410", 
           "DrugName": "ACETAMINOPHEN ER 650 MG TABLET,EXTENDED RELEASE", 
@@ -5364,7 +5364,7 @@
               "User": "  18060^SANSOM, DAVID"
             }
           ], 
-          "DateTimeEnded": "/Date(0000000000000-0000)/", 
+          "EndDate": "/Date(0000000000000-0000)/", 
           "DateTimeOrdered": "/Date(1436792480000-0700)/", 
           "DrugID": "2404", 
           "DrugName": "DIAZEPAM 2 MG TABLET", 
@@ -5419,7 +5419,7 @@
               "User": "  18060^SANSOM, DAVID"
             }
           ], 
-          "DateTimeEnded": "/Date(0000000000000-0000)/", 
+          "EndDate": "/Date(0000000000000-0000)/", 
           "DateTimeOrdered": "/Date(1436792480000-0700)/", 
           "DrugID": "1359", 
           "DrugName": "CARBAMIDE PEROXIDE 6.5 % EAR DROPS", 

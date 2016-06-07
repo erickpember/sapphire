@@ -100,8 +100,8 @@ public class MedicationOrderUtils {
    */
   public static boolean isExpired(MedicationOrder medicationOrder, Date expirationTime) {
     IDatatype effectiveTime = medicationOrder.getDateEndedElement();
-    if (effectiveTime != null &&
-        !((DateTimeDt) effectiveTime).getValue().equals(Date.from(Instant.EPOCH))) {
+    if (effectiveTime != null && ((DateTimeDt) effectiveTime).getValue() != null
+        && !((DateTimeDt) effectiveTime).getValue().equals(Date.from(Instant.EPOCH))) {
       return ((DateTimeDt) effectiveTime).getValue().before(expirationTime);
     }
     return false;

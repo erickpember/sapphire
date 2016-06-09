@@ -77,29 +77,34 @@ public class MechanicalVentilationGreaterThan48Hours {
     List<Observation> newEttInvasiveAndTrachInvasiveVentStatuses = observations.list(
         VENT_STATUS_OBSERVATION_CODES, fortyEightHoursAgo, null);
 
+    boolean thereAreNoDiscontinueETTObservations = true;
     for (Observation newEttOrTrachStatus : newEttInvasiveAndTrachInvasiveVentStatuses) {
       if (ObservationUtils.getValueAsString(newEttOrTrachStatus).equals("Patient taken off")
           || ObservationUtils.getValueAsString(newEttOrTrachStatus).equals("Discontinue")) {
-        // Logic for "No - Continuous"
-        List<Observation> oldEttInvasiveAndTrachInvasiveVentStatuses = observations.list(
-            VENT_STATUS_OBSERVATION_CODES, seventyTwoHoursAgo, fortyEightHoursAgo);
-        for (Observation ettOrTrachStatus : oldEttInvasiveAndTrachInvasiveVentStatuses) {
-          if (ObservationUtils.getValueAsString(ettOrTrachStatus).equals("Patient back on Invasive")
-              || ObservationUtils.getValueAsString(ettOrTrachStatus).equals("Continue")) {
-            return true;
-          }
-        }
+        thereAreNoDiscontinueETTObservations = false;
+      }
+    }
 
-        List<Observation> intermittentVentilationTypes = observations.list(
-            INTERMITTENT_OBSERVATION_CODES, seventyTwoHoursAgo, fortyEightHoursAgo);
-        for (Observation anyIntermittentVentilationType : intermittentVentilationTypes) {
-          if (ObservationUtils.getValueAsString(anyIntermittentVentilationType).equals("Yes")) {
-            // Yes: Intermittent
-            return true;
-          }
-        }
-      } else {
-        // Yes: Continuous
+    if (thereAreNoDiscontinueETTObservations) {
+      // Yes: Continuous
+      return true;
+    }
+
+    List<Observation> intermittentVentilationTypes = observations.list(
+        INTERMITTENT_OBSERVATION_CODES, seventyTwoHoursAgo, fortyEightHoursAgo);
+    for (Observation anyIntermittentVentilationType : intermittentVentilationTypes) {
+      if (ObservationUtils.getValueAsString(anyIntermittentVentilationType).equals("Yes")) {
+        // Yes: Intermittent
+        return true;
+      }
+    }
+
+    List<Observation> oldEttInvasiveAndTrachInvasiveVentStatuses = observations.list(
+        VENT_STATUS_OBSERVATION_CODES, seventyTwoHoursAgo, fortyEightHoursAgo);
+    for (Observation ettOrTrachStatus : oldEttInvasiveAndTrachInvasiveVentStatuses) {
+      if (ObservationUtils.getValueAsString(ettOrTrachStatus).equals("Patient back on Invasive")
+          || ObservationUtils.getValueAsString(ettOrTrachStatus).equals("Continue")) {
+        // Yes: Intermittent
         return true;
       }
     }

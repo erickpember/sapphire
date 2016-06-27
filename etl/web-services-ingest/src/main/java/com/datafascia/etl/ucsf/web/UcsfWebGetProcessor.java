@@ -13,6 +13,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -120,7 +121,17 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
    * @return The formatted string.
    */
   public static String epicDateToISO8601(String epicDate) {
-    Instant date = epicDateToInstant(epicDate);
+    Instant date = Instant.EPOCH;
+    if (epicDate.contains("Date")) {
+      date = epicDateToInstant(epicDate);
+    } else {
+      DateTimeFormatter f = DateTimeFormatter.ISO_INSTANT;
+      try {
+        date = Instant.from(f.parse(epicDate));
+      } catch (DateTimeParseException e) {
+        date = Instant.EPOCH;
+      }
+    }
     return date.toString();
   }
 

@@ -43,14 +43,6 @@ public class ProphylaxisContraindicated {
       return "Platelet Count <50,000";
     }
 
-    if (HarmsLookups.inrOver1point5(observations, null)) {
-      return "INR >1.5";
-    }
-
-    if (HarmsLookups.aPttRatioOver1point5(observations, null)) {
-      return "aPTT Ratio >1.5";
-    }
-
     List<ProcedureRequest> inProgressPpxRequests = apiClient.getProcedureRequestClient()
         .search(encounterId,
             ProcedureRequestCodeEnum.VTE_PPX_CONTRAINDICATIONS.getCode(),

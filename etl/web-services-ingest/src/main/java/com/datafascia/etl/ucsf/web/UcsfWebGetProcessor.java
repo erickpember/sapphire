@@ -13,6 +13,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
 import java.time.Instant;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -120,21 +121,33 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
    * @return An instant.
    */
   public static Instant epicDateToInstant(String epicDate) {
-    String trimmed = epicDate.replace("/Date(", "").replace(")/", "");
-    String[] parts = trimmed.split("-");
-    String milliseconds;
-    // Offsets follow a dash, but we need to handle negatives, so the time and offset to shift.
-    if (trimmed.startsWith("-")) {
-      milliseconds = parts[1];
+    Instant date = Instant.EPOCH;
+    if (epicDate.contains("Date")) {
+      String trimmed = epicDate.replace("/Date(", "").replace(")/", "");
+      String[] parts = trimmed.split("-");
+      String milliseconds;
+      // Offsets follow a dash, but we need to handle negatives, so the time and offset to shift.
+      if (trimmed.startsWith("-")) {
+        milliseconds = parts[1];
+      } else {
+        milliseconds = parts[0];
+      }
+      int offset = getOffset(epicDate);
+      if (milliseconds.equals("")) {
+        throw new RuntimeException("Epic date: " + trimmed);
+      }
+      long utc = Long.parseLong(milliseconds) + offset;
+      return Instant.ofEpochMilli(utc);
     } else {
-      milliseconds = parts[0];
+      DateTimeFormatter dtf = DateTimeFormatter.ISO_INSTANT;
+      try {
+        date = Instant.from(dtf.parse(epicDate));
+      } catch (DateTimeParseException e) {
+        date = Instant.EPOCH;
+      }
     }
-    int offset = getOffset(epicDate);
-    if (milliseconds.equals("")) {
-      throw new RuntimeException("Epic date: " + trimmed);
-    }
-    long utc = Long.parseLong(milliseconds) + offset;
-    return Instant.ofEpochMilli(utc);
+
+    return date;
   }
 
   private static int getOffset(String epicDate) {

@@ -13,11 +13,14 @@ import java.io.OutputStream;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.URL;
+import java.time.Instant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.nifi.util.MockFlowFile;
 import org.apache.nifi.util.TestRunner;
 import org.apache.nifi.util.TestRunners;
 import org.testng.annotations.Test;
+
+import static org.testng.Assert.assertEquals;
 
 /**
  * A test class for the {@link UcsfWebGetProcessor}
@@ -25,6 +28,16 @@ import org.testng.annotations.Test;
 @Slf4j
 public class UcsfWebGetProcessorTest {
   public static String lastUrl;
+
+  @Test
+  public void testEpicDateToInstant() throws IOException, InterruptedException {
+    Instant newFormat = UcsfWebGetProcessor.epicDateToInstant("2016-06-28T11:13:31Z");
+    assertEquals(newFormat, Instant.parse("2016-06-28T11:13:31Z"));
+    Instant oldFormat = UcsfWebGetProcessor.epicDateToInstant("/Date(1450192679000-0800)/");
+    assertEquals(oldFormat, Instant.parse("2015-12-15T23:17:59Z"));
+    Instant newFormatNull = UcsfWebGetProcessor.epicDateToInstant("0001-01-01T00:00:00");
+    assertEquals(newFormatNull, Instant.EPOCH);
+  }
 
   @Test
   public void testOnTrigger() throws IOException, InterruptedException {

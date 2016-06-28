@@ -13,7 +13,6 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.security.GeneralSecurityException;
 import java.time.Instant;
-import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
@@ -91,7 +90,7 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
   private Set<Relationship> relationships;
   private List<PropertyDescriptor> properties;
   private UcsfWebGetConfig config;
-  private UrlToFetchedTimeMap urlToFetchedTimeMap = new UrlToFetchedTimeMap();
+  private final UrlToFetchedTimeMap urlToFetchedTimeMap = new UrlToFetchedTimeMap();
 
   @Override
   protected void init(final ProcessorInitializationContext context) {
@@ -112,27 +111,6 @@ public class UcsfWebGetProcessor extends AbstractSessionFactoryProcessor {
   @Override
   protected List<PropertyDescriptor> getSupportedPropertyDescriptors() {
     return properties;
-  }
-
-  /**
-   * Translates the date format provided by the UCSF web services ("/Date(1234567890)/") to
-   * ISO8601 UTC.
-   * @param epicDate The date in EPIC's odd format.
-   * @return The formatted string.
-   */
-  public static String epicDateToISO8601(String epicDate) {
-    Instant date = Instant.EPOCH;
-    if (epicDate.contains("Date")) {
-      date = epicDateToInstant(epicDate);
-    } else {
-      DateTimeFormatter f = DateTimeFormatter.ISO_INSTANT;
-      try {
-        date = Instant.from(f.parse(epicDate));
-      } catch (DateTimeParseException e) {
-        date = Instant.EPOCH;
-      }
-    }
-    return date.toString();
   }
 
   /**

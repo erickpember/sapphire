@@ -3,6 +3,7 @@
 package com.datafascia.emerge.harms.rass;
 
 import ca.uhn.fhir.model.dstu2.resource.ProcedureRequest;
+import ca.uhn.fhir.model.dstu2.valueset.ProcedureRequestStatusEnum;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.ProcedureRequestUtils;
 import com.datafascia.emerge.ucsf.codes.ProcedureRequestCodeEnum;
@@ -61,7 +62,7 @@ public class RassGoalImpl {
 
     ProcedureRequest targetRass = getTargetRass(encounterId);
 
-    if (ProcedureRequestUtils.isCurrent(targetRass, Date.from(Instant.now(clock)))) {
+    if (targetRass != null) {
       if (targetRass.getNotesFirstRep().getText().equals(
           ProcedureRequestCodeEnum.TARGET_RASS_0_ALERT_AND_CALM
           .getCode())) {
@@ -109,13 +110,14 @@ public class RassGoalImpl {
    * @return Procedure request with notes value "Target RASS" or null if not found.
    */
   private ProcedureRequest getTargetRass(String encounterId) {
-    Optional<ProcedureRequest> targetRass = apiClient.getProcedureRequestClient()
-        .search(encounterId)
+    Optional<ProcedureRequest> inProgressTargetRass = apiClient.getProcedureRequestClient()
+        .search(encounterId,
+            ProcedureRequestCodeEnum.TARGET_RASS.getCode(),
+            ProcedureRequestStatusEnum.IN_PROGRESS.getCode())
         .stream()
-        .filter(request -> ProcedureRequestCodeEnum.TARGET_RASS.isCodeEquals(request.getCode()))
         .max(ProcedureRequestUtils.getScheduledComparator());
-    if (targetRass.isPresent()) {
-      return targetRass.get();
+    if (inProgressTargetRass.isPresent()) {
+      return inProgressTargetRass.get();
     } else {
       return null;
     }

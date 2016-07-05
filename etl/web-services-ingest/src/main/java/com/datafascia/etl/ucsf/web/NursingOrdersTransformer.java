@@ -115,7 +115,8 @@ public class NursingOrdersTransformer {
     }
 
     // The string here is a null date, which we don't want to use.
-    if (!discontinuedDate.equals("/Date(-62135568000000-0800)/")) {
+    if (!discontinuedDate.equals("/Date(-62135568000000-0800)/") &&
+        !discontinuedDate.equals("0001-01-01T00:00:00")) {
       try {
         Instant endInstant = UcsfWebGetProcessor.epicDateToInstant(discontinuedDate);
         period.setEnd(new DateTimeDt(Date.from(endInstant)));

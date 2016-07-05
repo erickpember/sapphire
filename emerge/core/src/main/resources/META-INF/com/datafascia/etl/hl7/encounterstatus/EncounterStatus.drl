@@ -58,4 +58,11 @@ then
   $encounter.setStatus(EncounterStateEnum.IN_PROGRESS);
 end
 
-// No transitions from Encounter status cancelled
+// Transitions from Encounter status cancelled
+rule "Encounter status arrived from cancelled, trigger event A01"
+when
+  $encounter: Encounter( statusElement.valueAsEnum == EncounterStateEnum.CANCELLED )
+  MessageType( triggerEvent == "A01" );
+then
+  $encounter.setStatus(EncounterStateEnum.IN_PROGRESS);
+end

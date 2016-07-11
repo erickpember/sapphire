@@ -52,7 +52,7 @@
     <guice.version>4.0</guice.version>
     <hadoop.version>2.2.0</hadoop.version>
     <hapi.version>2.2</hapi.version>
-    <hapi-fhir.version>1.6-SNAPSHOT</hapi-fhir.version>
+    <hapi-fhir.version>1.6</hapi-fhir.version>
     <jackson.version>2.5.3</jackson.version>
     <java.version>1.8</java.version>
     <jcommander.version>1.47</jcommander.version>

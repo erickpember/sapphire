@@ -35,6 +35,8 @@ public class CpotImpl {
 
   private static final int CPOT_LOOKBACK = 7;
 
+  private Date nowDate = null;
+
   /**
    * Result container for all of the CPOT levels. (current, minimum, maximum)
    */
@@ -94,6 +96,7 @@ public class CpotImpl {
     PeriodDt currentCpotTimeRange = Periods.getPastHoursToNow(clock, CPOT_LOOKBACK);
     PeriodDt cpotMinMaxTimeRange = Periods.getMidnightToNow(clock);
     Observations observations = apiClient.getObservationClient().list(encounterId);
+    nowDate = cpotMinMaxTimeRange.getEnd();
 
     return getAllCpotLevels(observations, currentCpotTimeRange, cpotMinMaxTimeRange);
   }
@@ -159,7 +162,7 @@ public class CpotImpl {
     CurrentCpotLevel result = CurrentCpotLevel
         .builder()
         .painScore(11)
-        .timeOfDataAquisition(timeRange.getStart())
+        .timeOfDataAquisition(nowDate)
         .build();
 
     Observation freshestCpotScore = ObservationUtils.findFreshestObservation(observations);

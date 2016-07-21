@@ -46,6 +46,8 @@ public class VerbalPainLevel {
   @Inject
   private Clock clock;
 
+  private Date nowDate = null;
+
   /**
    * Result container for all of the verbal pain levels (current + minimum + maximum)
    */
@@ -89,6 +91,7 @@ public class VerbalPainLevel {
     PeriodDt currentPainTimeRange = Periods.getPastHoursToNow(clock, VERBAL_PAIN_LOOKBACK);
     PeriodDt painMinMaxTimeRange = Periods.getMidnightToNow(clock);
     Observations observations = apiClient.getObservationClient().list(encounterId);
+    nowDate = painMinMaxTimeRange.getEnd();
 
     return getAllVerbalPainLevels(observations, currentPainTimeRange, painMinMaxTimeRange);
   }
@@ -173,7 +176,7 @@ public class VerbalPainLevel {
     CurrentPainLevel result = CurrentPainLevel
         .builder()
         .painScore(11)
-        .timeOfDataAquisition(timeRange.getStart())
+        .timeOfDataAquisition(nowDate)
         .build();
 
     Observation freshestVerbalPainScore = PainUtils.freshestHighestVerbalPainScore(observations);

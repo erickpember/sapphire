@@ -44,6 +44,8 @@ public class NumericalPainLevel {
     MIN, MAX
   }
 
+  private Date nowDate = null;
+
   /**
    * Result container for all of the numerical pain levels (current + minimum + maximum)
    */
@@ -108,6 +110,7 @@ public class NumericalPainLevel {
     PeriodDt currentPainTimeRange = Periods.getPastHoursToNow(clock, NUMERICAL_PAIN_LOOKBACK);
     PeriodDt painMinMaxTimeRange = Periods.getMidnightToNow(clock);
     Observations observations = apiClient.getObservationClient().list(encounterId);
+    nowDate = painMinMaxTimeRange.getEnd();
 
     return getAllNumericPainLevels(observations, currentPainTimeRange, painMinMaxTimeRange);
   }
@@ -172,7 +175,7 @@ public class NumericalPainLevel {
       PeriodDt timeRange) {
     CurrentPainLevel result = CurrentPainLevel.builder()
         .painScore(11)
-        .timeOfDataAquisition(timeRange.getStart())
+        .timeOfDataAquisition(nowDate)
         .build();
 
     Observation freshestNumericalPainScore = PainUtils.freshestHighestNumericalPainScore(

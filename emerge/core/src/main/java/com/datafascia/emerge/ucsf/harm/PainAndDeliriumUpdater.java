@@ -231,14 +231,14 @@ public class PainAndDeliriumUpdater {
         .withPainScore(currentLevel.getPainScore())
         .withTimeOfDataAquisition(currentLevel.getTimeOfDataAquisition());
 
-    MinimumOrMaximumCpotLevel maxLevel = cpotLevels.getMin();
+    MinimumOrMaximumCpotLevel maxLevel = cpotLevels.getMax();
     DailyMax__ dailyMax = new DailyMax__()
         .withEndOfTimePeriod(maxLevel.getEndOfTimePeriod())
         .withPainMax(maxLevel.getPainScore())
         .withStartOfTimePeriod(maxLevel.getStartOfTimePeriod())
         .withTimeOfCalculation(maxLevel.getTimeOfCalculation());
 
-    MinimumOrMaximumCpotLevel minLevel = cpotLevels.getMax();
+    MinimumOrMaximumCpotLevel minLevel = cpotLevels.getMin();
     DailyMin__ dailyMin = new DailyMin__()
         .withEndOfTimePeriod(minLevel.getEndOfTimePeriod())
         .withPainMin(minLevel.getPainScore())

@@ -155,3 +155,30 @@
 210068,2 Times Daily,BID Adult Diuretics,true,false,true,false
 210100124,Every 12 Weeks,Q12 Weeks,true,false,false,false
 200905,Continuous,Continuous,false,false,false,false
+210027,Every 30 Minutes PRN,Q30 Min PRN,true,false,false,false
+200026,6 Times Daily,6x a day,true,false,false,false
+200027,Every 4 Hours,Q4H,true,false,false,false
+210008,Bedtime And Early AM,Bedtime and early am,true,false,true,false
+210025,Every Hour PRN,true,false,false,false
+210026,Every 30 Minutes,true,false,false,false
+210040,Every 20 Minutes,true,false,false,false
+210054,Every 5 Min,Q 5 Min,true,false,false,false
+210058,6 times Daily while awake,6 x a day,true,false,false,false
+210069,Every 12 Hours,Every 12 Hours (Dofetilide),true,false,true,false
+210070,Once (Dofetilide),Once (Dofetilide),true,false,false,true
+210073,"Three Times Weekly (Monday, Wednesday, Friday)",Three Times Weekly (MWF),true,false,false,false
+210075,Every 3 Hours,Every 3 Hours,true,false,false,false
+2100007,Daily,Daily (PM),true,true,false,false
+4089988,Once As Needed,Once As Needed,true,false,false,true
+200053,Prior To Discharge,Prior to Discharge,true,false,false,true
+200554,Continuous PRN,Continuous PRN,false,false,false,false
+200905,Continuous,Continuous,false,false,false,false
+200906,Titrated,Titrated,false,false,false,false
+210017,Continuous,Continuous,false,false,false,false
+210022,Continuous PRN,Continuous PRN,false,false,false,false
+210030,Continuous,Continuous (TPN),false,false,false,false
+210033,Continuous,Continuous (Epoprostenol),false,false,false,false
+210034,Continuous,Continuous (Pediatric),false,false,false,false
+210035,Continuous,Continuous (Adult),false,false,false,false
+210067,Continuous,Continuous (Treprostinil),false,false,false,false
+210080,Continuous,Continuous,false,false,false,false

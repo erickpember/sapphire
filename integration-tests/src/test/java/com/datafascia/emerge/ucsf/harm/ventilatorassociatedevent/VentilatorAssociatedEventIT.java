@@ -15,6 +15,7 @@ import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertFalse;
 import static org.testng.Assert.assertTrue;
 
 /**
@@ -48,6 +49,10 @@ public class VentilatorAssociatedEventIT extends HarmEvidenceTestSupport {
     assertEquals(
         subglotticSuctionNonSurgicalAirway.getValue(), TimestampedMaybe.Value.NO);
     assertEquals(subglotticSuctionNonSurgicalAirway.getUpdateTime(), Date.from(Instant.now(clock)));
+
+    TimestampedBoolean ventilated =
+        harmEvidence.getMedicalData().getVAE().getVentilation().getVentilated();
+    assertFalse(ventilated.isValue());
   }
 
   @Test
@@ -58,6 +63,12 @@ public class VentilatorAssociatedEventIT extends HarmEvidenceTestSupport {
     TimestampedBoolean ventilated =
         harmEvidence.getMedicalData().getVAE().getVentilation().getVentilated();
     assertTrue(ventilated.isValue());
+    assertEquals(ventilated.getUpdateTime(), Date.from(Instant.now(clock)));
+
+    processMessage("ventilated-false.hl7");
+    harmEvidence = readHarmEvidence();
+    ventilated = harmEvidence.getMedicalData().getVAE().getVentilation().getVentilated();
+    assertFalse(ventilated.isValue());
     assertEquals(ventilated.getUpdateTime(), Date.from(Instant.now(clock)));
   }
 

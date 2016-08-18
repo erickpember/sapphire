@@ -164,12 +164,14 @@ public class Ventilated {
 
   private boolean isContinueOrBackOnInvasive(Observation obs) {
     String value = ObservationUtils.getValueAsString(obs);
-    return ("Continue".equals(value) || "Patient back on Invasive".equals(value));
+    return ("Continue".equals(value) || "Patient back on Invasive".equals(value) ||
+            "Trial in progress".equals(value));
   }
 
   private boolean isDiscontinueOrPatientTakenOff(Observation obs) {
     String value = ObservationUtils.getValueAsString(obs);
-    return ("Discontinue".equals(value) || "Patient taken off".equals(value));
+    return ("Discontinue".equals(value) || "Patient taken off".equals(value) ||
+            "Trial terminated".equals(value));
   }
 
   private boolean isYes(Observation obs) {

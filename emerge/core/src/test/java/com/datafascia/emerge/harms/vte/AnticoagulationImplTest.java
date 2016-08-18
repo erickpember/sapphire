@@ -13,6 +13,7 @@ import com.datafascia.api.client.Observations;
 import com.datafascia.domain.fhir.IdentifierSystems;
 import com.datafascia.emerge.testUtils.TestResources;
 import com.datafascia.emerge.ucsf.codes.ObservationCodeEnum;
+import java.lang.InterruptedException;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -204,6 +205,52 @@ public class AnticoagulationImplTest extends AnticoagulationImpl {
         "encounterId",
         Instant.now(),
         apiClient).isPresent());
+  }
+
+  /**
+   * Test of getAnticoagulationType method with 2 orders
+   */
+  @Test
+  public void testGetAnticoagulationType_MostRecentAdmin() {
+    ClientBuilder apiClient = TestResources.createMockClient();
+
+    Observation inrOver1point5 = TestResources.createObservation(
+        ObservationCodeEnum.INR.getCode(),
+        1.6, Instant.now());
+
+    Observations observations = new Observations(
+        Arrays.asList(inrOver1point5));
+
+    MedicationAdministration heparinFirst = TestResources.createMedicationAdministration(
+        "id",
+        Arrays.asList(AnticoagulationTypeEnum.CONTINUOUS_INFUSION_HEPARIN_IV.getCode()),
+        MedicationAdministrationStatusEnum.IN_PROGRESS,
+        1,
+        "mg/kg",
+        DateTimeDt.withCurrentTime(),
+        "activeOrder");
+
+    try {
+      Thread.sleep(2000);
+    } catch (InterruptedException e) {
+      System.out.println("exception encountered: " + e);
+    }
+
+    MedicationAdministration argatrobanSecond = TestResources.createMedicationAdministration(
+        "id",
+        Arrays.asList(AnticoagulationTypeEnum.CONTINUOUS_INFUSION_ARGATROBAN_IV.getCode()),
+        MedicationAdministrationStatusEnum.IN_PROGRESS,
+        100,
+        "mg",
+        DateTimeDt.withCurrentTime(),
+        "activeOrder");
+
+    assertEquals(getAnticoagulationType(Arrays.asList(heparinFirst, argatrobanSecond),
+        observations,
+        "encounterId",
+        Instant.now(),
+        apiClient).get(),
+        AnticoagulationTypeEnum.CONTINUOUS_INFUSION_ARGATROBAN_IV);
   }
 
   @Override

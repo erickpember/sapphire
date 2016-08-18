@@ -3,26 +3,39 @@
 package com.datafascia.emerge.ucsf;
 
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
-import com.datafascia.domain.fhir.Dates;
 import java.util.Comparator;
+import java.util.Date;
 
 /**
- * Compares the effective time property of medication administration resources.
+ * Compares the effective time property of medication administrations.
  */
 public class MedicationAdministrationEffectiveTimeComparator implements
     Comparator<MedicationAdministration> {
 
-  @Override
-  public int compare(MedicationAdministration left, MedicationAdministration right) {
-    if ((left == null || left.getEffectiveTime() == null)
-        && (right == null || right.getEffectiveTime() == null)) {
+  private static int compare(Date left, Date right) {
+    if (left == null && right == null) {
       return 0;
-    } else if ((left == null || left.getEffectiveTime() == null)) {
+    } else if (left == null) {
       return -1;
-    } else if ((right == null || right.getEffectiveTime() == null)) {
+    } else if (right == null) {
       return 1;
     }
 
-    return Dates.toDate(left.getEffectiveTime()).compareTo(Dates.toDate(right.getEffectiveTime()));
+    return left.compareTo(right);
+  }
+
+
+  @Override
+  public int compare(MedicationAdministration left, MedicationAdministration right) {
+    if (left == null && right == null) {
+      return 0;
+    } else if (left == null) {
+      return -1;
+    } else if (right == null) {
+      return 1;
+    }
+
+    return compare(MedicationAdministrationUtils.getEffectiveTime(left),
+        MedicationAdministrationUtils.getEffectiveTime(right));
   }
 }

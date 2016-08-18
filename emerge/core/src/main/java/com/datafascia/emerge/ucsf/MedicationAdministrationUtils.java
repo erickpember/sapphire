@@ -12,11 +12,13 @@ import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
 import ca.uhn.fhir.model.primitive.DateTimeDt;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.domain.fhir.CodingSystems;
+import com.datafascia.domain.fhir.Dates;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -31,6 +33,36 @@ import lombok.extern.slf4j.Slf4j;
 public class MedicationAdministrationUtils {
   // Private constructor disallows creating instances of this class.
   private MedicationAdministrationUtils() {
+  }
+
+  /**
+   * Compares effective time property of medication administration
+   *
+   * @return comparator
+   */
+  public static Comparator<MedicationAdministration> getEffectiveTimeComparator() {
+    return Comparator.nullsFirst(
+        Comparator.comparing(
+            admin -> Dates.toDate(admin.getEffectiveTime()),
+            Dates.getDateComparator()));
+  }
+
+  /**
+   * Returns the effective time of a medication administration
+   *
+   * @param admin
+   *     medication administration to pull from
+   * @return effective time
+   */
+  public static Date getEffectiveTime(MedicationAdministration admin) {
+    IDatatype effective = admin.getEffectiveTime();
+    if (effective instanceof DateTimeDt) {
+      return ((DateTimeDt) effective).getValue();
+    } else if (effective instanceof PeriodDt) {
+      return ((PeriodDt) effective).getStart();
+    }
+
+    return null;
   }
 
   /**

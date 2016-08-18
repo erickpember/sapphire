@@ -10,6 +10,7 @@ import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.api.client.Observations;
 import com.datafascia.domain.fhir.CodingSystems;
 import com.datafascia.emerge.harms.HarmsLookups;
+import com.datafascia.emerge.ucsf.MedicationAdministrationEffectiveTimeComparator;
 import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
 import java.math.BigDecimal;
 import java.time.Clock;
@@ -18,6 +19,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import javax.inject.Inject;
 import lombok.extern.slf4j.Slf4j;
 
@@ -73,7 +75,14 @@ public class AnticoagulationImpl {
       ClientBuilder client) {
     administrations = MedicationAdministrationUtils.freshestOfAllOrders(administrations).values();
 
-    for (MedicationAdministration admin : administrations) {
+    // Get a sorted list of anticoagulation administrations
+    List<MedicationAdministration> sortedAdmins =
+        MedicationAdministrationUtils.freshestOfAllOrders(administrations).values().stream()
+        .filter(admin -> !admin.getEffectiveTime().isEmpty())
+        .sorted(new MedicationAdministrationEffectiveTimeComparator())
+        .collect(Collectors.toList());
+
+    for (MedicationAdministration admin : sortedAdmins) {
       if (admin.getEffectiveTime() == null) {
         log.warn("Ignoring admin [{}] as it lacks an effective time.",
             admin.getIdentifierFirstRep().getValue());

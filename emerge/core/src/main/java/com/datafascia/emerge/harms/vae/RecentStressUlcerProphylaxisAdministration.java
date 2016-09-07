@@ -2,9 +2,8 @@
 // For license information, please contact http://datafascia.com/contact
 package com.datafascia.emerge.harms.vae;
 
-import ca.uhn.fhir.model.api.TemporalPrecisionEnum;
-import ca.uhn.fhir.model.dstu2.composite.PeriodDt;
 import ca.uhn.fhir.model.dstu2.resource.MedicationAdministration;
+import ca.uhn.fhir.model.dstu2.valueset.MedicationAdministrationStatusEnum;
 import com.datafascia.api.client.ClientBuilder;
 import com.datafascia.emerge.ucsf.MedicationAdministrationUtils;
 import com.datafascia.emerge.ucsf.codes.MedsSetEnum;
@@ -59,11 +58,16 @@ public class RecentStressUlcerProphylaxisAdministration {
   public boolean test(List<MedicationAdministration> admins, String encounterId, Instant now,
       ClientBuilder client) {
     Date twentyFiveHoursAgo = Date.from(now.minus(SUP_LOOKBACK, ChronoUnit.HOURS));
-    PeriodDt supPeriod = new PeriodDt();
-    supPeriod.setStart(twentyFiveHoursAgo, TemporalPrecisionEnum.SECOND);
-    supPeriod.setEnd(Date.from(now), TemporalPrecisionEnum.SECOND);
 
-    return MedicationAdministrationUtils.beenAdministered(
-        admins, supPeriod, MedsSetEnum.STRESS_ULCER_PROPHYLACTICS.getCode());
+    return admins.stream()
+        .filter(admin -> MedicationAdministrationUtils.hasMedsSet(admin,
+            MedsSetEnum.STRESS_ULCER_PROPHYLACTICS.getCode()))
+        .filter(admin -> MedicationAdministrationUtils.dosageOverZero(admin))
+        .anyMatch(admin -> (admin.getReasonNotGiven().isEmpty() &&
+            (admin.getStatusElement().getValueAsEnum() ==
+                MedicationAdministrationStatusEnum.IN_PROGRESS ||
+             admin.getStatusElement().getValueAsEnum() ==
+                MedicationAdministrationStatusEnum.COMPLETED) &&
+            (MedicationAdministrationUtils.isAfter(admin, twentyFiveHoursAgo))));
   }
 }

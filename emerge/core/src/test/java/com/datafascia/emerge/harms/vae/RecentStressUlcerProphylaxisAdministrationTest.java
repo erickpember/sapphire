@@ -59,6 +59,20 @@ public class RecentStressUlcerProphylaxisAdministrationTest
     assertFalse(test(Arrays.asList(supFailOldCompletedOrder), "encounterId", Instant.now(),
         apiClient));
 
+    MedicationAdministration supFailReasonNotGiven = TestResources.createMedicationAdministration(
+        "id",
+        Arrays.asList(MedsSetEnum.STRESS_ULCER_PROPHYLACTICS.getCode()),
+        MedicationAdministrationStatusEnum.IN_PROGRESS,
+        1,
+        "mg/kg",
+        new DateTimeDt(Date.from(Instant.now().minus(2, ChronoUnit.HOURS))),
+        "completedOrder");
+    supFailReasonNotGiven.setReasonNotGiven(Arrays.asList(new CodeableConceptDt("whatever man",
+        "i didn't feel like it")));
+
+    assertFalse(test(Arrays.asList(supFailReasonNotGiven), "encounterId", Instant.now(),
+        apiClient));
+
     MedicationAdministration supPassNewAdmin = TestResources.createMedicationAdministration(
         "id",
         Arrays.asList(MedsSetEnum.STRESS_ULCER_PROPHYLACTICS.getCode()),
@@ -71,18 +85,7 @@ public class RecentStressUlcerProphylaxisAdministrationTest
     assertTrue(test(Arrays.asList(supPassNewAdmin), "encounterId", Instant.now(),
         apiClient));
 
-    MedicationAdministration supFailReasonNotGiven = TestResources.createMedicationAdministration(
-        "id",
-        Arrays.asList(MedsSetEnum.STRESS_ULCER_PROPHYLACTICS.getCode()),
-        MedicationAdministrationStatusEnum.IN_PROGRESS,
-        1,
-        "mg/kg",
-        new DateTimeDt(Date.from(Instant.now().minus(3, ChronoUnit.HOURS))),
-        "completedOrder");
-    supFailReasonNotGiven.setReasonNotGiven(Arrays.asList(new CodeableConceptDt("whatever man",
-        "i didn't feel like it")));
-
-    assertFalse(test(Arrays.asList(supFailReasonNotGiven), "encounterId", Instant.now(),
-        apiClient));
+    assertTrue(test(Arrays.asList(supPassNewAdmin, supFailReasonNotGiven),
+        "encounterId", Instant.now(), apiClient));
   }
 }

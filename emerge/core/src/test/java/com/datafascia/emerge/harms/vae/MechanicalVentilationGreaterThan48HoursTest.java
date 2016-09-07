@@ -41,12 +41,15 @@ public class MechanicalVentilationGreaterThan48HoursTest
         ObservationCodeEnum.ETT_INVASIVE_VENT_INITIATION.getCode(),
         "Yes", fortySevenHoursAgo);
 
-    assertTrue(isMechanicalVentilationGreaterThan48Hours(new Observations(Arrays.asList(
+    assertFalse(isMechanicalVentilationGreaterThan48Hours(new Observations(Arrays.asList(
         newInitiateInvasive)), Instant.now()));
 
     Observation oldInitiateInvasive = createObservation(
         ObservationCodeEnum.ETT_INVASIVE_VENT_INITIATION.getCode(),
         "Yes", fortyNineHoursAgo);
+
+    assertTrue(isMechanicalVentilationGreaterThan48Hours(new Observations(Arrays.asList(
+        oldInitiateInvasive)), Instant.now()));
 
     Observation newEttInvasiveStatusDiscontinue = createObservation(
         ObservationCodeEnum.ETT_INVASIVE_VENT_STATUS.getCode(),
@@ -55,7 +58,7 @@ public class MechanicalVentilationGreaterThan48HoursTest
     assertFalse(isMechanicalVentilationGreaterThan48Hours(new Observations(Arrays.asList(
         newInitiateInvasive, newEttInvasiveStatusDiscontinue)), Instant.now()));
 
-    assertTrue(isMechanicalVentilationGreaterThan48Hours(new Observations(Arrays.asList(
+    assertFalse(isMechanicalVentilationGreaterThan48Hours(new Observations(Arrays.asList(
         newEttInvasiveStatusDiscontinue, oldInitiateInvasive)), Instant.now()));
 
     Observation oldEttInvasiveStatus = createObservation(
@@ -63,6 +66,9 @@ public class MechanicalVentilationGreaterThan48HoursTest
         "Patient back on Invasive", fortyNineHoursAgo);
 
     assertTrue(isMechanicalVentilationGreaterThan48Hours(new Observations(Arrays.asList(
+        oldEttInvasiveStatus)), Instant.now()));
+
+    assertFalse(isMechanicalVentilationGreaterThan48Hours(new Observations(Arrays.asList(
         newEttInvasiveStatusDiscontinue, oldEttInvasiveStatus)), Instant.now()));
   }
 

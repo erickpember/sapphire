@@ -85,15 +85,11 @@ public class MechanicalVentilationGreaterThan48Hours {
       }
     }
 
-    if (thereAreNoDiscontinueETTObservations) {
-      // Yes: Continuous
-      return true;
-    }
-
     List<Observation> intermittentVentilationTypes = observations.list(
         INTERMITTENT_OBSERVATION_CODES, seventyTwoHoursAgo, fortyEightHoursAgo);
     for (Observation anyIntermittentVentilationType : intermittentVentilationTypes) {
-      if (ObservationUtils.getValueAsString(anyIntermittentVentilationType).equals("Yes")) {
+      if (thereAreNoDiscontinueETTObservations &&
+          ObservationUtils.getValueAsString(anyIntermittentVentilationType).equals("Yes")) {
         // Yes: Intermittent
         return true;
       }
@@ -102,8 +98,9 @@ public class MechanicalVentilationGreaterThan48Hours {
     List<Observation> oldEttInvasiveAndTrachInvasiveVentStatuses = observations.list(
         VENT_STATUS_OBSERVATION_CODES, seventyTwoHoursAgo, fortyEightHoursAgo);
     for (Observation ettOrTrachStatus : oldEttInvasiveAndTrachInvasiveVentStatuses) {
-      if (ObservationUtils.getValueAsString(ettOrTrachStatus).equals("Patient back on Invasive")
-          || ObservationUtils.getValueAsString(ettOrTrachStatus).equals("Continue")) {
+      if (thereAreNoDiscontinueETTObservations &&
+          (ObservationUtils.getValueAsString(ettOrTrachStatus).equals("Patient back on Invasive")
+          || ObservationUtils.getValueAsString(ettOrTrachStatus).equals("Continue"))) {
         // Yes: Intermittent
         return true;
       }

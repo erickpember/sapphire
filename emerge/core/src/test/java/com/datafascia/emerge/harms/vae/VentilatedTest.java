@@ -32,7 +32,14 @@ public class VentilatedTest extends Ventilated {
   @Test
   public void testIsVentilated_Observations_Instant() {
     Instant icuAdmitTime = Instant.now().minus(23, ChronoUnit.HOURS);
+    Instant now = Instant.now();
 
+    Observation unrelatedObservation = createObservation(
+        "999999999",
+        "Continue", Instant.now().minus(1, ChronoUnit.HOURS));
+    Observation peepObservation = createObservation(
+        ObservationCodeEnum.PEEP.getCode(),
+        "12345", Instant.now().minus(1, ChronoUnit.HOURS));
     Observation newEttInvasiveStatus = createObservation(
         ObservationCodeEnum.ETT_INVASIVE_VENT_STATUS.getCode(),
         "Continue", Instant.now().minus(1, ChronoUnit.HOURS));
@@ -58,34 +65,42 @@ public class VentilatedTest extends Ventilated {
     Observation oldTrachInvasiveStatus = createObservation(
         ObservationCodeEnum.TRACH_INVASIVE_VENT_STATUS.getCode(),
         "Discontinue", Instant.now().minus(4, ChronoUnit.HOURS));
+    Observation newTrachInvasiveStatus1 = createObservation(
+        ObservationCodeEnum.TRACH_INVASIVE_VENT_STATUS.getCode(),
+        "Discontinue", Instant.now().minus(1, ChronoUnit.HOURS));
 
     Observation newEttInvasiveInit = createObservation(
         ObservationCodeEnum.ETT_INVASIVE_VENT_INITIATION.getCode(),
         "Yes", Instant.now().minus(1, ChronoUnit.HOURS));
     Observation newTrachInvasiveInit = createObservation(
         ObservationCodeEnum.TRACH_INVASIVE_VENT_INITIATION.getCode(),
-        "No", Instant.now().minus(1, ChronoUnit.HOURS));
+        "Yes", Instant.now().minus(3, ChronoUnit.HOURS));
+
+    assertFalse(isVentilated(new Observations(Arrays.asList(unrelatedObservation)),
+        icuAdmitTime, now));
+    assertFalse(isVentilated(new Observations(Arrays.asList(unrelatedObservation,
+        peepObservation)), icuAdmitTime, now));
 
     assertTrue(isVentilated(new Observations(Arrays.asList(newEttInvasiveStatus,
-        oldTrachInvasiveStatus)), icuAdmitTime));
+        oldTrachInvasiveStatus)), icuAdmitTime, now));
     assertTrue(isVentilated(
         new Observations(Arrays.asList(newTrachInvasiveStatus, oldTrachInvasiveStatus)),
-        icuAdmitTime));
+        icuAdmitTime, now));
+
     assertTrue(isVentilated(
-        new Observations(Arrays.asList(oldTrachInvasiveStatus, newEttInvasiveInit)), icuAdmitTime));
-    assertTrue(isVentilated(
-        new Observations(Arrays.asList(oldEttInvasiveStatus, newEttInvasiveInit)), icuAdmitTime));
-    assertFalse(isVentilated(new Observations(Arrays.asList(oldTrachInvasiveStatus,
-        newTrachInvasiveInit)), icuAdmitTime));
+        new Observations(Arrays.asList(oldTrachInvasiveStatus, newEttInvasiveInit)),
+        icuAdmitTime, now));
+    assertFalse(isVentilated(new Observations(Arrays.asList(newTrachInvasiveStatus1,
+        newTrachInvasiveInit)), icuAdmitTime, now));
 
     assertTrue(isVentilated(new Observations(Arrays.asList(oldEttInvasiveStatus,
-        newEttInvasiveStatus2)), icuAdmitTime));
+        newEttInvasiveStatus2)), icuAdmitTime, now));
     assertTrue(!isVentilated(new Observations(Arrays.asList(oldEttInvasiveStatus,
-        newEttInvasiveStatus3)), icuAdmitTime));
+        newEttInvasiveStatus3)), icuAdmitTime, now));
     assertTrue(isVentilated(new Observations(Arrays.asList(oldTrachInvasiveStatus,
-        newTrachInvasiveStatus2)), icuAdmitTime));
+        newTrachInvasiveStatus2)), icuAdmitTime, now));
     assertTrue(!isVentilated(new Observations(Arrays.asList(oldTrachInvasiveStatus,
-        newTrachInvasiveStatus3)), icuAdmitTime));
+        newTrachInvasiveStatus3)), icuAdmitTime, now));
   }
 
   private Observation createObservation(String code, String value, Instant time) {

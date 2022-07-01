@@ -61,7 +61,7 @@ limitations under the License.
     <dropwizard.version>0.8.3</dropwizard.version>
     <guava.version>18.0</guava.version>
     <guice.version>4.0</guice.version>
-    <hadoop.version>2.2.0</hadoop.version>
+    <hadoop.version>2.7.0</hadoop.version>
     <hapi.version>2.2</hapi.version>
     <hapi-fhir.version>1.6</hapi-fhir.version>
     <jackson.version>2.5.3</jackson.version>
